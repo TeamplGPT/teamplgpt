@@ -21,6 +21,8 @@ function assembleConnectionString({
       return `mysql://${username}:${password}@${host}:${port}/${database}`;
     case "sql-server":
       return `mssql://${username}:${password}@${host}:${port}/${database}`;
+    case "oracle":
+      return `oracle://${username}:${password}@${host}:${port}/${database}`;
     default:
       return null;
   }
@@ -131,6 +133,11 @@ export default function NewSQLConnection({ isOpen, closeModal, onSubmit }) {
                       provider="sql-server"
                       active={engine === "sql-server"}
                       onClick={() => setEngine("sql-server")}
+                    />
+                    <DBEngine
+                      provider="oracle"
+                      active={engine === "oracle"}
+                      onClick={() => setEngine("oracle")}
                     />
                   </div>
                 </div>
