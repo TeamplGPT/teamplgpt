@@ -37,14 +37,22 @@ const DEFAULT_CONFIG = {
   database: null,
 };
 
+const DEFAULT_ORACLE_MODE = "thin";
+const DEFAULT_ORACLE_LIBDIR = "";
+
 export default function NewSQLConnection({ isOpen, closeModal, onSubmit }) {
   const [engine, setEngine] = useState(DEFAULT_ENGINE);
   const [config, setConfig] = useState(DEFAULT_CONFIG);
+  const [oracleMode, setOracleMode] = useState(DEFAULT_ORACLE_MODE);
+  const [oracleLibDir, setOracleLibDir] = useState(DEFAULT_ORACLE_LIBDIR);
+
   if (!isOpen) return null;
 
   function handleClose() {
     setEngine(DEFAULT_ENGINE);
     setConfig(DEFAULT_CONFIG);
+    setOracleMode(DEFAULT_ORACLE_MODE);
+    setOracleLibDir(DEFAULT_ORACLE_LIBDIR);
     closeModal();
   }
 
@@ -63,11 +71,19 @@ export default function NewSQLConnection({ isOpen, closeModal, onSubmit }) {
     e.preventDefault();
     e.stopPropagation();
     const form = new FormData(e.target);
-    onSubmit({
+    const baseConfig = {
       engine,
       database_id: form.get("name"),
       connectionString: assembleConnectionString({ engine, ...config }),
-    });
+    };
+    // Oracle일 때만 모드/경로 추가
+    if (engine === "oracle") {
+      baseConfig.mode = oracleMode;
+      if (oracleMode === "thick") {
+        baseConfig.thickLibDir = oracleLibDir;
+      }
+    }
+    onSubmit(baseConfig);
     handleClose();
     return false;
   }
@@ -233,6 +249,52 @@ export default function NewSQLConnection({ isOpen, closeModal, onSubmit }) {
                     spellCheck={false}
                   />
                 </div>
+
+                {engine === "oracle" && (
+                  <div className="flex flex-col w-full">
+                    <label className="block mb-2 text-sm font-medium text-white mt-4">
+                      Oracle 접속 모드
+                    </label>
+                    <div className="flex gap-x-4 mb-2">
+                      <label className="flex items-center gap-x-2">
+                        <input
+                          type="radio"
+                          name="oracleMode"
+                          value="thin"
+                          checked={oracleMode === "thin"}
+                          onChange={() => setOracleMode("thin")}
+                        />
+                        Thin
+                      </label>
+                      <label className="flex items-center gap-x-2">
+                        <input
+                          type="radio"
+                          name="oracleMode"
+                          value="thick"
+                          checked={oracleMode === "thick"}
+                          onChange={() => setOracleMode("thick")}
+                        />
+                        Thick
+                      </label>
+                    </div>
+                    {oracleMode === "thick" && (
+                      <div className="flex flex-col">
+                        <label className="block mb-2 text-sm font-medium text-white">
+                          Oracle Instant Client 경로
+                        </label>
+                        <input
+                          type="text"
+                          name="oracleLibDir"
+                          className="border-none bg-theme-settings-input-bg w-full text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
+                          placeholder="/opt/oracle/instantclient_21_13"
+                          value={oracleLibDir}
+                          onChange={(e) => setOracleLibDir(e.target.value)}
+                          required={oracleMode === "thick"}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
                 <p className="text-theme-text-secondary text-sm">
                   {assembleConnectionString({ engine, ...config })}
                 </p>
