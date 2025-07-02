@@ -657,7 +657,10 @@ function mergeConnections(existingConnections = [], updates = []) {
         update.database_id = slugify(update.database_id);
       }
 
+      console.log("update", update);
+      const { action, ...rest } = update;
       updatedConnections.push({
+        ...rest,
         engine: update.engine,
         database_id: update.database_id,
         connectionString: update.connectionString,

@@ -1,6 +1,7 @@
 const oracledb = require("oracledb");
 const { ConnectionStringParser } = require("./utils");
-
+const fs = require("fs");
+const path = require("path");
 class OracleConnector {
   #connected = false;
   database_id = "";
@@ -26,14 +27,47 @@ class OracleConnector {
     this._client = null;
     this.#parseDatabase();
 
+    // thickLibDir 경로 실체 확인
+    if (config.thickLibDir) {
+      const resolvedPath = path.resolve(
+        config.thickLibDir.replace(/^~\//, `${process.env.HOME}/`)
+      );
+      console.log(
+        "[OracleConnector][DEBUG] thickLibDir 실제 경로:",
+        resolvedPath
+      );
+      try {
+        const exists = fs.existsSync(resolvedPath);
+        console.log("[OracleConnector][DEBUG] thickLibDir exists:", exists);
+        if (exists) {
+          const files = fs.readdirSync(resolvedPath);
+          console.log("[OracleConnector][DEBUG] thickLibDir 파일 목록:", files);
+        }
+      } catch (e) {
+        console.error(
+          "[OracleConnector][DEBUG] thickLibDir 경로 접근 에러:",
+          e
+        );
+      }
+    }
+
     // UI에서 thick 모드로 지정한 경우에만 Thick 모드 활성화
     if (this.mode === "thick") {
+      console.log(
+        "[OracleConnector] Thick 모드 활성화 시작: ",
+        this.thickLibDir
+      );
       try {
         if (this.thickLibDir) {
-          oracledb.initOracleClient({ libDir: this.thickLibDir });
+          const resolvedPath = this.thickLibDir.startsWith("~")
+            ? require("os").homedir() + this.thickLibDir.slice(1)
+            : this.thickLibDir;
+
+          console.log("[OracleConnector][DEBUG] resolvedPath:", resolvedPath);
+          oracledb.initOracleClient({ libDir: resolvedPath });
           console.log(
             "[OracleConnector] Thick 모드 활성화, libDir:",
-            this.thickLibDir
+            resolvedPath
           );
         } else {
           oracledb.initOracleClient();
@@ -119,11 +153,11 @@ class OracleConnector {
   }
 
   getTablesSql() {
-    return `SELECT table_name FROM user_tables ORDER BY table_name`;
+    return `SELECT OBJECT_NAME FROM ALL_OBJECTS WHERE OBJECT_TYPE = 'TABLE' ORDER BY OBJECT_NAME`;
   }
 
   getTableSchemaSql(table_name) {
-    return `SELECT column_name, data_type, data_length, nullable, data_default FROM user_tab_columns WHERE table_name = '${table_name.toUpperCase()}' ORDER BY column_id`;
+    return `SELECT COLUMN_NAME, DATA_TYPE, DATA_LENGTH, NULLABLE, DATA_DEFAULT FROM ALL_TAB_COLUMNS WHERE TABLE_NAME = '${table_name.toUpperCase()}' ORDER BY COLUMN_NAME`;
   }
 }
 
