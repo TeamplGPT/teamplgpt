@@ -1,51 +1,60 @@
-// Anything with "null" requires a translation. Contribute to translation via a PR!
 const TRANSLATIONS = {
   onboarding: {
-    survey: {
-      email: null,
-      useCase: null,
-      useCaseWork: null,
-      useCasePersonal: null,
-      useCaseOther: null,
-      comment: null,
-      commentPlaceholder: null,
-      skip: null,
-      thankYou: null,
-      title: null,
-      description: null,
-    },
     home: {
-      title: null,
-      getStarted: null,
+      title: "Welcome to",
+      getStarted: "Get Started",
     },
     llm: {
-      title: null,
-      description: null,
+      title: "LLM Preference",
+      description:
+        "AnythingLLM can work with many LLM providers. This will be the service which handles chatting.",
     },
     userSetup: {
-      title: null,
-      description: null,
-      howManyUsers: null,
-      justMe: null,
-      myTeam: null,
-      instancePassword: null,
-      setPassword: null,
-      passwordReq: null,
-      passwordWarn: null,
-      adminUsername: null,
-      adminUsernameReq: null,
-      adminPassword: null,
-      adminPasswordReq: null,
-      teamHint: null,
+      title: "User Setup",
+      description: "Configure your user settings.",
+      howManyUsers: "How many users will be using this instance?",
+      justMe: "Just me",
+      myTeam: "My team",
+      instancePassword: "Instance Password",
+      setPassword: "Would you like to set up a password?",
+      passwordReq: "Passwords must be at least 8 characters.",
+      passwordWarn:
+        "It's important to save this password because there is no recovery method.",
+
+      adminUsername: "Admin account username",
+      adminUsernameReq:
+        "Username must be at least 6 characters long and only contain lowercase letters, numbers, underscores, and hyphens with no spaces.",
+      adminPassword: "Admin account password",
+      adminPasswordReq: "Passwords must be at least 8 characters.",
+      teamHint:
+        "By default, you will be the only admin. Once onboarding is completed you can create and invite others to be users or admins. Do not lose your password as only admins can reset passwords.",
     },
     data: {
-      title: null,
-      description: null,
-      settingsHint: null,
+      title: "Data Handling & Privacy",
+      description:
+        "We are committed to transparency and control when it comes to your personal data.",
+      settingsHint:
+        "These settings can be reconfigured at any time in the settings.",
+    },
+    survey: {
+      title: "Welcome to AnythingLLM",
+      description: "Help us make AnythingLLM built for your needs. Optional.",
+
+      email: "What's your email?",
+      useCase: "What will you use AnythingLLM for?",
+      useCaseWork: "For work",
+      useCasePersonal: "For personal use",
+      useCaseOther: "Other",
+      comment: "How did you hear about AnythingLLM?",
+      commentPlaceholder:
+        "Reddit, Twitter, GitHub, YouTube, etc. - Let us know how you found us!",
+      skip: "Skip Survey",
+      thankYou: "Thank you for your feedback!",
     },
     workspace: {
-      title: null,
-      description: null,
+      title: "Create your first workspace",
+      description:
+        "Create your first workspace and get started with AnythingLLM.",
     },
   },
   common: {
@@ -62,6 +71,8 @@ const TRANSLATIONS = {
     yes: null,
     no: null,
   },
+
+  // Setting Sidebar menu items.
   settings: {
     title: "인스턴스 설정",
     system: "일반 설정",
@@ -94,6 +105,8 @@ const TRANSLATIONS = {
     branding: null,
     chat: null,
   },
+
+  // Page Definitions
   login: {
     "multi-user": {
       welcome: "웰컴!",
@@ -110,16 +123,126 @@ const TRANSLATIONS = {
     },
     "password-reset": {
       title: "비밀번호 재설정",
-      description: "비밀번호를 재설정하려면 아래에 필요한 정보를 입력하세요.",
+      description:
+       "비밀번호를 재설정하려면 아래에 필요한 정보를 입력하세요.",
       "recovery-codes": "복구 코드",
       "recovery-code": "복구 코드 {{index}}",
       "back-to-login": "로그인으로 돌아가기",
     },
   },
+
+  welcomeMessage: {
+    part1:
+      "Welcome to AnythingLLM, AnythingLLM is an open-source AI tool by Mintplex Labs that turns anything into a trained chatbot you can query and chat with. AnythingLLM is a BYOK (bring-your-own-keys) software so there is no subscription, fee, or charges for this software outside of the services you want to use with it.",
+    part2:
+      "AnythingLLM is the easiest way to put powerful AI products like OpenAi, GPT-4, LangChain, PineconeDB, ChromaDB, and other services together in a neat package with no fuss to increase your productivity by 100x.",
+    part3:
+      "AnythingLLM can run totally locally on your machine with little overhead you wont even notice it's there! No GPU needed. Cloud and on-premises installation is available as well.\nThe AI tooling ecosystem gets more powerful everyday. AnythingLLM makes it easy to use.",
+    githubIssue: "Create an issue on GitHub",
+    user1: "How do I get started?!",
+    part4:
+      "It's simple. All collections are organized into buckets we call \"Workspaces\". Workspaces are buckets of files, documents, images, PDFs, and other files which will be transformed into something LLM's can understand and use in conversation.\n\nYou can add and remove files at anytime.",
+    createWorkspace: "Create your first workspace",
+    user2:
+      "Is this like an AI dropbox or something? What about chatting? It is a chatbot isn't it?",
+    part5:
+      "AnythingLLM is more than a smarter Dropbox.\n\nAnythingLLM offers two ways of talking with your data:\n\n<i>Query:</i> Your chats will return data or inferences found with the documents in your workspace it has access to. Adding more documents to the Workspace make it smarter! \n\n<i>Conversational:</i> Your documents + your on-going chat history both contribute to the LLM knowledge at the same time. Great for appending real-time text-based info or corrections and misunderstandings the LLM might have. \n\nYou can toggle between either mode \n<i>in the middle of chatting!</i>",
+    user3: "Wow, this sounds amazing, let me try it out already!",
+    part6: "Have Fun!",
+    starOnGitHub: "Star on GitHub",
+    contact: "Contact Mintplex Labs",
+  },
+
+  "main-page": {
+    noWorkspaceError: "Please create a workspace before starting a chat.",
+    checklist: {
+      title: "시작하기",
+      tasksLeft: "남은 작업",
+      completed: "You're on your way to becoming an AnythingLLM expert!",
+      dismiss: "close",
+      tasks: {
+        create_workspace: {
+          title: "Create a workspace",
+          description: "Create your first workspace to get started",
+          action: "Create",
+        },
+        send_chat: {
+          title: "Send a chat",
+          description: "Start a conversation with your AI assistant",
+          action: "Chat",
+        },
+        embed_document: {
+          title: "Embed a document",
+          description: "Add your first document to your workspace",
+          action: "Embed",
+        },
+        setup_system_prompt: {
+          title: "Set up a system prompt",
+          description: "Configure your AI assistant's behavior",
+          action: "Set Up",
+        },
+        define_slash_command: {
+          title: "Define a slash command",
+          description: "Create custom commands for your assistant",
+          action: "Define",
+        },
+        visit_community: {
+          title: "Visit Community Hub",
+          description: "Explore community resources and templates",
+          action: "Browse",
+        },
+      },
+    },
+    quickLinks: {
+      title: "Quick Links",
+      sendChat: "Send Chat",
+      embedDocument: "Embed a Document",
+      createWorkspace: "Create Workspace",
+    },
+    exploreMore: {
+      title: "Explore more features",
+      features: {
+        customAgents: {
+          title: "Custom AI Agents",
+          description: "Build powerful AI Agents and automations with no code.",
+          primaryAction: "Chat using @agent",
+          secondaryAction: "Build an agent flow",
+        },
+        slashCommands: {
+          title: "Slash Commands",
+          description:
+            "Save time and inject prompts using custom slash commands.",
+          primaryAction: "Create a Slash Command",
+          secondaryAction: "Explore on Hub",
+        },
+        systemPrompts: {
+          title: "System Prompts",
+          description:
+            "Modify the system prompt to customize the AI replies of a workspace.",
+          primaryAction: "Modify a System Prompt",
+          secondaryAction: "Manage prompt variables",
+        },
+      },
+    },
+    announcements: {
+      title: "Updates & Announcements",
+    },
+    resources: {
+      title: "Resources",
+      links: {
+        docs: "Docs",
+        star: "Star on Github",
+      },
+      keyboardShortcuts: "Keyboard Shortcuts",
+    },
+  },
+
   "new-workspace": {
     title: "새 워크스페이스",
     placeholder: "내 워크스페이스",
   },
+
+  // Workspace Settings menu items
   "workspaces—settings": {
     general: "일반 설정",
     chat: "채팅 설정",
@@ -127,27 +250,8 @@ const TRANSLATIONS = {
     members: "구성원",
     agent: "에이전트 구성",
   },
-  welcomeMessage: {
-    part1:
-      "AnythingLLM에 오신 것을 환영합니다. AnythingLLM은 Mintplex Labs에서 개발한 오픈 소스 AI 도구로, 어떤 것이든 훈련된 챗봇으로 변환하여 쿼리하고 대화할 수 있습니다. AnythingLLM은 BYOK(Bring Your Own Key) 소프트웨어이므로 사용하려는 서비스 외에는 구독료나 기타 비용이 없습니다.",
-    part2:
-      "AnythingLLM은 OpenAi, GPT-4, LangChain, PineconeDB, ChromaDB 등 강력한 AI 제품을 번거로움 없이 깔끔하게 패키지로 묶어 생산성을 100배 향상시키는 가장 쉬운 방법입니다.",
-    part3:
-      "AnythingLLM은 로컬 컴퓨터에서 완전히 작동하며, 거의 리소스를 사용하지 않으므로 존재조차 느끼지 못할 것입니다! GPU가 필요하지 않습니다. 클라우드 및 온프레미스 설치도 가능합니다.\nAI 도구 생태계는 날로 강력해지고 있습니다. AnythingLLM은 이를 쉽게 사용할 수 있게 해줍니다.",
-    githubIssue: "GitHub에 이슈 생성하기",
-    user1: "어떻게 시작하나요?!",
-    part4:
-      '간단합니다. 모든 컬렉션은 "워크스페이스"라고 부르는 버킷으로 구성됩니다. 워크스페이스는 문서, 이미지, PDF 및 기타 파일의 버킷으로, LLM이 이해하고 대화에서 사용할 수 있는 형태로 변환합니다.\n\n언제든지 파일을 추가하고 삭제할 수 있습니다.',
-    createWorkspace: "첫 번째 워크스페이스 생성하기",
-    user2:
-      "이것은 AI 드롭박스와 같은 건가요? 채팅은 어떤가요? 이건 챗봇 아닌가요?",
-    part5:
-      "AnythingLLM은 더 스마트한 Dropbox 이상의 것입니다.\n\nAnythingLLM은 데이터와 대화할 수 있는 두 가지 방법을 제공합니다:\n\n<i>쿼리:</i> 워크스페이스 내 문서에서 찾아낸 데이터나 추론 결과만 채팅으로 제공합니다. 워크스페이스에 문서를 더 많이 추가할수록 더 똑똑해집니다!\n\n<i>대화:</i> 문서와 실시간 채팅 기록이 동시에 LLM의 지식에 기여합니다. 실시간 텍스트 정보나 LLM의 오해를 바로잡는 데 매우 유용합니다.\n\n채팅 중간에 <i>모드를 전환할 수 있습니다!</i>",
-    user3: "와, 이거 정말 놀랍네요, 당장 사용해보고 싶어요!",
-    part6: "즐기세요!",
-    starOnGitHub: "GitHub에 별표 달기",
-    contact: "Mintplex Labs에 연락하기",
-  },
+
+  // General Appearance
   general: {
     vector: {
       title: "벡터 수",
@@ -158,7 +262,8 @@ const TRANSLATIONS = {
     },
     message: {
       title: "제안된 채팅 메시지",
-      description: "워크스페이스 사용자가 사용할 메시지를 수정합니다.",
+      description:
+        "워크스페이스 사용자가 사용할 메시지를 수정합니다.",
       add: "새 메시지 추가",
       save: "메시지 저장",
       heading: "저에게 설명해주세요",
@@ -166,7 +271,8 @@ const TRANSLATIONS = {
     },
     pfp: {
       title: "어시스턴트 프로필 이미지",
-      description: "이 워크스페이스의 어시스턴트 프로필 이미지를 수정합니다.",
+      description:
+        "이 워크스페이스의 어시스턴트 프로필 이미지를 수정합니다.",
       image: "워크스페이스 이미지",
       remove: "워크스페이스 이미지 제거",
     },
@@ -181,6 +287,8 @@ const TRANSLATIONS = {
         "워크스페이스 전체를 삭제합니다. 이 작업은 벡터 데이터베이스에 있는 모든 벡터 임베딩을 제거합니다.\n\n원본 소스 파일은 그대로 유지됩니다. 이 작업은 되돌릴 수 없습니다.",
     },
   },
+
+  // Chat Settings
   chat: {
     llm: {
       title: "워크스페이스 LLM 제공자",
@@ -246,6 +354,8 @@ const TRANSLATIONS = {
       hint: "대부분의 LLM은 유효한 값의 다양한 허용 범위를 가지고 있습니다. 해당 정보는 LLM 제공자에게 문의하세요.",
     },
   },
+
+  // Vector Database
   "vector-workspace": {
     identifier: "벡터 데이터베이스 식별자",
     snippets: {
@@ -272,6 +382,8 @@ const TRANSLATIONS = {
       success: "워크스페이스 벡터 데이터베이스가 재설정되었습니다!",
     },
   },
+
+  // Agent Configuration
   agent: {
     "performance-warning":
       "도구 호출을 명시적으로 지원하지 않는 LLM의 성능은 모델의 기능과 정확도에 크게 좌우됩니다. 일부 기능은 제한되거나 작동하지 않을 수 있습니다.",
@@ -329,6 +441,8 @@ const TRANSLATIONS = {
       },
     },
   },
+
+  // Workspace Chats
   recorded: {
     title: "워크스페이스 채팅",
     description:
@@ -343,6 +457,107 @@ const TRANSLATIONS = {
       at: "보낸 시각",
     },
   },
+
+  customization: {
+    interface: {
+      title: "UI Preferences",
+      description: "Set your UI preferences for AnythingLLM.",
+    },
+    branding: {
+      title: "Branding & Whitelabeling",
+      description:
+        "White-label your AnythingLLM instance with custom branding.",
+    },
+    chat: {
+      title: "Chat",
+      description: "Set your chat preferences for AnythingLLM.",
+      auto_submit: {
+        title: "Auto-Submit Speech Input",
+        description:
+          "Automatically submit speech input after a period of silence",
+      },
+      auto_speak: {
+        title: "Auto-Speak Responses",
+        description: "Automatically speak responses from the AI",
+      },
+      spellcheck: {
+        title: "Enable Spellcheck",
+        description: "Enable or disable spellcheck in the chat input field",
+      },
+    },
+    items: {
+      theme: {
+        title: "Theme",
+        description: "Select your preferred color theme for the application.",
+      },
+      "show-scrollbar": {
+        title: "Show Scrollbar",
+        description: "Enable or disable the scrollbar in the chat window.",
+      },
+      "support-email": {
+        title: "Support Email",
+        description:
+          "Set the support email address that should be accessible by users when they need help.",
+      },
+      "app-name": {
+        title: "Name",
+        description:
+          "Set a name that is displayed on the login page to all users.",
+      },
+      "chat-message-alignment": {
+        title: "Chat Message Alignment",
+        description:
+          "Select the message alignment mode when using the chat interface.",
+      },
+      "display-language": {
+        title: "Display Language",
+        description:
+          "Select the preferred language to render AnythingLLM's UI in - when translations are available.",
+      },
+      logo: {
+        title: "Brand Logo",
+        description: "Upload your custom logo to showcase on all pages.",
+        add: "Add a custom logo",
+        recommended: "Recommended size: 800 x 200",
+        remove: "Remove",
+        replace: "Replace",
+      },
+      "welcome-messages": {
+        title: "Welcome Messages",
+        description:
+          "Customize the welcome messages displayed to your users. Only non-admin users will see these messages.",
+        new: "New",
+        system: "system",
+        user: "user",
+        message: "message",
+        assistant: "AnythingLLM Chat Assistant",
+        "double-click": "Double click to edit...",
+        save: "Save Messages",
+      },
+      "browser-appearance": {
+        title: "Browser Appearance",
+        description:
+          "Customize the appearance of the browser tab and title when the app is open.",
+        tab: {
+          title: "Title",
+          description:
+            "Set a custom tab title when the app is open in a browser.",
+        },
+        favicon: {
+          title: "Favicon",
+          description: "Use a custom favicon for the browser tab.",
+        },
+      },
+      "sidebar-footer": {
+        title: "Sidebar Footer Items",
+        description:
+          "Customize the footer items displayed on the bottom of the sidebar.",
+        icon: "Icon",
+        link: "Link",
+      },
+    },
+  },
+
   api: {
     title: "API 키",
     description:
@@ -355,6 +570,7 @@ const TRANSLATIONS = {
       created: "생성일",
     },
   },
+
   llm: {
     title: "LLM 기본 설정",
     description:
@@ -372,6 +588,7 @@ const TRANSLATIONS = {
       },
     },
   },
+
   transcription: {
     title: "텍스트 변환 모델 기본 설정",
     description:
@@ -382,6 +599,7 @@ const TRANSLATIONS = {
     "warn-recommend": "최소 2GB RAM과 10Mb 보다 작은 파일 업로드를 권장합니다.",
     "warn-end": "내장된 모델은 첫 번째 사용 시 자동으로 다운로드됩니다.",
   },
+
   embedding: {
     title: "임베딩 기본 설정",
     "desc-start":
@@ -394,6 +612,7 @@ const TRANSLATIONS = {
         "AnythingLLM의 기본 임베딩 엔진을 사용할 때는 설정이 필요하지 않습니다.",
     },
   },
+
   text: {
     title: "텍스트 분할 및 청킹 기본 설정",
     "desc-start":
@@ -408,12 +627,14 @@ const TRANSLATIONS = {
       description: "단일 벡터에 들어갈 수 있는 최대 문자 길이입니다.",
       recommend: "임베드 모델 최대 길이는",
     },
+
     overlap: {
       title: "텍스트 청크 겹침",
       description:
         "청킹 동안 두 인접 텍스트 청크 간에 겹칠 수 있는 최대 문자 수입니다.",
     },
   },
+
   vector: {
     title: "벡터 데이터베이스",
     description:
@@ -423,6 +644,8 @@ const TRANSLATIONS = {
       description: "LanceDB를 선택하면 설정이 필요 없습니다.",
     },
   },
+
+  // Embeddable Chat Widgets
   embeddable: {
     title: "임베드 가능한 채팅 위젯",
     description:
@@ -435,6 +658,7 @@ const TRANSLATIONS = {
       created: null,
     },
   },
+
   "embed-chats": {
     title: "임베드 채팅",
     export: "내보내기",
@@ -447,6 +671,7 @@ const TRANSLATIONS = {
       at: "보낸 시각",
     },
   },
+
   multi: {
     title: "다중 사용자 모드",
     description:
@@ -471,6 +696,8 @@ const TRANSLATIONS = {
       password: "인스턴스 비밀번호",
     },
   },
+
+  // Event Logs
   event: {
     title: "이벤트 로그",
     description:
@@ -482,6 +709,8 @@ const TRANSLATIONS = {
       occurred: "발생 시각",
     },
   },
+
+  // Privacy & Data-Handling
   privacy: {
     title: "개인정보와 데이터 처리",
     description:
@@ -491,507 +720,398 @@ const TRANSLATIONS = {
     vector: "벡터 데이터베이스",
     anonymous: "익명 원격 분석 활성화",
   },
+
   connectors: {
-    "search-placeholder": null,
-    "no-connectors": null,
+    "search-placeholder": "Search data connectors",
+    "no-connectors": "No data connectors found.",
+    obsidian: {
+      name: "Obsidian",
+      description: "Import Obsidian vault in a single click.",
+      vault_location: "Vault Location",
+      vault_description:
+        "Select your Obsidian vault folder to import all notes and their connections.",
+      selected_files: "Found {{count}} markdown files",
+      importing: "Importing vault...",
+      import_vault: "Import Vault",
+      processing_time:
+        "This may take a while depending on the size of your vault.",
+      vault_warning:
+        "To avoid any conflicts, make sure your Obsidian vault is not currently open.",
+    },
     github: {
-      name: null,
-      description: null,
-      URL: null,
-      URL_explained: null,
-      token: null,
-      optional: null,
-      token_explained: null,
-      token_explained_start: null,
-      token_explained_link1: null,
-      token_explained_middle: null,
-      token_explained_link2: null,
-      token_explained_end: null,
-      ignores: null,
-      git_ignore: null,
-      task_explained: null,
-      branch: null,
-      branch_loading: null,
-      branch_explained: null,
-      token_information: null,
-      token_personal: null,
+      name: "GitHub Repo",
+      description:
+        "Import an entire public or private GitHub repository in a single click.",
+      URL: "GitHub Repo URL",
+      URL_explained: "Url of the GitHub repo you wish to collect.",
+      token: "GitHub Access Token",
+      optional: "optional",
+      token_explained: "Access Token to prevent rate limiting.",
+      token_explained_start: "Without a ",
+      token_explained_link1: "Personal Access Token",
+      token_explained_middle:
+        ", the GitHub API may limit the number of files that can be collected due to rate limits. You can ",
+      token_explained_link2: "create a temporary Access Token",
+      token_explained_end: " to avoid this issue.",
+      ignores: "File Ignores",
+      git_ignore:
+        "List in .gitignore format to ignore specific files during collection. Press enter after each entry you want to save.",
+      task_explained:
+        "Once complete, all files will be available for embedding into workspaces in the document picker.",
+      branch: "Branch you wish to collect files from.",
+      branch_loading: "-- loading available branches --",
+      branch_explained: "Branch you wish to collect files from.",
+      token_information:
+        "Without filling out the <b>GitHub Access Token</b> this data connector will only be able to collect the <b>top-level</b> files of the repo due to GitHub's public API rate-limits.",
+      token_personal:
+        "Get a free Personal Access Token with a GitHub account here.",
     },
     gitlab: {
-      name: null,
-      description: null,
-      URL: null,
-      URL_explained: null,
-      token: null,
-      optional: null,
-      token_explained: null,
-      token_description: null,
-      token_explained_start: null,
-      token_explained_link1: null,
-      token_explained_middle: null,
-      token_explained_link2: null,
-      token_explained_end: null,
-      fetch_issues: null,
-      ignores: null,
-      git_ignore: null,
-      task_explained: null,
-      branch: null,
-      branch_loading: null,
-      branch_explained: null,
-      token_information: null,
-      token_personal: null,
+      name: "GitLab Repo",
+      description:
+        "Import an entire public or private GitLab repository in a single click.",
+      URL: "GitLab Repo URL",
+      URL_explained: "URL of the GitLab repo you wish to collect.",
+      token: "GitLab Access Token",
+      optional: "optional",
+      token_explained: "Access Token to prevent rate limiting.",
+      token_description:
+        "Select additional entities to fetch from the GitLab API.",
+      token_explained_start: "Without a ",
+      token_explained_link1: "Personal Access Token",
+      token_explained_middle:
+        ", the GitLab API may limit the number of files that can be collected due to rate limits. You can ",
+      token_explained_link2: "create a temporary Access Token",
+      token_explained_end: " to avoid this issue.",
+      fetch_issues: "Fetch Issues as Documents",
+      ignores: "File Ignores",
+      git_ignore:
+        "List in .gitignore format to ignore specific files during collection. Press enter after each entry you want to save.",
+      task_explained:
+        "Once complete, all files will be available for embedding into workspaces in the document picker.",
+      branch: "Branch you wish to collect files from",
+      branch_loading: "-- loading available branches --",
+      branch_explained: "Branch you wish to collect files from.",
+      token_information:
+        "Without filling out the <b>GitLab Access Token</b> this data connector will only be able to collect the <b>top-level</b> files of the repo due to GitLab's public API rate-limits.",
+      token_personal:
+        "Get a free Personal Access Token with a GitLab account here.",
     },
     youtube: {
-      name: null,
-      description: null,
-      URL: null,
-      URL_explained_start: null,
-      URL_explained_link: null,
-      URL_explained_end: null,
-      task_explained: null,
-      language: null,
-      language_explained: null,
-      loading_languages: null,
+      name: "YouTube Transcript",
+      description:
+        "Import the transcription of an entire YouTube video from a link.",
+      URL: "YouTube Video URL",
+      URL_explained_start:
+        "Enter the URL of any YouTube video to fetch its transcript. The video must have ",
+      URL_explained_link: "closed captions",
+      URL_explained_end: " available.",
+      task_explained:
+        "Once complete, the transcript will be available for embedding into workspaces in the document picker.",
+      language: "Transcript Language",
+      language_explained:
+        "Select the language of the transcript you want to collect.",
+      loading_languages: "-- loading available languages --",
     },
     "website-depth": {
-      name: null,
-      description: null,
-      URL: null,
-      URL_explained: null,
-      depth: null,
-      depth_explained: null,
-      max_pages: null,
-      max_pages_explained: null,
-      task_explained: null,
+      name: "Bulk Link Scraper",
+      description: "Scrape a website and its sub-links up to a certain depth.",
+      URL: "Website URL",
+      URL_explained: "URL of the website you want to scrape.",
+      depth: "Crawl Depth",
+      depth_explained:
+        "This is the number of child-links that the worker should follow from the origin URL.",
+      max_pages: "Maximum Pages",
+      max_pages_explained: "Maximum number of links to scrape.",
+      task_explained:
+        "Once complete, all scraped content will be available for embedding into workspaces in the document picker.",
     },
     confluence: {
-      name: null,
-      description: null,
-      deployment_type: null,
-      deployment_type_explained: null,
-      base_url: null,
-      base_url_explained: null,
-      space_key: null,
-      space_key_explained: null,
-      username: null,
-      username_explained: null,
-      auth_type: null,
-      auth_type_explained: null,
-      auth_type_username: null,
-      auth_type_personal: null,
-      token: null,
-      token_explained_start: null,
-      token_explained_link: null,
-      token_desc: null,
-      pat_token: null,
-      pat_token_explained: null,
-      task_explained: null,
+      name: "Confluence",
+      description: "Import an entire Confluence page in a single click.",
+      deployment_type: "Confluence deployment type",
+      deployment_type_explained:
+        "Determine if your Confluence instance is hosted on Atlassian cloud or self-hosted.",
+      base_url: "Confluence base URL",
+      base_url_explained: "This is the base URL of your Confluence space.",
+      space_key: "Confluence space key",
+      space_key_explained:
+        "This is the spaces key of your confluence instance that will be used. Usually begins with ~",
+      username: "Confluence Username",
+      username_explained: "Your Confluence username",
+      auth_type: "Confluence Auth Type",
+      auth_type_explained:
+        "Select the authentication type you want to use to access your Confluence pages.",
+      auth_type_username: "Username and Access Token",
+      auth_type_personal: "Personal Access Token",
+      token: "Confluence Access Token",
+      token_explained_start:
+        "You need to provide an access token for authentication. You can generate an access token",
+      token_explained_link: "here",
+      token_desc: "Access token for authentication",
+      pat_token: "Confluence Personal Access Token",
+      pat_token_explained: "Your Confluence personal access token.",
+      task_explained:
+        "Once complete, the page content will be available for embedding into workspaces in the document picker.",
     },
+
     manage: {
-      documents: null,
-      "data-connectors": null,
-      "desktop-only": null,
-      dismiss: null,
-      editing: null,
+      documents: "Documents",
+      "data-connectors": "Data Connectors",
+      "desktop-only":
+        "Editing these settings are only available on a desktop device. Please access this page on your desktop to continue.",
+      dismiss: "Dismiss",
+      editing: "Editing",
     },
     directory: {
-      "my-documents": null,
-      "new-folder": null,
-      "search-document": null,
-      "no-documents": null,
-      "move-workspace": null,
-      name: null,
-      "delete-confirmation": null,
-      "removing-message": null,
-      "move-success": null,
-      date: null,
-      type: null,
-      no_docs: null,
-      select_all: null,
-      deselect_all: null,
-      remove_selected: null,
-      costs: null,
-      save_embed: null,
+      "my-documents": "My Documents",
+      "new-folder": "New Folder",
+      "search-document": "Search for document",
+      "no-documents": "No Documents",
+      "move-workspace": "Move to Workspace",
+      name: "Name",
+      "delete-confirmation":
+        "Are you sure you want to delete these files and folders?\nThis will remove the files from the system and remove them from any existing workspaces automatically.\nThis action is not reversible.",
+      "removing-message":
+        "Removing {{count}} documents and {{folderCount}} folders. Please wait.",
+      "move-success": "Successfully moved {{count}} documents.",
+      date: "Date",
+      type: "Type",
+      no_docs: "No Documents",
+      select_all: "Select All",
+      deselect_all: "Deselect All",
+      remove_selected: "Remove Selected",
+      costs: "*One time cost for embeddings",
+      save_embed: "Save and Embed",
     },
     upload: {
-      "processor-offline": null,
-      "processor-offline-desc": null,
-      "click-upload": null,
-      "file-types": null,
-      "or-submit-link": null,
-      "placeholder-link": null,
-      fetching: null,
-      "fetch-website": null,
-      "privacy-notice": null,
+      "processor-offline": "Document Processor Unavailable",
+      "processor-offline-desc":
+        "We can't upload your files right now because the document processor is offline. Please try again later.",
+      "click-upload": "Click to upload or drag and drop",
+      "file-types":
+        "supports text files, csv's, spreadsheets, audio files, and more!",
+      "or-submit-link": "or submit a link",
+      "placeholder-link": "https://example.com",
+      fetching: "Fetching...",
+      "fetch-website": "Fetch website",
+      "privacy-notice":
+        "These files will be uploaded to the document processor running on this AnythingLLM instance. These files are not sent or shared with a third party.",
     },
     pinning: {
-      what_pinning: null,
-      pin_explained_block1: null,
-      pin_explained_block2: null,
-      pin_explained_block3: null,
-      accept: null,
+      what_pinning: "What is document pinning?",
+      pin_explained_block1:
+        "When you <b>pin</b> a document in AnythingLLM we will inject the entire content of the document into your prompt window for your LLM to fully comprehend.",
+      pin_explained_block2:
+        "This works best with <b>large-context models</b> or small files that are critical to its knowledge-base.",
+      pin_explained_block3:
+        "If you are not getting the answers you desire from AnythingLLM by default then pinning is a great way to get higher quality answers in a click.",
+      accept: "Okay, got it",
     },
     watching: {
-      what_watching: null,
-      watch_explained_block1: null,
-      watch_explained_block2: null,
-      watch_explained_block3_start: null,
-      watch_explained_block3_link: null,
-      watch_explained_block3_end: null,
-      accept: null,
-    },
-    obsidian: {
-      name: null,
-      description: null,
-      vault_location: null,
-      vault_description: null,
-      selected_files: null,
-      importing: null,
-      import_vault: null,
-      processing_time: null,
-      vault_warning: null,
+      what_watching: "What does watching a document do?",
+      watch_explained_block1:
+        "When you <b>watch</b> a document in AnythingLLM we will <i>automatically</i> sync your document content from it's original source on regular intervals. This will automatically update the content in every workspace where this file is managed.",
+      watch_explained_block2:
+        "This feature currently supports online-based content and will not be available for manually uploaded documents.",
+      watch_explained_block3_start:
+        "You can manage what documents are watched from the ",
+      watch_explained_block3_link: "File manager",
+      watch_explained_block3_end: " admin view.",
+      accept: "Okay, got it",
     },
   },
+
   chat_window: {
-    welcome: null,
-    get_started: null,
-    get_started_default: null,
-    upload: null,
-    or: null,
-    send_chat: null,
-    send_message: null,
-    attach_file: null,
-    slash: null,
-    agents: null,
-    text_size: null,
-    microphone: null,
-    send: null,
-    attachments_processing: null,
-    tts_speak_message: null,
-    copy: null,
-    regenerate: null,
-    regenerate_response: null,
-    good_response: null,
-    more_actions: null,
-    hide_citations: null,
-    show_citations: null,
-    pause_tts_speech_message: null,
-    fork: null,
-    delete: null,
-    save_submit: null,
-    cancel: null,
-    edit_prompt: null,
-    edit_response: null,
-    at_agent: null,
-    default_agent_description: null,
-    custom_agents_coming_soon: null,
-    slash_reset: null,
-    preset_reset_description: null,
-    add_new_preset: null,
-    command: null,
-    your_command: null,
-    placeholder_prompt: null,
-    description: null,
-    placeholder_description: null,
-    save: null,
-    small: null,
-    normal: null,
-    large: null,
+    welcome: "Welcome to your new workspace.",
+    get_started: "To get started either",
+    get_started_default: "To get started",
+    upload: "upload a document",
+    or: "or",
+    attachments_processing: "Attachments are processing. Please wait...",
+    send_chat: "send a chat.",
+    send_message: "Send a message",
+    attach_file: "Attach a file to this chat",
+    slash: "View all available slash commands for chatting.",
+    agents: "View all available agents you can use for chatting.",
+    text_size: "Change text size.",
+    microphone: "Speak your prompt.",
+    send: "Send prompt message to workspace",
+    tts_speak_message: "TTS Speak message",
+    copy: "Copy",
+    regenerate: "Regenerate",
+    regenerate_response: "Regenerate response",
+    good_response: "Good response",
+    more_actions: "More actions",
+    hide_citations: "Hide citations",
+    show_citations: "Show citations",
+    pause_tts_speech_message: "Pause TTS speech of message",
+    fork: "Fork",
+    delete: "Delete",
+    save_submit: "Save & Submit",
+    cancel: "Cancel",
+    edit_prompt: "Edit prompt",
+    edit_response: "Edit response",
+    at_agent: "@agent",
+    default_agent_description: " - the default agent for this workspace.",
+    custom_agents_coming_soon: "custom agents are coming soon!",
+    slash_reset: "/reset",
+    preset_reset_description: "Clear your chat history and begin a new chat",
+    add_new_preset: " Add New Preset",
+    command: "Command",
+    your_command: "your-command",
+    placeholder_prompt:
+      "This is the content that will be injected in front of your prompt.",
+    description: "Description",
+    placeholder_description: "Responds with a poem about LLMs.",
+    save: "Save",
+    small: "Small",
+    normal: "Normal",
+    large: "Large",
     workspace_llm_manager: {
-      search: null,
-      loading_workspace_settings: null,
-      available_models: null,
-      available_models_description: null,
-      save: null,
-      saving: null,
-      missing_credentials: null,
-      missing_credentials_description: null,
+      search: "Search LLM providers",
+      loading_workspace_settings: "Loading workspace settings...",
+      available_models: "Available Models for {{provider}}",
+      available_models_description: "Select a model to use for this workspace.",
+      save: "Use this model",
+      saving: "Setting model as workspace default...",
+      missing_credentials: "This provider is missing credentials!",
+      missing_credentials_description: "Click to set up credentials",
     },
   },
+
   profile_settings: {
-    edit_account: null,
-    profile_picture: null,
-    remove_profile_picture: null,
-    username: null,
-    username_description: null,
-    new_password: null,
-    passwort_description: null,
-    cancel: null,
-    update_account: null,
-    theme: null,
-    language: null,
-    failed_upload: null,
-    upload_success: null,
-    failed_remove: null,
-    profile_updated: null,
-    failed_update_user: null,
-    account: null,
-    support: null,
-    signout: null,
+    edit_account: "Edit Account",
+    profile_picture: "Profile Picture",
+    remove_profile_picture: "Remove Profile Picture",
+    username: "Username",
+    username_description:
+      "Username must be only contain lowercase letters, numbers, underscores, and hyphens with no spaces",
+    new_password: "New Password",
+    passwort_description: "Password must be at least 8 characters long",
+    cancel: "Cancel",
+    update_account: "Update Account",
+    theme: "Theme Preference",
+    language: "Preferred language",
+    failed_upload: "Failed to upload profile picture: {{error}}",
+    upload_success: "Profile picture uploaded.",
+    failed_remove: "Failed to remove profile picture: {{error}}",
+    profile_updated: "Profile updated.",
+    failed_update_user: "Failed to update user: {{error}}",
+    account: "Account",
+    support: "Support",
+    signout: "Sign out",
   },
-  customization: {
-    interface: {
-      title: null,
-      description: null,
-    },
-    branding: {
-      title: null,
-      description: null,
-    },
-    chat: {
-      title: null,
-      description: null,
-      auto_submit: {
-        title: null,
-        description: null,
-      },
-      auto_speak: {
-        title: null,
-        description: null,
-      },
-      spellcheck: {
-        title: null,
-        description: null,
-      },
-    },
-    items: {
-      theme: {
-        title: null,
-        description: null,
-      },
-      "show-scrollbar": {
-        title: null,
-        description: null,
-      },
-      "support-email": {
-        title: null,
-        description: null,
-      },
-      "app-name": {
-        title: null,
-        description: null,
-      },
-      "chat-message-alignment": {
-        title: null,
-        description: null,
-      },
-      "display-language": {
-        title: null,
-        description: null,
-      },
-      logo: {
-        title: null,
-        description: null,
-        add: null,
-        recommended: null,
-        remove: null,
-        replace: null,
-      },
-      "welcome-messages": {
-        title: null,
-        description: null,
-        new: null,
-        system: null,
-        user: null,
-        message: null,
-        assistant: null,
-        "double-click": null,
-        save: null,
-      },
-      "browser-appearance": {
-        title: null,
-        description: null,
-        tab: {
-          title: null,
-          description: null,
-        },
-        favicon: {
-          title: null,
-          description: null,
-        },
-      },
-      "sidebar-footer": {
-        title: null,
-        description: null,
-        icon: null,
-        link: null,
-      },
-    },
-  },
-  "main-page": {
-    noWorkspaceError: null,
-    checklist: {
-      title: null,
-      tasksLeft: null,
-      completed: null,
-      dismiss: null,
-      tasks: {
-        create_workspace: {
-          title: null,
-          description: null,
-          action: null,
-        },
-        send_chat: {
-          title: null,
-          description: null,
-          action: null,
-        },
-        embed_document: {
-          title: null,
-          description: null,
-          action: null,
-        },
-        setup_system_prompt: {
-          title: null,
-          description: null,
-          action: null,
-        },
-        define_slash_command: {
-          title: null,
-          description: null,
-          action: null,
-        },
-        visit_community: {
-          title: null,
-          description: null,
-          action: null,
-        },
-      },
-    },
-    quickLinks: {
-      title: null,
-      sendChat: null,
-      embedDocument: null,
-      createWorkspace: null,
-    },
-    exploreMore: {
-      title: null,
-      features: {
-        customAgents: {
-          title: null,
-          description: null,
-          primaryAction: null,
-          secondaryAction: null,
-        },
-        slashCommands: {
-          title: null,
-          description: null,
-          primaryAction: null,
-          secondaryAction: null,
-        },
-        systemPrompts: {
-          title: null,
-          description: null,
-          primaryAction: null,
-          secondaryAction: null,
-        },
-      },
-    },
-    announcements: {
-      title: null,
-    },
-    resources: {
-      title: null,
-      links: {
-        docs: null,
-        star: null,
-      },
-      keyboardShortcuts: null,
-    },
-  },
+
   "keyboard-shortcuts": {
-    title: null,
+    title: "Keyboard Shortcuts",
     shortcuts: {
-      settings: null,
-      workspaceSettings: null,
-      home: null,
-      workspaces: null,
-      apiKeys: null,
-      llmPreferences: null,
-      chatSettings: null,
-      help: null,
-      showLLMSelector: null,
+      settings: "Open Settings",
+      workspaceSettings: "Open Current Workspace Settings",
+      home: "Go to Home",
+      workspaces: "Manage Workspaces",
+      apiKeys: "API Keys Settings",
+      llmPreferences: "LLM Preferences",
+      chatSettings: "Chat Settings",
+      help: "Show keyboard shortcuts help",
+      showLLMSelector: "Show workspace LLM Selector",
     },
   },
+
   community_hub: {
     publish: {
       system_prompt: {
-        success_title: null,
-        success_description: null,
-        success_thank_you: null,
-        view_on_hub: null,
-        modal_title: null,
-        name_label: null,
-        name_description: null,
-        name_placeholder: null,
-        description_label: null,
-        description_description: null,
-        tags_label: null,
-        tags_description: null,
-        tags_placeholder: null,
-        visibility_label: null,
-        public_description: null,
-        private_description: null,
-        publish_button: null,
-        submitting: null,
-        submit: null,
-        prompt_label: null,
-        prompt_description: null,
-        prompt_placeholder: null,
+        success_title: "Success!",
+        success_description:
+          "Your System Prompt has been published to the Community Hub!",
+        success_thank_you: "Thank you for sharing to the Community!",
+        view_on_hub: "View on Community Hub",
+        modal_title: "Publish System Prompt",
+        name_label: "Name",
+        name_description: "This is the display name of your system prompt.",
+        name_placeholder: "My System Prompt",
+        description_label: "Description",
+        description_description:
+          "This is the description of your system prompt. Use this to describe the purpose of your system prompt.",
+        tags_label: "Tags",
+        tags_description:
+          "Tags are used to label your system prompt for easier searching. You can add multiple tags. Max 5 tags. Max 20 characters per tag.",
+        tags_placeholder: "Type and press Enter to add tags",
+        visibility_label: "Visibility",
+        public_description: "Public system prompts are visible to everyone.",
+        private_description: "Private system prompts are only visible to you.",
+        publish_button: "Publish to Community Hub",
+        submitting: "Publishing...",
+        submit: "Publish to Community Hub",
+        prompt_label: "Prompt",
+        prompt_description:
+          "This is the actual system prompt that will be used to guide the LLM.",
+        prompt_placeholder: "Enter your system prompt here...",
       },
       agent_flow: {
-        public_description: null,
-        private_description: null,
-        success_title: null,
-        success_description: null,
-        success_thank_you: null,
-        view_on_hub: null,
-        modal_title: null,
-        name_label: null,
-        name_description: null,
-        name_placeholder: null,
-        description_label: null,
-        description_description: null,
-        tags_label: null,
-        tags_description: null,
-        tags_placeholder: null,
-        visibility_label: null,
-        publish_button: null,
-        submitting: null,
-        submit: null,
-        privacy_note: null,
+        public_description: "Public agent flows are visible to everyone.",
+        private_description: "Private agent flows are only visible to you.",
+        success_title: "Success!",
+        success_description:
+          "Your Agent Flow has been published to the Community Hub!",
+        success_thank_you: "Thank you for sharing to the Community!",
+        view_on_hub: "View on Community Hub",
+        modal_title: "Publish Agent Flow",
+        name_label: "Name",
+        name_description: "This is the display name of your agent flow.",
+        name_placeholder: "My Agent Flow",
+        description_label: "Description",
+        description_description:
+          "This is the description of your agent flow. Use this to describe the purpose of your agent flow.",
+        tags_label: "Tags",
+        tags_description:
+          "Tags are used to label your agent flow for easier searching. You can add multiple tags. Max 5 tags. Max 20 characters per tag.",
+        tags_placeholder: "Type and press Enter to add tags",
+        visibility_label: "Visibility",
+        publish_button: "Publish to Community Hub",
+        submitting: "Publishing...",
+        submit: "Publish to Community Hub",
+        privacy_note:
+          "Agent flows are always uploaded as private to protect any sensitive data. You can change the visibility in the Community Hub after publishing. Please verify your flow does not contain any sensitive or private information before publishing.",
+      },
+      slash_command: {
+        success_title: "Success!",
+        success_description:
+          "Your Slash Command has been published to the Community Hub!",
+        success_thank_you: "Thank you for sharing to the Community!",
+        view_on_hub: "View on Community Hub",
+        modal_title: "Publish Slash Command",
+        name_label: "Name",
+        name_description: "This is the display name of your slash command.",
+        name_placeholder: "My Slash Command",
+        description_label: "Description",
+        description_description:
+          "This is the description of your slash command. Use this to describe the purpose of your slash command.",
+        command_label: "Command",
+        command_description:
+          "This is the slash command that users will type to trigger this preset.",
+        command_placeholder: "my-command",
+        tags_label: "Tags",
+        tags_description:
+          "Tags are used to label your slash command for easier searching. You can add multiple tags. Max 5 tags. Max 20 characters per tag.",
+        tags_placeholder: "Type and press Enter to add tags",
+        visibility_label: "Visibility",
+        public_description: "Public slash commands are visible to everyone.",
+        private_description: "Private slash commands are only visible to you.",
+        publish_button: "Publish to Community Hub",
+        submitting: "Publishing...",
+        prompt_label: "Prompt",
+        prompt_description:
+          "This is the prompt that will be used when the slash command is triggered.",
+        prompt_placeholder: "Enter your prompt here...",
       },
       generic: {
         unauthenticated: {
-          title: null,
-          description: null,
-          button: null,
+          title: "Authentication Required",
+          description:
+            "You need to authenticate with the AnythingLLM Community Hub before publishing items.",
+          button: "Connect to Community Hub",
         },
-      },
-      slash_command: {
-        success_title: null,
-        success_description: null,
-        success_thank_you: null,
-        view_on_hub: null,
-        modal_title: null,
-        name_label: null,
-        name_description: null,
-        name_placeholder: null,
-        description_label: null,
-        description_description: null,
-        command_label: null,
-        command_description: null,
-        command_placeholder: null,
-        tags_label: null,
-        tags_description: null,
-        tags_placeholder: null,
-        visibility_label: null,
-        public_description: null,
-        private_description: null,
-        publish_button: null,
-        submitting: null,
-        prompt_label: null,
-        prompt_description: null,
-        prompt_placeholder: null,
       },
     },
   },

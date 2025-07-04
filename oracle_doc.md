@@ -56,7 +56,7 @@ sudo ln -s /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/li
 ### (1) 시스템 전체 적용 
 
 ```
-echo "$HOME/oracle/instantclient_23_5" | sudo tee /etc/ld.so.conf.d/oracle-instantclient.conf  
+echo "$HOME/oracle/instantclient_23_8" | sudo tee /etc/ld.so.conf.d/oracle-instantclient.conf  
 sudo ldconfig
 ```
 
@@ -68,7 +68,7 @@ nano ~/.bashrc
 
 > 파일 맨 아래에 추가
 ```
-export LD_LIBRARY_PATH=$HOME/oracle/instantclient_23_5:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$HOME/oracle/instantclient_23_8:$LD_LIBRARY_PATH
 ```
 > 저장 후 아래 명령으로 즉시 반영
 ```
