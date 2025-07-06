@@ -11,9 +11,17 @@
   "overrides": [
     {
       "files": ["*.js", "*.mjs", "*.jsx"],
+      "excludeFiles": ["frontend/src/locales/**/*.js"],
       "options": {
         "parser": "flow",
         "arrowParens": "always"
+      }
+    },
+    {
+      "files": ["src/locales/**/*.js"],
+      "options": {
+        "parser": "babel",
+        "arrowParens": "always" 
       }
     },
     {

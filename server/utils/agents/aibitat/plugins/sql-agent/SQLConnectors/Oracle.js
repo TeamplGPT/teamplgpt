@@ -1,7 +1,5 @@
 const oracledb = require("oracledb");
 const { ConnectionStringParser } = require("./utils");
-const fs = require("fs");
-const path = require("path");
 class OracleConnector {
   #connected = false;
   database_id = "";

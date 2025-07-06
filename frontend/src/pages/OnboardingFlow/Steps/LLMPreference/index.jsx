@@ -347,7 +347,7 @@ export default function LLMPreference({
               />
               <input
                 type="text"
-                placeholder="Search LLM providers"
+                placeholder={t("chat_window.workspace_llm_manager.search")}
                 className="bg-theme-bg-secondary placeholder:text-theme-text-secondary z-20 pl-10 h-[38px] rounded-full w-full px-4 py-1 text-sm border border-theme-chat-input-border outline-none focus:outline-primary-button active:outline-primary-button outline-none text-theme-text-primary"
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoComplete="off"
