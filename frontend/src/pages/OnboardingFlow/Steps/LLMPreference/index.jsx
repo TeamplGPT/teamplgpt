@@ -357,7 +357,7 @@ export default function LLMPreference({
               />
             </div>
           </div>
-          <div className="px-4 pt-[70px] flex flex-col gap-y-1 max-h-[390px] overflow-y-auto no-scroll pb-4">
+          <div className="px-4 pt-[70px] flex flex-col gap-y-1 max-h-[590px] overflow-y-auto no-scroll pb-4">
             {filteredLLMs.map((llm) => {
               if (llm.value === "native" && isHosted) return null;
               return (
