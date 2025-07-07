@@ -587,6 +587,8 @@ const TRANSLATIONS = {
     provider: "LLM Provider",
     providers: {
       azure_openai: {
+        description:
+          "The enterprise option of OpenAI hosted on Azure services.",
         azure_service_endpoint: "Azure Service Endpoint",
         api_key: "API Key",
         chat_deployment_name: "Chat Deployment Name",
@@ -595,6 +597,7 @@ const TRANSLATIONS = {
         default: "Default",
         reasoning: "Reasoning",
       },
+      select_llm_required: "You need to select an LLM",
     },
   },
 

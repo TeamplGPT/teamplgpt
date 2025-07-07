@@ -80,7 +80,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "azure",
     logo: AzureOpenAiLogo,
     options: (settings) => <AzureAiOptions settings={settings} />,
-    description: "The enterprise option of OpenAI hosted on Azure services.",
+    description: "llm.providers.azure_openai.description",
     requiredConfig: ["AzureOpenAiEndpoint"],
   },
   {
@@ -471,7 +471,7 @@ export default function GeneralLLMPreference() {
                               name={llm.name}
                               value={llm.value}
                               image={llm.logo}
-                              description={llm.description}
+                              description={t(llm.description)}
                               checked={selectedLLM === llm.value}
                               onClick={() => updateLLMChoice(llm.value)}
                             />
@@ -497,8 +497,9 @@ export default function GeneralLLMPreference() {
                           {selectedLLMObject?.name || "None selected"}
                         </div>
                         <div className="mt-1 text-xs text-description">
-                          {selectedLLMObject?.description ||
-                            "You need to select an LLM"}
+                          {selectedLLMObject
+                            ? t(selectedLLMObject.description)
+                            : t("llm.providers.select_llm_required")}
                         </div>
                       </div>
                     </div>

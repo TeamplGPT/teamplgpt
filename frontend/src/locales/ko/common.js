@@ -574,6 +574,8 @@ const TRANSLATIONS = {
     provider: "LLM 제공자",
     providers: {
       azure_openai: {
+        description:
+          "Azure 서비스에서 호스팅되는 OpenAI의 엔터프라이즈 옵션입니다.",
         azure_service_endpoint: "Azure 서비스 엔드포인트",
         api_key: "API 키",
         chat_deployment_name: "채팅 배포 이름",
