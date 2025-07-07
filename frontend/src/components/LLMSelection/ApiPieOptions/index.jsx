@@ -16,7 +16,7 @@ export default function ApiPieLLMOptions({ settings }) {
             placeholder="APIpie API Key"
             defaultValue={settings?.ApipieLLMApiKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>

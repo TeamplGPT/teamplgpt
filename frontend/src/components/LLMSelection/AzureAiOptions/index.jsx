@@ -33,7 +33,7 @@ export default function AzureAiOptions({ settings }) {
             placeholder="Azure OpenAI API Key"
             defaultValue={settings?.AzureOpenAiKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>

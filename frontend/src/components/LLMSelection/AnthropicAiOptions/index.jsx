@@ -21,7 +21,7 @@ export default function AnthropicAiOptions({ settings }) {
             placeholder="Anthropic Claude-2 API Key"
             defaultValue={settings?.AnthropicApiKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
             onChange={(e) => setInputValue(e.target.value)}
             onBlur={() => setAnthropicApiKey(inputValue)}

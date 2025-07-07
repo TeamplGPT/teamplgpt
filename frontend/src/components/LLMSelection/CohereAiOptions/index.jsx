@@ -13,7 +13,7 @@ export default function CohereAiOptions({ settings }) {
             placeholder="Cohere API Key"
             defaultValue={settings?.CohereApiKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>

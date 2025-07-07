@@ -215,7 +215,7 @@ export default function OllamaLLMOptions({ settings }) {
                 onChange={authToken.onChange}
                 onBlur={authToken.onBlur}
                 required={false}
-                autoComplete="off"
+                autoComplete="new-password"
                 spellCheck={false}
               />
             </div>

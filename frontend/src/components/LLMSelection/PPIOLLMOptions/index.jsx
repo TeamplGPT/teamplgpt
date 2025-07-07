@@ -16,7 +16,7 @@ export default function PPIOLLMOptions({ settings }) {
             placeholder="PPIO API Key"
             defaultValue={settings?.PPIOApiKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>

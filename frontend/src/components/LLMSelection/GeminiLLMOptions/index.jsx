@@ -19,7 +19,7 @@ export default function GeminiLLMOptions({ settings }) {
             placeholder="Google Gemini API Key"
             defaultValue={settings?.GeminiLLMApiKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
             onChange={(e) => setInputValue(e.target.value)}
             onBlur={() => setGeminiApiKey(inputValue)}
