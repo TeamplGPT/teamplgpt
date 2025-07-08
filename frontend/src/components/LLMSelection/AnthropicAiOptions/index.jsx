@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react";
 import System from "@/models/system";
+import { useTranslation } from "react-i18next";
 
 export default function AnthropicAiOptions({ settings }) {
   const [inputValue, setInputValue] = useState(settings?.AnthropicApiKey);
   const [anthropicApiKey, setAnthropicApiKey] = useState(
     settings?.AnthropicApiKey
   );
+  const { t } = useTranslation();
 
   return (
     <div className="w-full flex flex-col">
       <div className="w-full flex items-center gap-[36px] mt-1.5">
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            Anthropic API Key
+            {t("llm.providers.api_key")}
           </label>
           <input
             type="password"
@@ -81,6 +83,7 @@ const DEFAULT_MODELS = [
 function AnthropicModelSelection({ apiKey, settings }) {
   const [models, setModels] = useState(DEFAULT_MODELS);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -99,7 +102,7 @@ function AnthropicModelSelection({ apiKey, settings }) {
     return (
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-3">
-          Chat Model Selection
+          {t("llm.providers.chat_model_selection")}
         </label>
         <select
           name="AnthropicModelPref"
@@ -107,9 +110,12 @@ function AnthropicModelSelection({ apiKey, settings }) {
           className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- loading available models --
+            -- {t("llm.providers.loading_models")} --
           </option>
         </select>
+        <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
+          {t("llm.providers.enter_valid_api_key")}
+        </p>
       </div>
     );
   }
@@ -117,7 +123,7 @@ function AnthropicModelSelection({ apiKey, settings }) {
   return (
     <div className="flex flex-col w-60">
       <label className="text-white text-sm font-semibold block mb-3">
-        Chat Model Selection
+        {t("llm.providers.chat_model_selection")}
       </label>
       <select
         name="AnthropicModelPref"

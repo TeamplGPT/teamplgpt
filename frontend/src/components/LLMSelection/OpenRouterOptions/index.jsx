@@ -1,14 +1,17 @@
 import System from "@/models/system";
 import { CaretDown, CaretUp } from "@phosphor-icons/react";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function OpenRouterOptions({ settings }) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col gap-y-4 mt-1.5">
       <div className="flex gap-[36px]">
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            OpenRouter API Key
+            {t("llm.providers.api_key")}
           </label>
           <input
             type="password"
@@ -32,15 +35,18 @@ export default function OpenRouterOptions({ settings }) {
 
 function AdvancedControls({ settings }) {
   const [showAdvancedControls, setShowAdvancedControls] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col gap-y-4">
       <button
         type="button"
         onClick={() => setShowAdvancedControls(!showAdvancedControls)}
-        className="border-none text-white hover:text-white/70 flex items-center text-sm"
+        className="border-none text-theme-text-primary hover:text-theme-text-secondary flex items-center text-sm"
       >
-        {showAdvancedControls ? "Hide" : "Show"} advanced controls
+        {showAdvancedControls
+          ? t("llm.providers.hide_advanced_settings")
+          : t("llm.providers.show_advanced_settings")}
         {showAdvancedControls ? (
           <CaretUp size={14} className="ml-1" />
         ) : (
@@ -50,7 +56,7 @@ function AdvancedControls({ settings }) {
       <div hidden={!showAdvancedControls}>
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            Stream Timeout (ms)
+            {t("llm.providers.stream_timeout")}
           </label>
           <input
             type="number"
@@ -63,6 +69,9 @@ function AdvancedControls({ settings }) {
             min={500}
             step={1}
           />
+          <p className="text-xs leading-[18px] font-base text-theme-text-primary text-opacity-60 mt-2">
+            {t("llm.providers.stream_timeout_description")}
+          </p>
         </div>
       </div>
     </div>
@@ -72,6 +81,7 @@ function AdvancedControls({ settings }) {
 function OpenRouterModelSelection({ settings }) {
   const [groupedModels, setGroupedModels] = useState({});
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -96,7 +106,7 @@ function OpenRouterModelSelection({ settings }) {
     return (
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-3">
-          Chat Model Selection
+          {t("llm.providers.chat_model_selection")}
         </label>
         <select
           name="OpenRouterModelPref"
@@ -104,9 +114,12 @@ function OpenRouterModelSelection({ settings }) {
           className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- loading available models --
+            -- {t("llm.providers.loading_models")} --
           </option>
         </select>
+        <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
+          {t("llm.providers.enter_valid_api_key")}
+        </p>
       </div>
     );
   }
@@ -114,7 +127,7 @@ function OpenRouterModelSelection({ settings }) {
   return (
     <div className="flex flex-col w-60">
       <label className="text-white text-sm font-semibold block mb-3">
-        Chat Model Selection
+        {t("llm.providers.chat_model_selection")}
       </label>
       <select
         name="OpenRouterModelPref"

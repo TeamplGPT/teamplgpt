@@ -3,7 +3,7 @@ import useProviderEndpointAutoDiscovery from "@/hooks/useProviderEndpointAutoDis
 import System from "@/models/system";
 import { NVIDIA_NIM_COMMON_URLS } from "@/utils/constants";
 import { useState, useEffect } from "react";
-
+import { useTranslation } from "react-i18next";
 /**
  * This component is used to select a remote NVIDIA NIM model endpoint
  * This is the default component and way to connect to NVIDIA NIM
@@ -20,13 +20,14 @@ export default function RemoteNvidiaNimOptions({ settings }) {
     initialBasePath: settings?.NvidiaNimLLMBasePath,
     ENDPOINTS: NVIDIA_NIM_COMMON_URLS,
   });
+  const { t } = useTranslation();
 
   return (
     <div className="flex gap-[36px] mt-1.5">
       <div className="flex flex-col w-60">
         <div className="flex justify-between items-center mb-2">
           <label className="text-white text-sm font-semibold">
-            NVIDIA Nim Base URL
+            NVIDIA Nim {t("llm.providers.base_url")}
           </label>
           {loading ? (
             <PreLoader size="6" />
@@ -37,7 +38,7 @@ export default function RemoteNvidiaNimOptions({ settings }) {
                   onClick={handleAutoDetectClick}
                   className="bg-primary-button text-xs font-medium px-2 py-1 rounded-lg hover:bg-secondary hover:text-white shadow-[0_4px_14px_rgba(0,0,0,0.25)]"
                 >
-                  Auto-Detect
+                  {t("llm.providers.auto_detect")}
                 </button>
               )}
             </>
@@ -56,7 +57,7 @@ export default function RemoteNvidiaNimOptions({ settings }) {
           onBlur={basePath.onBlur}
         />
         <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-          Enter the URL where NVIDIA NIM is running.
+          {t("llm.providers.nvidia_nim.base_url_description")}
         </p>
       </div>
       {!settings?.credentialsOnly && (
@@ -71,6 +72,7 @@ export default function RemoteNvidiaNimOptions({ settings }) {
 function NvidiaNimModelSelection({ settings, basePath }) {
   const [models, setModels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -90,7 +92,7 @@ function NvidiaNimModelSelection({ settings, basePath }) {
     return (
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-3">
-          Chat Model Selection
+          {t("llm.providers.chat_model_selection")}
         </label>
         <select
           name="NvidiaNimLLMModelPref"
@@ -98,9 +100,12 @@ function NvidiaNimModelSelection({ settings, basePath }) {
           className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- loading available models --
+            -- {t("llm.providers.loading_models")} --
           </option>
         </select>
+        <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
+          {t("llm.providers.enter_valid_api_key")}
+        </p>
       </div>
     );
   }
@@ -108,7 +113,7 @@ function NvidiaNimModelSelection({ settings, basePath }) {
   return (
     <div className="flex flex-col w-60">
       <label className="text-white text-sm font-semibold block mb-3">
-        Chat Model Selection
+        {t("llm.providers.chat_model_selection")}
       </label>
       <select
         name="NvidiaNimLLMModelPref"

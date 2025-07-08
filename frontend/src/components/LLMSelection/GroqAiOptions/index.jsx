@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
 import System from "@/models/system";
+import { useTranslation } from "react-i18next";
 
 export default function GroqAiOptions({ settings }) {
   const [inputValue, setInputValue] = useState(settings?.GroqApiKey);
   const [apiKey, setApiKey] = useState(settings?.GroqApiKey);
+  const { t } = useTranslation();
 
   return (
     <div className="flex gap-[36px] mt-1.5">
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-3">
-          Groq API Key
+          {t("llm.providers.api_key")}
         </label>
         <input
           type="password"
@@ -35,6 +37,7 @@ export default function GroqAiOptions({ settings }) {
 function GroqAIModelSelection({ apiKey, settings }) {
   const [customModels, setCustomModels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -62,7 +65,7 @@ function GroqAIModelSelection({ apiKey, settings }) {
     return (
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-3">
-          Chat Model Selection
+          {t("llm.providers.chat_model_selection")}
         </label>
         <select
           name="GroqModelPref"
@@ -70,11 +73,11 @@ function GroqAIModelSelection({ apiKey, settings }) {
           className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            --loading available models--
+            -- {t("llm.providers.loading_models")} --
           </option>
         </select>
         <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-          Enter a valid API key to view all available models for your account.
+          {t("llm.providers.enter_valid_api_key")}
         </p>
       </div>
     );
@@ -83,7 +86,7 @@ function GroqAIModelSelection({ apiKey, settings }) {
   return (
     <div className="flex flex-col w-60">
       <label className="text-white text-sm font-semibold block mb-3">
-        Chat Model Selection
+        {t("llm.providers.chat_model_selection")}
       </label>
       <select
         name="GroqModelPref"

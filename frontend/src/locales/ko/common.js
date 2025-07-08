@@ -577,13 +577,119 @@ const TRANSLATIONS = {
         description:
           "Azure 서비스에서 호스팅되는 OpenAI의 엔터프라이즈 옵션입니다.",
         azure_service_endpoint: "Azure 서비스 엔드포인트",
-        api_key: "API 키",
         chat_deployment_name: "채팅 배포 이름",
         chat_model_token_limit: "채팅 모델 토큰 한도",
-        model_type: "모델 유형",
-        default: "기본값",
         reasoning: "추론",
       },
+      openai: {
+        description: "대부분의 비상업적 용도에 대한 표준 옵션입니다.",
+      },
+      anthropic: {
+        description: "Anthropic에서 제공하는 친근한 AI 어시스턴트입니다.",
+      },
+      gemini: {
+        description: "Google이 제공하는 가장 크고 강력한 AI 모델입니다.",
+      },
+      nvidia_nim: {
+        description:
+          "NVIDIA NIM을 사용하여 NVIDIA RTX GPU에서 직접 대규모 LLM을 실행하세요.",
+        base_url_description: "NVIDIA NIM이 실행되는 URL을 입력하세요.",
+      },
+      huggingface: {
+        description:
+          "150,000개 이상의 오픈소스 LLM과 전 세계 AI 커뮤니티에 접근하세요.",
+      },
+      ollama: {
+        description: "자신의 컴퓨터에서 LLM을 로컬로 실행하세요.",
+      },
+      dpais: {
+        description:
+          "Dell Pro AI Studio의 NPU를 활용해 강력한 LLM을 빠르게 실행하세요.",
+        dell_pro_ai_studio_base_url: "Dell Pro AI Studio 기본 URL",
+      },
+      lmstudio: {
+        description:
+          "몇 번의 클릭만으로 수천 개의 최신 LLM을 탐색, 다운로드, 실행하세요.",
+      },
+      localai: {
+        description: "자신의 컴퓨터에서 LLM을 로컬로 실행하세요.",
+      },
+      novita: {
+        description:
+          "Novita AI의 신뢰할 수 있고 확장 가능하며 비용 효율적인 LLM을 사용하세요.",
+      },
+      togetherai: {
+        description: "Together AI에서 제공하는 오픈소스 모델을 실행하세요.",
+      },
+      fireworksai: {
+        description:
+          "프로덕션 수준의 복합 AI 시스템 구축을 위한 가장 빠르고 효율적인 추론 엔진입니다.",
+      },
+      mistral: {
+        description: "Mistral AI의 오픈소스 모델을 실행하세요.",
+      },
+      perplexity: {
+        description:
+          "Perplexity AI에서 호스팅하는 강력하고 인터넷 연결된 모델을 실행하세요.",
+      },
+      openrouter: {
+        description: "여러 LLM을 위한 통합 인터페이스입니다.",
+      },
+      groq: {
+        description:
+          "실시간 AI 애플리케이션을 위한 가장 빠른 LLM 추론을 제공합니다.",
+      },
+      koboldcpp: {
+        description: "koboldcpp를 사용해 로컬 LLM을 실행하세요.",
+      },
+      textgenwebui: {
+        description: "Oobabooga의 문자 생성 웹 UI로 로컬 LLM을 실행하세요.",
+      },
+      cohere: {
+        description: "Cohere의 강력한 Command 모델을 실행하세요.",
+      },
+      litellm: {
+        description: "여러 LLM을 위한 OpenAI 호환 LiteLLM 프록시를 실행하세요.",
+      },
+      deepseek: {
+        description: "DeepSeek의 강력한 LLM을 실행하세요.",
+      },
+      ppio: {
+        description:
+          "DeepSeek, Llama, Qwen 등과 같은 안정적이고 비용 효율적인 오픈소스 LLM API를 실행하세요.",
+      },
+      bedrock: {
+        description:
+          "AWS Bedrock을 통해 강력한 파운데이션 모델을 프라이빗하게 실행하세요.",
+      },
+      apipie: {
+        description: "주요 제공업체의 AI 서비스를 통합한 통합 API입니다.",
+      },
+      generic_openai: {
+        description: "커스텀 설정을 통해 OpenAI 호환 서비스를 연결하세요.",
+      },
+      xai: {
+        description: "Grok-2 등 xAI의 강력한 LLM을 실행하세요.",
+      },
+      api_key: "API 키",
+      chat_model_selection: "채팅 모델 선택",
+      loading_models: "사용 가능한 모델을 불러오는 중...",
+      enter_valid_api_key:
+        "계정에 유효한 API 키를 입력하면 사용 가능한 모든 모델을 볼 수 있습니다.",
+      model_type: "모데 유형",
+      default: "기본",
+      token_context_window: "토큰 컨텍스트 창",
+      show_advanced_settings: "고급 설정 보이기",
+      hide_advanced_settings: "고급 설정 숨기기",
+      auto_detect: "자동 감지",
+      base_url: "기본 URL",
+      waiting_for_url: "URL 대기 중...",
+      waiting_for_api_key: "API 키 대기 중...",
+      optional: "선택 사항",
+      select_llm_required: "LLM을 선택해야 합니다.",
+      stream_timeout: "스트림 타임아웃 (ms)",
+      stream_timeout_description:
+        "토큰 응답 간 시간을 초과하면 자동으로 스트림을 종료합니다.",
     },
   },
 

@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
 import System from "@/models/system";
+import { useTranslation } from "react-i18next";
 
 export default function OpenAiOptions({ settings }) {
   const [inputValue, setInputValue] = useState(settings?.OpenAiKey);
   const [openAIKey, setOpenAIKey] = useState(settings?.OpenAiKey);
+  const { t } = useTranslation();
 
   return (
     <div className="flex gap-[36px] mt-1.5">
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-3">
-          API Key
+          {t("llm.providers.api_key")}
         </label>
         <input
           type="password"
@@ -34,6 +36,7 @@ export default function OpenAiOptions({ settings }) {
 function OpenAIModelSelection({ apiKey, settings }) {
   const [groupedModels, setGroupedModels] = useState({});
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -61,7 +64,7 @@ function OpenAIModelSelection({ apiKey, settings }) {
     return (
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-3">
-          Chat Model Selection
+          {t("llm.providers.chat_model_selection")}
         </label>
         <select
           name="OpenAiModelPref"
@@ -69,9 +72,12 @@ function OpenAIModelSelection({ apiKey, settings }) {
           className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- loading available models --
+            -- {t("llm.providers.loading_models")} --
           </option>
         </select>
+        <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
+          {t("llm.providers.enter_valid_api_key")}
+        </p>
       </div>
     );
   }
@@ -79,7 +85,7 @@ function OpenAIModelSelection({ apiKey, settings }) {
   return (
     <div className="flex flex-col w-60">
       <label className="text-white text-sm font-semibold block mb-3">
-        Chat Model Selection
+        {t("llm.providers.chat_model_selection")}
       </label>
       <select
         name="OpenAiModelPref"

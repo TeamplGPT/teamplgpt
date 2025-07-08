@@ -24,7 +24,7 @@ export default function AzureAiOptions({ settings }) {
 
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            {t("llm.providers.azure_openai.api_key")}
+            {t("llm.providers.api_key")}
           </label>
           <input
             type="password"
@@ -80,7 +80,7 @@ export default function AzureAiOptions({ settings }) {
 
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            {t("llm.providers.azure_openai.model_type")}
+            {t("llm.providers.model_type")}
           </label>
           <select
             name="AzureOpenAiModelType"
@@ -88,9 +88,7 @@ export default function AzureAiOptions({ settings }) {
             className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
             required={true}
           >
-            <option value="default">
-              {t("llm.providers.azure_openai.default")}
-            </option>
+            <option value="default">{t("llm.providers.default")}</option>
             <option value="reasoning">
               {t("llm.providers.azure_openai.reasoning")}
             </option>

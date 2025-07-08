@@ -590,13 +590,118 @@ const TRANSLATIONS = {
         description:
           "The enterprise option of OpenAI hosted on Azure services.",
         azure_service_endpoint: "Azure Service Endpoint",
-        api_key: "API Key",
         chat_deployment_name: "Chat Deployment Name",
         chat_model_token_limit: "Chat Model Token Limit",
         model_type: "Model Type",
         default: "Default",
         reasoning: "Reasoning",
       },
+      openai: {
+        description: "The standard option for most non-commercial use.",
+      },
+      anthropic: {
+        description: "A friendly AI Assistant hosted by Anthropic.",
+      },
+      gemini: {
+        description: "Google's largest and most capable AI model",
+      },
+      nvidia_nim: {
+        description:
+          "Run full parameter LLMs directly on your NVIDIA RTX GPU using NVIDIA NIM.",
+        base_url_description: "Enter the URL where NVIDIA NIM is running.",
+      },
+      huggingface: {
+        description:
+          "Access 150,000+ open-source LLMs and the world's AI community",
+      },
+      ollama: {
+        description: "Run LLMs locally on your own machine.",
+      },
+      dpais: {
+        description:
+          "Run powerful LLMs quickly on NPU powered by Dell Pro AI Studio.",
+        dell_pro_ai_studio_base_url: "Dell Pro AI Studio Base URL",
+      },
+      lmstudio: {
+        description:
+          "Discover, download, and run thousands of cutting edge LLMs in a few clicks.",
+      },
+      localai: {
+        description: "Run LLMs locally on your own machine.",
+      },
+      novita: {
+        description:
+          "Reliable, Scalable, and Cost-Effective for LLMs from Novita AI",
+      },
+      togetherai: {
+        description: "Run open source models from Together AI.",
+      },
+      fireworksai: {
+        description:
+          "The fastest and most efficient inference engine to build production-ready, compound AI systems.",
+      },
+      mistral: {
+        description: "Run open source models from Mistral AI.",
+      },
+      perplexity: {
+        description:
+          "Run powerful and internet-connected models hosted by Perplexity AI.",
+      },
+      openrouter: {
+        description: "A unified interface for LLMs.",
+      },
+      groq: {
+        description:
+          "The fastest LLM inferencing available for real-time AI applications.",
+      },
+      koboldcpp: {
+        description: "Run local LLMs using koboldcpp.",
+      },
+      textgenwebui: {
+        description: "Run local LLMs using Oobabooga's Text Generation Web UI.",
+      },
+      cohere: {
+        description: "Run Cohere's powerful Command models.",
+      },
+      litellm: {
+        description: "Run LiteLLM's OpenAI compatible proxy for various LLMs.",
+      },
+      deepseek: {
+        description: "Run DeepSeek's powerful LLMs.",
+      },
+      ppio: {
+        description:
+          "Run stable and cost-efficient open-source LLM APIs, such as DeepSeek, Llama, Qwen etc.",
+      },
+      bedrock: {
+        description:
+          "Run powerful foundation models privately with AWS Bedrock.",
+      },
+      apipie: {
+        description: "A unified API of AI services from leading providers",
+      },
+      generic_openai: {
+        description:
+          "Connect to any OpenAi-compatible service via a custom configuration",
+      },
+      xai: {
+        description: "Run xAI's powerful LLMs like Grok-2 and more.",
+      },
+      api_key: "API Key",
+      chat_model_selection: "Chat Model Selection",
+      loading_models: "Loading available models...",
+      enter_valid_api_key:
+        "Enter a valid API key to view all available models for your account.",
+      model_type: "Model Type",
+      default: "Default",
+      token_context_window: "Token Context Window",
+      show_advanced_settings: "Show Advanced Settings",
+      hide_advanced_settings: "Hide Advanced Settings",
+      auto_detect: "Auto-Detect",
+      base_url: "Base URL",
+      waiting_for_url: "Waiting for URL",
+      waiting_for_api_key: "Waiting for API Key",
+      optional: "optional",
       select_llm_required: "You need to select an LLM",
     },
   },
