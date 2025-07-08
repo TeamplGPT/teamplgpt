@@ -69,199 +69,189 @@ const LLMS = [
     value: "openai",
     logo: OpenAiLogo,
     options: (settings) => <OpenAiOptions settings={settings} />,
-    description: "The standard option for most non-commercial use.",
+    description: "llm.providers.openai.description",
   },
   {
     name: "Azure OpenAI",
     value: "azure",
     logo: AzureOpenAiLogo,
     options: (settings) => <AzureAiOptions settings={settings} />,
-    description: "The enterprise option of OpenAI hosted on Azure services.",
+    description: "llm.providers.azure_openai.description",
   },
   {
     name: "Anthropic",
     value: "anthropic",
     logo: AnthropicLogo,
     options: (settings) => <AnthropicAiOptions settings={settings} />,
-    description: "A friendly AI Assistant hosted by Anthropic.",
+    description: "llm.providers.anthropic.description",
   },
   {
     name: "Gemini",
     value: "gemini",
     logo: GeminiLogo,
     options: (settings) => <GeminiLLMOptions settings={settings} />,
-    description: "Google's largest and most capable AI model",
+    description: "llm.providers.gemini.description",
   },
   {
     name: "NVIDIA NIM",
     value: "nvidia-nim",
     logo: NvidiaNimLogo,
     options: (settings) => <NvidiaNimOptions settings={settings} />,
-    description:
-      "Run full parameter LLMs directly on your NVIDIA RTX GPU using NVIDIA NIM.",
+    description: "llm.providers.nvidia_nim.description",
   },
   {
     name: "HuggingFace",
     value: "huggingface",
     logo: HuggingFaceLogo,
     options: (settings) => <HuggingFaceOptions settings={settings} />,
-    description:
-      "Access 150,000+ open-source LLMs and the world's AI community",
+    description: "llm.providers.huggingface.description",
   },
   {
     name: "Ollama",
     value: "ollama",
     logo: OllamaLogo,
     options: (settings) => <OllamaLLMOptions settings={settings} />,
-    description: "Run LLMs locally on your own machine.",
+    description: "llm.providers.ollama.description",
   },
   {
     name: "Dell Pro AI Studio",
     value: "dpais",
     logo: DellProAiStudioLogo,
     options: (settings) => <DellProAiStudioOptions settings={settings} />,
-    description:
-      "Run powerful LLMs quickly on NPU powered by Dell Pro AI Studio.",
+    description: "llm.providers.dpais.description",
   },
   {
     name: "LM Studio",
     value: "lmstudio",
     logo: LMStudioLogo,
     options: (settings) => <LMStudioOptions settings={settings} />,
-    description:
-      "Discover, download, and run thousands of cutting edge LLMs in a few clicks.",
+    description: "llm.providers.lmstudio.description",
   },
   {
     name: "Local AI",
     value: "localai",
     logo: LocalAiLogo,
     options: (settings) => <LocalAiOptions settings={settings} />,
-    description: "Run LLMs locally on your own machine.",
+    description: "llm.providers.localai.description",
   },
   {
     name: "Novita AI",
     value: "novita",
     logo: NovitaLogo,
     options: (settings) => <NovitaLLMOptions settings={settings} />,
-    description:
-      "Reliable, Scalable, and Cost-Effective for LLMs from Novita AI",
+    description: "llm.providers.novita.description",
   },
   {
     name: "KoboldCPP",
     value: "koboldcpp",
     logo: KoboldCPPLogo,
     options: (settings) => <KoboldCPPOptions settings={settings} />,
-    description: "Run local LLMs using koboldcpp.",
+    description: "llm.providers.koboldcpp.description",
   },
   {
     name: "Oobabooga Web UI",
     value: "textgenwebui",
     logo: TextGenWebUILogo,
     options: (settings) => <TextGenWebUIOptions settings={settings} />,
-    description: "Run local LLMs using Oobabooga's Text Generation Web UI.",
+    description: "llm.providers.textgenwebui.description",
   },
   {
     name: "Together AI",
     value: "togetherai",
     logo: TogetherAILogo,
     options: (settings) => <TogetherAiOptions settings={settings} />,
-    description: "Run open source models from Together AI.",
+    description: "llm.providers.togetherai.description",
   },
   {
     name: "Fireworks AI",
     value: "fireworksai",
     logo: FireworksAILogo,
     options: (settings) => <FireworksAiOptions settings={settings} />,
-    description:
-      "The fastest and most efficient inference engine to build production-ready, compound AI systems.",
+    description: "llm.providers.fireworksai.description",
   },
   {
     name: "Mistral",
     value: "mistral",
     logo: MistralLogo,
     options: (settings) => <MistralOptions settings={settings} />,
-    description: "Run open source models from Mistral AI.",
+    description: "llm.providers.mistral.description",
   },
   {
     name: "Perplexity AI",
     value: "perplexity",
     logo: PerplexityLogo,
     options: (settings) => <PerplexityOptions settings={settings} />,
-    description:
-      "Run powerful and internet-connected models hosted by Perplexity AI.",
+    description: "llm.providers.perplexity.description",
   },
   {
     name: "OpenRouter",
     value: "openrouter",
     logo: OpenRouterLogo,
     options: (settings) => <OpenRouterOptions settings={settings} />,
-    description: "A unified interface for LLMs.",
+    description: "llm.providers.openrouter.description",
   },
   {
     name: "Groq",
     value: "groq",
     logo: GroqLogo,
     options: (settings) => <GroqAiOptions settings={settings} />,
-    description:
-      "The fastest LLM inferencing available for real-time AI applications.",
+    description: "llm.providers.groq.description",
   },
   {
     name: "Cohere",
     value: "cohere",
     logo: CohereLogo,
     options: (settings) => <CohereAiOptions settings={settings} />,
-    description: "Run Cohere's powerful Command models.",
+    description: "llm.providers.cohere.description",
   },
   {
     name: "LiteLLM",
     value: "litellm",
     logo: LiteLLMLogo,
     options: (settings) => <LiteLLMOptions settings={settings} />,
-    description: "Run LiteLLM's OpenAI compatible proxy for various LLMs.",
+    description: "llm.providers.litellm.description",
   },
   {
     name: "DeepSeek",
     value: "deepseek",
     logo: DeepSeekLogo,
     options: (settings) => <DeepSeekOptions settings={settings} />,
-    description: "Run DeepSeek's powerful LLMs.",
+    description: "llm.providers.deepseek.description",
   },
   {
     name: "PPIO",
     value: "ppio",
     logo: PPIOLogo,
     options: (settings) => <PPIOLLMOptions settings={settings} />,
-    description:
-      "Run stable and cost-efficient open-source LLM APIs, such as DeepSeek, Llama, Qwen etc.",
+    description: "llm.providers.ppio.description",
   },
   {
     name: "APIpie",
     value: "apipie",
     logo: APIPieLogo,
     options: (settings) => <ApiPieLLMOptions settings={settings} />,
-    description: "A unified API of AI services from leading providers",
+    description: "llm.providers.apipie.description",
   },
   {
     name: "Generic OpenAI",
     value: "generic-openai",
     logo: GenericOpenAiLogo,
     options: (settings) => <GenericOpenAiOptions settings={settings} />,
-    description:
-      "Connect to any OpenAi-compatible service via a custom configuration",
+    description: "llm.providers.generic_openai.description",
   },
   {
     name: "AWS Bedrock",
     value: "bedrock",
     logo: AWSBedrockLogo,
     options: (settings) => <AWSBedrockLLMOptions settings={settings} />,
-    description: "Run powerful foundation models privately with AWS Bedrock.",
+    description: "llm.providers.bedrock.description",
   },
   {
     name: "xAI",
     value: "xai",
     logo: XAILogo,
     options: (settings) => <XAILLMOptions settings={settings} />,
-    description: "Run xAI's powerful LLMs like Grok-2 and more.",
+    description: "llm.providers.xai.description",
   },
 ];
 
@@ -366,7 +356,7 @@ export default function LLMPreference({
                   name={llm.name}
                   value={llm.value}
                   image={llm.logo}
-                  description={llm.description}
+                  description={t(llm.description)}
                   checked={selectedLLM === llm.value}
                   onClick={() => setSelectedLLM(llm.value)}
                 />

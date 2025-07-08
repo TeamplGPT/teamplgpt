@@ -10,7 +10,7 @@ export default function LiteLLMOptions({ settings }) {
   const { t } = useTranslation();
   return (
     <div className="w-full flex flex-col gap-y-7 mt-1.5">
-      <div className="w-full flex items-center gap-[36px]">
+      <div className="w-full flex gap-[36px]">
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
             {t("llm.providers.base_url")}

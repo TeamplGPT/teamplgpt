@@ -52,7 +52,7 @@ const EMBEDDERS = [
     value: "openai",
     logo: OpenAiLogo,
     options: (settings) => <OpenAiOptions settings={settings} />,
-    description: "The standard option for most non-commercial use.",
+    description: "llm.providers.openai.description",
   },
   {
     name: "Azure OpenAI",
@@ -87,8 +87,7 @@ const EMBEDDERS = [
     value: "lmstudio",
     logo: LMStudioLogo,
     options: (settings) => <LMStudioEmbeddingOptions settings={settings} />,
-    description:
-      "Discover, download, and run thousands of cutting edge LLMs in a few clicks.",
+    description: "llm.providers.lmstudio.description",
   },
   {
     name: "Cohere",

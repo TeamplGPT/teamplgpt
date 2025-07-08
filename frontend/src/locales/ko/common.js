@@ -598,9 +598,45 @@ const TRANSLATIONS = {
       huggingface: {
         description:
           "150,000개 이상의 오픈소스 LLM과 전 세계 AI 커뮤니티에 접근하세요.",
+        inference_endpoint: "HuggingFace 추론 엔드포인트",
+        access_token: "HuggingFace 액세스 토큰",
+        model_token_limit: "모델 토큰 한도",
       },
       ollama: {
         description: "자신의 컴퓨터에서 LLM을 로컬로 실행하세요.",
+        model: "Ollama 모델",
+        model_description:
+          "사용하려는 Ollama 모델을 선택하세요. 유효한 Ollama URL을 입력한 후 모델이 로드됩니다.",
+        model_description_2: "대화에 사용하려는 Ollama 모델을 선택하세요.",
+        enter_ollama_url_first: "Ollama URL을 먼저 입력하세요",
+        model_token_limit: "최대 토큰",
+        model_token_limit_description:
+          "컨텍스트와 응답에 사용할 최대 토큰 수입니다.",
+        base_url_description: "Ollama가 실행되는 URL을 입력하세요.",
+        performance_mode: "성능 모드",
+        performance_mode_description: "Ollama 모델의 성능 모드를 선택하세요.",
+        base_mode: "기본 (기본값)",
+        maximum_mode: "최대",
+        note: "주의:",
+        note_description:
+          "최대 모드 사용 시 리소스 사용량이 크게 증가할 수 있으니 주의하세요.",
+        maximum_mode_description:
+          "전체 컨텍스트 윈도우(최대 토큰 수까지)를 사용합니다. 리소스 사용량이 크게 증가하지만 더 긴 대화가 가능합니다.<br /><br /> 대부분의 사용자에게는 권장하지 않습니다.",
+        base_mode_description:
+          "Ollama는 자동으로 컨텍스트를 2048 토큰으로 제한하여 리소스 사용을 최소화하면서도 우수한 성능을 유지합니다. 대부분의 사용자와 모델에 적합한 설정입니다.",
+        keep_alive: "Ollama 캐시 유지 시간",
+        no_cache: "캐시 없음",
+        five_minutes: "5분",
+        one_hour: "1시간",
+        forever: "영구",
+        keep_alive_description:
+          "Ollama가 모델을 메모리에 유지할 시간을 선택하세요.",
+        learn_more: "자세히 보기",
+        auth_token: "인증 토큰",
+        auth_token_description:
+          "Ollama 서버와 상호작용하기 위한 <code>Bearer</code> 인증 토큰을 입력하세요.",
+        auth_token_description_2:
+          "인증 서버 뒤에서 Ollama를 실행할 때만 사용됩니다.",
       },
       dpais: {
         description:
@@ -610,6 +646,19 @@ const TRANSLATIONS = {
       lmstudio: {
         description:
           "몇 번의 클릭만으로 수천 개의 최신 LLM을 탐색, 다운로드, 실행하세요.",
+        alert:
+          "LMStudio를 LLM으로 사용하려면 임베딩 서비스를 반드시 설정해야 합니다.",
+        manage_embedding: "임베딩 관리",
+        max_tokens: "최대 토큰",
+        max_tokens_description: "컨텍스트와 응답에 사용할 최대 토큰 수입니다.",
+        hide_endpoint_input: "엔드포인트 관리 숨기기",
+        show_endpoint_input: "엔드포인트 관리 보이기",
+        base_url_description: "LM Studio가 실행되는 URL을 입력하세요.",
+        model: "LM Studio 모델",
+        enter_url_first: "LM Studio URL을 먼저 입력하세요",
+        model_description:
+          "사용할 LM Studio 모델을 선택하세요. 올바른 LM Studio URL을 입력하면 모델 목록을 불러옵니다.",
+        model_description_2: "대화에 사용할 LM Studio 모델을 선택하세요.",
       },
       localai: {
         description: "자신의 컴퓨터에서 LLM을 로컬로 실행하세요.",
@@ -676,7 +725,7 @@ const TRANSLATIONS = {
       loading_models: "사용 가능한 모델을 불러오는 중...",
       enter_valid_api_key:
         "계정에 유효한 API 키를 입력하면 사용 가능한 모든 모델을 볼 수 있습니다.",
-      model_type: "모데 유형",
+      model_type: "모델 유형",
       default: "기본",
       token_context_window: "토큰 컨텍스트 창",
       show_advanced_settings: "고급 설정 보이기",

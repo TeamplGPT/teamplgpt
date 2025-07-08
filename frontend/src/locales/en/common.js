@@ -613,9 +613,47 @@ const TRANSLATIONS = {
       huggingface: {
         description:
           "Access 150,000+ open-source LLMs and the world's AI community",
+        inference_endpoint: "HuggingFace Inference Endpoint",
+        access_token: "HuggingFace Access Token",
+        model_token_limit: "Model Token Limit",
       },
       ollama: {
         description: "Run LLMs locally on your own machine.",
+        model: "Ollama Model",
+        model_description:
+          "Select the Ollama model you want to use. Models will load after entering a valid Ollama URL.",
+        model_description_2:
+          "Choose the Ollama model you want to use for your conversations.",
+        enter_ollama_url_first: "Enter Ollama URL first",
+        model_token_limit: "Max Tokens",
+        model_token_limit_description:
+          "Maximum number of tokens for context and response.",
+        base_url_description: "Enter the URL where Ollama is running.",
+        performance_mode: "Performance Mode",
+        performance_mode_description:
+          "Choose the performance mode for the Ollama model.",
+        base_mode: "Base (Default)",
+        maximum_mode: "Maximum",
+        note: "Note:",
+        note_description:
+          "Be careful with the Maximum mode. It may increase resource usage significantly.",
+        maximum_mode_description:
+          "Uses the full context window (up to Max Tokens). Will result in increased resource usage but allows for larger context conversations. <br /><br /> This is not recommended for most users.",
+        base_mode_description:
+          "Ollama automatically limits the context to 2048 tokens, keeping resources usage low while maintaining good performance. Suitable for most users and models.",
+        keep_alive: "Ollama Keep Alive",
+        no_cache: "No cache",
+        five_minutes: "5 minutes",
+        one_hour: "1 hour",
+        forever: "Forever",
+        keep_alive_description:
+          "Choose how long Ollama should keep your model in memory before unloading.",
+        learn_more: "Learn more",
+        auth_token: "Auth Token",
+        auth_token_description:
+          "Enter a <code>Bearer</code> Auth Token for interacting with your Ollama server.",
+        auth_token_description_2:
+          "Used <b>only</b> if running Ollama behind an authentication server.",
       },
       dpais: {
         description:
@@ -625,6 +663,21 @@ const TRANSLATIONS = {
       lmstudio: {
         description:
           "Discover, download, and run thousands of cutting edge LLMs in a few clicks.",
+        alert:
+          "LMStudio as your LLM requires you to set an embedding service to use.",
+        manage_embedding: "Manage embedding",
+        max_tokens: "Max Tokens",
+        max_tokens_description:
+          "Maximum number of tokens for context and response.",
+        hide_endpoint_input: "Hide Manual Endpoint Input",
+        show_endpoint_input: "Show Manual Endpoint Input",
+        base_url_description: "Enter the URL where LM Studio is running.",
+        model: "LM Studio Model",
+        enter_url_first: "Enter LM Studio URL first",
+        model_description:
+          "Select the LM Studio model you want to use. Models will load after entering a valid LM Studio URL.",
+        model_description_2:
+          "Choose the LM Studio model you want to use for your conversations.",
       },
       localai: {
         description: "Run LLMs locally on your own machine.",
@@ -655,7 +708,7 @@ const TRANSLATIONS = {
           "The fastest LLM inferencing available for real-time AI applications.",
       },
       koboldcpp: {
-        description: "Run local LLMs using koboldcpp.",
+        description: "Run local LLMs using KoboldCPP.",
       },
       textgenwebui: {
         description: "Run local LLMs using Oobabooga's Text Generation Web UI.",

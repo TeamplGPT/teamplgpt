@@ -26,7 +26,7 @@ export default function DellProAIStudioOptions({
 
   return (
     <div className="w-full flex flex-col gap-y-7">
-      <div className="w-full flex items-center gap-[36px] mt-1.5">
+      <div className="w-full flex gap-[36px] mt-1.5">
         {!settings?.credentialsOnly && (
           <>
             <DellProAiStudioModelSelection
@@ -61,8 +61,8 @@ export default function DellProAIStudioOptions({
           className="border-none text-theme-text-primary hover:text-theme-text-secondary flex items-center text-sm"
         >
           {showAdvancedControls
-            ? t("llm.providers.dpais.hide_advanced_settings")
-            : t("llm.providers.dpais.show_advanced_settings")}
+            ? t("llm.providers.hide_advanced_settings")
+            : t("llm.providers.show_advanced_settings")}
           {showAdvancedControls ? (
             <CaretUp size={14} className="ml-1" />
           ) : (

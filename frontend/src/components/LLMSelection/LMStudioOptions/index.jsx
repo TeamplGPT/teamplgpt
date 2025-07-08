@@ -5,8 +5,10 @@ import System from "@/models/system";
 import PreLoader from "@/components/Preloader";
 import { LMSTUDIO_COMMON_URLS } from "@/utils/constants";
 import useProviderEndpointAutoDiscovery from "@/hooks/useProviderEndpointAutoDiscovery";
+import { useTranslation } from "react-i18next";
 
 export default function LMStudioOptions({ settings, showAlert = false }) {
+  const { t } = useTranslation();
   const {
     autoDetecting: loading,
     basePath,
@@ -35,15 +37,14 @@ export default function LMStudioOptions({ settings, showAlert = false }) {
           <div className="gap-x-2 flex items-center">
             <Info size={12} className="hidden md:visible" />
             <p className="text-sm md:text-base">
-              LMStudio as your LLM requires you to set an embedding service to
-              use.
+              {t("llm.providers.lmstudio.alert")}
             </p>
           </div>
           <a
             href={paths.settings.embedder.modelPreference()}
             className="text-sm md:text-base my-2 underline"
           >
-            Manage embedding &rarr;
+            {t("llm.providers.lmstudio.manage_embedding")} &rarr;
           </a>
         </div>
       )}
@@ -51,7 +52,7 @@ export default function LMStudioOptions({ settings, showAlert = false }) {
         <LMStudioModelSelection settings={settings} basePath={basePath.value} />
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-2">
-            Max Tokens
+            {t("llm.providers.lmstudio.max_tokens")}
           </label>
           <input
             type="number"
@@ -67,7 +68,7 @@ export default function LMStudioOptions({ settings, showAlert = false }) {
             autoComplete="off"
           />
           <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-            Maximum number of tokens for context and response.
+            {t("llm.providers.lmstudio.max_tokens_description")}
           </p>
         </div>
       </div>
@@ -79,7 +80,9 @@ export default function LMStudioOptions({ settings, showAlert = false }) {
           }}
           className="border-none text-theme-text-primary hover:text-theme-text-secondary flex items-center text-sm"
         >
-          {showAdvancedControls ? "Hide" : "Show"} Manual Endpoint Input
+          {showAdvancedControls
+            ? t("llm.providers.lmstudio.hide_endpoint_input")
+            : t("llm.providers.lmstudio.show_endpoint_input")}
           {showAdvancedControls ? (
             <CaretUp size={14} className="ml-1" />
           ) : (
@@ -93,7 +96,7 @@ export default function LMStudioOptions({ settings, showAlert = false }) {
           <div className="flex flex-col w-60">
             <div className="flex justify-between items-center mb-2">
               <label className="text-white text-sm font-semibold">
-                LM Studio Base URL
+                LM Studio {t("llm.providers.base_url")}
               </label>
               {loading ? (
                 <PreLoader size="6" />
@@ -104,7 +107,7 @@ export default function LMStudioOptions({ settings, showAlert = false }) {
                       onClick={handleAutoDetectClick}
                       className="bg-primary-button text-xs font-medium px-2 py-1 rounded-lg hover:bg-secondary hover:text-white shadow-[0_4px_14px_rgba(0,0,0,0.25)]"
                     >
-                      Auto-Detect
+                      {t("llm.providers.auto_detect")}
                     </button>
                   )}
                 </>
@@ -123,7 +126,7 @@ export default function LMStudioOptions({ settings, showAlert = false }) {
               onBlur={basePath.onBlur}
             />
             <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-              Enter the URL where LM Studio is running.
+              {t("llm.providers.lmstudio.base_url_description")}
             </p>
           </div>
         </div>
@@ -135,6 +138,7 @@ export default function LMStudioOptions({ settings, showAlert = false }) {
 function LMStudioModelSelection({ settings, basePath = null }) {
   const [customModels, setCustomModels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -164,7 +168,7 @@ function LMStudioModelSelection({ settings, basePath = null }) {
     return (
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-2">
-          LM Studio Model
+          {t("llm.providers.lmstudio.model")}
         </label>
         <select
           name="LMStudioModelPref"
@@ -173,13 +177,12 @@ function LMStudioModelSelection({ settings, basePath = null }) {
         >
           <option disabled={true} selected={true}>
             {!!basePath
-              ? "--loading available models--"
-              : "Enter LM Studio URL first"}
+              ? t("llm.providers.loading_available_models")
+              : t("llm.providers.lmstudio.enter_url_first")}
           </option>
         </select>
         <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-          Select the LM Studio model you want to use. Models will load after
-          entering a valid LM Studio URL.
+          {t("llm.providers.lmstudio.model_description")}
         </p>
       </div>
     );
@@ -188,7 +191,7 @@ function LMStudioModelSelection({ settings, basePath = null }) {
   return (
     <div className="flex flex-col w-60">
       <label className="text-white text-sm font-semibold block mb-2">
-        LM Studio Model
+        {t("llm.providers.lmstudio.model")}
       </label>
       <select
         name="LMStudioModelPref"
@@ -212,7 +215,7 @@ function LMStudioModelSelection({ settings, basePath = null }) {
         )}
       </select>
       <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-        Choose the LM Studio model you want to use for your conversations.
+        {t("llm.providers.lmstudio.model_description_2")}
       </p>
     </div>
   );

@@ -58,6 +58,6 @@
     "XAILLM",
     "Zilliz"
   ],
-  "eslint.experimental.useFlatConfig": true,
+  "eslint.useFlatConfig": true,
   "docker.languageserver.formatter.ignoreMultilineInstructions": true
 }

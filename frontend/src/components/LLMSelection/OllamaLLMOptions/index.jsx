@@ -5,8 +5,11 @@ import { OLLAMA_COMMON_URLS } from "@/utils/constants";
 import { CaretDown, CaretUp, Info } from "@phosphor-icons/react";
 import useProviderEndpointAutoDiscovery from "@/hooks/useProviderEndpointAutoDiscovery";
 import { Tooltip } from "react-tooltip";
+import { useTranslation } from "react-i18next";
 
 export default function OllamaLLMOptions({ settings }) {
+  const { t } = useTranslation();
+
   const {
     autoDetecting: loading,
     basePath,
@@ -38,7 +41,7 @@ export default function OllamaLLMOptions({ settings }) {
         />
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-2">
-            Max Tokens
+            {t("llm.providers.ollama.model_token_limit")}
           </label>
           <input
             type="number"
@@ -54,7 +57,7 @@ export default function OllamaLLMOptions({ settings }) {
             autoComplete="off"
           />
           <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-            Maximum number of tokens for context and response.
+            {t("llm.providers.ollama.model_token_limit_description")}
           </p>
         </div>
       </div>
@@ -66,7 +69,9 @@ export default function OllamaLLMOptions({ settings }) {
           }}
           className="border-none text-theme-text-primary hover:text-theme-text-secondary flex items-center text-sm"
         >
-          {showAdvancedControls ? "Hide" : "Show"} advanced settings
+          {showAdvancedControls
+            ? t("llm.providers.hide_advanced_settings")
+            : t("llm.providers.show_advanced_settings")}
           {showAdvancedControls ? (
             <CaretUp size={14} className="ml-1" />
           ) : (
@@ -81,7 +86,7 @@ export default function OllamaLLMOptions({ settings }) {
             <div className="flex flex-col w-60">
               <div className="flex justify-between items-center mb-2">
                 <label className="text-white text-sm font-semibold">
-                  Ollama Base URL
+                  Ollama {t("llm.providers.base_url")}
                 </label>
                 {loading ? (
                   <PreLoader size="6" />
@@ -92,7 +97,7 @@ export default function OllamaLLMOptions({ settings }) {
                         onClick={handleAutoDetectClick}
                         className="bg-primary-button text-xs font-medium px-2 py-1 rounded-lg hover:bg-secondary hover:text-white shadow-[0_4px_14px_rgba(0,0,0,0.25)]"
                       >
-                        Auto-Detect
+                        {t("llm.providers.auto_detect")}
                       </button>
                     )}
                   </>
@@ -111,12 +116,12 @@ export default function OllamaLLMOptions({ settings }) {
                 onBlur={basePath.onBlur}
               />
               <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-                Enter the URL where Ollama is running.
+                {t("llm.providers.ollama.base_url_description")}
               </p>
             </div>
             <div className="flex flex-col w-60">
               <label className="text-white text-sm font-semibold mb-2 flex items-center">
-                Performance Mode
+                {t("llm.providers.ollama.performance_mode")}
                 <Info
                   size={16}
                   className="ml-2 text-white"
@@ -130,11 +135,15 @@ export default function OllamaLLMOptions({ settings }) {
                 value={performanceMode}
                 onChange={(e) => setPerformanceMode(e.target.value)}
               >
-                <option value="base">Base (Default)</option>
-                <option value="maximum">Maximum</option>
+                <option value="base">
+                  {t("llm.providers.ollama.base_mode")}
+                </option>
+                <option value="maximum">
+                  {t("llm.providers.ollama.maximum_mode")}
+                </option>
               </select>
               <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-                Choose the performance mode for the Ollama model.
+                {t("llm.providers.ollama.performance_mode_description")}
               </p>
               <Tooltip
                 id="performance-mode-tooltip"
@@ -142,28 +151,30 @@ export default function OllamaLLMOptions({ settings }) {
                 className="tooltip !text-xs max-w-xs"
               >
                 <p className="text-red-500">
-                  <strong>Note:</strong> Be careful with the Maximum mode. It
-                  may increase resource usage significantly.
+                  <strong>{t("llm.providers.ollama.note")}</strong>{" "}
+                  {t("llm.providers.ollama.note_description")}
                 </p>
                 <br />
                 <p>
-                  <strong>Base:</strong> Ollama automatically limits the context
-                  to 2048 tokens, keeping resources usage low while maintaining
-                  good performance. Suitable for most users and models.
+                  <strong>{t("llm.providers.ollama.base_mode")}:</strong>{" "}
+                  {t("llm.providers.ollama.base_mode_description")}
                 </p>
                 <br />
                 <p>
-                  <strong>Maximum:</strong> Uses the full context window (up to
-                  Max Tokens). Will result in increased resource usage but
-                  allows for larger context conversations. <br />
-                  <br />
-                  This is not recommended for most users.
+                  <strong>{t("llm.providers.ollama.maximum_mode")}:</strong>{" "}
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: t(
+                        "llm.providers.ollama.maximum_mode_description"
+                      ),
+                    }}
+                  />
                 </p>
               </Tooltip>
             </div>
             <div className="flex flex-col w-60">
               <label className="text-white text-sm font-semibold block mb-2">
-                Ollama Keep Alive
+                {t("llm.providers.ollama.keep_alive")}
               </label>
               <select
                 name="OllamaLLMKeepAliveSeconds"
@@ -171,14 +182,17 @@ export default function OllamaLLMOptions({ settings }) {
                 className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
                 defaultValue={settings?.OllamaLLMKeepAliveSeconds ?? "300"}
               >
-                <option value="0">No cache</option>
-                <option value="300">5 minutes</option>
-                <option value="3600">1 hour</option>
-                <option value="-1">Forever</option>
+                <option value="0">{t("llm.providers.ollama.no_cache")}</option>
+                <option value="300">
+                  {t("llm.providers.ollama.five_minutes")}
+                </option>
+                <option value="3600">
+                  {t("llm.providers.ollama.one_hour")}
+                </option>
+                <option value="-1">{t("llm.providers.ollama.forever")}</option>
               </select>
               <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-                Choose how long Ollama should keep your model in memory before
-                unloading.
+                {t("llm.providers.ollama.keep_alive_description")}
                 <a
                   className="underline text-blue-300"
                   href="https://github.com/ollama/ollama/blob/main/docs/faq.md#how-do-i-keep-a-model-loaded-in-memory-or-make-it-unload-immediately"
@@ -186,7 +200,7 @@ export default function OllamaLLMOptions({ settings }) {
                   rel="noreferrer"
                 >
                   {" "}
-                  Learn more &rarr;
+                  {t("llm.providers.ollama.learn_more")} &rarr;
                 </a>
               </p>
             </div>
@@ -194,15 +208,21 @@ export default function OllamaLLMOptions({ settings }) {
           <div className="w-full flex items-start gap-4">
             <div className="flex flex-col w-100">
               <label className="text-white text-sm font-semibold">
-                Auth Token
+                {t("llm.providers.ollama.auth_token")}
               </label>
-              <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-                Enter a <code>Bearer</code> Auth Token for interacting with your
-                Ollama server.
-                <br />
-                Used <b>only</b> if running Ollama behind an authentication
-                server.
-              </p>
+              <div className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: t("llm.providers.ollama.auth_token_description"),
+                  }}
+                />
+                <div
+                  className="mt-1"
+                  dangerouslySetInnerHTML={{
+                    __html: t("llm.providers.ollama.auth_token_description_2"),
+                  }}
+                />
+              </div>
               <input
                 type="password"
                 name="OllamaLLMAuthToken"
@@ -233,6 +253,7 @@ function OllamaLLMModelSelection({
 }) {
   const [customModels, setCustomModels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -262,7 +283,7 @@ function OllamaLLMModelSelection({
     return (
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-2">
-          Ollama Model
+          {t("llm.providers.ollama.model")}
         </label>
         <select
           name="OllamaLLMModelPref"
@@ -271,13 +292,12 @@ function OllamaLLMModelSelection({
         >
           <option disabled={true} selected={true}>
             {!!basePath
-              ? "--loading available models--"
-              : "Enter Ollama URL first"}
+              ? t("llm.providers.loading_available_models")
+              : t("llm.providers.ollama.enter_ollama_url_first")}
           </option>
         </select>
         <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-          Select the Ollama model you want to use. Models will load after
-          entering a valid Ollama URL.
+          {t("llm.providers.ollama.model_description")}
         </p>
       </div>
     );
@@ -286,7 +306,7 @@ function OllamaLLMModelSelection({
   return (
     <div className="flex flex-col w-60">
       <label className="text-white text-sm font-semibold block mb-2">
-        Ollama Model
+        {t("llm.providers.ollama.model")}
       </label>
       <select
         name="OllamaLLMModelPref"
@@ -310,7 +330,7 @@ function OllamaLLMModelSelection({
         )}
       </select>
       <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-        Choose the Ollama model you want to use for your conversations.
+        {t("llm.providers.ollama.model_description_2")}
       </p>
     </div>
   );
