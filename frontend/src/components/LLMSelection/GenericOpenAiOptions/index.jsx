@@ -1,10 +1,13 @@
+import { useTranslation } from "react-i18next";
+
 export default function GenericOpenAiOptions({ settings }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-y-7">
       <div className="flex gap-[36px] mt-1.5 flex-wrap">
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            Base URL
+            {t("llm.providers.base_url")}
           </label>
           <input
             type="url"
@@ -19,7 +22,7 @@ export default function GenericOpenAiOptions({ settings }) {
         </div>
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            API Key
+            {t("llm.providers.api_key")}
           </label>
           <input
             type="password"
@@ -34,13 +37,15 @@ export default function GenericOpenAiOptions({ settings }) {
         </div>
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            Chat Model Name
+            {t("llm.providers.generic_openai.chat_model_name")}
           </label>
           <input
             type="text"
             name="GenericOpenAiModelPref"
             className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
-            placeholder="Model id used for chat requests"
+            placeholder={t(
+              "llm.providers.generic_openai.model_id_used_for_chat_requests"
+            )}
             defaultValue={settings?.GenericOpenAiModelPref}
             required={true}
             autoComplete="off"
@@ -50,13 +55,13 @@ export default function GenericOpenAiOptions({ settings }) {
       <div className="flex gap-[36px] flex-wrap">
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            Token context window
+            {t("llm.providers.token_context_window")}
           </label>
           <input
             type="number"
             name="GenericOpenAiTokenLimit"
             className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
-            placeholder="Content window limit (eg: 4096)"
+            placeholder={t("llm.providers.token_context_window_placeholder")}
             min={1}
             onScroll={(e) => e.target.blur()}
             defaultValue={settings?.GenericOpenAiTokenLimit}
@@ -66,13 +71,15 @@ export default function GenericOpenAiOptions({ settings }) {
         </div>
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            Max Tokens
+            {t("llm.providers.max_tokens")}
           </label>
           <input
             type="number"
             name="GenericOpenAiMaxTokens"
             className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
-            placeholder="Max tokens per request (eg: 1024)"
+            placeholder={t(
+              "llm.providers.generic_openai.max_tokens_per_request_placeholder"
+            )}
             min={1}
             defaultValue={settings?.GenericOpenAiMaxTokens || 1024}
             required={true}

@@ -666,7 +666,6 @@ const TRANSLATIONS = {
         alert:
           "LMStudio as your LLM requires you to set an embedding service to use.",
         manage_embedding: "Manage embedding",
-        max_tokens: "Max Tokens",
         max_tokens_description:
           "Maximum number of tokens for context and response.",
         hide_endpoint_input: "Hide Manual Endpoint Input",
@@ -742,6 +741,23 @@ const TRANSLATIONS = {
       bedrock: {
         description:
           "Run powerful foundation models privately with AWS Bedrock.",
+        alert: "You should use a properly defined IAM user for inferencing.",
+        read_more: "Read more on how to use AWS Bedrock in AnythingLLM",
+        use_session_token: "Use session token",
+        select_method: "Select the method to authenticate with AWS Bedrock.",
+        iam_explicit_credentials: "IAM (Explicit Credentials)",
+        session_token: "Session Token (Temporary Credentials)",
+        iam_role: "IAM Role (Implied Credentials)",
+        iam_access_id: "AWS Bedrock IAM Access ID",
+        iam_access_key: "AWS Bedrock IAM Access Key",
+        session_token_placeholder: "AWS Bedrock Session Token",
+        aws_region: "AWS region",
+        model_id: "Model ID",
+        model_id_placeholder: "Model id from AWS eg: meta.llama3.1-v0.1",
+        model_context_window: "Model context window",
+        model_context_window_placeholder: "Content window limit (eg: 8192)",
+        model_max_output_tokens: "Model max output tokens",
+        model_max_output_tokens_placeholder: "Max output tokens (eg: 4096)",
       },
       apipie: {
         description: "A unified API of AI services from leading providers",
@@ -749,6 +765,9 @@ const TRANSLATIONS = {
       generic_openai: {
         description:
           "Connect to any OpenAi-compatible service via a custom configuration",
+        chat_model_name: "Chat Model Name",
+        model_id_used_for_chat_requests: "Model id used for chat requests",
+        max_tokens_per_request_placeholder: "Max tokens per request (eg: 1024)",
       },
       xai: {
         description: "Run xAI's powerful LLMs like Grok-2 and more.",
@@ -769,6 +788,8 @@ const TRANSLATIONS = {
       waiting_for_api_key: "Waiting for API Key",
       optional: "optional",
       select_llm_required: "You need to select an LLM",
+      max_tokens: "Max Tokens",
+      token_context_window_placeholder: "Content window limit (eg: 4096)",
     },
   },
 

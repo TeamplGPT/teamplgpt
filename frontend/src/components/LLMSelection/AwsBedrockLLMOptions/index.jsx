@@ -1,8 +1,10 @@
 import { ArrowSquareOut, Info } from "@phosphor-icons/react";
 import { AWS_REGIONS } from "./regions";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function AwsBedrockLLMOptions({ settings }) {
+  const { t } = useTranslation();
   const [connectionMethod, setConnectionMethod] = useState(
     settings?.AwsBedrockLLMConnectionMethod ?? "iam"
   );
@@ -15,7 +17,7 @@ export default function AwsBedrockLLMOptions({ settings }) {
           <div className="gap-x-2 flex items-center">
             <Info size={40} />
             <p className="text-base">
-              You should use a properly defined IAM user for inferencing.
+              {t("llm.providers.bedrock.alert")}
               <br />
               <a
                 href="https://docs.anythingllm.com/setup/llm-configuration/cloud/aws-bedrock"
@@ -23,7 +25,7 @@ export default function AwsBedrockLLMOptions({ settings }) {
                 rel="noreferrer"
                 className="underline flex gap-x-1 items-center"
               >
-                Read more on how to use AWS Bedrock in AnythingLLM
+                {t("llm.providers.bedrock.read_more")}
                 <ArrowSquareOut size={14} />
               </a>
             </p>
@@ -39,10 +41,10 @@ export default function AwsBedrockLLMOptions({ settings }) {
         />
         <div className="flex flex-col w-full">
           <label className="text-theme-text-primary text-sm font-semibold block mb-3">
-            Use session token
+            {t("llm.providers.bedrock.use_session_token")}
           </label>
           <p className="text-theme-text-secondary text-sm">
-            Select the method to authenticate with AWS Bedrock.
+            {t("llm.providers.bedrock.select_method")}
           </p>
         </div>
         <select
@@ -52,11 +54,15 @@ export default function AwsBedrockLLMOptions({ settings }) {
           onChange={(e) => setConnectionMethod(e.target.value)}
           className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-fit p-2.5"
         >
-          <option value="iam">IAM (Explicit Credentials)</option>
-          <option value="sessionToken">
-            Session Token (Temporary Credentials)
+          <option value="iam">
+            {t("llm.providers.bedrock.iam_explicit_credentials")}
           </option>
-          <option value="iam_role">IAM Role (Implied Credentials)</option>
+          <option value="sessionToken">
+            {t("llm.providers.bedrock.session_token")}
+          </option>
+          <option value="iam_role">
+            {t("llm.providers.bedrock.iam_role")}
+          </option>
         </select>
       </div>
 
@@ -65,7 +71,7 @@ export default function AwsBedrockLLMOptions({ settings }) {
           <>
             <div className="flex flex-col w-60">
               <label className="text-white text-sm font-semibold block mb-3">
-                AWS Bedrock IAM Access ID
+                {t("llm.providers.bedrock.iam_access_id")}
               </label>
               <input
                 type="password"
@@ -82,7 +88,7 @@ export default function AwsBedrockLLMOptions({ settings }) {
             </div>
             <div className="flex flex-col w-60">
               <label className="text-white text-sm font-semibold block mb-3">
-                AWS Bedrock IAM Access Key
+                {t("llm.providers.bedrock.iam_access_key")}
               </label>
               <input
                 type="password"
@@ -93,7 +99,7 @@ export default function AwsBedrockLLMOptions({ settings }) {
                   settings?.AwsBedrockLLMAccessKey ? "*".repeat(20) : ""
                 }
                 required={true}
-                autoComplete="off"
+                autoComplete="new-password"
                 spellCheck={false}
               />
             </div>
@@ -102,25 +108,25 @@ export default function AwsBedrockLLMOptions({ settings }) {
         {connectionMethod === "sessionToken" && (
           <div className="flex flex-col w-60">
             <label className="text-theme-text-primary text-sm font-semibold block mb-3">
-              AWS Bedrock Session Token
+              {t("llm.providers.bedrock.session_token")}
             </label>
             <input
               type="password"
               name="AwsBedrockLLMSessionToken"
               className="border-none bg-theme-settings-input-bg text-theme-text-primary placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
-              placeholder="AWS Bedrock Session Token"
+              placeholder={t("llm.providers.bedrock.session_token_placeholder")}
               defaultValue={
                 settings?.AwsBedrockLLMSessionToken ? "*".repeat(20) : ""
               }
               required={true}
-              autoComplete="off"
+              autoComplete="new-password"
               spellCheck={false}
             />
           </div>
         )}
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            AWS region
+            {t("llm.providers.bedrock.aws_region")}
           </label>
           <select
             name="AwsBedrockLLMRegion"
@@ -144,13 +150,13 @@ export default function AwsBedrockLLMOptions({ settings }) {
           <>
             <div className="flex flex-col w-60">
               <label className="text-white text-sm font-semibold block mb-3">
-                Model ID
+                {t("llm.providers.bedrock.model_id")}
               </label>
               <input
                 type="text"
                 name="AwsBedrockLLMModel"
                 className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
-                placeholder="Model id from AWS eg: meta.llama3.1-v0.1"
+                placeholder={t("llm.providers.bedrock.model_id_placeholder")}
                 defaultValue={settings?.AwsBedrockLLMModel}
                 required={true}
                 autoComplete="off"
@@ -159,13 +165,15 @@ export default function AwsBedrockLLMOptions({ settings }) {
             </div>
             <div className="flex flex-col w-60">
               <label className="text-white text-sm font-semibold block mb-3">
-                Model context window
+                {t("llm.providers.bedrock.model_context_window")}
               </label>
               <input
                 type="number"
                 name="AwsBedrockLLMTokenLimit"
                 className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
-                placeholder="Content window limit (eg: 8192)"
+                placeholder={t(
+                  "llm.providers.bedrock.model_context_window_placeholder"
+                )}
                 min={1}
                 onScroll={(e) => e.target.blur()}
                 defaultValue={settings?.AwsBedrockLLMTokenLimit}
@@ -175,13 +183,15 @@ export default function AwsBedrockLLMOptions({ settings }) {
             </div>
             <div className="flex flex-col w-60">
               <label className="text-white text-sm font-semibold block mb-3">
-                Model max output tokens
+                {t("llm.providers.bedrock.model_max_output_tokens")}
               </label>
               <input
                 type="number"
                 name="AwsBedrockLLMMaxOutputTokens"
                 className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
-                placeholder="Max output tokens (eg: 4096)"
+                placeholder={t(
+                  "llm.providers.bedrock.model_max_output_tokens_placeholder"
+                )}
                 min={1}
                 onScroll={(e) => e.target.blur()}
                 defaultValue={settings?.AwsBedrockLLMMaxOutputTokens}

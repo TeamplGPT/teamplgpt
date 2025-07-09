@@ -649,7 +649,6 @@ const TRANSLATIONS = {
         alert:
           "LMStudio를 LLM으로 사용하려면 임베딩 서비스를 반드시 설정해야 합니다.",
         manage_embedding: "임베딩 관리",
-        max_tokens: "최대 토큰",
         max_tokens_description: "컨텍스트와 응답에 사용할 최대 토큰 수입니다.",
         hide_endpoint_input: "엔드포인트 관리 숨기기",
         show_endpoint_input: "엔드포인트 관리 보이기",
@@ -720,12 +719,34 @@ const TRANSLATIONS = {
       bedrock: {
         description:
           "AWS Bedrock을 통해 강력한 파운데이션 모델을 프라이빗하게 실행하세요.",
+        alert:
+          "AWS Bedrock을 사용하려면 적절하게 정의된 IAM 사용자를 사용해야 합니다.",
+        read_more:
+          "AnythingLLM에서 AWS Bedrock을 사용하는 방법에 대해 자세히 알아보세요",
+        use_session_token: "세션 토큰 사용",
+        select_method: "AWS Bedrock에 인증하는 방법을 선택하세요.",
+        iam_explicit_credentials: "IAM (명시적 자격 증명)",
+        session_token: "Session Token (임시 자격 증명)",
+        iam_role: "IAM Role (암시적 자격 증명)",
+        iam_access_id: "AWS Bedrock IAM 액세스 ID",
+        iam_access_key: "AWS Bedrock IAM 액세스 키",
+        session_token_placeholder: "AWS Bedrock 세션 토큰",
+        aws_region: "AWS 리전",
+        model_id: "모델 ID",
+        model_id_placeholder: "AWS에서 모델 ID (예: meta.llama3.1-v0.1)",
+        model_context_window: "모델 컨텍스트 창",
+        model_context_window_placeholder: "컨텍스트 창 한도 (예: 8192)",
+        model_max_output_tokens: "모델 최대 출력 토큰",
+        model_max_output_tokens_placeholder: "최대 출력 토큰 (예: 4096)",
       },
       apipie: {
         description: "주요 제공업체의 AI 서비스를 통합한 통합 API입니다.",
       },
       generic_openai: {
         description: "커스텀 설정을 통해 OpenAI 호환 서비스를 연결하세요.",
+        chat_model_name: "채팅 모델 이름",
+        model_id_used_for_chat_requests: "채팅 요청에 사용되는 모델 ID",
+        max_tokens_per_request_placeholder: "요청당 최대 토큰 (예: 1024)",
       },
       xai: {
         description: "Grok-2 등 xAI의 강력한 LLM을 실행하세요.",
@@ -749,6 +770,8 @@ const TRANSLATIONS = {
       stream_timeout: "스트림 타임아웃 (ms)",
       stream_timeout_description:
         "토큰 응답 간 시간을 초과하면 자동으로 스트림을 종료합니다.",
+      max_tokens: "최대 토큰",
+      token_context_window_placeholder: "컨텍스트 창 한도 (예: 4096)",
     },
   },
 

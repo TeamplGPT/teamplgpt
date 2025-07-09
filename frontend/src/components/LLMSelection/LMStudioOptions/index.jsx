@@ -52,7 +52,7 @@ export default function LMStudioOptions({ settings, showAlert = false }) {
         <LMStudioModelSelection settings={settings} basePath={basePath.value} />
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-2">
-            {t("llm.providers.lmstudio.max_tokens")}
+            {t("llm.providers.max_tokens")}
           </label>
           <input
             type="number"
