@@ -690,6 +690,16 @@ const TRANSLATIONS = {
       },
       koboldcpp: {
         description: "koboldcpp를 사용해 로컬 LLM을 실행하세요.",
+        max_tokens_description: "컨텍스트와 응답에 사용할 최대 토큰 수입니다.",
+        max_response_tokens: "최대 응답 토큰",
+        max_response_tokens_description: "응답에 사용할 최대 토큰 수입니다.",
+        hide_manual_endpoint_input: "수동 엔드포인트 입력 숨기기",
+        show_manual_endpoint_input: "수동 엔드포인트 입력 보이기",
+        base_url_description: "KoboldCPP가 실행되는 URL을 입력하세요.",
+        model: "KoboldCPP 모델",
+        model_description:
+          "사용할 KoboldCPP 모델을 선택하세요. 유효한 KoboldCPP URL을 입력하면 모델을 불러옵니다.",
+        model_description_2: "대화에 사용할 KoboldCPP 모델을 선택하세요.",
       },
       textgenwebui: {
         description: "Oobabooga의 문자 생성 웹 UI로 로컬 LLM을 실행하세요.",

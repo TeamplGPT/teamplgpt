@@ -709,6 +709,19 @@ const TRANSLATIONS = {
       },
       koboldcpp: {
         description: "Run local LLMs using KoboldCPP.",
+        max_tokens_description:
+          "Maximum number of tokens for context and response.",
+        max_response_tokens: "Max response tokens",
+        max_response_tokens_description:
+          "Maximum number of tokens for the response.",
+        hide_manual_endpoint_input: "Hide Manual Endpoint Input",
+        show_manual_endpoint_input: "Show Manual Endpoint Input",
+        base_url_description: "Enter the URL where KoboldCPP is running.",
+        model: "KoboldCPP Model",
+        model_description:
+          "Select the KoboldCPP model you want to use. Models will load after entering a valid KoboldCPP URL.",
+        model_description_2:
+          "Choose the KoboldCPP model you want to use for your conversations.",
       },
       textgenwebui: {
         description: "Run local LLMs using Oobabooga's Text Generation Web UI.",
