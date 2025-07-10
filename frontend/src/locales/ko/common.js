@@ -55,6 +55,7 @@ const TRANSLATIONS = {
         "첫 번째 워크스페이스를 생성하고 AnythingLLM을 시작해보세요.",
     },
   },
+
   common: {
     "workspaces-name": "워크스페이스 이름",
     error: "오류",
@@ -68,6 +69,7 @@ const TRANSLATIONS = {
     optional: "선택 사항",
     yes: "예",
     no: "아니오",
+    "your-admin-password": "관리자 비밀번호",
   },
 
   // Setting Sidebar menu items.
@@ -901,9 +903,124 @@ const TRANSLATIONS = {
     title: "개인정보와 데이터 처리",
     description:
       "연결된 타사 제공자와 AnythingLLM이 데이터를 처리하는 방식을 구성합니다.",
-    llm: "LLM 선택",
-    embedding: "임베딩 기본 설정",
-    vector: "벡터 데이터베이스",
+    llm: {
+      title: "LLM 선택",
+      openai: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 OpenAI에 노출될 수 있습니다",
+      },
+      azure: {
+        description:
+          "입력한 텍스트와 임베딩 데이터는 OpenAI 또는 Microsoft에 노출되지 않습니다",
+      },
+      anthropic: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 Anthropic에 노출될 수 있습니다",
+      },
+      gemini: {
+        description: "대화 내용은 식별되지 않고 학습에 사용됩니다",
+        description2:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 Google에 노출될 수 있습니다",
+      },
+      nvidia_nim: {
+        description:
+          "NVIDIA NIM을 실행하는 머신에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      lmstudio: {
+        description:
+          "LMStudio를 실행하는 서버에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      localai: {
+        description:
+          "LocalAI를 실행하는 서버에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      ollama: {
+        description:
+          "Ollama 모델을 실행하는 머신에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      togetherai: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 TogetherAI에 노출될 수 있습니다",
+      },
+      fireworksai: {
+        description2:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 Fireworks AI에 노출될 수 있습니다",
+      },
+      mistral: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 Mistral에 노출될 수 있습니다",
+      },
+      huggingface: {
+        description:
+          "응답에 사용된 프롬프트와 문서 내용이 사용자의 HuggingFace 관리 엔드포인트로 전송됩니다",
+      },
+      perplexity: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 Perplexity AI에 노출될 수 있습니다",
+      },
+      openrouter: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 OpenRouter에 노출될 수 있습니다",
+      },
+      novita: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 Novita AI에 노출될 수 있습니다",
+      },
+      groq: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 Groq에 노출될 수 있습니다",
+      },
+      koboldcpp: {
+        description:
+          "KoboldCPP를 실행하는 서버에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      textgenwebui: {
+        description:
+          "Oobabooga Text Generation Web UI를 실행하는 서버에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      generic_openai: {
+        description:
+          "데이터는 사용 중인 Generic Openai 엔드포인트 제공업체의 서비스 약관에 따라 공유됩니다.",
+      },
+      cohere: {
+        description:
+          "cohere.com의 서비스 약관과 지역 개인정보 보호법에 따라 데이터가 공유됩니다.",
+      },
+      litellm: {
+        description:
+          "LiteLLM를 실행하는 서버에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      bedrock: {
+        description:
+          "모델과 대화 내용은 AWS 및 aws.amazon.com의 모델 제공업체와 체결한 EULA(최종 사용자 라이선스 계약)에 따라 처리됩니다.",
+      },
+      deepseek: {
+        description: "모델과 대화 내용은 DeepSeek에 노출될 수 있습니다",
+      },
+      apipie: {
+        description:
+          "모델과 대화 내용은 APIpie의 서비스 약관에 따라 노출될 수 있습니다.",
+      },
+      xai: {
+        description:
+          "모델과 대화 내용은 xAI의 서비스 약관에 따라 노출될 수 있습니다.",
+      },
+      ppio: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 PPIO에 노출될 수 있습니다",
+      },
+      dpais: {
+        description:
+          "Dell Pro AI Studio를 실행하는 머신에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      description: "대화 내용은 학습에 사용되지 않습니다",
+    },
+    embedding: {
+      title: "임베딩 기본 설정",
+    },
+    vector: {
+      title: "벡터 데이터베이스",
+    },
     anonymous: "익명 원격 분석 활성화",
   },
 

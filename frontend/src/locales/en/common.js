@@ -57,6 +57,7 @@ const TRANSLATIONS = {
         "Create your first workspace and get started with AnythingLLM.",
     },
   },
+
   common: {
     "workspaces-name": "Workspaces Name",
     error: "error",
@@ -70,6 +71,7 @@ const TRANSLATIONS = {
     optional: "Optional",
     yes: "Yes",
     no: "No",
+    "your-admin-password": "Your admin password",
   },
 
   // Setting Sidebar menu items.
@@ -924,9 +926,125 @@ const TRANSLATIONS = {
     title: "Privacy & Data-Handling",
     description:
       "This is your configuration for how connected third party providers and AnythingLLM handle your data.",
-    llm: "LLM Selection",
-    embedding: "Embedding Preference",
-    vector: "Vector Database",
+    llm: {
+      title: "LLM Selection",
+      openai: {
+        description:
+          "Your prompts and document text used in response creation are visible to OpenAI",
+      },
+      azure: {
+        description:
+          "Your text and embedding text are not visible to OpenAI or Microsoft",
+      },
+      anthropic: {
+        description:
+          "Your prompts and document text used in response creation are visible to Anthropic",
+      },
+      gemini: {
+        description: "Your chats are de-identified and used in training",
+        description2:
+          "Your prompts and document text used in response creation are visible to Google",
+      },
+      nvidia_nim: {
+        description:
+          "Your model and chats are only accessible on the machine running the NVIDIA NIM",
+      },
+      lmstudio: {
+        description:
+          "Your model and chats are only accessible on the server running LMStudio",
+      },
+      localai: {
+        description:
+          "Your model and chats are only accessible on the server running LocalAI",
+      },
+      ollama: {
+        description:
+          "Your model and chats are only accessible on the machine running Ollama models",
+      },
+      togetherai: {
+        description:
+          "Your prompts and document text used in response creation are visible to TogetherAI",
+      },
+      fireworksai: {
+        description2:
+          "Your prompts and document text used in response creation are visible to Fireworks AI",
+      },
+      mistral: {
+        description:
+          "Your prompts and document text used in response creation are visible to Mistral",
+      },
+      huggingface: {
+        description:
+          "Your prompts and document text used in response are sent to your HuggingFace managed endpoint",
+      },
+      perplexity: {
+        description:
+          "Your prompts and document text used in response creation are visible to Perplexity AI",
+      },
+      openrouter: {
+        description:
+          "Your prompts and document text used in response creation are visible to OpenRouter",
+      },
+      novita: {
+        description:
+          "Your prompts and document text used in response creation are visible to Novita AI",
+      },
+      groq: {
+        description:
+          "Your prompts and document text used in response creation are visible to Groq",
+      },
+      koboldcpp: {
+        description:
+          "Your model and chats are only accessible on the server running KoboldCPP",
+      },
+      textgenwebui: {
+        description:
+          "Your model and chats are only accessible on the server running the Oobabooga Text Generation Web UI",
+      },
+      generic_openai: {
+        description:
+          "Data is shared according to the terms of service applicable with your generic endpoint provider.",
+      },
+      cohere: {
+        description:
+          "Data is shared according to the terms of service of cohere.com and your localities privacy laws.",
+      },
+      litellm: {
+        description:
+          "Your model and chats are only accessible on the server running LiteLLM",
+      },
+      bedrock: {
+        description:
+          "You model and chat contents are subject to the agreed EULA for AWS and the model provider on aws.amazon.com",
+      },
+      deepseek: {
+        description: "Your model and chat contents are visible to DeepSeek",
+      },
+      apipie: {
+        description:
+          "Your model and chat contents are visible to APIpie in accordance with their terms of service.",
+      },
+      xai: {
+        description:
+          "Your model and chat contents are visible to xAI in accordance with their terms of service.",
+      },
+      ppio: {
+        description:
+          "Your prompts and document text used in response creation are visible to PPIO",
+      },
+      dpais: {
+        description:
+          "Your model and chat contents are only accessible on the computer running Dell Pro AI Studio",
+      },
+      description: "Your chats will not be used for training",
+    },
+    embedding: {
+      title: "Embedding Preference",
+    },
+    vector: {
+      title: "Vector Database",
+    },
+
     anonymous: "Anonymous Telemetry Enabled",
   },
 

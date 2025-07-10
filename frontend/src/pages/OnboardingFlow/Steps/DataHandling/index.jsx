@@ -46,200 +46,155 @@ import { useTranslation } from "react-i18next";
 export const LLM_SELECTION_PRIVACY = {
   openai: {
     name: "OpenAI",
-    description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to OpenAI",
-    ],
+    description: ["privacy.llm.description", "privacy.llm.openai.description"],
     logo: OpenAiLogo,
   },
   azure: {
     name: "Azure OpenAI",
-    description: [
-      "Your chats will not be used for training",
-      "Your text and embedding text are not visible to OpenAI or Microsoft",
-    ],
+    description: ["privacy.llm.description", "privacy.llm.azure.description"],
     logo: AzureOpenAiLogo,
   },
   anthropic: {
     name: "Anthropic",
     description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to Anthropic",
+      "privacy.llm.description",
+      "privacy.llm.anthropic.description",
     ],
     logo: AnthropicLogo,
   },
   gemini: {
     name: "Google Gemini",
     description: [
-      "Your chats are de-identified and used in training",
-      "Your prompts and document text used in response creation are visible to Google",
+      "privacy.llm.gemini.description",
+      "privacy.llm.gemini.description2",
     ],
     logo: GeminiLogo,
   },
   "nvidia-nim": {
     name: "NVIDIA NIM",
-    description: [
-      "Your model and chats are only accessible on the machine running the NVIDIA NIM",
-    ],
+    description: ["privacy.llm.nvidia_nim.description"],
     logo: NvidiaNimLogo,
   },
   lmstudio: {
     name: "LMStudio",
-    description: [
-      "Your model and chats are only accessible on the server running LMStudio",
-    ],
+    description: ["privacy.llm.lmstudio.description"],
     logo: LMStudioLogo,
   },
   localai: {
     name: "LocalAI",
-    description: [
-      "Your model and chats are only accessible on the server running LocalAI",
-    ],
+    description: ["privacy.llm.localai.description"],
     logo: LocalAiLogo,
   },
   ollama: {
     name: "Ollama",
-    description: [
-      "Your model and chats are only accessible on the machine running Ollama models",
-    ],
+    description: ["privacy.llm.ollama.description"],
     logo: OllamaLogo,
   },
   togetherai: {
     name: "TogetherAI",
     description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to TogetherAI",
+      "privacy.llm.description",
+      "privacy.llm.togetherai.description",
     ],
     logo: TogetherAILogo,
   },
   fireworksai: {
     name: "FireworksAI",
     description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to Fireworks AI",
+      "privacy.llm.description",
+      "privacy.llm.fireworksai.description",
     ],
     logo: FireworksAILogo,
   },
   mistral: {
     name: "Mistral",
-    description: [
-      "Your prompts and document text used in response creation are visible to Mistral",
-    ],
+    description: "privacy.llm.mistral.description",
     logo: MistralLogo,
   },
   huggingface: {
     name: "HuggingFace",
-    description: [
-      "Your prompts and document text used in response are sent to your HuggingFace managed endpoint",
-    ],
+    description: "privacy.llm.huggingface.description",
     logo: HuggingFaceLogo,
   },
   perplexity: {
     name: "Perplexity AI",
     description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to Perplexity AI",
+      "privacy.llm.description",
+      "privacy.llm.perplexity.description",
     ],
     logo: PerplexityLogo,
   },
   openrouter: {
     name: "OpenRouter",
     description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to OpenRouter",
+      "privacy.llm.description",
+      "privacy.llm.openrouter.description",
     ],
     logo: OpenRouterLogo,
   },
   novita: {
     name: "Novita AI",
-    description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to Novita AI",
-    ],
+    description: ["privacy.llm.description", "privacy.llm.novita.description"],
     logo: NovitaLogo,
   },
   groq: {
     name: "Groq",
-    description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to Groq",
-    ],
+    description: ["privacy.llm.description", "privacy.llm.groq.description"],
     logo: GroqLogo,
   },
   koboldcpp: {
     name: "KoboldCPP",
-    description: [
-      "Your model and chats are only accessible on the server running KoboldCPP",
-    ],
+    description: ["privacy.llm.koboldcpp.description"],
     logo: KoboldCPPLogo,
   },
   textgenwebui: {
     name: "Oobabooga Web UI",
-    description: [
-      "Your model and chats are only accessible on the server running the Oobabooga Text Generation Web UI",
-    ],
+    description: ["privacy.llm.textgenwebui.description"],
     logo: TextGenWebUILogo,
   },
   "generic-openai": {
     name: "Generic OpenAI compatible service",
-    description: [
-      "Data is shared according to the terms of service applicable with your generic endpoint provider.",
-    ],
+    description: ["privacy.llm.generic_openai.description"],
     logo: GenericOpenAiLogo,
   },
   cohere: {
     name: "Cohere",
-    description: [
-      "Data is shared according to the terms of service of cohere.com and your localities privacy laws.",
-    ],
+    description: ["privacy.llm.cohere.description"],
     logo: CohereLogo,
   },
   litellm: {
     name: "LiteLLM",
-    description: [
-      "Your model and chats are only accessible on the server running LiteLLM",
-    ],
+    description: ["privacy.llm.litellm.description"],
     logo: LiteLLMLogo,
   },
   bedrock: {
     name: "AWS Bedrock",
-    description: [
-      "You model and chat contents are subject to the agreed EULA for AWS and the model provider on aws.amazon.com",
-    ],
+    description: ["privacy.llm.bedrock.description"],
     logo: AWSBedrockLogo,
   },
   deepseek: {
     name: "DeepSeek",
-    description: ["Your model and chat contents are visible to DeepSeek"],
+    description: ["privacy.llm.deepseek.description"],
     logo: DeepSeekLogo,
   },
   apipie: {
     name: "APIpie.AI",
-    description: [
-      "Your model and chat contents are visible to APIpie in accordance with their terms of service.",
-    ],
+    description: ["privacy.llm.apipie.description"],
     logo: APIPieLogo,
   },
   xai: {
     name: "xAI",
-    description: [
-      "Your model and chat contents are visible to xAI in accordance with their terms of service.",
-    ],
+    description: ["privacy.llm.xai.description"],
     logo: XAILogo,
   },
   ppio: {
     name: "PPIO",
-    description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to PPIO",
-    ],
+    description: ["privacy.llm.description", "privacy.llm.ppio.description"],
     logo: PPIOLogo,
   },
   dpais: {
     name: "Dell Pro AI Studio",
-    description: [
-      "Your model and chat contents are only accessible on the computer running Dell Pro AI Studio",
-    ],
+    description: ["privacy.llm.dpais.description"],
     logo: DPAISLogo,
   },
 };
@@ -480,7 +435,7 @@ export default function DataHandling({ setHeader, setForwardBtn, setBackBtn }) {
       <div className="p-8 flex flex-col gap-8">
         <div className="flex flex-col gap-y-2 border-b border-theme-sidebar-border pb-4">
           <div className="text-theme-text-primary text-base font-bold">
-            LLM Selection
+            {t("privacy.llm.title")}
           </div>
           <div className="flex items-center gap-2.5">
             <img
@@ -494,13 +449,15 @@ export default function DataHandling({ setHeader, setForwardBtn, setBackBtn }) {
           </div>
           <ul className="flex flex-col list-disc ml-4">
             {LLMSelection.description.map((desc) => (
-              <li className="text-theme-text-primary text-sm">{desc}</li>
+              <li className="text-theme-text-primary text-sm" key={desc}>
+                {t(desc)}
+              </li>
             ))}
           </ul>
         </div>
         <div className="flex flex-col gap-y-2 border-b border-theme-sidebar-border pb-4">
           <div className="text-theme-text-primary text-base font-bold">
-            Embedding Preference
+            {t("privacy.embedding.title")}
           </div>
           <div className="flex items-center gap-2.5">
             <img
@@ -514,14 +471,16 @@ export default function DataHandling({ setHeader, setForwardBtn, setBackBtn }) {
           </div>
           <ul className="flex flex-col list-disc ml-4">
             {EmbeddingEngine.description.map((desc) => (
-              <li className="text-theme-text-primary text-sm">{desc}</li>
+              <li className="text-theme-text-primary text-sm" key={desc}>
+                {t(desc)}
+              </li>
             ))}
           </ul>
         </div>
 
         <div className="flex flex-col gap-y-2 pb-4">
           <div className="text-theme-text-primary text-base font-bold">
-            Vector Database
+            {t("privacy.vector.title")}
           </div>
           <div className="flex items-center gap-2.5">
             <img
@@ -535,7 +494,9 @@ export default function DataHandling({ setHeader, setForwardBtn, setBackBtn }) {
           </div>
           <ul className="flex flex-col list-disc ml-4">
             {VectorDb.description.map((desc) => (
-              <li className="text-theme-text-primary text-sm">{desc}</li>
+              <li className="text-theme-text-primary text-sm" key={desc}>
+                {t(desc)}
+              </li>
             ))}
           </ul>
         </div>
