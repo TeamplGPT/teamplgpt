@@ -1040,9 +1040,97 @@ const TRANSLATIONS = {
     },
     embedding: {
       title: "Embedding Preference",
+      native: {
+        description:
+          "Your document text is embedded privately on this instance of AnythingLLM",
+      },
+      openai: {
+        description: "Your document text is sent to OpenAI servers",
+      },
+      azure: {
+        description:
+          "Your document text is sent to your Microsoft Azure service",
+      },
+      localai: {
+        description:
+          "Your document text is embedded privately on the server running LocalAI",
+      },
+      ollama: {
+        description:
+          "Your document text is embedded privately on the server running Ollama",
+      },
+      lmstudio: {
+        description:
+          "Your document text is embedded privately on the server running LMStudio",
+      },
+      cohere: {
+        description:
+          "Data is shared according to the terms of service of cohere.com and your localities privacy laws.",
+      },
+      voyageai: {
+        description:
+          "Data sent to Voyage AI's servers is shared according to the terms of service of voyageai.com.",
+      },
+      mistral: {
+        description:
+          "Data sent to Mistral AI's servers is shared according to the terms of service of https://mistral.ai.",
+      },
+      litellm: {
+        description:
+          "Your document text is only accessible on the server running LiteLLM and to the providers you configured in LiteLLM.",
+      },
+      generic_openai: {
+        description:
+          "Data is shared according to the terms of service applicable with your generic endpoint provider.",
+      },
+      gemini: {
+        description:
+          "Your document text is sent to Google Gemini's servers for processing",
+        description2:
+          "Your document text is stored or managed according to the terms of service of Google Gemini API Terms of Service",
+      },
+      description: "Your documents are not used for training",
     },
     vector: {
       title: "Vector Database",
+      pgvector: {
+        description:
+          "Your vectors and document text are stored on your PostgreSQL instance",
+      },
+      chroma: {
+        description:
+          "Your vectors and document text are stored on your Chroma instance",
+      },
+      pinecone: {
+        description:
+          "Your vectors and document text are stored on Pinecone's servers",
+        description2: "Access to your data is managed by Pinecone",
+      },
+      qdrant: {
+        description:
+          "Your vectors and document text are stored on your Qdrant instance (cloud or self-hosted)",
+      },
+      weaviate: {
+        description:
+          "Your vectors and document text are stored on your Weaviate instance (cloud or self-hosted)",
+      },
+      milvus: {
+        description:
+          "Your vectors and document text are stored on your Milvus instance (cloud or self-hosted)",
+      },
+      zilliz: {
+        description:
+          "Your vectors and document text are stored on your Zilliz cloud cluster.",
+      },
+      astra: {
+        description:
+          "Your vectors and document text are stored on your cloud AstraDB database.",
+      },
+      lancedb: {
+        description:
+          "Your vectors and document text are stored privately on this instance of AnythingLLM",
+      },
+      description: "Access to your instance is managed by you",
     },
 
     anonymous: "Anonymous Telemetry Enabled",

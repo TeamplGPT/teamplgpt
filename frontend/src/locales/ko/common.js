@@ -1017,9 +1017,95 @@ const TRANSLATIONS = {
     },
     embedding: {
       title: "임베딩 기본 설정",
+      native: {
+        description:
+          "문서의 텍스트는 이 AnythingLLM 인스턴스에서만 비공개로 임베딩됩니다",
+      },
+      openai: {
+        description: "문서의 텍스트가 OpenAI 서버로 전송됩니다",
+      },
+      azure: {
+        description: "문서의 텍스트가 Microsoft Azure 서비스로 전송됩니다",
+      },
+      localai: {
+        description:
+          "문서의 텍스트는 LocalAI가 실행 중인 서버에서만 비공개로 임베딩됩니다",
+      },
+      ollama: {
+        description:
+          "문서의 텍스트는 Ollama가 실행 중인 서버에서만 비공개로 임베딩됩니다",
+      },
+      lmstudio: {
+        description:
+          "문서의 텍스트는 LMStudio가 실행 중인 서버에서만 비공개로 임베딩됩니다",
+      },
+      cohere: {
+        description:
+          "데이터는 cohere.com의 서비스 약관과 거주 지역의 개인정보 보호법에 따라 처리 및 공유됩니다.",
+      },
+      voyageai: {
+        description:
+          "문서의 텍스트가 Voyage AI 서버로 전송되며, voyageai.com의 서비스 약관에 따라 처리 및 공유됩니다.",
+      },
+      mistral: {
+        description:
+          "문서의 텍스트는 Mistral AI 서버로 전송되며, https://mistral.ai의 서비스 약관에 따라 처리 및 공유됩니다.",
+      },
+      litellm: {
+        description:
+          "문서의 텍스트는 LiteLLM이 실행 중인 서버와 LiteLLM에 설정한 공급자만 접근할 수 있습니다.",
+      },
+      generic_openai: {
+        description:
+          "데이터는 사용 중인 일반 엔드포인트 공급자의 서비스 약관에 따라 처리 및 공유됩니다.",
+      },
+      gemini: {
+        description:
+          "문서의 텍스트가 처리 목적으로 Google Gemini 서버로 전송됩니다",
+        description2:
+          "문서의 텍스트는 Google Gemini API 서비스 약관에 따라 저장되거나 관리됩니다",
+      },
+      description: "문서는 AI 모델 학습에 사용되지 않습니다",
     },
     vector: {
       title: "벡터 데이터베이스",
+      pgvector: {
+        description:
+          "벡터와 문서 텍스트가 사용자의 PostgreSQL 인스턴스에 저장됩니다",
+      },
+      chroma: {
+        description:
+          "벡터와 문서 텍스트가 사용자의 Chroma 인스턴스에 저장됩니다",
+      },
+      pinecone: {
+        description: "벡터와 문서 텍스트가 Pinecone 서버에 저장됩니다",
+        description2: "데이터 접근 권한은 Pinecone에서 관리됩니다",
+      },
+      qdrant: {
+        description:
+          "벡터와 문서 텍스트가 사용자의 Qdrant 인스턴스(클라우드 또는 자체 호스팅)에 저장됩니다",
+      },
+      weaviate: {
+        description:
+          "벡터와 문서 텍스트가 사용자의 Weaviate 인스턴스(클라우드 또는 자체 호스팅)에 저장됩니다",
+      },
+      milvus: {
+        description:
+          "벡터와 문서 텍스트가 사용자의 Milvus 인스턴스(클라우드 또는 자체 호스팅)에 저장됩니다",
+      },
+      zilliz: {
+        description:
+          "벡터와 문서 텍스트가 사용자의 Zilliz 클라우드 클러스터에 저장됩니다.",
+      },
+      astra: {
+        description:
+          "벡터와 문서 텍스트가 클라우드 AstraDB 데이터베이스에 저장됩니다.",
+      },
+      lancedb: {
+        description:
+          "벡터와 문서 텍스트는 이 AnythingLLM 인스턴스에 안전하게 저장됩니다",
+      },
+      description: "인스턴스에 대한 접근 권한은 사용자가 직접 관리합니다",
     },
     anonymous: "익명 원격 분석 활성화",
   },

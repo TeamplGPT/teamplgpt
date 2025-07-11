@@ -203,67 +203,55 @@ export const VECTOR_DB_PRIVACY = {
   pgvector: {
     name: "PGVector",
     description: [
-      "Your vectors and document text are stored on your PostgreSQL instance",
-      "Access to your instance is managed by you",
+      "privacy.vector.pgvector.description",
+      "privacy.vector.description",
     ],
     logo: PGVectorLogo,
   },
   chroma: {
     name: "Chroma",
     description: [
-      "Your vectors and document text are stored on your Chroma instance",
-      "Access to your instance is managed by you",
+      "privacy.vector.chroma.description",
+      "privacy.vector.description",
     ],
     logo: ChromaLogo,
   },
   pinecone: {
     name: "Pinecone",
     description: [
-      "Your vectors and document text are stored on Pinecone's servers",
-      "Access to your data is managed by Pinecone",
+      "privacy.vector.pinecone.description",
+      "privacy.vector.pinecone.description2",
     ],
     logo: PineconeLogo,
   },
   qdrant: {
     name: "Qdrant",
-    description: [
-      "Your vectors and document text are stored on your Qdrant instance (cloud or self-hosted)",
-    ],
+    description: ["privacy.vector.qdrant.description"],
     logo: QDrantLogo,
   },
   weaviate: {
     name: "Weaviate",
-    description: [
-      "Your vectors and document text are stored on your Weaviate instance (cloud or self-hosted)",
-    ],
+    description: ["privacy.vector.weaviate.description"],
     logo: WeaviateLogo,
   },
   milvus: {
     name: "Milvus",
-    description: [
-      "Your vectors and document text are stored on your Milvus instance (cloud or self-hosted)",
-    ],
+    description: ["privacy.vector.milvus.description"],
     logo: MilvusLogo,
   },
   zilliz: {
     name: "Zilliz Cloud",
-    description: [
-      "Your vectors and document text are stored on your Zilliz cloud cluster.",
-    ],
+    description: ["privacy.vector.zilliz.description"],
     logo: ZillizLogo,
   },
   astra: {
     name: "AstraDB",
-    description: [
-      "Your vectors and document text are stored on your cloud AstraDB database.",
-    ],
+    description: ["privacy.vector.astra.description"],
     logo: AstraDBLogo,
   },
   lancedb: {
     name: "LanceDB",
-    description: [
-      "Your vectors and document text are stored privately on this instance of AnythingLLM",
-    ],
+    description: ["privacy.vector.lancedb.description"],
     logo: LanceDbLogo,
   },
 };
@@ -271,88 +259,70 @@ export const VECTOR_DB_PRIVACY = {
 export const EMBEDDING_ENGINE_PRIVACY = {
   native: {
     name: "AnythingLLM Embedder",
-    description: [
-      "Your document text is embedded privately on this instance of AnythingLLM",
-    ],
+    description: ["privacy.embedding.native.description"],
     logo: AnythingLLMIcon,
   },
   openai: {
     name: "OpenAI",
     description: [
-      "Your document text is sent to OpenAI servers",
-      "Your documents are not used for training",
+      "privacy.embedding.openai.description",
+      "privacy.embedding.description",
     ],
     logo: OpenAiLogo,
   },
   azure: {
     name: "Azure OpenAI",
     description: [
-      "Your document text is sent to your Microsoft Azure service",
-      "Your documents are not used for training",
+      "privacy.embedding.azure.description",
+      "privacy.embedding.description",
     ],
     logo: AzureOpenAiLogo,
   },
   localai: {
     name: "LocalAI",
-    description: [
-      "Your document text is embedded privately on the server running LocalAI",
-    ],
+    description: ["privacy.embedding.localai.description"],
     logo: LocalAiLogo,
   },
   ollama: {
     name: "Ollama",
-    description: [
-      "Your document text is embedded privately on the server running Ollama",
-    ],
+    description: ["privacy.embedding.ollama.description"],
     logo: OllamaLogo,
   },
   lmstudio: {
     name: "LMStudio",
-    description: [
-      "Your document text is embedded privately on the server running LMStudio",
-    ],
+    description: ["privacy.embedding.lmstudio.description"],
     logo: LMStudioLogo,
   },
   cohere: {
     name: "Cohere",
-    description: [
-      "Data is shared according to the terms of service of cohere.com and your localities privacy laws.",
-    ],
+    description: ["privacy.embedding.cohere.description"],
     logo: CohereLogo,
   },
   voyageai: {
     name: "Voyage AI",
-    description: [
-      "Data sent to Voyage AI's servers is shared according to the terms of service of voyageai.com.",
-    ],
+    description: ["privacy.embedding.voyageai.description"],
     logo: VoyageAiLogo,
   },
   mistral: {
     name: "Mistral AI",
-    description: [
-      "Data sent to Mistral AI's servers is shared according to the terms of service of https://mistral.ai.",
-    ],
+    description: ["privacy.embedding.mistral.description"],
     logo: MistralLogo,
   },
   litellm: {
     name: "LiteLLM",
-    description: [
-      "Your document text is only accessible on the server running LiteLLM and to the providers you configured in LiteLLM.",
-    ],
+    description: ["privacy.embedding.litellm.description"],
     logo: LiteLLMLogo,
   },
   "generic-openai": {
     name: "Generic OpenAI compatible service",
-    description: [
-      "Data is shared according to the terms of service applicable with your generic endpoint provider.",
-    ],
+    description: ["privacy.embedding.generic_openai.description"],
     logo: GenericOpenAiLogo,
   },
   gemini: {
     name: "Google Gemini",
     description: [
-      "Your document text is sent to Google Gemini's servers for processing",
-      "Your document text is stored or managed according to the terms of service of Google Gemini API Terms of Service",
+      "privacy.embedding.gemini.description",
+      "privacy.embedding.gemini.description2",
     ],
     logo: GeminiLogo,
   },
