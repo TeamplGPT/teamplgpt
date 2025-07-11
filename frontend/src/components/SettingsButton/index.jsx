@@ -3,10 +3,12 @@ import paths from "@/utils/paths";
 import { ArrowUUpLeft, Wrench } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 import { useMatch } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function SettingsButton() {
   const isInSettings = !!useMatch("/settings/*");
   const { user } = useUser();
+  const { t } = useTranslation();
 
   if (user && user?.role === "default") return null;
 
@@ -36,7 +38,7 @@ export default function SettingsButton() {
         className="transition-all duration-300 p-2 rounded-full bg-theme-sidebar-footer-icon hover:bg-theme-sidebar-footer-icon-hover"
         aria-label="Settings"
         data-tooltip-id="footer-item"
-        data-tooltip-content="Open settings"
+        data-tooltip-content={t("main-page.footer.settings")}
       >
         <Wrench
           className="h-5 w-5"

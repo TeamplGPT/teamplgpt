@@ -233,6 +233,12 @@ const TRANSLATIONS = {
       },
       keyboardShortcuts: "단축키 안내",
     },
+    footer: {
+      github: "GitHub에서 소스 코드 보기",
+      docs: "AnythingLLM 도움말 문서 열기",
+      community: "AnythingLLM 디스코드 서버 참여",
+      settings: "설정 열기",
+    },
   },
 
   "new-workspace": {

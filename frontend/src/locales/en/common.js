@@ -237,6 +237,12 @@ const TRANSLATIONS = {
       },
       keyboardShortcuts: "Keyboard Shortcuts",
     },
+    footer: {
+      github: "View source code on GitHub",
+      docs: "Open AnythingLLM help docs",
+      community: "Join the AnythingLLM Discord",
+      settings: "Open settings",
+    },
   },
 
   "new-workspace": {
