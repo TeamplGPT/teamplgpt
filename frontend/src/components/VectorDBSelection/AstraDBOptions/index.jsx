@@ -1,10 +1,14 @@
+import { useTranslation } from "react-i18next";
+
 export default function AstraDBOptions({ settings }) {
+  const { t } = useTranslation();
+
   return (
     <div className="w-full flex flex-col gap-y-7">
       <div className="w-full flex items-center gap-[36px] mt-1.5">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-96">
           <label className="text-white text-sm font-semibold block mb-3">
-            Astra DB Endpoint
+            {t("vector.provider.astra.endpoint")}
           </label>
           <input
             type="url"
@@ -18,9 +22,9 @@ export default function AstraDBOptions({ settings }) {
           />
         </div>
 
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-96">
           <label className="text-white text-sm font-semibold block mb-3">
-            Astra DB Application Token
+            {t("vector.provider.astra.applicationToken")}
           </label>
           <input
             type="password"
@@ -31,7 +35,7 @@ export default function AstraDBOptions({ settings }) {
               settings?.AstraDBApplicationToken ? "*".repeat(20) : ""
             }
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>

@@ -1,10 +1,14 @@
+import { useTranslation } from "react-i18next";
+
 export default function PineconeDBOptions({ settings }) {
+  const { t } = useTranslation();
+
   return (
     <div className="w-full flex flex-col gap-y-7">
       <div className="w-full flex items-center gap-[36px] mt-1.5">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-96">
           <label className="text-white text-sm font-semibold block mb-3">
-            Pinecone DB API Key
+            {t("vector.provider.pinecone.apiKey")}
           </label>
           <input
             type="password"
@@ -13,13 +17,13 @@ export default function PineconeDBOptions({ settings }) {
             placeholder="Pinecone API Key"
             defaultValue={settings?.PineConeKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-96">
           <label className="text-white text-sm font-semibold block mb-3">
-            Pinecone Index Name
+            {t("vector.provider.pinecone.indexName")}
           </label>
           <input
             type="text"

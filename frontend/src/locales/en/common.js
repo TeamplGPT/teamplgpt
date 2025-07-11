@@ -858,6 +858,72 @@ const TRANSLATIONS = {
     provider: {
       title: "Vector Database Provider",
       description: "There is no configuration needed for LanceDB.",
+      search: "Search all vector database providers",
+      lancedb: {
+        description:
+          "100% local vector DB that runs on the same instance as AnythingLLM.",
+      },
+      pgvector: {
+        description: "Vector search powered by PostgreSQL.",
+        connectionString: "Postgres Connection String",
+        tableName: "Vector Table Name",
+        tooltip: {
+          intro:
+            "This is the connection string for the Postgres database in the format of <br /><code>postgresql://username:password@host:port/database</code>",
+          permissions:
+            "The user for the database must have the following permissions:",
+          permission_db: "Read access to the database",
+          permission_schema: "Read access to the database schem",
+          permission_create: "Create access to the database",
+          pgvector:
+            "You must have the pgvector extension installed on the database.",
+          desc_1:
+            "This is the name of the table in the Postgres database that will store the vectors",
+          desc_2:
+            "By default, the table name is <code>anythingllm_vectors</code>.",
+          desc_3:
+            "This table must not already exist on the database - it will be created automatically.",
+        },
+      },
+      chroma: {
+        description:
+          "Open source vector database you can host yourself or on the cloud.",
+        endpoint: "Chroma Endpoint",
+        apiHeader: "API Header",
+      },
+      pinecone: {
+        description:
+          "100% cloud-based vector database for enterprise use cases.",
+        apiKey: "Pinecone DB API Key",
+        indexName: "Pinecone Index Name",
+      },
+      zilliz: {
+        description:
+          "Cloud hosted vector database built for enterprise with SOC 2 compliance.",
+        clusterEndpoint: "Cluster Endpoint",
+        apiToken: "API Token",
+      },
+      qdrant: {
+        description: "Open source local and distributed cloud vector database.",
+        QDrantAPIEndpoint: "QDrant API Endpoint",
+      },
+      weaviate: {
+        description:
+          "Open source local and cloud hosted multi-modal vector database.",
+        endpoint: "Weaviate Endpoint",
+      },
+      milvus: {
+        description: "Open-source, highly scalable, and blazing fast.",
+        dbAddress: "Milvus DB Address",
+        username: "Milvus Username",
+        password: "Milvus Password",
+      },
+      astra: {
+        description: "Vector Search for Real-world GenAI.",
+        endpoint: "Astra DB Endpoint",
+        applicationToken: "Astra DB Application Token",
+      },
+      apiKey: "API Key",
     },
   },
 

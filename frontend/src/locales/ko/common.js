@@ -836,6 +836,75 @@ const TRANSLATIONS = {
     provider: {
       title: "벡터 데이터베이스 제공자",
       description: "LanceDB를 선택하면 설정이 필요 없습니다.",
+      search: "모든 벡터 데이터베이스 제공자 검색",
+      lancedb: {
+        description:
+          "AnythingLLM과 동일한 인스턴스에서 실행되는 100% 로컬 벡터 데이터베이스입니다.",
+      },
+      pgvector: {
+        description: "PostgreSQL을 통한 벡터 검색입니다.",
+        connectionString: "Postgres 연결 문자열",
+        tableName: "벡터 테이블 이름",
+        tooltip: {
+          intro:
+            "Postgres 데이터베이스에 연결하기 위한 문자열입니다.<br /><code>postgresql://username:password@host:port/database</code> 형식으로 입력하세요.",
+          permissions:
+            "데이터베이스 사용자는 다음 권한을 반드시 가지고 있어야 합니다:",
+          permission_db: "데이터베이스 읽기 권한",
+          permission_schema: "데이터베이스 스키마 읽기 권한",
+          permission_create: "데이터베이스 생성 권한",
+          pgvector:
+            "데이터베이스에 pgvector 확장 기능이 반드시 설치되어 있어야 합니다.",
+          desc_1:
+            "Postgres 데이터베이스에서 벡터를 저장할 테이블의 이름입니다.",
+          desc_2:
+            "기본적으로 테이블 이름은 <code>anythingllm_vectors</code>입니다.",
+          desc_3:
+            "이 테이블은 데이터베이스에 미리 존재하지 않아야 하며, 자동으로 생성됩니다.",
+        },
+      },
+      chroma: {
+        description:
+          "직접 호스팅하거나 클라우드에서 사용할 수 있는 오픈소스 벡터 데이터베이스입니다.",
+        endpoint: "Chroma 엔드포인트",
+        apiHeader: "API 헤더",
+      },
+      pinecone: {
+        description:
+          "기업 환경에 최적화된 100% 클라우드 기반 벡터 데이터베이스입니다.",
+        apiKey: "Pinecone API 키",
+        indexName: "Pinecone 인덱스 이름",
+      },
+      zilliz: {
+        description:
+          "기업 환경을 위한 SOC 2 인증 클라우드 기반 벡터 데이터베이스입니다.",
+        clusterEndpoint: "클러스터 엔드포인트",
+        apiToken: "API 토큰",
+      },
+      qdrant: {
+        description:
+          "오픈소스 로컬 및 분산형 클라우드 벡터 데이터베이스입니다.",
+        QDrantAPIEndpoint: "QDrant API 엔드포인트",
+      },
+      weaviate: {
+        description:
+          "오픈소스 기반의 로컬 및 클라우드에서 모두 사용할 수 있는 멀티모달 벡터 데이터베이스입니다.",
+        endpoint: "Weaviate 엔드포인트",
+      },
+      milvus: {
+        description:
+          "오픈소스이며, 매우 확장 가능하고 빠른 벡터 데이터베이스입니다.",
+        dbAddress: "Milvus DB 주소",
+        username: "Milvus 사용자 이름",
+        password: "Milvus 비밀번호",
+      },
+      astra: {
+        description:
+          "실제 환경의 생성형 AI를 위한 벡터 검색 데이터베이스입니다.",
+        endpoint: "Astra DB 엔드포인트",
+        applicationToken: "Astra DB 애플리케이션 토큰",
+      },
+      apiKey: "API 키",
     },
   },
 

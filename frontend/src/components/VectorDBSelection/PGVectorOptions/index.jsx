@@ -1,14 +1,17 @@
 import { Info } from "@phosphor-icons/react";
 import { Tooltip } from "react-tooltip";
+import { useTranslation } from "react-i18next";
 
 export default function PGVectorOptions({ settings }) {
+  const { t } = useTranslation();
+
   return (
     <div className="w-full flex flex-col gap-y-7">
       <div className="w-full flex items-center gap-[36px] mt-1.5">
         <div className="flex flex-col w-96">
           <div className="flex items-center gap-x-1 mb-3">
             <label className="text-white text-sm font-semibold block">
-              Postgres Connection String
+              {t("vector.provider.pgvector.connectionString")}
             </label>
             <Info
               size={16}
@@ -23,22 +26,25 @@ export default function PGVectorOptions({ settings }) {
               clickable={true}
             >
               <p className="text-md whitespace-pre-line break-words">
-                This is the connection string for the Postgres database in the
-                format of <br />
-                <code>postgresql://username:password@host:port/database</code>
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: t("vector.provider.pgvector.tooltip.intro"),
+                  }}
+                />
                 <br />
                 <br />
-                The user for the database must have the following permissions:
+                {t("vector.provider.pgvector.tooltip.permissions")}
                 <ul className="list-disc list-inside">
-                  <li>Read access to the database</li>
-                  <li>Read access to the database schema</li>
-                  <li>Create access to the database</li>
+                  <li>{t("vector.provider.pgvector.tooltip.permission_db")}</li>
+                  <li>
+                    {t("vector.provider.pgvector.tooltip.permission_schema")}
+                  </li>
+                  <li>
+                    {t("vector.provider.pgvector.tooltip.permission_create")}
+                  </li>
                 </ul>
                 <br />
-                <b>
-                  You must have the pgvector extension installed on the
-                  database.
-                </b>
+                <b>{t("vector.provider.pgvector.tooltip.pgvector")}</b>
               </p>
             </Tooltip>
           </div>
@@ -56,10 +62,10 @@ export default function PGVectorOptions({ settings }) {
           />
         </div>
 
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-80">
           <div className="flex items-center gap-x-1 mb-3">
             <label className="text-white text-sm font-semibold block">
-              Vector Table Name
+              {t("vector.provider.pgvector.tableName")}
             </label>
             <Info
               size={16}
@@ -74,17 +80,17 @@ export default function PGVectorOptions({ settings }) {
               clickable={true}
             >
               <p className="text-md whitespace-pre-line break-words">
-                This is the name of the table in the Postgres database that will
-                store the vectors.
+                {t("vector.provider.pgvector.tooltip.desc_1")}
                 <br />
                 <br />
-                By default, the table name is <code>anythingllm_vectors</code>.
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: t("vector.provider.pgvector.tooltip.desc_2"),
+                  }}
+                />
                 <br />
                 <br />
-                <b>
-                  This table must not already exist on the database - it will be
-                  created automatically.
-                </b>
+                <b>{t("vector.provider.pgvector.tooltip.desc_3")}</b>
               </p>
             </Tooltip>
           </div>

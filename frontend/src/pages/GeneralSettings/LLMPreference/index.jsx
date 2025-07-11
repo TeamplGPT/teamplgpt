@@ -409,7 +409,7 @@ export default function GeneralLLMPreference() {
                     onClick={() => handleSubmit()}
                     className="mt-3 mr-0 -mb-14 z-10"
                   >
-                    {saving ? "Saving..." : "Save changes"}
+                    {saving ? t("common.saving") : t("common.save")}
                   </CTAButton>
                 )}
               </div>

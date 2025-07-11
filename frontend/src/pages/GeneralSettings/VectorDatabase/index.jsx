@@ -115,67 +115,63 @@ export default function GeneralVectorDatabase() {
       value: "lancedb",
       logo: LanceDbLogo,
       options: <LanceDBOptions />,
-      description:
-        "100% local vector DB that runs on the same instance as AnythingLLM.",
+      description: "vector.provider.lancedb.description",
     },
     {
       name: "PGVector",
       value: "pgvector",
       logo: PGVectorLogo,
       options: <PGVectorOptions settings={settings} />,
-      description: "Vector search powered by PostgreSQL.",
+      description: "vector.provider.pgvector.description",
     },
     {
       name: "Chroma",
       value: "chroma",
       logo: ChromaLogo,
       options: <ChromaDBOptions settings={settings} />,
-      description:
-        "Open source vector database you can host yourself or on the cloud.",
+      description: "vector.provider.chroma.description",
     },
     {
       name: "Pinecone",
       value: "pinecone",
       logo: PineconeLogo,
       options: <PineconeDBOptions settings={settings} />,
-      description: "100% cloud-based vector database for enterprise use cases.",
+      description: "vector.provider.pinecone.description",
     },
     {
       name: "Zilliz Cloud",
       value: "zilliz",
       logo: ZillizLogo,
       options: <ZillizCloudOptions settings={settings} />,
-      description:
-        "Cloud hosted vector database built for enterprise with SOC 2 compliance.",
+      description: "vector.provider.zilliz.description",
     },
     {
       name: "QDrant",
       value: "qdrant",
       logo: QDrantLogo,
       options: <QDrantDBOptions settings={settings} />,
-      description: "Open source local and distributed cloud vector database.",
+      description: "vector.provider.qdrant.description",
     },
     {
       name: "Weaviate",
       value: "weaviate",
       logo: WeaviateLogo,
       options: <WeaviateDBOptions settings={settings} />,
-      description:
-        "Open source local and cloud hosted multi-modal vector database.",
+      description: "vector.provider.weaviate.description",
     },
     {
       name: "Milvus",
       value: "milvus",
       logo: MilvusLogo,
       options: <MilvusDBOptions settings={settings} />,
-      description: "Open-source, highly scalable, and blazing fast.",
+      description: "vector.provider.milvus.description",
     },
     {
       name: "AstraDB",
       value: "astra",
       logo: AstraDBLogo,
       options: <AstraDBOptions settings={settings} />,
-      description: "Vector Search for Real-world GenAI.",
+      description: "vector.provider.astra.description",
     },
   ];
 
@@ -235,7 +231,7 @@ export default function GeneralVectorDatabase() {
                   />
                 )}
                 {searchMenuOpen ? (
-                  <div className="absolute top-0 left-0 w-full max-w-[640px] max-h-[310px] min-h-[64px] bg-theme-settings-input-bg rounded-lg flex flex-col justify-between cursor-pointer border-2 border-primary-button z-20">
+                  <div className="absolute top-0 left-0 w-full max-w-[640px] max-h-[610px] min-h-[64px] bg-theme-settings-input-bg rounded-lg flex flex-col justify-between cursor-pointer border-2 border-primary-button z-20">
                     <div className="w-full flex flex-col gap-y-1">
                       <div className="flex items-center sticky top-0 z-10 border-b border-[#9CA3AF] mx-4 bg-theme-settings-input-bg">
                         <MagnifyingGlass
@@ -247,7 +243,7 @@ export default function GeneralVectorDatabase() {
                           type="text"
                           name="vdb-search"
                           autoComplete="off"
-                          placeholder="Search all vector database providers"
+                          placeholder={t("vector.provider.search")}
                           className="border-none -ml-4 my-2 bg-transparent z-20 pl-12 h-[38px] w-full px-4 py-1 text-sm outline-none text-theme-text-primary placeholder:text-theme-text-primary placeholder:font-medium"
                           onChange={(e) => setSearchQuery(e.target.value)}
                           ref={searchInputRef}
@@ -262,14 +258,14 @@ export default function GeneralVectorDatabase() {
                           onClick={handleXButton}
                         />
                       </div>
-                      <div className="flex-1 pl-4 pr-2 flex flex-col gap-y-1 overflow-y-auto white-scrollbar pb-4 max-h-[245px]">
+                      <div className="flex-1 pl-4 pr-2 flex flex-col gap-y-1 overflow-y-auto white-scrollbar pb-4 max-h-[545px]">
                         {filteredVDBs.map((vdb) => (
                           <VectorDBItem
                             key={vdb.name}
                             name={vdb.name}
                             value={vdb.value}
                             image={vdb.logo}
-                            description={vdb.description}
+                            description={t(vdb.description)}
                             checked={selectedVDB === vdb.value}
                             onClick={() => updateVectorChoice(vdb.value)}
                           />
@@ -294,7 +290,7 @@ export default function GeneralVectorDatabase() {
                           {selectedVDBObject.name}
                         </div>
                         <div className="mt-1 text-xs text-description">
-                          {selectedVDBObject.description}
+                          {t(selectedVDBObject.description)}
                         </div>
                       </div>
                     </div>
