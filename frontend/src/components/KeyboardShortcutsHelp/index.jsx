@@ -25,7 +25,7 @@ export default function KeyboardShortcutsHelp() {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="relative bg-theme-bg-secondary rounded-lg p-6 max-w-2xl w-full mx-4">
+      <div className="relative bg-theme-bg-secondary rounded-lg p-6 max-w-3xl w-full mx-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-white">
             {t("keyboard-shortcuts.title")}
@@ -45,10 +45,10 @@ export default function KeyboardShortcutsHelp() {
               key={key}
               className="flex items-center justify-between p-3 bg-theme-bg-hover rounded-lg"
             >
-              <span className="text-white">
+              <span className="text-white text-sm">
                 {t(`keyboard-shortcuts.shortcuts.${shortcut.translationKey}`)}
               </span>
-              <kbd className="px-2 py-1 bg-theme-bg-secondary text-white rounded border border-gray-600">
+              <kbd className="px-2 py-1 bg-theme-bg-secondary text-white text-sm rounded border border-gray-600">
                 {isMac ? key : key.replace("⌘", "Ctrl")}
               </kbd>
             </div>
