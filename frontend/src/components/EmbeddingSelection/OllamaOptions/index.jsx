@@ -4,8 +4,10 @@ import PreLoader from "@/components/Preloader";
 import { OLLAMA_COMMON_URLS } from "@/utils/constants";
 import { CaretDown, CaretUp } from "@phosphor-icons/react";
 import useProviderEndpointAutoDiscovery from "@/hooks/useProviderEndpointAutoDiscovery";
+import { useTranslation } from "react-i18next";
 
 export default function OllamaEmbeddingOptions({ settings }) {
+  const { t } = useTranslation();
   const {
     autoDetecting: loading,
     basePath,
@@ -36,7 +38,7 @@ export default function OllamaEmbeddingOptions({ settings }) {
         />
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-2">
-            Max Embedding Chunk Length
+            {t("embedding.providers.max_embedding_chunk_length")}
           </label>
           <input
             type="number"
@@ -51,7 +53,7 @@ export default function OllamaEmbeddingOptions({ settings }) {
             autoComplete="off"
           />
           <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-            Maximum length of text chunks for embedding.
+            {t("embedding.providers.max_embedding_chunk_length_description")}
           </p>
         </div>
       </div>
@@ -63,7 +65,9 @@ export default function OllamaEmbeddingOptions({ settings }) {
           }}
           className="border-none text-theme-text-primary hover:text-theme-text-secondary flex items-center text-sm"
         >
-          {showAdvancedControls ? "Hide" : "Show"} Manual Endpoint Input
+          {showAdvancedControls
+            ? t("embedding.providers.hide_advanced_settings")
+            : t("embedding.providers.show_advanced_settings")}
           {showAdvancedControls ? (
             <CaretUp size={14} className="ml-1" />
           ) : (
@@ -74,10 +78,10 @@ export default function OllamaEmbeddingOptions({ settings }) {
 
       <div hidden={!showAdvancedControls}>
         <div className="w-full flex items-start gap-4">
-          <div className="flex flex-col w-60">
+          <div className="flex flex-col w-96">
             <div className="flex justify-between items-center mb-2">
               <label className="text-white text-sm font-semibold">
-                Ollama Base URL
+                {t("embedding.providers.ollama.ollama_base_url")}
               </label>
               {loading ? (
                 <PreLoader size="6" />
@@ -88,7 +92,7 @@ export default function OllamaEmbeddingOptions({ settings }) {
                       onClick={handleAutoDetectClick}
                       className="bg-primary-button text-xs font-medium px-2 py-1 rounded-lg hover:bg-secondary hover:text-white shadow-[0_4px_14px_rgba(0,0,0,0.25)]"
                     >
-                      Auto-Detect
+                      {t("embedding.providers.auto_detect")}
                     </button>
                   )}
                 </>
@@ -107,7 +111,7 @@ export default function OllamaEmbeddingOptions({ settings }) {
               onBlur={basePath.onBlur}
             />
             <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-              Enter the URL where Ollama is running.
+              {t("embedding.providers.ollama.ollama_base_url_description")}
             </p>
           </div>
         </div>
@@ -119,6 +123,7 @@ export default function OllamaEmbeddingOptions({ settings }) {
 function OllamaEmbeddingModelSelection({ settings, basePath = null }) {
   const [customModels, setCustomModels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -142,9 +147,9 @@ function OllamaEmbeddingModelSelection({ settings, basePath = null }) {
 
   if (loading || customModels.length == 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-96">
         <label className="text-white text-sm font-semibold block mb-2">
-          Ollama Embedding Model
+          {t("embedding.providers.ollama.ollama_embedding_model")}
         </label>
         <select
           name="EmbeddingModelPref"
@@ -153,22 +158,21 @@ function OllamaEmbeddingModelSelection({ settings, basePath = null }) {
         >
           <option disabled={true} selected={true}>
             {!!basePath
-              ? "--loading available models--"
-              : "Enter Ollama URL first"}
+              ? t("embedding.providers.loading_models")
+              : t("embedding.providers.ollama.enter_ollama_url_first")}
           </option>
         </select>
         <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-          Select the Ollama model for embeddings. Models will load after
-          entering a valid Ollama URL.
+          {t("embedding.providers.ollama.ollama_embedding_model_description")}
         </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-96">
       <label className="text-white text-sm font-semibold block mb-2">
-        Ollama Embedding Model
+        {t("embedding.providers.ollama.ollama_embedding_model")}
       </label>
       <select
         name="EmbeddingModelPref"
@@ -176,7 +180,7 @@ function OllamaEmbeddingModelSelection({ settings, basePath = null }) {
         className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
       >
         {customModels.length > 0 && (
-          <optgroup label="Your loaded models">
+          <optgroup label={t("embedding.providers.your_loaded_models")}>
             {customModels.map((model) => {
               return (
                 <option
@@ -192,7 +196,7 @@ function OllamaEmbeddingModelSelection({ settings, basePath = null }) {
         )}
       </select>
       <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-        Choose the Ollama model you want to use for generating embeddings.
+        {t("embedding.providers.ollama.ollama_embedding_model_description_2")}
       </p>
     </div>
   );

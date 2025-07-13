@@ -4,8 +4,10 @@ import System from "@/models/system";
 import PreLoader from "@/components/Preloader";
 import { LOCALAI_COMMON_URLS } from "@/utils/constants";
 import useProviderEndpointAutoDiscovery from "@/hooks/useProviderEndpointAutoDiscovery";
+import { useTranslation } from "react-i18next";
 
 export default function LocalAiOptions({ settings }) {
+  const { t } = useTranslation();
   const {
     autoDetecting: loading,
     basePath,
@@ -31,7 +33,7 @@ export default function LocalAiOptions({ settings }) {
         />
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-2">
-            Max embedding chunk length
+            {t("embedding.providers.max_embedding_chunk_length")}
           </label>
           <input
             type="number"
@@ -45,11 +47,15 @@ export default function LocalAiOptions({ settings }) {
             autoComplete="off"
           />
         </div>
-        <div className="flex flex-col w-60">
+      </div>
+      <div className="w-full flex items-center gap-[36px] mt-1.5">
+        <div className="flex flex-col w-96">
           <div className="flex flex-col gap-y-1 mb-2">
             <label className="text-white text-sm font-semibold flex items-center gap-x-2">
-              Local AI API Key{" "}
-              <p className="!text-xs !italic !font-thin">optional</p>
+              {t("embedding.providers.localai.local_ai_api_key")}{" "}
+              <p className="!text-xs !italic !font-thin">
+                {t("embedding.providers.optional")}
+              </p>
             </label>
           </div>
           <input
@@ -58,7 +64,7 @@ export default function LocalAiOptions({ settings }) {
             className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
             placeholder="sk-mysecretkey"
             defaultValue={settings?.LocalAiApiKey ? "*".repeat(20) : ""}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
             onChange={(e) => setApiKeyValue(e.target.value)}
             onBlur={() => setApiKey(apiKeyValue)}
@@ -73,7 +79,9 @@ export default function LocalAiOptions({ settings }) {
           }}
           className="border-none text-theme-text-primary hover:text-theme-text-secondary flex items-center text-sm"
         >
-          {showAdvancedControls ? "Hide" : "Show"} advanced settings
+          {showAdvancedControls
+            ? t("embedding.providers.hide_advanced_settings")
+            : t("embedding.providers.show_advanced_settings")}
           {showAdvancedControls ? (
             <CaretUp size={14} className="ml-1" />
           ) : (
@@ -83,10 +91,10 @@ export default function LocalAiOptions({ settings }) {
       </div>
       <div hidden={!showAdvancedControls}>
         <div className="w-full flex items-center gap-4">
-          <div className="flex flex-col w-60">
+          <div className="flex flex-col w-96">
             <div className="flex justify-between items-center mb-2">
               <label className="text-white text-sm font-semibold">
-                LocalAI Base URL
+                {t("embedding.providers.localai.local_ai_base_url")}
               </label>
               {loading ? (
                 <PreLoader size="6" />
@@ -97,7 +105,7 @@ export default function LocalAiOptions({ settings }) {
                       onClick={handleAutoDetectClick}
                       className="bg-primary-button text-xs font-medium px-2 py-1 rounded-lg hover:bg-secondary hover:text-white shadow-[0_4px_14px_rgba(0,0,0,0.25)]"
                     >
-                      Auto-Detect
+                      {t("embedding.providers.auto_detect")}
                     </button>
                   )}
                 </>
@@ -125,6 +133,7 @@ export default function LocalAiOptions({ settings }) {
 function LocalAIModelSelection({ settings, apiKey = null, basePath = null }) {
   const [customModels, setCustomModels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -147,9 +156,9 @@ function LocalAIModelSelection({ settings, apiKey = null, basePath = null }) {
 
   if (loading || customModels.length == 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-96">
         <label className="text-white text-sm font-semibold block mb-2">
-          Embedding Model Name
+          {t("embedding.providers.localai.embedding_model_name")}
         </label>
         <select
           name="EmbeddingModelPref"
@@ -158,8 +167,8 @@ function LocalAIModelSelection({ settings, apiKey = null, basePath = null }) {
         >
           <option disabled={true} selected={true}>
             {basePath?.includes("/v1")
-              ? "-- loading available models --"
-              : "-- waiting for URL --"}
+              ? t("embedding.providers.loading_models")
+              : t("embedding.providers.waiting_for_url")}
           </option>
         </select>
       </div>
@@ -169,7 +178,7 @@ function LocalAIModelSelection({ settings, apiKey = null, basePath = null }) {
   return (
     <div className="flex flex-col w-60">
       <label className="text-white text-sm font-semibold block mb-2">
-        Embedding Model Name
+        {t("embedding.providers.localai.embedding_model_name")}
       </label>
       <select
         name="EmbeddingModelPref"
@@ -177,7 +186,7 @@ function LocalAIModelSelection({ settings, apiKey = null, basePath = null }) {
         className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
       >
         {customModels.length > 0 && (
-          <optgroup label="Your loaded models">
+          <optgroup label={t("embedding.providers.localai.your_loaded_models")}>
             {customModels.map((model) => {
               return (
                 <option

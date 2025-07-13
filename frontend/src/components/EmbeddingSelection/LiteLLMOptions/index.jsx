@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import System from "@/models/system";
 import { Warning } from "@phosphor-icons/react";
 import { Tooltip } from "react-tooltip";
+import { useTranslation } from "react-i18next";
 
 export default function LiteLLMOptions({ settings }) {
+  const { t } = useTranslation();
   const [basePathValue, setBasePathValue] = useState(settings?.LiteLLMBasePath);
   const [basePath, setBasePath] = useState(settings?.LiteLLMBasePath);
   const [apiKeyValue, setApiKeyValue] = useState(settings?.LiteLLMAPIKey);
@@ -12,9 +14,9 @@ export default function LiteLLMOptions({ settings }) {
   return (
     <div className="w-full flex flex-col gap-y-7">
       <div className="w-full flex items-center gap-[36px] mt-1.5">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-96">
           <label className="text-white text-sm font-semibold block mb-3">
-            Base URL
+            {t("embedding.providers.base_url")}
           </label>
           <input
             type="url"
@@ -29,14 +31,16 @@ export default function LiteLLMOptions({ settings }) {
             onBlur={() => setBasePath(basePathValue)}
           />
         </div>
+      </div>
+      <div className="w-full flex items-center gap-[36px]">
         <LiteLLMModelSelection
           settings={settings}
           basePath={basePath}
           apiKey={apiKey}
         />
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-80">
           <label className="text-white text-sm font-semibold block mb-3">
-            Max embedding chunk length
+            {t("embedding.providers.max_embedding_chunk_length")}
           </label>
           <input
             type="number"
@@ -52,10 +56,13 @@ export default function LiteLLMOptions({ settings }) {
         </div>
       </div>
       <div className="w-full flex items-center gap-[36px]">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-80">
           <div className="flex flex-col gap-y-1 mb-4">
             <label className="text-white text-sm font-semibold flex items-center gap-x-2">
-              API Key <p className="!text-xs !italic !font-thin">optional</p>
+              {t("embedding.providers.api_key")}{" "}
+              <p className="!text-xs !italic !font-thin">
+                {t("embedding.providers.optional")}
+              </p>
             </label>
           </div>
           <input
@@ -64,7 +71,7 @@ export default function LiteLLMOptions({ settings }) {
             className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
             placeholder="sk-mysecretkey"
             defaultValue={settings?.LiteLLMAPIKey ? "*".repeat(20) : ""}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
             onChange={(e) => setApiKeyValue(e.target.value)}
             onBlur={() => setApiKey(apiKeyValue)}
@@ -78,6 +85,7 @@ export default function LiteLLMOptions({ settings }) {
 function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
   const [customModels, setCustomModels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -100,9 +108,9 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
 
   if (loading || customModels.length == 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-80">
         <label className="text-white text-sm font-semibold block mb-3">
-          Embedding Model Selection
+          {t("embedding.providers.embedding_model_selection")}
         </label>
         <select
           name="EmbeddingModelPref"
@@ -111,8 +119,8 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
         >
           <option disabled={true} selected={true}>
             {basePath?.includes("/v1")
-              ? "-- loading available models --"
-              : "-- waiting for URL --"}
+              ? t("embedding.providers.loading_models")
+              : t("embedding.providers.waiting_for_url")}
           </option>
         </select>
       </div>
@@ -120,10 +128,10 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-80">
       <div className="flex items-center">
         <label className="text-white text-sm font-semibold block mb-3">
-          Embedding Model Selection
+          {t("embedding.providers.embedding_model_selection")}
         </label>
         <EmbeddingModelTooltip />
       </div>
@@ -133,7 +141,7 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
         className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
       >
         {customModels.length > 0 && (
-          <optgroup label="Your loaded models">
+          <optgroup label={t("embedding.providers.your_loaded_models")}>
             {customModels.map((model) => {
               return (
                 <option

@@ -824,6 +824,93 @@ const TRANSLATIONS = {
       title: "Embedding Provider",
       description:
         "There is no set up required when using AnythingLLM's native embedding engine.",
+      search: "Search all embedding providers",
+    },
+    providers: {
+      native: {
+        description:
+          "Use the built-in embedding provider for AnythingLLM. Zero setup!",
+      },
+      openai: {
+        description: "The standard option for most non-commercial use.",
+      },
+      azure: {
+        description:
+          "The enterprise option of OpenAI hosted on Azure services.",
+        azure_service_endpoint: "Azure Service Endpoint",
+        embedding_deployment_name: "Embedding Deployment Name",
+      },
+      gemini: {
+        description: "Run powerful embedding models from Google AI.",
+      },
+      localai: {
+        description: "Run embedding models locally on your own machine.",
+        embedding_model_name: "Embedding Model Name",
+        local_ai_api_key: "Local AI API Key",
+        local_ai_base_url: "LocalAI Base URL",
+      },
+      ollama: {
+        description: "Run embedding models locally on your own machine.",
+        ollama_embedding_model: "Ollama Embedding Model",
+        enter_ollama_url_first: "Enter Ollama URL first",
+        ollama_embedding_model_description:
+          "Select the Ollama model for embeddings. Models will load after entering a valid Ollama URL.",
+        ollama_embedding_model_description_2:
+          "Choose the Ollama model you want to use for generating embeddings.",
+        ollama_base_url: "Ollama Base URL",
+        ollama_base_url_description: "Enter the URL where Ollama is running.",
+      },
+      lmstudio: {
+        description:
+          "Discover, download, and run thousands of cutting edge LLMs in a few clicks.",
+        lmstudio_embedding_model: "LM Studio Embedding Model",
+        lmstudio_embedding_model_description:
+          "Select the LM Studio model for embeddings. Models will load after entering a valid LM Studio URL.",
+        lmstudio_embedding_model_description_2:
+          "Choose the LM Studio model you want to use for generating embeddings.",
+        enter_lmstudio_url_first: "Enter LM Studio URL first",
+        lmstudio_base_url: "LM Studio Base URL",
+        lmstudio_base_url_description:
+          "Enter the URL where LM Studio is running.",
+      },
+      cohere: {
+        description: "Run powerful embedding models from Cohere.",
+      },
+      voyageai: {
+        description: "Run powerful embedding models from Voyage AI.",
+      },
+      litellm: {
+        description: "Run powerful embedding models from LiteLLM.",
+      },
+      mistral: {
+        description: "Run powerful embedding models from Mistral AI.",
+      },
+      generic_openai: {
+        description:
+          "Run embedding models from any OpenAI compatible API service.",
+        embedding_model: "Embedding Model",
+        max_concurrent_chunks: "Max Concurrent Chunks",
+      },
+      endpoint_discovery: {
+        success: "Provider endpoint discovered automatically.",
+        manual_required:
+          "Couldn't automatically discover the provider endpoint. Please enter it manually.",
+      },
+      api_key: "API Key",
+      base_url: "Base URL",
+      embedding_model_selection: "Embedding Model Selection",
+      model_preference: "Model Preference",
+      available_embedding_models: "Available embedding models",
+      show_advanced_settings: "Show Advanced Settings",
+      hide_advanced_settings: "Hide Advanced Settings",
+      your_loaded_models: "Your loaded models",
+      auto_detect: "Auto-Detect",
+      optional: "optional",
+      loading_models: "-- loading available models --",
+      waiting_for_url: "-- waiting for URL --",
+      max_embedding_chunk_length: "Max Embedding Chunk Length",
+      max_embedding_chunk_length_description:
+        "Maximum length of text chunks for embedding.",
     },
   },
 
