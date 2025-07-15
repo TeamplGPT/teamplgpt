@@ -3,10 +3,11 @@ import { X, Trash } from "@phosphor-icons/react";
 import System from "@/models/system";
 import ModalWrapper from "@/components/ModalWrapper";
 import { useModal } from "@/hooks/useModal";
+import { useTranslation } from "react-i18next";
 
 // Some LLMs may return a "valid" response that truncation fails to truncate because
 // it stored an Object as opposed to a string for the `text` field.
-function parseText(jsonResponse = "") {
+function parseText(jsonResponse = "", t) {
   try {
     const json = JSON.parse(jsonResponse);
     if (!json.hasOwnProperty("text"))
@@ -16,11 +17,12 @@ function parseText(jsonResponse = "") {
       : json.text;
   } catch (e) {
     console.error(e);
-    return "--failed to parse--";
+    return t("recorded.chatrow.failed-to-parse");
   }
 }
 
 export default function ChatRow({ chat, onDelete }) {
+  const { t } = useTranslation();
   const {
     isOpen: isPromptOpen,
     openModal: openPromptModal,
@@ -33,11 +35,7 @@ export default function ChatRow({ chat, onDelete }) {
   } = useModal();
 
   const handleDelete = async () => {
-    if (
-      !window.confirm(
-        `Are you sure you want to delete this chat?\n\nThis action is irreversible.`
-      )
-    )
+    if (!window.confirm(`${t("recorded.chatrow.delete-confirm")}`))
       return false;
     await System.deleteChat(chat.id);
     onDelete(chat.id);
@@ -63,7 +61,7 @@ export default function ChatRow({ chat, onDelete }) {
           onClick={openResponseModal}
           className="px-6 cursor-pointer transform transition-transform duration-200 hover:scale-105 hover:shadow-lg"
         >
-          {truncate(parseText(chat.response), 40)}
+          {truncate(parseText(chat.response, t), 40)}
         </td>
         <td className="px-6">{chat.createdAt}</td>
         <td className="px-6 flex items-center gap-x-6 h-full mt-1">
@@ -80,7 +78,7 @@ export default function ChatRow({ chat, onDelete }) {
       </ModalWrapper>
       <ModalWrapper isOpen={isResponseOpen}>
         <TextPreview
-          text={parseText(chat.response)}
+          text={parseText(chat.response, t)}
           closeModal={closeResponseModal}
         />
       </ModalWrapper>
@@ -88,11 +86,14 @@ export default function ChatRow({ chat, onDelete }) {
   );
 }
 const TextPreview = ({ text, closeModal }) => {
+  const { t } = useTranslation();
   return (
-    <div className="relative w-full md:max-w-2xl max-h-full">
-      <div className="w-full max-w-2xl bg-theme-bg-secondary rounded-lg shadow border-2 border-theme-modal-border overflow-hidden">
+    <div className="relative w-full md:max-w-6xl max-h-full">
+      <div className="w-full max-w-6xl bg-theme-bg-secondary rounded-lg shadow border-2 border-theme-modal-border overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b rounded-t border-theme-modal-border">
-          <h3 className="text-xl font-semibold text-white">Viewing Text</h3>
+          <h3 className="text-xl font-semibold text-white">
+            {t("recorded.chatrow.viewing-text")}
+          </h3>
           <button
             onClick={closeModal}
             type="button"
@@ -102,7 +103,7 @@ const TextPreview = ({ text, closeModal }) => {
           </button>
         </div>
         <div className="w-full p-6">
-          <pre className="w-full h-[200px] py-2 px-4 whitespace-pre-line overflow-auto rounded-lg bg-zinc-900 light:bg-theme-bg-secondary border border-gray-500 text-white text-sm">
+          <pre className="w-full h-[600px] py-2 px-4 whitespace-pre-line overflow-auto rounded-lg bg-zinc-900 light:bg-theme-bg-secondary border border-gray-500 text-white text-sm">
             {text}
           </pre>
         </div>

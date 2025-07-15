@@ -65,22 +65,18 @@ export default function WorkspaceChats() {
         exportOptions[exportType];
       const blob = new Blob([chats], { type: mimeType });
       saveAs(blob, `${filenameFunc()}.${fileExtension}`);
-      showToast(`Chats exported successfully as ${name}.`, "success");
+      showToast(`${t("recorded.chatrow.export-success")} ${name}.`, "success");
     } else {
-      showToast("Failed to export chats.", "error");
+      showToast(t("recorded.chatrow.export-failed"), "error");
     }
   };
 
   const handleClearAllChats = async () => {
-    if (
-      !window.confirm(
-        `Are you sure you want to clear all chats?\n\nThis action is irreversible.`
-      )
-    )
+    if (!window.confirm(`${t("recorded.chatrow.clear-all-confirm")}`))
       return false;
     await System.deleteChat(-1);
     setChats([]);
-    showToast("Cleared all chats.", "success");
+    showToast(t("recorded.chatrow.clear-all-success"), "success");
   };
 
   const toggleMenu = () => {
@@ -167,7 +163,7 @@ export default function WorkspaceChats() {
                     className="flex items-center gap-x-2 px-4 py-1 border hover:border-transparent light:border-theme-sidebar-border border-white/40 text-white/40 light:text-theme-text-secondary rounded-lg bg-transparent hover:light:text-theme-bg-primary hover:text-theme-text-primary text-xs font-semibold hover:bg-red-500 shadow-[0_4px_14px_rgba(0,0,0,0.25)] h-[34px] w-fit"
                   >
                     <Trash size={18} weight="bold" />
-                    Clear Chats
+                    {t("recorded.clear")}
                   </button>
                 )}
               </div>
@@ -270,14 +266,14 @@ function ChatsContainer({
           disabled={offset === 0}
         >
           {" "}
-          Previous Page
+          {t("recorded.previous")}
         </button>
         <button
           onClick={handleNext}
           className="px-4 py-2 rounded-lg border border-slate-200 text-slate-200 light:text-theme-text-secondary light:border-theme-sidebar-border text-sm items-center flex gap-x-2 hover:bg-slate-200 hover:text-slate-800 disabled:invisible"
           disabled={!canNext}
         >
-          Next Page
+          {t("recorded.next")}
         </button>
       </div>
     </>

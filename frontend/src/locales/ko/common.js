@@ -452,7 +452,7 @@ const TRANSLATIONS = {
   recorded: {
     title: "워크스페이스 채팅",
     description:
-      "이것들은 사용자들이 보낸 모든 채팅과 메시지입니다. 생성 날짜별로 정렬되어 있습니다.",
+      "이 목록들은 사용자들이 보낸 모든 채팅과 메시지입니다. 생성 날짜별로 정렬되어 있습니다.",
     export: "내보내기",
     table: {
       id: "ID",
@@ -461,6 +461,20 @@ const TRANSLATIONS = {
       prompt: "프롬프트",
       response: "응답",
       at: "보낸 시각",
+    },
+    clear: "모든 채팅 지우기",
+    next: "다음 페이지",
+    previous: "이전 페이지",
+    chatrow: {
+      "failed-to-parse": "-- 파싱에 실패했습니다 --",
+      "export-failed": "채팅 내보내기에 실패했습니다.",
+      "export-success": "채팅이 성공적으로 내보내졌습니다. - ",
+      "clear-all-confirm":
+        "모든 채팅을 정말로 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.",
+      "clear-all-success": "모든 채팅이 삭제되었습니다.",
+      "delete-confirm":
+        "이 채팅을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.",
+      "viewing-text": "텍스트 보기",
     },
   },
 

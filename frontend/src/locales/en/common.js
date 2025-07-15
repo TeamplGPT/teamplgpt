@@ -472,6 +472,20 @@ const TRANSLATIONS = {
       response: "Response",
       at: "Sent At",
     },
+    clear: "Clear Chats",
+    next: "Next Page",
+    previous: "Previous Page",
+    chatrow: {
+      "failed-to-parse": "-- Failed to parse --",
+      "export-failed": "Failed to export chats.",
+      "export-success": "Chats exported successfully as ",
+      "clear-all-confirm":
+        "Are you sure you want to clear all chats?\n\nThis action is irreversible.",
+      "clear-all-success": "Cleared all chats.",
+      "delete-confirm":
+        "Are you sure you want to delete this chat?\n\nThis action is irreversible.",
+      "viewing-text": "Viewing Text",
+    },
   },
 
   customization: {
