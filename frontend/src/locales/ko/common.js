@@ -1049,10 +1049,23 @@ const TRANSLATIONS = {
     description:
       "이것은 선호하는 텍스트 변환 모델 제공자의 인증입니다. 이 키가 현재 활성 상태이고 정확해야 미디어 파일 및 오디오가 텍스트 변환됩니다.",
     provider: "텍스트 변환 제공자",
+    providers: {
+      openai: {
+        description:
+          "API 키를 사용하여 OpenAI Whisper-large 모델을 활용합니다.",
+        whisper_model: "Whisper 모델",
+      },
+      local: {
+        description:
+          "이 인스턴스에서 내장된 whisper 모델을 비공개로 실행합니다.",
+      },
+    },
     "warn-start":
       "RAM 또는 CPU 성능이 제한된 머신에서 로컬 위스퍼 모델을 사용하면 미디어 파일을 처리할 때 AnythingLLM이 중단될 수 있습니다.",
     "warn-recommend": "최소 2GB RAM과 10Mb 보다 작은 파일 업로드를 권장합니다.",
     "warn-end": "내장된 모델은 첫 번째 사용 시 자동으로 다운로드됩니다.",
+    search: "오디오 텍스트 변환 제공자 검색",
+    api_key: "API 키",
   },
 
   // Embeddable Chat Widgets

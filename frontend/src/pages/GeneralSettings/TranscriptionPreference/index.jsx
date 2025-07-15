@@ -19,14 +19,14 @@ const PROVIDERS = [
     value: "openai",
     logo: OpenAiLogo,
     options: (settings) => <OpenAiWhisperOptions settings={settings} />,
-    description: "Leverage the OpenAI Whisper-large model using your API key.",
+    description: "transcription.providers.openai.description",
   },
   {
     name: "AnythingLLM Built-In",
     value: "local",
     logo: AnythingLLMIcon,
     options: (settings) => <NativeTranscriptionOptions settings={settings} />,
-    description: "Run a built-in whisper model on this instance privately.",
+    description: "transcription.providers.local.description",
   },
 ];
 
@@ -133,7 +133,7 @@ export default function TranscriptionModelPreference() {
                     onClick={() => handleSubmit()}
                     className="mt-3 mr-0 -mb-14 z-10"
                   >
-                    {saving ? "Saving..." : "Save changes"}
+                    {saving ? t("common.saving") : t("common.save")}
                   </CTAButton>
                 )}
               </div>
@@ -148,7 +148,7 @@ export default function TranscriptionModelPreference() {
                   />
                 )}
                 {searchMenuOpen ? (
-                  <div className="absolute top-0 left-0 w-full max-w-[640px] max-h-[310px] min-h-[64px] bg-theme-settings-input-bg rounded-lg flex flex-col justify-between cursor-pointer border-2 border-primary-button z-20">
+                  <div className="absolute top-0 left-0 w-full max-w-[640px] max-h-[610px] min-h-[64px] bg-theme-settings-input-bg rounded-lg flex flex-col justify-between cursor-pointer border-2 border-primary-button z-20">
                     <div className="w-full flex flex-col gap-y-1">
                       <div className="flex items-center sticky top-0 z-10 border-b border-[#9CA3AF] mx-4 bg-theme-settings-input-bg">
                         <MagnifyingGlass
@@ -160,7 +160,7 @@ export default function TranscriptionModelPreference() {
                           type="text"
                           name="provider-search"
                           autoComplete="off"
-                          placeholder="Search audio transcription providers"
+                          placeholder={t("transcription.search")}
                           className="border-none -ml-4 my-2 bg-transparent z-20 pl-12 h-[38px] w-full px-4 py-1 text-sm outline-none focus:outline-primary-button active:outline-primary-button outline-none text-theme-text-primary placeholder:text-theme-text-primary placeholder:font-medium"
                           onChange={(e) => setSearchQuery(e.target.value)}
                           ref={searchInputRef}
@@ -175,14 +175,14 @@ export default function TranscriptionModelPreference() {
                           onClick={handleXButton}
                         />
                       </div>
-                      <div className="flex-1 pl-4 pr-2 flex flex-col gap-y-1 overflow-y-auto white-scrollbar pb-4 max-h-[245px]">
+                      <div className="flex-1 pl-4 pr-2 flex flex-col gap-y-1 overflow-y-auto white-scrollbar pb-4 max-h-[545px]">
                         {filteredProviders.map((provider) => (
                           <LLMItem
                             key={provider.name}
                             name={provider.name}
                             value={provider.value}
                             image={provider.logo}
-                            description={provider.description}
+                            description={t(provider.description)}
                             checked={selectedProvider === provider.value}
                             onClick={() => updateProviderChoice(provider.value)}
                           />
@@ -207,7 +207,7 @@ export default function TranscriptionModelPreference() {
                           {selectedProviderObject.name}
                         </div>
                         <div className="mt-1 text-xs text-description">
-                          {selectedProviderObject.description}
+                          {t(selectedProviderObject.description)}
                         </div>
                       </div>
                     </div>
