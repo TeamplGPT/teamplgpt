@@ -13,7 +13,7 @@ export default function ElevenLabsOptions({ settings }) {
     <div className="flex gap-x-4">
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-3">
-          {t("llm.providers.api_key")}
+          {t("speech-text.api_key")}
         </label>
         <input
           type="password"
@@ -22,7 +22,7 @@ export default function ElevenLabsOptions({ settings }) {
           placeholder="ElevenLabs API Key"
           defaultValue={settings?.TTSElevenLabsKey ? "*".repeat(20) : ""}
           required={true}
-          autoComplete="off"
+          autoComplete="new-password"
           spellCheck={false}
           onChange={(e) => setInputValue(e.target.value)}
           onBlur={() => setElevenLabsKey(inputValue)}
@@ -66,7 +66,7 @@ function ElevenLabsModelSelection({ apiKey, settings }) {
     return (
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-3">
-          {t("llm.providers.chat_model_selection")}
+          {t("speech-text.voice_model")}
         </label>
         <select
           name="TTSElevenLabsVoiceModel"
@@ -74,12 +74,9 @@ function ElevenLabsModelSelection({ apiKey, settings }) {
           className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- {t("llm.providers.loading_models")} --
+            -- {t("speech-text.loading_models")} --
           </option>
         </select>
-        <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-          {t("llm.providers.enter_valid_api_key")}
-        </p>
       </div>
     );
   }
@@ -87,7 +84,7 @@ function ElevenLabsModelSelection({ apiKey, settings }) {
   return (
     <div className="flex flex-col w-60">
       <label className="text-white text-sm font-semibold block mb-3">
-        {t("llm.providers.chat_model_selection")}
+        {t("speech-text.voice_model")}
       </label>
       <select
         name="TTSElevenLabsVoiceModel"
@@ -97,7 +94,10 @@ function ElevenLabsModelSelection({ apiKey, settings }) {
         {Object.keys(groupedModels)
           .sort()
           .map((organization) => (
-            <optgroup key={organization} label={organization}>
+            <optgroup
+              key={organization}
+              label={t(`speech-text.text.providers.elevenlabs.organization`)}
+            >
               {groupedModels[organization].map((model) => (
                 <option
                   key={model.id}

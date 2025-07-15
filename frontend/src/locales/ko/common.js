@@ -783,15 +783,83 @@ const TRANSLATIONS = {
     },
   },
 
-  transcription: {
-    title: "텍스트 변환 모델 기본 설정",
+  vector: {
+    title: "벡터 데이터베이스",
     description:
-      "이것은 선호하는 텍스트 변환 모델 제공자의 인증입니다. 이 키가 현재 활성 상태이고 정확해야 미디어 파일 및 오디오가 텍스트 변환됩니다.",
-    provider: "텍스트 변환 제공자",
-    "warn-start":
-      "RAM 또는 CPU 성능이 제한된 머신에서 로컬 위스퍼 모델을 사용하면 미디어 파일을 처리할 때 AnythingLLM이 중단될 수 있습니다.",
-    "warn-recommend": "최소 2GB RAM과 10Mb 보다 작은 파일 업로드를 권장합니다.",
-    "warn-end": "내장된 모델은 첫 번째 사용 시 자동으로 다운로드됩니다.",
+      "이것은 AnythingLLM 인스턴스가 벡터 데이터베이스 사용을 위한 인증 설정입니다. 이 키가 활성 상태이고 정확해야 합니다.",
+    provider: {
+      title: "벡터 데이터베이스 제공자",
+      description: "LanceDB를 선택하면 설정이 필요 없습니다.",
+      search: "모든 벡터 데이터베이스 제공자 검색",
+      lancedb: {
+        description:
+          "AnythingLLM과 동일한 인스턴스에서 실행되는 100% 로컬 벡터 데이터베이스입니다.",
+      },
+      pgvector: {
+        description: "PostgreSQL을 통한 벡터 검색입니다.",
+        connectionString: "Postgres 연결 문자열",
+        tableName: "벡터 테이블 이름",
+        tooltip: {
+          intro:
+            "Postgres 데이터베이스에 연결하기 위한 문자열입니다.<br /><code>postgresql://username:password@host:port/database</code> 형식으로 입력하세요.",
+          permissions:
+            "데이터베이스 사용자는 다음 권한을 반드시 가지고 있어야 합니다:",
+          permission_db: "데이터베이스 읽기 권한",
+          permission_schema: "데이터베이스 스키마 읽기 권한",
+          permission_create: "데이터베이스 생성 권한",
+          pgvector:
+            "데이터베이스에 pgvector 확장 기능이 반드시 설치되어 있어야 합니다.",
+          desc_1:
+            "Postgres 데이터베이스에서 벡터를 저장할 테이블의 이름입니다.",
+          desc_2:
+            "기본적으로 테이블 이름은 <code>anythingllm_vectors</code>입니다.",
+          desc_3:
+            "이 테이블은 데이터베이스에 미리 존재하지 않아야 하며, 자동으로 생성됩니다.",
+        },
+      },
+      chroma: {
+        description:
+          "직접 호스팅하거나 클라우드에서 사용할 수 있는 오픈소스 벡터 데이터베이스입니다.",
+        endpoint: "Chroma 엔드포인트",
+        apiHeader: "API 헤더",
+      },
+      pinecone: {
+        description:
+          "기업 환경에 최적화된 100% 클라우드 기반 벡터 데이터베이스입니다.",
+        apiKey: "Pinecone API 키",
+        indexName: "Pinecone 인덱스 이름",
+      },
+      zilliz: {
+        description:
+          "기업 환경을 위한 SOC 2 인증 클라우드 기반 벡터 데이터베이스입니다.",
+        clusterEndpoint: "클러스터 엔드포인트",
+        apiToken: "API 토큰",
+      },
+      qdrant: {
+        description:
+          "오픈소스 로컬 및 분산형 클라우드 벡터 데이터베이스입니다.",
+        QDrantAPIEndpoint: "QDrant API 엔드포인트",
+      },
+      weaviate: {
+        description:
+          "오픈소스 기반의 로컬 및 클라우드에서 모두 사용할 수 있는 멀티모달 벡터 데이터베이스입니다.",
+        endpoint: "Weaviate 엔드포인트",
+      },
+      milvus: {
+        description:
+          "오픈소스이며, 매우 확장 가능하고 빠른 벡터 데이터베이스입니다.",
+        dbAddress: "Milvus DB 주소",
+        username: "Milvus 사용자 이름",
+        password: "Milvus 비밀번호",
+      },
+      astra: {
+        description:
+          "실제 환경의 생성형 AI를 위한 벡터 검색 데이터베이스입니다.",
+        endpoint: "Astra DB 엔드포인트",
+        applicationToken: "Astra DB 애플리케이션 토큰",
+      },
+      apiKey: "API 키",
+    },
   },
 
   embedding: {
@@ -914,83 +982,77 @@ const TRANSLATIONS = {
     },
   },
 
-  vector: {
-    title: "벡터 데이터베이스",
-    description:
-      "이것은 AnythingLLM 인스턴스가 벡터 데이터베이스 사용을 위한 인증 설정입니다. 이 키가 활성 상태이고 정확해야 합니다.",
-    provider: {
-      title: "벡터 데이터베이스 제공자",
-      description: "LanceDB를 선택하면 설정이 필요 없습니다.",
-      search: "모든 벡터 데이터베이스 제공자 검색",
-      lancedb: {
-        description:
-          "AnythingLLM과 동일한 인스턴스에서 실행되는 100% 로컬 벡터 데이터베이스입니다.",
-      },
-      pgvector: {
-        description: "PostgreSQL을 통한 벡터 검색입니다.",
-        connectionString: "Postgres 연결 문자열",
-        tableName: "벡터 테이블 이름",
-        tooltip: {
-          intro:
-            "Postgres 데이터베이스에 연결하기 위한 문자열입니다.<br /><code>postgresql://username:password@host:port/database</code> 형식으로 입력하세요.",
-          permissions:
-            "데이터베이스 사용자는 다음 권한을 반드시 가지고 있어야 합니다:",
-          permission_db: "데이터베이스 읽기 권한",
-          permission_schema: "데이터베이스 스키마 읽기 권한",
-          permission_create: "데이터베이스 생성 권한",
-          pgvector:
-            "데이터베이스에 pgvector 확장 기능이 반드시 설치되어 있어야 합니다.",
-          desc_1:
-            "Postgres 데이터베이스에서 벡터를 저장할 테이블의 이름입니다.",
-          desc_2:
-            "기본적으로 테이블 이름은 <code>anythingllm_vectors</code>입니다.",
-          desc_3:
-            "이 테이블은 데이터베이스에 미리 존재하지 않아야 하며, 자동으로 생성됩니다.",
+  "speech-text": {
+    provider: "제공자",
+    speech: {
+      title: "음성 인식(STT) 기본 설정",
+      description:
+        "AnythingLLM에서 사용할 음성 인식(STT) 및 음성 합성(TTS) 제공자를 선택할 수 있습니다. 기본적으로 브라우저에 내장된 서비스를 사용하지만, 필요에 따라 다른 제공자를 선택할 수도 있습니다.",
+      success: "음성 인식(STT) 기본 설정이 성공적으로 저장되었습니다.",
+      search: "음성 인식(STT) 제공자 검색",
+      providers: {
+        native: {
+          description:
+            "브라우저에 내장된 음성 인식(STT) 기능이 지원되는 경우 이를 사용합니다.",
+          description2: "이 제공자는 별도의 설정이 필요하지 않습니다.",
         },
       },
-      chroma: {
-        description:
-          "직접 호스팅하거나 클라우드에서 사용할 수 있는 오픈소스 벡터 데이터베이스입니다.",
-        endpoint: "Chroma 엔드포인트",
-        apiHeader: "API 헤더",
-      },
-      pinecone: {
-        description:
-          "기업 환경에 최적화된 100% 클라우드 기반 벡터 데이터베이스입니다.",
-        apiKey: "Pinecone API 키",
-        indexName: "Pinecone 인덱스 이름",
-      },
-      zilliz: {
-        description:
-          "기업 환경을 위한 SOC 2 인증 클라우드 기반 벡터 데이터베이스입니다.",
-        clusterEndpoint: "클러스터 엔드포인트",
-        apiToken: "API 토큰",
-      },
-      qdrant: {
-        description:
-          "오픈소스 로컬 및 분산형 클라우드 벡터 데이터베이스입니다.",
-        QDrantAPIEndpoint: "QDrant API 엔드포인트",
-      },
-      weaviate: {
-        description:
-          "오픈소스 기반의 로컬 및 클라우드에서 모두 사용할 수 있는 멀티모달 벡터 데이터베이스입니다.",
-        endpoint: "Weaviate 엔드포인트",
-      },
-      milvus: {
-        description:
-          "오픈소스이며, 매우 확장 가능하고 빠른 벡터 데이터베이스입니다.",
-        dbAddress: "Milvus DB 주소",
-        username: "Milvus 사용자 이름",
-        password: "Milvus 비밀번호",
-      },
-      astra: {
-        description:
-          "실제 환경의 생성형 AI를 위한 벡터 검색 데이터베이스입니다.",
-        endpoint: "Astra DB 엔드포인트",
-        applicationToken: "Astra DB 애플리케이션 토큰",
-      },
-      apiKey: "API 키",
     },
+    text: {
+      title: "음성 합성(TTS) 기본 설정",
+      description:
+        "AnythingLLM에서 사용할 음성 합성(TTS) 제공자를 선택할 수 있습니다. 기본적으로 브라우저에 내장된 서비스를 사용하지만, 필요에 따라 다른 제공자를 선택할 수도 있습니다.",
+      success: "음성 합성(TTS) 기본 설정이 성공적으로 저장되었습니다.",
+      error: "기본 설정 저장에 실패했습니다.",
+      search: "음성 합성(TTS) 제공자 검색",
+      providers: {
+        native: {
+          description:
+            "브라우저에 내장된 음성 합성(TTS) 기능이 지원되는 경우 이를 사용합니다.",
+          description2: "이 제공자는 별도의 설정이 필요하지 않습니다.",
+        },
+        openai: {
+          description: "OpenAI의 음성 합성(TTS) 음성을 사용합니다.",
+        },
+        elevenlabs: {
+          description: "ElevenLabs의 음성 합성(TTS) 음성과 기술을 사용합니다.",
+          organization: "기본 제공",
+        },
+        piper_local: {
+          description:
+            "브라우저에서 TTS 모델을 로컬로 실행하여 개인적으로 음성 합성을 처리합니다.",
+          description2:
+            "모든 PiperTTS 모델은 브라우저에서 로컬로 실행됩니다. 사양이 낮은 기기에서는 리소스 사용량이 많을 수 있습니다.",
+          info: "브라우저 저장소에서 모든 음성이 삭제되었습니다.",
+        },
+        generic_openai: {
+          description:
+            "로컬 또는 원격에서 실행 중인 OpenAI 호환 TTS 서비스에 연결합니다.",
+          description2:
+            "여기에는 TTS 응답을 생성할 OpenAI 호환 TTS 서비스의 기본 URL을 입력해야 합니다.",
+          description3:
+            "일부 TTS 서비스는 음성 합성 응답을 생성하기 위해 API 키가 필요할 수 있습니다. 서비스에서 필요하지 않다면 입력하지 않아도 됩니다.",
+          description4:
+            "대부분의 TTS 서비스는 여러 개의 음성 모델을 제공합니다. 여기에는 사용하려는 음성 모델의 식별자를 입력하세요.",
+          voice_model_placeholder: "음성 모델 식별자",
+        },
+      },
+    },
+    api_key: "API 키",
+    voice_model: "음성 모델",
+    loading_models: "사용 가능한 모델을 불러오는 중",
+    base_url: "기본 URL",
+  },
+
+  transcription: {
+    title: "텍스트 변환 모델 기본 설정",
+    description:
+      "이것은 선호하는 텍스트 변환 모델 제공자의 인증입니다. 이 키가 현재 활성 상태이고 정확해야 미디어 파일 및 오디오가 텍스트 변환됩니다.",
+    provider: "텍스트 변환 제공자",
+    "warn-start":
+      "RAM 또는 CPU 성능이 제한된 머신에서 로컬 위스퍼 모델을 사용하면 미디어 파일을 처리할 때 AnythingLLM이 중단될 수 있습니다.",
+    "warn-recommend": "최소 2GB RAM과 10Mb 보다 작은 파일 업로드를 권장합니다.",
+    "warn-end": "내장된 모델은 첫 번째 사용 시 자동으로 다운로드됩니다.",
   },
 
   // Embeddable Chat Widgets

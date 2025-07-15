@@ -801,17 +801,81 @@ const TRANSLATIONS = {
     },
   },
 
-  transcription: {
-    title: "Transcription Model Preference",
+  // Vector Database
+  vector: {
+    title: "Vector Database",
     description:
-      "These are the credentials and settings for your preferred transcription model provider. Its important these keys are current and correct or else media files and audio will not transcribe.",
-    provider: "Transcription Provider",
-    "warn-start":
-      "Using the local whisper model on machines with limited RAM or CPU can stall AnythingLLM when processing media files.",
-    "warn-recommend":
-      "We recommend at least 2GB of RAM and upload files <10Mb.",
-    "warn-end":
-      "The built-in model will automatically download on the first use.",
+      "These are the credentials and settings for how your AnythingLLM instance will function. It's important these keys are current and correct.",
+    provider: {
+      title: "Vector Database Provider",
+      description: "There is no configuration needed for LanceDB.",
+      search: "Search all vector database providers",
+      lancedb: {
+        description:
+          "100% local vector DB that runs on the same instance as AnythingLLM.",
+      },
+      pgvector: {
+        description: "Vector search powered by PostgreSQL.",
+        connectionString: "Postgres Connection String",
+        tableName: "Vector Table Name",
+        tooltip: {
+          intro:
+            "This is the connection string for the Postgres database in the format of <br /><code>postgresql://username:password@host:port/database</code>",
+          permissions:
+            "The user for the database must have the following permissions:",
+          permission_db: "Read access to the database",
+          permission_schema: "Read access to the database schem",
+          permission_create: "Create access to the database",
+          pgvector:
+            "You must have the pgvector extension installed on the database.",
+          desc_1:
+            "This is the name of the table in the Postgres database that will store the vectors",
+          desc_2:
+            "By default, the table name is <code>anythingllm_vectors</code>.",
+          desc_3:
+            "This table must not already exist on the database - it will be created automatically.",
+        },
+      },
+      chroma: {
+        description:
+          "Open source vector database you can host yourself or on the cloud.",
+        endpoint: "Chroma Endpoint",
+        apiHeader: "API Header",
+      },
+      pinecone: {
+        description:
+          "100% cloud-based vector database for enterprise use cases.",
+        apiKey: "Pinecone DB API Key",
+        indexName: "Pinecone Index Name",
+      },
+      zilliz: {
+        description:
+          "Cloud hosted vector database built for enterprise with SOC 2 compliance.",
+        clusterEndpoint: "Cluster Endpoint",
+        apiToken: "API Token",
+      },
+      qdrant: {
+        description: "Open source local and distributed cloud vector database.",
+        QDrantAPIEndpoint: "QDrant API Endpoint",
+      },
+      weaviate: {
+        description:
+          "Open source local and cloud hosted multi-modal vector database.",
+        endpoint: "Weaviate Endpoint",
+      },
+      milvus: {
+        description: "Open-source, highly scalable, and blazing fast.",
+        dbAddress: "Milvus DB Address",
+        username: "Milvus Username",
+        password: "Milvus Password",
+      },
+      astra: {
+        description: "Vector Search for Real-world GenAI.",
+        endpoint: "Astra DB Endpoint",
+        applicationToken: "Astra DB Application Token",
+      },
+      apiKey: "API Key",
+    },
   },
 
   embedding: {
@@ -937,81 +1001,82 @@ const TRANSLATIONS = {
     },
   },
 
-  // Vector Database
-  vector: {
-    title: "Vector Database",
-    description:
-      "These are the credentials and settings for how your AnythingLLM instance will function. It's important these keys are current and correct.",
-    provider: {
-      title: "Vector Database Provider",
-      description: "There is no configuration needed for LanceDB.",
-      search: "Search all vector database providers",
-      lancedb: {
-        description:
-          "100% local vector DB that runs on the same instance as AnythingLLM.",
-      },
-      pgvector: {
-        description: "Vector search powered by PostgreSQL.",
-        connectionString: "Postgres Connection String",
-        tableName: "Vector Table Name",
-        tooltip: {
-          intro:
-            "This is the connection string for the Postgres database in the format of <br /><code>postgresql://username:password@host:port/database</code>",
-          permissions:
-            "The user for the database must have the following permissions:",
-          permission_db: "Read access to the database",
-          permission_schema: "Read access to the database schem",
-          permission_create: "Create access to the database",
-          pgvector:
-            "You must have the pgvector extension installed on the database.",
-          desc_1:
-            "This is the name of the table in the Postgres database that will store the vectors",
-          desc_2:
-            "By default, the table name is <code>anythingllm_vectors</code>.",
-          desc_3:
-            "This table must not already exist on the database - it will be created automatically.",
+  "speech-text": {
+    provider: "Provider",
+    speech: {
+      title: "Speech-to-text Preference",
+      description:
+        "Here you can specify what kind of text-to-speech and speech-to-text providers you would want to use in your AnythingLLM experience. By default, we use the browser's built in support for these services, but you may want to use others.",
+      success: "Speech-to-text preferences saved successfully.",
+      search: "Search speech to text providers",
+      providers: {
+        native: {
+          description: "Uses your browser's built in STT service if supported.",
+          description2: "There is no configuration needed for this provider.",
         },
       },
-      chroma: {
-        description:
-          "Open source vector database you can host yourself or on the cloud.",
-        endpoint: "Chroma Endpoint",
-        apiHeader: "API Header",
-      },
-      pinecone: {
-        description:
-          "100% cloud-based vector database for enterprise use cases.",
-        apiKey: "Pinecone DB API Key",
-        indexName: "Pinecone Index Name",
-      },
-      zilliz: {
-        description:
-          "Cloud hosted vector database built for enterprise with SOC 2 compliance.",
-        clusterEndpoint: "Cluster Endpoint",
-        apiToken: "API Token",
-      },
-      qdrant: {
-        description: "Open source local and distributed cloud vector database.",
-        QDrantAPIEndpoint: "QDrant API Endpoint",
-      },
-      weaviate: {
-        description:
-          "Open source local and cloud hosted multi-modal vector database.",
-        endpoint: "Weaviate Endpoint",
-      },
-      milvus: {
-        description: "Open-source, highly scalable, and blazing fast.",
-        dbAddress: "Milvus DB Address",
-        username: "Milvus Username",
-        password: "Milvus Password",
-      },
-      astra: {
-        description: "Vector Search for Real-world GenAI.",
-        endpoint: "Astra DB Endpoint",
-        applicationToken: "Astra DB Application Token",
-      },
-      apiKey: "API Key",
     },
+    text: {
+      title: "Text-to-speech Preference",
+      description:
+        "Here you can specify what kind of text-to-speech providers you would want to use in your AnythingLLM experience. By default, we use the browser's built in support for these services, but you may want to use others.",
+      success: "Text-to-speech preferences saved successfully.",
+      error: "Failed to save preferences",
+      search: "Search text to speech providers",
+      providers: {
+        native: {
+          description: "Uses your browser's built in TTS service if supported.",
+          description2: "There is no configuration needed for this provider.",
+        },
+        openai: {
+          description: "Use OpenAI's text to speech voices.",
+        },
+        elevenlabs: {
+          description: "Use ElevenLabs's text to speech voices and technology.",
+          organization: "premade",
+        },
+        piper_local: {
+          description: "Run TTS models locally in your browser privately.",
+          description2:
+            "All PiperTTS models will run in your browser locally. This can be resource intensive on lower-end devices.",
+          description3:
+            "The '✔' indicates this model is already stored locally and does not need to be downloaded when run.",
+          info: "All voices flushed from browser storage",
+          flush_voice_cache: "Flush voice cache",
+          stop_demo: "Stop demo",
+          loading_voice: "Loading voice",
+          play_sample: "Play sample",
+        },
+        generic_openai: {
+          description:
+            "Connect to an OpenAI compatible TTS service running locally or remotely.",
+          description2:
+            "This should be the base URL of the OpenAI compatible TTS service you will generate TTS responses from.",
+          description3:
+            "Some TTS services require an API key to generate TTS responses - this is optional if your service does not require one.",
+          description4:
+            "Most TTS services will have several voice models available, this is the identifier for the voice model you want to use.",
+          voice_model_placeholder: "Your voice model identifier",
+        },
+      },
+    },
+    api_key: "API Key",
+    voice_model: "Voice Model",
+    loading_models: "loading available models",
+    base_url: "Base URL",
+  },
+
+  transcription: {
+    title: "Transcription Model Preference",
+    description:
+      "These are the credentials and settings for your preferred transcription model provider. Its important these keys are current and correct or else media files and audio will not transcribe.",
+    provider: "Transcription Provider",
+    "warn-start":
+      "Using the local whisper model on machines with limited RAM or CPU can stall AnythingLLM when processing media files.",
+    "warn-recommend":
+      "We recommend at least 2GB of RAM and upload files <10Mb.",
+    "warn-end":
+      "The built-in model will automatically download on the first use.",
   },
 
   // Embeddable Chat Widgets
