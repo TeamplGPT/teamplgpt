@@ -68,6 +68,7 @@ const TRANSLATIONS = {
     optional: "Valikuline",
     yes: "Jah",
     no: "Ei",
+    search: null,
   },
   settings: {
     title: "Instantsi seaded",
@@ -925,7 +926,7 @@ const TRANSLATIONS = {
     username_description:
       "Kasutajanimi võib sisaldada ainult väiketähti, numbreid, alakriipse ja sidekriipse, ilma tühikuteta",
     new_password: "Uus parool",
-    passwort_description: "Parool peab olema vähemalt 8 märki",
+    password_description: "Parool peab olema vähemalt 8 märki",
     cancel: "Tühista",
     update_account: "Uuenda kontot",
     theme: "Teema eelistus",

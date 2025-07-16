@@ -70,6 +70,7 @@ const TRANSLATIONS = {
     yes: "예",
     no: "아니오",
     "your-admin-password": "관리자 비밀번호",
+    search: "검색",
   },
 
   // Setting Sidebar menu items.
@@ -601,6 +602,8 @@ const TRANSLATIONS = {
         azure_service_endpoint: "Azure 서비스 엔드포인트",
         chat_deployment_name: "채팅 배포 이름",
         chat_model_token_limit: "채팅 모델 토큰 한도",
+        model_type: "모델 유형",
+        default: "기본값",
         reasoning: "추론",
       },
       openai: {
@@ -1623,7 +1626,7 @@ const TRANSLATIONS = {
     username_description:
       "사용자명은 소문자, 숫자, 밑줄(_), 하이픈(-)만 사용할 수 있으며, 공백은 허용되지 않습니다.",
     new_password: "새 비밀번호",
-    passwort_description: "비밀번호는 최소 8자 이상이어야 합니다.",
+    password_description: "비밀번호는 최소 8자 이상이어야 합니다.",
     cancel: "취소",
     update_account: "계정 정보 업데이트",
     theme: "테마 설정",

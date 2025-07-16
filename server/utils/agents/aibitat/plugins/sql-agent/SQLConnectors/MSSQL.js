@@ -43,8 +43,12 @@ class MSSQLConnector {
       user: parsed?.username,
       password: parsed?.password,
       database: parsed?.endpoint,
-      server: parsed?.hosts[0]?.host,
-      port: parsed?.hosts[0]?.port,
+      server: parsed?.hosts?.[0]?.host,
+      port: parsed?.hosts?.[0]?.port,
+      options: {
+        ...this.connectionConfig.options,
+        encrypt: parsed?.options?.encrypt === "true",
+      },
     };
   }
 

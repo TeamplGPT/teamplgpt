@@ -69,6 +69,7 @@ const TRANSLATIONS = {
     optional: "Необязательный",
     yes: "Да",
     no: "Нет",
+    search: null,
   },
   settings: {
     title: "Настройки экземпляра",
@@ -771,7 +772,7 @@ const TRANSLATIONS = {
     username_description:
       "Имя пользователя должно состоять только из строчных букв, цифр, символов подчеркивания и дефисов без пробелов",
     new_password: "Новый пароль",
-    passwort_description: "Пароль должен содержать не менее 8 символов",
+    password_description: "Пароль должен содержать не менее 8 символов",
     cancel: "Отмена",
     update_account: "Обновить учётную запись",
     theme: "Предпочтения темы",

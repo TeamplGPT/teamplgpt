@@ -68,6 +68,7 @@ const TRANSLATIONS = {
     optional: "اختياري",
     yes: "نعم",
     no: "لا",
+    search: null,
   },
   settings: {
     title: "إعدادات المثيل",
@@ -731,7 +732,7 @@ const TRANSLATIONS = {
     username: null,
     username_description: null,
     new_password: null,
-    passwort_description: null,
+    password_description: null,
     cancel: null,
     update_account: null,
     theme: null,

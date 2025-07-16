@@ -70,6 +70,7 @@ const TRANSLATIONS = {
     optional: "Optional",
     yes: "Ja",
     no: "Nein",
+    search: null,
   },
   settings: {
     title: "Instanzeinstellungen",
@@ -966,7 +967,7 @@ const TRANSLATIONS = {
     username_description:
       "Der Nutzername darf nur kleine Buchstaben, Zahlen, Unterstrich und Bindestriche ohne Leerzeichen.",
     new_password: "Neues Passwort",
-    passwort_description: "Das Passwort muss mindestens 8 Zeichen haben.",
+    password_description: "Das Passwort muss mindestens 8 Zeichen haben.",
     cancel: "Abbrechen",
     update_account: "Account updaten",
     theme: "Bevozugtes Design",
