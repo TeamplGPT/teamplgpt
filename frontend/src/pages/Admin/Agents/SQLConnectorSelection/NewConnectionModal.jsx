@@ -3,6 +3,8 @@ import { createPortal } from "react-dom";
 import ModalWrapper from "@/components/ModalWrapper";
 import { WarningOctagon, X } from "@phosphor-icons/react";
 import { DB_LOGOS } from "./DBConnection";
+import System from "@/models/system";
+import showToast from "@/utils/toast";
 
 function assembleConnectionString({
   engine,
@@ -42,12 +44,17 @@ const DEFAULT_CONFIG = {
 const DEFAULT_ORACLE_MODE = "thin";
 const DEFAULT_ORACLE_LIBDIR = "";
 
-export default function NewSQLConnection({ isOpen, closeModal, onSubmit }) {
+export default function NewSQLConnection({
+  isOpen,
+  closeModal,
+  onSubmit,
+  setHasChanges,
+}) {
   const [engine, setEngine] = useState(DEFAULT_ENGINE);
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [oracleMode, setOracleMode] = useState(DEFAULT_ORACLE_MODE);
   const [oracleLibDir, setOracleLibDir] = useState(DEFAULT_ORACLE_LIBDIR);
-
+  const [isValidating, setIsValidating] = useState(false);
   if (!isOpen) return null;
 
   function handleClose() {
@@ -58,8 +65,8 @@ export default function NewSQLConnection({ isOpen, closeModal, onSubmit }) {
     closeModal();
   }
 
-  function onFormChange() {
-    const form = new FormData(document.getElementById("sql-connection-form"));
+  function onFormChange(e) {
+    const form = new FormData(e.target.form);
     setConfig({
       username: form.get("username").trim(),
       password: form.get("password"),
@@ -74,20 +81,53 @@ export default function NewSQLConnection({ isOpen, closeModal, onSubmit }) {
     e.preventDefault();
     e.stopPropagation();
     const form = new FormData(e.target);
-    const baseConfig = {
-      engine,
-      database_id: form.get("name"),
-      connectionString: assembleConnectionString({ engine, ...config }),
-    };
-    // Oracle일 때만 모드/경로 추가
-    if (engine === "oracle") {
-      baseConfig.mode = oracleMode;
-      if (oracleMode === "thick") {
-        baseConfig.thickLibDir = oracleLibDir;
+    const connectionString = assembleConnectionString({ engine, ...config });
+
+    setIsValidating(true);
+    try {
+      const { success, error } = await System.validateSQLConnection(
+        engine,
+        connectionString
+      );
+      if (!success) {
+        showToast(
+          error ||
+            "Failed to establish database connection. Please check your connection details.",
+          "error",
+          { clear: true }
+        );
+        setIsValidating(false);
+        return;
       }
+
+      const baseConfig = {
+        engine,
+        database_id: form.get("name"),
+        connectionString,
+      };
+
+      // Add mode/path only when engine is Oracle
+      if (engine === "oracle") {
+        baseConfig.mode = oracleMode;
+        if (oracleMode === "thick") {
+          baseConfig.thickLibDir = oracleLibDir;
+        }
+      }
+
+      onSubmit(baseConfig);
+      setHasChanges(true);
+      handleClose();
+    } catch (error) {
+      console.error("Error validating connection:", error);
+      showToast(
+        error?.message ||
+          "Failed to validate connection. Please check your connection details.",
+        "error",
+        { clear: true }
+      );
+    } finally {
+      setIsValidating(false);
     }
-    onSubmit(baseConfig);
-    handleClose();
     return false;
   }
 
@@ -113,8 +153,8 @@ export default function NewSQLConnection({ isOpen, closeModal, onSubmit }) {
           </div>
           <form
             id="sql-connection-form"
-            onSubmit={handleUpdate}
             onChange={onFormChange}
+            onSubmit={handleUpdate}
           >
             <div className="px-7 py-6">
               <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
@@ -256,7 +296,7 @@ export default function NewSQLConnection({ isOpen, closeModal, onSubmit }) {
                 {engine === "oracle" && (
                   <div className="flex flex-col w-full">
                     <label className="block mb-2 text-sm font-medium text-white mt-4">
-                      Oracle 접속 모드
+                      Oracle Connection Mode
                     </label>
                     <div className="flex gap-x-4 mb-2">
                       <label className="flex items-center gap-x-2">
@@ -283,7 +323,7 @@ export default function NewSQLConnection({ isOpen, closeModal, onSubmit }) {
                     {oracleMode === "thick" && (
                       <div className="flex flex-col">
                         <label className="block mb-2 text-sm font-medium text-white">
-                          Oracle Instant Client 경로
+                          Oracle Instant Client Path
                         </label>
                         <input
                           type="text"
@@ -306,7 +346,6 @@ export default function NewSQLConnection({ isOpen, closeModal, onSubmit }) {
                         name="encrypt"
                         value="true"
                         className="sr-only peer"
-                        onChange={onFormChange}
                         checked={config.encrypt}
                       />
                       <div className="w-11 h-6 bg-theme-settings-input-bg peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -333,9 +372,10 @@ export default function NewSQLConnection({ isOpen, closeModal, onSubmit }) {
               <button
                 type="submit"
                 form="sql-connection-form"
-                className="transition-all duration-300 bg-white text-black hover:opacity-60 px-4 py-2 rounded-lg text-sm"
+                disabled={isValidating}
+                className="transition-all duration-300 bg-white text-black hover:opacity-60 px-4 py-2 rounded-lg text-sm disabled:opacity-50"
               >
-                Save connection
+                {isValidating ? "Validating..." : "Save connection"}
               </button>
             </div>
           </form>
