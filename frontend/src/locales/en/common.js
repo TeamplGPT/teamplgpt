@@ -421,41 +421,201 @@ const TRANSLATIONS = {
     },
 
     skill: {
-      title: "Default agent skills",
-      description:
-        "Improve the natural abilities of the default agent with these pre-built skills. This set up applies to all workspaces.",
-      rag: {
+      title: "Agent Skills",
+      description: "Select an Agent Skill, Agent Flow, or MCP Server",
+      defaultskil:
+        "By default, this skill is enabled, but you can disable it if you don't want it to be available to the agent.",
+      agentPreferencesSavedSuccessfully:
+        "Agent preferences saved successfully.",
+      agentPreferencesFailedToSave: "Agent preferences failed to save",
+      back: "Back",
+      default: "Default",
+      "rag-memory": {
         title: "RAG & long-term memory",
         description:
           'Allow the agent to leverage your local documents to answer a query or ask the agent to "remember" pieces of content for long-term memory retrieval.',
       },
-      view: {
+      "document-summarizer": {
         title: "View & summarize documents",
         description:
           "Allow the agent to list and summarize the content of workspace files currently embedded.",
       },
-      scrape: {
+      "web-scraping": {
         title: "Scrape websites",
         description:
           "Allow the agent to visit and scrape the content of websites.",
       },
-      generate: {
+      "save-file-to-browser": {
+        title: "Generate & save files to browser",
+        description:
+          "Enable the default agent to generate and write to files that can be saved to your computer.",
+      },
+      "create-chart": {
         title: "Generate charts",
         description:
           "Enable the default agent to generate various types of charts from data provided or given in chat.",
       },
-      save: {
-        title: "Generate & save files to browser",
+      "web-browsing": {
+        title: "Web Search",
+        title2: "Live web search and browsing",
         description:
-          "Enable the default agent to generate and write to files that save and can be downloaded in your browser.",
+          "Enable your agent to search the web to answer your questions by connecting to a web-search (SERP) provider. Web search during agent sessions will not work until this is set up.",
+      },
+      "sql-agent": {
+        title: "SQL Connector",
+        description:
+          "Enable your agent to be able to leverage SQL to answer you questions by connecting to various SQL database providers.",
+      },
+      On: "On",
+      Off: "Off",
+    },
+    "custom-skills": {
+      title: "Custom Skills",
+      description: "Learn about agent skills in the AnythingLLM Agent Docs.",
+      noSkills: "No imported skills found",
+      learnAboutSkills:
+        "Learn about agent skills in the <docsLink>AnythingLLM Agent Docs</docsLink>.",
+      On: "On",
+      Off: "Off",
+    },
+    "agent-flows": {
+      title: "Agent Flows",
+      learnMore: "Learn more about Agent Flows.",
+      noFlows: "No agent flows found",
+      create: "Create Flow",
+      openBuilder: "Open Builder",
+      builder: "Builder",
+      untitledFlow: "Untitled Flow",
+      newFlow: "New Flow",
+      publish: "Publish",
+      save: "Save",
+      viewDocumentation: "View documentation",
+      "failed-load": "Failed to load flow",
+      "failed-available": "Failed to load available flows",
+      "name-description-required":
+        "Please provide both a name and description for your flow",
+      "saved-successfully": "Agent flow saved successfully!",
+      "failed-to-save": "Failed to save agent flow.",
+      flowInformation: {
+        title: "Flow Information",
+        description: "Basic flow information",
+        name: "Flow Name",
+        nameDescription:
+          "It is important to give your flow a name that an LLM can easily understand.",
+        namePlaceholder: "Enter flow name",
+        descriptionLabel: "Description",
+        descriptionDescription:
+          "It is equally important to give your flow a description that an LLM can easily understand. Be sure to include the purpose of the flow, the context it will be used in, and any other relevant information.",
+        descriptionPlaceholder: "Enter flow description",
+      },
+      flowVariables: {
+        title: "Flow Variables",
+        description: "Configure agent variables and settings",
+        variablesDefined_one: "{{count}} variable defined",
+        variablesDefined_other: "{{count}} variables defined",
+        variables: "Variables",
+        name: "Variable Name",
+        initialValue: "Initial Value",
+        deleteVariable: "Delete Variable",
+        addVariable: "Add Variable",
+      },
+      apiCall: {
+        title: "API Call",
+        description: "Make an HTTP request",
+        noURL: "No URL",
+        selectInsert: "Select variable to insert",
+        method: "Method",
+        headers: "Headers",
+        addHeader: "Add header",
+        headerName: "Header name",
+        headerValue: "Value",
+        removeHeader: "Remove header",
+        requestBody: "Request Body",
+        rawText: "Raw Text",
+        rawRequest: "Raw request body...",
+        formData: "Form Data",
+        removeField: "Remove field",
+        addField: "Add Form Field",
+        storeResponse: "Store Response In",
+      },
+      llm: {
+        title: "LLM Instruction",
+        description: "Process data using LLM instructions",
+        noInstruction: "No instruction",
+        instruction: "Instruction",
+        "enter-instructions": "Enter instructions for the LLM...",
       },
       web: {
-        title: "Live web search and browsing",
-        "desc-start":
-          "Enable your agent to search the web to answer your questions by connecting to a web-search (SERP) provider.",
-        "desc-end":
-          "Web search during agent sessions will not work until this is set up.",
+        title: "Web Scraping",
+        description: "Scrape content from a webpage",
+        noURL: "No URL specified",
+        "url-to-scrape": "URL to Scrape",
+        "capture-page": "Capture Page Content As",
+        "text-content-only": "Text content only",
+        "raw-html": "Raw HTML",
+        "query-selector": "CSS Query Selector",
+        "query-selector-description":
+          "Enter a valid CSS selector to scrape the content of the page.",
+        "content-summarization": "Content Summarization",
+        "content-summarization-description":
+          "When enabled, long webpage content will be automatically summarized to reduce token usage.",
+        "content-summarization-description2":
+          "Note: This may affect data quality and remove specific details from the original content.",
       },
+      complete: {
+        title: "Flow Complete",
+        description: "End of agent flow",
+        summary: "Flow will end here",
+      },
+      "direct-output": "Direct Output",
+      "direct-output-description":
+        "The output of this block will be returned directly to the chat.",
+      "direct-output-description2":
+        "This will prevent any further tool calls from being also being executed",
+      "coming-soon": "Configuration options coming soon...",
+      resultVariable: "Result Variable",
+      selectVariable: "Select or create variable",
+      addBlock: "Add Block",
+      "move-block-up": "Move block up",
+      "move-block-down": "Move block down",
+      "delete-block": "Delete block",
+    },
+    "mcp-servers": {
+      title: "MCP Servers",
+      refreshConfirm:
+        "Are you sure you want to refresh the list of MCP servers? This will restart all MCP servers and reload their tools.",
+      failedToRefresh: "Failed to refresh MCP servers.",
+      noServers: "No MCP servers found",
+      loading: "Loading...",
+      refresh: "Refresh",
+      loadingMcpServers: "Loading MCP Servers from configuration file...",
+      learnMore: "Learn more about MCP Servers.",
+      On: "On",
+      Stopped: "Stopped",
+      deleteConfirm:
+        "Are you sure you want to delete this MCP server? It will be removed from your config file and you will need to add it back manually.",
+      deletedSuccessfully: "MCP server deleted successfully.",
+      failedToDelete: "Failed to delete MCP server.",
+      stopConfirm:
+        "Are you sure you want to stop this MCP server? It will be started automatically when you next start the server.",
+      startConfirm:
+        "Are you sure you want to start this MCP server? It will be started automatically when you next start the server.",
+      toggleSuccess: "MCP server {{serverName}} {{action}} successfully.",
+      started: "started",
+      stopped: "stopped",
+      failedToToggle: "Failed to toggle MCP server.",
+      stopMcpServer: "Stop MCP Server",
+      startMcpServer: "Start MCP Server",
+      deleteMcpServer: "Delete MCP Server",
+      toolsAvailable_one: "{{count}} tool available",
+      toolsAvailable_other: "{{count}} tools available",
+      startupCommand: "Startup Command",
+      command: "Command",
+      arguments: "Arguments",
+      none: "None",
+      notRunning:
+        "This MCP server is not running - it may be stopped or experiencing an error on startup.",
+      toolCallArguments: "Tool call arguments",
     },
   },
 

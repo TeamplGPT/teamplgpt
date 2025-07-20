@@ -1,21 +1,24 @@
 import React from "react";
 import { CaretRight } from "@phosphor-icons/react";
+import { useTranslation } from "react-i18next";
 
 export default function AgentFlowsList({
   flows = [],
   selectedFlow,
   handleClick,
 }) {
+  const { t } = useTranslation();
   if (flows.length === 0) {
     return (
       <div className="text-theme-text-secondary text-center text-xs flex flex-col gap-y-2">
-        <p>No agent flows found</p>
+        <p>{t("agent.agent-flows.noFlows")}</p>
         <a
           href="https://docs.anythingllm.com/agent-flows/getting-started"
           target="_blank"
           className="text-theme-text-secondary underline hover:text-cta-button"
+          rel="noreferrer"
         >
-          Learn more about Agent Flows.
+          {t("agent.agent-flows.learnMore")}
         </a>
       </div>
     );

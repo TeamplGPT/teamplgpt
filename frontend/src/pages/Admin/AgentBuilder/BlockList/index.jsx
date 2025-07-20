@@ -20,6 +20,7 @@ import LLMInstructionNode from "../nodes/LLMInstructionNode";
 import FinishNode from "../nodes/FinishNode";
 import WebScrapingNode from "../nodes/WebScrapingNode";
 import FlowInfoNode from "../nodes/FlowInfoNode";
+import { useTranslation } from "react-i18next";
 
 const BLOCK_TYPES = {
   FLOW_INFO: "flowInfo",
@@ -35,28 +36,28 @@ const BLOCK_TYPES = {
 
 const BLOCK_INFO = {
   [BLOCK_TYPES.FLOW_INFO]: {
-    label: "Flow Information",
+    label: "agent.agent-flows.flowInformation.title",
     icon: <Info className="w-5 h-5 text-theme-text-primary" />,
-    description: "Basic flow information",
+    description: "agent.agent-flows.flowInformation.description",
     defaultConfig: {
       name: "",
       description: "",
     },
-    getSummary: (config) => config.name || "Untitled Flow",
+    getSummary: (config) => config.name || "agent.agent-flows.untitledFlow",
   },
   [BLOCK_TYPES.START]: {
-    label: "Flow Variables",
+    label: "agent.agent-flows.flowVariables.title",
     icon: <BracketsCurly className="w-5 h-5 text-theme-text-primary" />,
-    description: "Configure agent variables and settings",
+    description: "agent.agent-flows.flowVariables.description",
     getSummary: (config) => {
       const varCount = config.variables?.filter((v) => v.name)?.length || 0;
       return `${varCount} variable${varCount !== 1 ? "s" : ""} defined`;
     },
   },
   [BLOCK_TYPES.API_CALL]: {
-    label: "API Call",
+    label: "agent.agent-flows.apiCall.title",
     icon: <Globe className="w-5 h-5 text-theme-text-primary" />,
-    description: "Make an HTTP request",
+    description: "agent.agent-flows.apiCall.description",
     defaultConfig: {
       url: "",
       method: "GET",
@@ -68,7 +69,9 @@ const BLOCK_INFO = {
       directOutput: false,
     },
     getSummary: (config) =>
-      `${config.method || "GET"} ${config.url || "(no URL)"}`,
+      config.url
+        ? `${config.method || "GET"} : ${config.url}`
+        : "agent.agent-flows.apiCall.noURL",
   },
   // TODO: Implement website, file, and code blocks
   /* [BLOCK_TYPES.WEBSITE]: {
@@ -111,20 +114,21 @@ const BLOCK_INFO = {
   },
   */
   [BLOCK_TYPES.LLM_INSTRUCTION]: {
-    label: "LLM Instruction",
+    label: "agent.agent-flows.llm.title",
     icon: <Brain className="w-5 h-5 text-theme-text-primary" />,
-    description: "Process data using LLM instructions",
+    description: "agent.agent-flows.llm.description",
     defaultConfig: {
       instruction: "",
       resultVariable: "",
       directOutput: false,
     },
-    getSummary: (config) => config.instruction || "No instruction",
+    getSummary: (config) =>
+      config.instruction || "agent.agent-flows.llm.noInstruction",
   },
   [BLOCK_TYPES.WEB_SCRAPING]: {
-    label: "Web Scraping",
+    label: "agent.agent-flows.web.title",
     icon: <Browser className="w-5 h-5 text-theme-text-primary" />,
-    description: "Scrape content from a webpage",
+    description: "agent.agent-flows.web.description",
     defaultConfig: {
       url: "",
       captureAs: "text",
@@ -132,13 +136,13 @@ const BLOCK_INFO = {
       resultVariable: "",
       directOutput: false,
     },
-    getSummary: (config) => config.url || "No URL specified",
+    getSummary: (config) => config.url || "agent.agent-flows.web.noURL",
   },
   [BLOCK_TYPES.FINISH]: {
-    label: "Flow Complete",
+    label: "agent.agent-flows.complete.title",
     icon: <Flag className="w-4 h-4" />,
-    description: "End of agent flow",
-    getSummary: () => "Flow will end here",
+    description: "agent.agent-flows.complete.description",
+    getSummary: () => "agent.agent-flows.complete.summary",
     defaultConfig: {},
     renderConfig: () => null,
   },
@@ -154,6 +158,7 @@ export default function BlockList({
   moveBlock,
   refs,
 }) {
+  const { t } = useTranslation();
   const renderBlockConfig = (block) => {
     const isLastConfigurableBlock = blocks[blocks.length - 2]?.id === block.id;
     const props = {
@@ -175,13 +180,12 @@ export default function BlockList({
           <div className="flex justify-between items-center pt-4 border-t border-white/10">
             <div>
               <label className="block text-sm font-medium text-theme-text-primary">
-                Direct Output
+                {t("agent.agent-flows.direct-output")}
               </label>
               <p className="text-xs text-theme-text-secondary">
-                The output of this block will be returned directly to the chat.
+                {t("agent.agent-flows.direct-output-description")}
                 <br />
-                This will prevent any further tool calls from being also being
-                executed.
+                {t("agent.agent-flows.direct-output-description2")}
               </p>
             </div>
             <label className="relative inline-flex cursor-pointer items-center">
@@ -228,7 +232,7 @@ export default function BlockList({
       case BLOCK_TYPES.FINISH:
         return <FinishNode />;
       default:
-        return <div>Configuration options coming soon...</div>;
+        return <div>{t("agent.agent-flows.coming-soon")}</div>;
     }
   };
 
@@ -253,11 +257,11 @@ export default function BlockList({
                 </div>
                 <div className="flex-1 text-left min-w-0 max-w-[115px]">
                   <span className="text-sm font-medium text-white block">
-                    {BLOCK_INFO[block.type].label}
+                    {t(BLOCK_INFO[block.type].label)}
                   </span>
                   {!block.isExpanded && (
                     <p className="text-xs text-white/60 truncate">
-                      {BLOCK_INFO[block.type].getSummary(block.config)}
+                      {t(BLOCK_INFO[block.type].getSummary(block.config))}
                     </p>
                   )}
                 </div>
@@ -275,7 +279,9 @@ export default function BlockList({
                           }}
                           className="w-7 h-7 flex items-center justify-center rounded-lg bg-theme-bg-primary border border-white/5 text-white hover:bg-theme-action-menu-item-hover transition-colors duration-300"
                           data-tooltip-id="block-action"
-                          data-tooltip-content="Move block up"
+                          data-tooltip-content={t(
+                            "agent.agent-flows.move-block-up"
+                          )}
                         >
                           <CaretUp className="w-3.5 h-3.5" />
                         </button>
@@ -288,7 +294,9 @@ export default function BlockList({
                           }}
                           className="w-7 h-7 flex items-center justify-center rounded-lg bg-theme-bg-primary border border-white/5 text-white hover:bg-theme-action-menu-item-hover transition-colors duration-300"
                           data-tooltip-id="block-action"
-                          data-tooltip-content="Move block down"
+                          data-tooltip-content={t(
+                            "agent.agent-flows.move-block-down"
+                          )}
                         >
                           <CaretDown className="w-3.5 h-3.5" />
                         </button>
@@ -300,7 +308,9 @@ export default function BlockList({
                         }}
                         className="w-7 h-7 flex items-center justify-center rounded-lg bg-theme-bg-primary border border-white/5 text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition-colors duration-300"
                         data-tooltip-id="block-action"
-                        data-tooltip-content="Delete block"
+                        data-tooltip-content={t(
+                          "agent.agent-flows.delete-block"
+                        )}
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>

@@ -27,6 +27,7 @@ import {
   TavilySearchOptions,
   DuckDuckGoOptions,
 } from "./SearchProviderOptions";
+import { useTranslation } from "react-i18next";
 
 const SEARCH_PROVIDERS = [
   {
@@ -109,6 +110,7 @@ export default function AgentWebSearchSelection({
   enabled = false,
   setHasChanges,
 }) {
+  const { t } = useTranslation();
   const searchInputRef = useRef(null);
   const [filteredResults, setFilteredResults] = useState([]);
   const [selectedProvider, setSelectedProvider] = useState("none");
@@ -163,7 +165,7 @@ export default function AgentWebSearchSelection({
             htmlFor="name"
             className="text-theme-text-primary text-md font-bold"
           >
-            Live web search and browsing
+            {t("agent.skill.web-browsing.title2")}
           </label>
           <label className="border-none relative inline-flex items-center ml-auto cursor-pointer">
             <input
@@ -182,9 +184,7 @@ export default function AgentWebSearchSelection({
           className="w-full rounded-md"
         />
         <p className="text-theme-text-secondary text-opacity-60 text-xs font-medium py-1.5">
-          Enable your agent to search the web to answer your questions by
-          connecting to a web-search (SERP) provider. Web search during agent
-          sessions will not work until this is set up.
+          {t("agent.skill.web-browsing.description")}
         </p>
         <div hidden={!enabled}>
           <div className="relative">
