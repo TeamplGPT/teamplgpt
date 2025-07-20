@@ -64,6 +64,8 @@ const TRANSLATIONS = {
     selection: "모델 선택",
     saving: "저장 중...",
     save: "저장",
+    cancel: "취소",
+    unsavedChanges: "저장되지 않은 변경사항",
     previous: "이전",
     next: "다음",
     optional: "선택 사항",
@@ -451,6 +453,7 @@ const TRANSLATIONS = {
         title2: "실시간 웹 검색 및 탐색",
         description:
           "에이전트가 웹 검색(SERP) 제공자와 연결하여 질문에 답변할 수 있도록 합니다. 이 설정이 완료되어야 에이전트 세션 중 웹 검색이 정상적으로 동작합니다.",
+        "search-providers": "사용 가능한 웹 검색 제공자 검색",
       },
       "sql-agent": {
         title: "SQL 커넥터",

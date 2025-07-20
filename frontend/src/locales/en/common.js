@@ -66,6 +66,8 @@ const TRANSLATIONS = {
     selection: "Model Selection",
     saving: "Saving...",
     save: "Save changes",
+    cancel: "Cancel",
+    unsavedChanges: "Unsaved Changes",
     previous: "Previous Page",
     next: "Next Page",
     optional: "Optional",
@@ -460,6 +462,52 @@ const TRANSLATIONS = {
         title2: "Live web search and browsing",
         description:
           "Enable your agent to search the web to answer your questions by connecting to a web-search (SERP) provider. Web search during agent sessions will not work until this is set up.",
+        "search-providers": "Search available web-search providers",
+        none: {
+          name: "Please make a selection",
+          description:
+            "Web search will be disabled until a provider and keys are provided.",
+        },
+        "duckduckgo-engine": {
+          name: "DuckDuckGo",
+          description:
+            "Free and privacy-focused web search using DuckDuckGo's HTML interface.",
+        },
+        "google-search-engine": {
+          name: "Google Search Engine",
+          description:
+            "Web search powered by a custom Google Search Engine. Free for 100 queries per day.",
+        },
+        searchapi: {
+          name: "SearchApi",
+          description:
+            "SearchApi delivers structured data from multiple search engines. Free for 100 queries, but then paid.",
+        },
+        "serper-dot-dev": {
+          name: "Serper.dev",
+          description:
+            "Serper.dev web-search. Free account with a 2,500 calls, but then paid.",
+        },
+        "bing-search": {
+          name: "Bing Search",
+          description:
+            "Web search powered by the Bing Search API (paid service).",
+        },
+        "serply-engine": {
+          name: "Serply.io",
+          description:
+            "Serply.io web-search. Free account with a 100 calls/month forever.",
+        },
+        "searxng-engine": {
+          name: "SearXNG",
+          description:
+            "Free, open-source, internet meta-search engine with no tracking.",
+        },
+        "tavily-search": {
+          name: "Tavily Search",
+          description:
+            "Tavily Search API. Offers a free tier with 1000 queries per month.",
+        },
       },
       "sql-agent": {
         title: "SQL Connector",

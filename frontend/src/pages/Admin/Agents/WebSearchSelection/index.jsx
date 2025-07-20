@@ -200,7 +200,7 @@ export default function AgentWebSearchSelection({
               />
             )}
             {searchMenuOpen ? (
-              <div className="absolute top-0 left-0 w-full max-w-[640px] max-h-[310px] min-h-[64px] bg-theme-settings-input-bg rounded-lg flex flex-col justify-between cursor-pointer border-2 border-primary-button z-20">
+              <div className="absolute top-0 left-0 w-full max-w-[640px] max-h-[610px] min-h-[64px] bg-theme-settings-input-bg rounded-lg flex flex-col justify-between cursor-pointer border-2 border-primary-button z-20">
                 <div className="w-full flex flex-col gap-y-1">
                   <div className="flex items-center sticky top-0 z-10 border-b border-[#9CA3AF] mx-4 bg-theme-settings-input-bg">
                     <MagnifyingGlass
@@ -212,7 +212,9 @@ export default function AgentWebSearchSelection({
                       type="text"
                       name="web-provider-search"
                       autoComplete="off"
-                      placeholder="Search available web-search providers"
+                      placeholder={t(
+                        "agent.skill.web-browsing.search-providers"
+                      )}
                       className="border-none -ml-4 my-2 bg-transparent z-20 pl-12 h-[38px] w-full px-4 py-1 text-sm outline-none text-theme-text-primary placeholder:text-theme-text-primary placeholder:font-medium"
                       onChange={(e) => setSearchQuery(e.target.value)}
                       ref={searchInputRef}
@@ -227,7 +229,7 @@ export default function AgentWebSearchSelection({
                       onClick={handleXButton}
                     />
                   </div>
-                  <div className="flex-1 pl-4 pr-2 flex flex-col gap-y-1 overflow-y-auto white-scrollbar pb-4 max-h-[245px]">
+                  <div className="flex-1 pl-4 pr-2 flex flex-col gap-y-1 overflow-y-auto white-scrollbar pb-4 max-h-[545px]">
                     {filteredResults.map((provider) => {
                       return (
                         <SearchProviderItem
@@ -255,10 +257,10 @@ export default function AgentWebSearchSelection({
                   />
                   <div className="flex flex-col text-left">
                     <div className="text-sm font-semibold text-white">
-                      {selectedSearchProviderObject.name}
+                      {t(selectedSearchProviderObject.name)}
                     </div>
                     <div className="mt-1 text-xs text-description">
-                      {selectedSearchProviderObject.description}
+                      {t(selectedSearchProviderObject.description)}
                     </div>
                   </div>
                 </div>
