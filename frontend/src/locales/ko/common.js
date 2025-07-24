@@ -454,6 +454,47 @@ const TRANSLATIONS = {
         description:
           "에이전트가 웹 검색(SERP) 제공자와 연결하여 질문에 답변할 수 있도록 합니다. 이 설정이 완료되어야 에이전트 세션 중 웹 검색이 정상적으로 동작합니다.",
         "search-providers": "사용 가능한 웹 검색 제공자 검색",
+        none: {
+          name: "선택해 주세요",
+          description: "제공자와 키가 설정될 때까지 웹 검색이 비활성화됩니다.",
+        },
+        "duckduckgo-engine": {
+          description:
+            "DuckDuckGo의 HTML 인터페이스를 이용한 무료이자 개인정보 보호 중심의 웹 검색입니다.",
+          description2:
+            "DuckDuckGo는 별도의 추가 설정 없이 바로 사용할 수 있습니다.",
+        },
+        "google-search-engine": {
+          description:
+            "커스텀 Google 검색 엔진을 통한 웹 검색입니다. 하루 100회까지 무료로 이용할 수 있습니다.",
+          description2:
+            "여기에서 Google 무료 검색 엔진 API 키를 발급받을 수 있습니다.",
+          "search-engine-id": "검색 엔진 ID",
+          "access-api-key": "프로그램 액세스 API 키",
+        },
+        searchapi: {
+          description:
+            "SearchApi는 여러 검색 엔진에서 구조화된 데이터를 제공합니다. 100회까지 무료로 사용할 수 있으며, 이후에는 유료로 전환됩니다.",
+        },
+        "serper-dot-dev": {
+          description:
+            "Serper.dev 웹 검색입니다. 무료 계정으로 월 2,500회까지 사용 가능하며, 그 이후에는 유료로 전환됩니다.",
+        },
+        "bing-search": {
+          description: "Bing Search API(유료 서비스)를 통한 웹 검색입니다.",
+        },
+        "serply-engine": {
+          description:
+            "Serply.io 웹 검색입니다. 무료 계정으로 월 100회까지 영구적으로 사용할 수 있습니다.",
+        },
+        "searxng-engine": {
+          description:
+            "추적 없이 사용할 수 있는 무료 오픈소스 인터넷 메타 검색 엔진입니다.",
+        },
+        "tavily-search": {
+          description:
+            "Tavily Search API입니다. 월 1,000회까지 무료로 사용할 수 있는 요금제가 제공됩니다.",
+        },
       },
       "sql-agent": {
         title: "SQL 커넥터",

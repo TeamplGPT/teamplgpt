@@ -469,42 +469,40 @@ const TRANSLATIONS = {
             "Web search will be disabled until a provider and keys are provided.",
         },
         "duckduckgo-engine": {
-          name: "DuckDuckGo",
           description:
             "Free and privacy-focused web search using DuckDuckGo's HTML interface.",
+          description2:
+            "DuckDuckGo is ready to use without any additional configuration.",
         },
         "google-search-engine": {
-          name: "Google Search Engine",
           description:
             "Web search powered by a custom Google Search Engine. Free for 100 queries per day.",
+          description2:
+            "You can get a free search engine & API key from Google here.",
+          "search-engine-id": "Search engine ID",
+          "access-api-key": "Programmatic Access API Key",
         },
         searchapi: {
-          name: "SearchApi",
           description:
             "SearchApi delivers structured data from multiple search engines. Free for 100 queries, but then paid.",
         },
         "serper-dot-dev": {
-          name: "Serper.dev",
           description:
             "Serper.dev web-search. Free account with a 2,500 calls, but then paid.",
         },
         "bing-search": {
-          name: "Bing Search",
           description:
             "Web search powered by the Bing Search API (paid service).",
         },
         "serply-engine": {
-          name: "Serply.io",
           description:
             "Serply.io web-search. Free account with a 100 calls/month forever.",
         },
         "searxng-engine": {
-          name: "SearXNG",
           description:
             "Free, open-source, internet meta-search engine with no tracking.",
         },
         "tavily-search": {
-          name: "Tavily Search",
           description:
             "Tavily Search API. Offers a free tier with 1000 queries per month.",
         },

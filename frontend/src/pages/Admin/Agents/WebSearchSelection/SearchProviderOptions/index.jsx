@@ -1,21 +1,30 @@
+import { useTranslation } from "react-i18next";
+import { LinkSimpleHorizontal } from "@phosphor-icons/react";
+
 export function GoogleSearchOptions({ settings }) {
+  const { t } = useTranslation();
   return (
     <>
       <p className="text-sm text-white/60 my-2">
-        You can get a free search engine & API key{" "}
         <a
           href="https://programmablesearchengine.google.com/controlpanel/create"
           target="_blank"
           rel="noreferrer"
-          className="text-blue-300 underline"
+          className="border-none text-theme-text-secondary hover:text-cta-button"
         >
-          from Google here.
+          {t("agent.skill.web-browsing.google-search-engine.description2")}{" "}
+          <LinkSimpleHorizontal
+            size={20}
+            className="inline-block align-middle"
+          />
         </a>
       </p>
       <div className="flex gap-x-4">
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            Search engine ID
+            {t(
+              "agent.skill.web-browsing.google-search-engine.search-engine-id"
+            )}
           </label>
           <input
             type="text"
@@ -30,7 +39,7 @@ export function GoogleSearchOptions({ settings }) {
         </div>
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            Programmatic Access API Key
+            {t("agent.skill.web-browsing.google-search-engine.access-api-key")}
           </label>
           <input
             type="password"
@@ -41,7 +50,7 @@ export function GoogleSearchOptions({ settings }) {
               settings?.AgentGoogleSearchEngineKey ? "*".repeat(20) : ""
             }
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>
@@ -319,10 +328,11 @@ export function TavilySearchOptions({ settings }) {
 }
 
 export function DuckDuckGoOptions() {
+  const { t } = useTranslation();
   return (
     <>
       <p className="text-sm text-white/60 my-2">
-        DuckDuckGo is ready to use without any additional configuration.
+        {t("agent.skill.web-browsing.duckduckgo-engine.description2")}
       </p>
     </>
   );
