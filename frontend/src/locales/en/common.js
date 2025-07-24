@@ -1275,8 +1275,12 @@ const TRANSLATIONS = {
           description3:
             "Some TTS services require an API key to generate TTS responses - this is optional if your service does not require one.",
           description4:
+            "Most TTS services will have several models available. This is the model parameter you will use to select the model you want to use. Note: This is not the same as the voice model.",
+          description5:
             "Most TTS services will have several voice models available, this is the identifier for the voice model you want to use.",
           voice_model_placeholder: "Your voice model identifier",
+          tts_model_placeholder: "Your TTS model identifier",
+          tts_model: "TTS Model",
         },
       },
     },

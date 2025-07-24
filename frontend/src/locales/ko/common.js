@@ -1209,13 +1209,17 @@ const TRANSLATIONS = {
           description3:
             "일부 TTS 서비스는 음성 합성 응답을 생성하기 위해 API 키가 필요할 수 있습니다. 서비스에서 필요하지 않다면 입력하지 않아도 됩니다.",
           description4:
+            "대부분의 음성 합성 서비스는 여러 모델을 지원합니다. 음성합성 모델 파라미터는 원하는 음성 합성 모델을 선택할 때 사용합니다. 참고: 이 값은 음성 모델과는 별개입니다.",
+          description5:
             "대부분의 TTS 서비스는 여러 개의 음성 모델을 제공합니다. 여기에는 사용하려는 음성 모델의 식별자를 입력하세요.",
           voice_model_placeholder: "음성 모델 식별자",
+          tts_model_placeholder: "음성 합성 모델 식별자",
+          tts_model: "음성 합성 모델(TTS)",
         },
       },
     },
     api_key: "API 키",
-    voice_model: "음성 모델",
+    voice_model: "음성 모델(Voice)",
     loading_models: "사용 가능한 모델을 불러오는 중",
     base_url: "기본 URL",
   },

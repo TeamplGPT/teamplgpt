@@ -50,25 +50,25 @@ export default function OpenAiGenericTextToSpeechOptions({ settings }) {
       <div className="flex gap-x-4">
         <div className="flex flex-col w-80">
           <label className="text-white text-sm font-semibold block mb-3">
-            TTS Model
+            {t("speech-text.text.providers.generic_openai.tts_model")}
           </label>
           <input
             type="text"
             name="TTSOpenAICompatibleModel"
             className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
-            placeholder="Your TTS model identifier"
+            placeholder={t(
+              "speech-text.text.providers.generic_openai.tts_model_placeholder"
+            )}
             defaultValue={settings?.TTSOpenAICompatibleModel}
             required={true}
             autoComplete="off"
             spellCheck={false}
           />
           <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-            Most TTS services will have several models available. This is the{" "}
-            <code>model</code> parameter you will use to select the model you
-            want to use. Note: This is not the same as the voice model.
+            {t("speech-text.text.providers.generic_openai.description4")}
           </p>
         </div>
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-80">
           <label className="text-white text-sm font-semibold block mb-3">
             {t("speech-text.voice_model")}
           </label>
@@ -85,7 +85,7 @@ export default function OpenAiGenericTextToSpeechOptions({ settings }) {
             spellCheck={false}
           />
           <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-            {t("speech-text.text.providers.generic_openai.description4")}
+            {t("speech-text.text.providers.generic_openai.description5")}
           </p>
         </div>
       </div>
