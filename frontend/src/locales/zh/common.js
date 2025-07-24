@@ -557,7 +557,6 @@ const TRANSLATIONS = {
       "嵌入是将文本转换为矢量的过程。需要这些凭据才能将你的文件和提示转换为 AnythingLLM 可以用来处理的格式。",
     provider: {
       title: "嵌入引擎提供商",
-      description: "使用 AnythingLLM 的本机嵌入引擎时不需要设置。",
     },
   },
   text: {
@@ -565,9 +564,6 @@ const TRANSLATIONS = {
     "desc-start":
       "有时，你可能希望更改新文档在插入到矢量数据库之前拆分和分块的默认方式。",
     "desc-end": "只有在了解文本拆分的工作原理及其副作用时，才应修改此设置。",
-    "warn-start": "此处的更改仅适用于",
-    "warn-center": "新嵌入的文档",
-    "warn-end": "，而不是现有文档。",
     size: {
       title: "文本块大小",
       description: "这是单个向量中可以存在的字符的最大长度。",

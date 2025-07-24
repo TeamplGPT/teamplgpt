@@ -404,8 +404,6 @@ const TRANSLATIONS = {
       "L'embedding è il processo di trasformazione del testo in vettori. Queste credenziali sono necessarie per trasformare i file e i prompt in un formato che AnythingLLM può utilizzare per l'elaborazione.",
     provider: {
       title: "Provider di embedding",
-      description:
-        "Non è richiesta alcuna configurazione quando si utilizza il motore di embedding nativo di AnythingLLM.",
     },
   },
   text: {
@@ -414,9 +412,6 @@ const TRANSLATIONS = {
       "A volte, potresti voler cambiare il modo predefinito in cui i nuovi documenti vengono suddivisi e spezzettati in blocchi prima di essere inseriti nel tuo database vettoriale.",
     "desc-end":
       "Dovresti modificare questa impostazione solo se capisci come funziona la suddivisione del testo e i suoi effetti collaterali.",
-    "warn-start": "Le modifiche qui si applicheranno solo a",
-    "warn-center": "nuovi documenti incorporati",
-    "warn-end": ", non documenti esistenti.",
     size: {
       title: "Dimensioni blocco di testo",
       description:

@@ -379,7 +379,7 @@ const TRANSLATIONS = {
     snippets: {
       title: "Max Context Snippets",
       description:
-        "This setting controls the maximum amount of context snippets the will be sent to the LLM for per chat or query.",
+        "This setting controls the maximum amount of context snippets that will be sent to the LLM for per chat or query.",
       recommend: "Recommended: 4",
     },
     doc: {
@@ -619,7 +619,7 @@ const TRANSLATIONS = {
       "direct-output-description":
         "The output of this block will be returned directly to the chat.",
       "direct-output-description2":
-        "This will prevent any further tool calls from being also being executed",
+        "This will prevent any further tool calls from being executed.",
       "coming-soon": "Configuration options coming soon...",
       resultVariable: "Result Variable",
       selectVariable: "Select or create variable",
@@ -1207,9 +1207,6 @@ const TRANSLATIONS = {
       "Sometimes, you may want to change the default way that new documents are split and chunked before being inserted into your vector database.",
     "desc-end":
       "You should only modify this setting if you understand how text splitting works and it's side effects.",
-    "warn-start": "Changes here will only apply to",
-    "warn-center": "newly embedded documents",
-    "warn-end": ", not existing documents.",
     size: {
       title: "Text Chunk Size",
       description:
@@ -1860,7 +1857,7 @@ const TRANSLATIONS = {
     remove_profile_picture: "Remove Profile Picture",
     username: "Username",
     username_description:
-      "Username must be only contain lowercase letters, numbers, underscores, and hyphens with no spaces",
+      "Username must only contain lowercase letters, numbers, underscores, and hyphens with no spaces",
     new_password: "New Password",
     password_description: "Password must be at least 8 characters long",
     cancel: "Cancel",

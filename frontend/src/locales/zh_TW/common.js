@@ -389,7 +389,6 @@ const TRANSLATIONS = {
       "嵌入是將文字轉換成向量的過程。這些憑證是用於將您的檔案和提示詞轉換成 AnythingLLM 可以處理的格式。",
     provider: {
       title: "向量嵌入提供者",
-      description: "使用 AnythingLLM 的原生嵌入引擎時，不需要任何設定。",
     },
   },
   text: {
@@ -398,9 +397,6 @@ const TRANSLATIONS = {
       "有時您可能需要修改新文件在插入向量資料庫之前的預設分割和區塊化方式。",
     "desc-end":
       "只有在了解文字分割的運作方式及其副作用的情況下，才應該修改此設定。",
-    "warn-start": "此處的修改只會套用至",
-    "warn-center": "新嵌入的文件",
-    "warn-end": "，而不會套用至現有文件。",
     size: {
       title: "文字區塊大小",
       description: "這是單一向量中可包含的最大字元長度。",

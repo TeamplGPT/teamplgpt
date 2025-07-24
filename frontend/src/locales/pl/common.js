@@ -597,8 +597,6 @@ const TRANSLATIONS = {
       "Embedding to proces przekształcania tekstu na wektory. Poświadczenia są wymagane do przekształcenia plików i tekstu za pomocą wybranego modelu.",
     provider: {
       title: "Model używany do tworzenia embeddingów",
-      description:
-        "Podczas korzystania z natywnego silnika osadzania AnythingLLM nie jest wymagana żadna konfiguracja.",
     },
   },
   text: {
@@ -607,9 +605,6 @@ const TRANSLATIONS = {
       "Czasami może zaistnieć potrzeba zmiany domyślnego sposobu, w jaki nowe dokumenty są dzielone i fragmentowane przed wstawieniem ich do wektorowej bazy danych.",
     "desc-end":
       "Powinieneś modyfikować to ustawienie tylko wtedy, gdy rozumiesz, jak działa dzielenie tekstu i jakie są jego skutki uboczne.",
-    "warn-start": "Zmiany tutaj będą miały zastosowanie tylko do",
-    "warn-center": "nowo osadzone dokumenty",
-    "warn-end": "a nie istniejące dokumenty.",
     size: {
       title: "Rozmiar fragmentu tekstu",
       description:

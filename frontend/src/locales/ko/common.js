@@ -1145,9 +1145,6 @@ const TRANSLATIONS = {
       "새 문서를 벡터 데이터베이스에 삽입하기 전에 기본 텍스트 분할 방식을 변경할 수 있습니다.",
     "desc-end":
       "텍스트 분할 방식과 그 영향을 이해하고 있는 경우에만 이 설정을 변경해야 합니다.",
-    "warn-start": "여기의 변경 사항은",
-    "warn-center": "새로 임베딩되는 문서",
-    "warn-end": "에만 적용됩니다. 기존 문서에는 적용되지 않습니다.",
     size: {
       title: "텍스트 청크 크기",
       description: "단일 벡터에 들어갈 수 있는 최대 문자 길이입니다.",
@@ -1786,7 +1783,7 @@ const TRANSLATIONS = {
     remove_profile_picture: "프로필 사진 삭제",
     username: "사용자명",
     username_description:
-      "사용자명은 소문자, 숫자, 밑줄(_), 하이픈(-)만 사용할 수 있으며, 공백은 허용되지 않습니다.",
+      "사용자명은 소문자 영문자, 숫자, 밑줄(), 하이픈(-)만 사용할 수 있으며, 공백은 포함할 수 없습니다.",
     new_password: "새 비밀번호",
     password_description: "비밀번호는 최소 8자 이상이어야 합니다.",
     cancel: "취소",
