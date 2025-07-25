@@ -3,6 +3,7 @@ import MySQLLogo from "./icons/mysql.png";
 import MSSQLLogo from "./icons/mssql.png";
 import OracleLogo from "./icons/oracle.png";
 import { X } from "@phosphor-icons/react";
+import { useTranslation } from "react-i18next";
 
 export const DB_LOGOS = {
   postgresql: PostgreSQLLogo,
@@ -12,11 +13,14 @@ export const DB_LOGOS = {
 };
 
 export default function DBConnection({ connection, onRemove }) {
+  const { t } = useTranslation();
   const { database_id, engine } = connection;
   function removeConfirmation() {
     if (
       !window.confirm(
-        `Delete ${database_id} from the list of available SQL connections? This cannot be undone.`
+        t("agent.skill.sql-agent.delete_confirmation", {
+          database_id,
+        })
       )
     )
       return false;

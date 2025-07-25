@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { LinkSimpleHorizontal } from "@phosphor-icons/react";
+import { Link } from "@phosphor-icons/react";
 
 export function GoogleSearchOptions({ settings }) {
   const { t } = useTranslation();
@@ -13,10 +13,7 @@ export function GoogleSearchOptions({ settings }) {
           className="border-none text-theme-text-secondary hover:text-cta-button"
         >
           {t("agent.skill.web-browsing.google-search-engine.description2")}{" "}
-          <LinkSimpleHorizontal
-            size={20}
-            className="inline-block align-middle"
-          />
+          <Link size={20} className="inline-block align-middle" />
         </a>
       </p>
       <div className="flex gap-x-4">
@@ -75,23 +72,24 @@ const SearchApiEngines = [
   { name: "Baidu", value: "baidu" },
 ];
 export function SearchApiOptions({ settings }) {
+  const { t } = useTranslation();
   return (
     <>
       <p className="text-sm text-white/60 my-2">
-        You can get a free API key{" "}
         <a
           href="https://www.searchapi.io/"
           target="_blank"
           rel="noreferrer"
-          className="text-blue-300 underline"
+          className="border-none text-theme-text-secondary hover:text-cta-button"
         >
-          from SearchApi.
+          {t("agent.skill.web-browsing.searchapi.searchapi-link")}
+          <Link size={20} className="inline-block align-middle ml-1" />
         </a>
       </p>
       <div className="flex gap-x-4">
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            API Key
+            {t("agent.skill.web-browsing.apikey")}
           </label>
           <input
             type="password"
@@ -100,13 +98,13 @@ export function SearchApiOptions({ settings }) {
             placeholder="SearchApi API Key"
             defaultValue={settings?.AgentSearchApiKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            Engine
+            {t("agent.skill.web-browsing.engine")}
           </label>
           <select
             name="env::AgentSearchApiEngine"
@@ -137,23 +135,24 @@ export function SearchApiOptions({ settings }) {
 }
 
 export function SerperDotDevOptions({ settings }) {
+  const { t } = useTranslation();
   return (
     <>
       <p className="text-sm text-white/60 my-2">
-        You can get a free API key{" "}
         <a
           href="https://serper.dev"
           target="_blank"
           rel="noreferrer"
-          className="text-blue-300 underline"
+          className="border-none text-theme-text-secondary hover:text-cta-button"
         >
-          from Serper.dev.
+          {t("agent.skill.web-browsing.serper-dot-dev.serper-dev-link")}
+          <Link size={20} className="inline-block align-middle ml-1" />
         </a>
       </p>
       <div className="flex gap-x-4">
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            API Key
+            {t("agent.skill.web-browsing.apikey")}
           </label>
           <input
             type="password"
@@ -162,7 +161,7 @@ export function SerperDotDevOptions({ settings }) {
             placeholder="Serper.dev API Key"
             defaultValue={settings?.AgentSerperApiKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>
@@ -172,23 +171,24 @@ export function SerperDotDevOptions({ settings }) {
 }
 
 export function BingSearchOptions({ settings }) {
+  const { t } = useTranslation();
   return (
     <>
       <p className="text-sm text-white/60 my-2">
-        You can get a Bing Web Search API subscription key{" "}
         <a
           href="https://portal.azure.com/"
           target="_blank"
           rel="noreferrer"
-          className="text-blue-300 underline"
+          className="border-none text-theme-text-secondary hover:text-cta-button"
         >
-          from the Azure portal.
+          {t("agent.skill.web-browsing.bing-search.bing-search-link")}
+          <Link size={20} className="inline-block align-middle ml-1" />
         </a>
       </p>
       <div className="flex gap-x-4">
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            API Key
+            {t("agent.skill.web-browsing.apikey")}
           </label>
           <input
             type="password"
@@ -197,17 +197,17 @@ export function BingSearchOptions({ settings }) {
             placeholder="Bing Web Search API Key"
             defaultValue={settings?.AgentBingSearchApiKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>
       </div>
       <p className="text-sm text-white/60 my-2">
-        To set up a Bing Web Search API subscription:
+        {t("agent.skill.web-browsing.bing-search.description2")}
       </p>
       <ol className="list-decimal text-sm text-white/60 ml-6">
         <li>
-          Go to the Azure portal:{" "}
+          {t("agent.skill.web-browsing.bing-search.description3")}
           <a
             href="https://portal.azure.com/"
             target="_blank"
@@ -217,42 +217,34 @@ export function BingSearchOptions({ settings }) {
             https://portal.azure.com/
           </a>
         </li>
-        <li>Create a new Azure account or sign in with an existing one.</li>
-        <li>
-          Navigate to the "Create a resource" section and search for "Grounding
-          with Bing Search".
-        </li>
-        <li>
-          Select the "Grounding with Bing Search" resource and create a new
-          subscription.
-        </li>
-        <li>Choose the pricing tier that suits your needs.</li>
-        <li>
-          Obtain the API key for your Grounding with Bing Search subscription.
-        </li>
+        <li>{t("agent.skill.web-browsing.bing-search.description4")}</li>
+        <li>{t("agent.skill.web-browsing.bing-search.description5")}</li>
+        <li>{t("agent.skill.web-browsing.bing-search.description6")}</li>
+        <li>{t("agent.skill.web-browsing.bing-search.description8")}</li>
       </ol>
     </>
   );
 }
 
 export function SerplySearchOptions({ settings }) {
+  const { t } = useTranslation();
   return (
     <>
       <p className="text-sm text-white/60 my-2">
-        You can get a free API key{" "}
         <a
           href="https://serply.io"
           target="_blank"
           rel="noreferrer"
-          className="text-blue-300 underline"
+          className="border-none text-theme-text-secondary hover:text-cta-button"
         >
-          from Serply.io.
+          {t("agent.skill.web-browsing.serply-engine.serply-link")}
+          <Link size={20} className="inline-block align-middle ml-1" />
         </a>
       </p>
       <div className="flex gap-x-4">
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            API Key
+            {t("agent.skill.web-browsing.apikey")}
           </label>
           <input
             type="password"
@@ -261,7 +253,7 @@ export function SerplySearchOptions({ settings }) {
             placeholder="Serply API Key"
             defaultValue={settings?.AgentSerplyApiKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>
@@ -271,11 +263,12 @@ export function SerplySearchOptions({ settings }) {
 }
 
 export function SearXNGOptions({ settings }) {
+  const { t } = useTranslation();
   return (
     <div className="flex gap-x-4">
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-3">
-          SearXNG API Base URL
+          {t("agent.skill.web-browsing.searxng-engine.searxng-url")}
         </label>
         <input
           type="url"
@@ -293,23 +286,24 @@ export function SearXNGOptions({ settings }) {
 }
 
 export function TavilySearchOptions({ settings }) {
+  const { t } = useTranslation();
   return (
     <>
       <p className="text-sm text-white/60 my-2">
-        You can get an API key{" "}
         <a
           href="https://tavily.com/"
           target="_blank"
           rel="noreferrer"
-          className="text-blue-300 underline"
+          className="border-none text-theme-text-secondary hover:text-cta-button"
         >
-          from Tavily.
+          {t("agent.skill.web-browsing.tavily-search.tavily-link")}
+          <Link size={20} className="inline-block align-middle ml-1" />
         </a>
       </p>
       <div className="flex gap-x-4">
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            API Key
+            {t("agent.skill.web-browsing.apikey")}
           </label>
           <input
             type="password"
@@ -318,7 +312,7 @@ export function TavilySearchOptions({ settings }) {
             placeholder="Tavily API Key"
             defaultValue={settings?.AgentTavilyApiKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>

@@ -103,6 +103,10 @@ const TRANSLATIONS = {
     privacy: "Privacy & Data",
     "ai-providers": "AI Providers",
     "agent-skills": "Agent Skills",
+    "community-hub": "Community Hub",
+    "explore-trending": "Explore Trending",
+    "your-account": "Your Account",
+    "import-item": "Import Item",
     admin: "Admin",
     tools: "Tools",
     "system-prompt-variables": "System Prompt Variables",
@@ -485,32 +489,83 @@ const TRANSLATIONS = {
         searchapi: {
           description:
             "SearchApi delivers structured data from multiple search engines. Free for 100 queries, but then paid.",
+          "searchapi-link":
+            "You can get a free API key from SearchApi. (Click)",
         },
         "serper-dot-dev": {
           description:
             "Serper.dev web-search. Free account with a 2,500 calls, but then paid.",
+          "serper-dev-link":
+            "You can get a free API key from Serper.dev. (Click)",
         },
         "bing-search": {
           description:
             "Web search powered by the Bing Search API (paid service).",
+          "bing-search-link":
+            "You can get a Bing Web Search API subscription key from the Azure portal. (Click)",
+          description2: "To set up a Bing Web Search API subscription:",
+          description3: "Go to the Azure portal: ",
+          description4:
+            "Create a new Azure account or sign in with an existing one.",
+          description5:
+            'Navigate to the "Create a resource" section and search for "Grounding with Bing Search".',
+          description6:
+            'Select the "Grounding with Bing Search" resource and create a new subscription.',
+          description7: "Choose the pricing tier that suits your needs.",
+          description8:
+            "Obtain the API key for your Grounding with Bing Search subscription.",
         },
         "serply-engine": {
           description:
             "Serply.io web-search. Free account with a 100 calls/month forever.",
+          "serply-link": "You can get a free API key from Serply.io. (Click)",
         },
         "searxng-engine": {
           description:
             "Free, open-source, internet meta-search engine with no tracking.",
+          "searxng-url": "SearXNG API Base URL",
         },
         "tavily-search": {
           description:
             "Tavily Search API. Offers a free tier with 1000 queries per month.",
+          "tavily-link": "You can get an API key from Tavily. (Click)",
         },
+        apikey: "API Key",
+        engine: "Engine",
       },
       "sql-agent": {
         title: "SQL Connector",
+        title2: "SQL Agent",
         description:
           "Enable your agent to be able to leverage SQL to answer you questions by connecting to various SQL database providers.",
+        connections: "Your database connections",
+        new: "New SQL connection",
+        new_description:
+          "Add the connection information for your database below and it will be available for future SQL agent calls.",
+        warning_message:
+          "<strong>WARNING:</strong> The SQL agent has been <i>instructed</i> to only perform non-modifying queries. This <strong>does not</strong> prevent a hallucination from still deleting data. Only connect with a user who has <strong>READ_ONLY</strong> permissions.",
+        select: "Select your SQL engine",
+        name: "Connection name",
+        name_description: "a unique name to identify this SQL connection",
+        user: "Database user",
+        password: "Database user password",
+        endpoint: "Server endpoint",
+        endpoint_description: "the hostname or endpoint for your database",
+        database: "Database",
+        database_description: "the name of the database to connect to",
+        encryption: "Enable Encryption",
+        oracle_mode: "Oracle Connection Mode",
+        oracle_client_path: "Oracle Instant Client Path",
+        fill: "Please fill out all the fields above.",
+        save: "Save connection",
+        validating: "Validating...",
+        "failed-to-connect":
+          "Failed to establish database connection. Please check your connection details.",
+        "failed-to-validate":
+          "Failed to validate connection. Please check your connection details.",
+        delete_confirmation:
+          "Delete {{database_id}} from the list of available SQL connections? This cannot be undone.",
+        cancel: "Cancel",
       },
       On: "On",
       Off: "Off",

@@ -98,6 +98,10 @@ const TRANSLATIONS = {
     privacy: "사생활 보호와 데이터",
     "ai-providers": "AI 제공자",
     "agent-skills": "에이전트 스킬",
+    "community-hub": "커뮤니티 허브",
+    "explore-trending": "트렌딩 탐색",
+    "your-account": "내 계정",
+    "import-item": "아이템 가져오기",
     admin: "관리자",
     tools: "도구",
     "experimental-features": "실험적 기능",
@@ -475,31 +479,84 @@ const TRANSLATIONS = {
         searchapi: {
           description:
             "SearchApi는 여러 검색 엔진에서 구조화된 데이터를 제공합니다. 100회까지 무료로 사용할 수 있으며, 이후에는 유료로 전환됩니다.",
+          "searchapi-link":
+            "SearchApi에서 무료 API 키를 발급받을 수 있습니다. (클릭)",
         },
         "serper-dot-dev": {
           description:
             "Serper.dev 웹 검색입니다. 무료 계정으로 월 2,500회까지 사용 가능하며, 그 이후에는 유료로 전환됩니다.",
+          "serper-dev-link":
+            "Serper.dev에서 무료 API 키를 발급받을 수 있습니다. (클릭)",
         },
         "bing-search": {
           description: "Bing Search API(유료 서비스)를 통한 웹 검색입니다.",
+          "bing-search-link":
+            "Azure 포털에서 Bing Web Search API 구독 키를 발급받을 수 있습니다. (클릭)",
+          description2: "Bing Web Search API 구독을 설정하려면:",
+          description3: "Azure 포털로 이동하세요: ",
+          description4:
+            "새 Azure 계정을 생성하거나 기존 계정으로 로그인하세요.",
+          description5:
+            '"리소스 만들기" 섹션으로 이동하여 "Grounding with Bing Search"를 검색하세요.',
+          description6:
+            '"Grounding with Bing Search" 리소스를 선택하고 새 구독을 생성하세요.',
+          description7: "필요에 맞는 가격 책정 계층을 선택하세요.",
+          description8:
+            "Grounding with Bing Search 구독에 대한 API 키를 발급받으세요.",
         },
         "serply-engine": {
           description:
             "Serply.io 웹 검색입니다. 무료 계정으로 월 100회까지 영구적으로 사용할 수 있습니다.",
+          "serply-link":
+            "Serply.io에서 무료 API 키를 발급받을 수 있습니다. (클릭)",
         },
         "searxng-engine": {
           description:
             "추적 없이 사용할 수 있는 무료 오픈소스 인터넷 메타 검색 엔진입니다.",
+          "searxng-url": "SearXNG API 기본 URL",
         },
         "tavily-search": {
           description:
             "Tavily Search API입니다. 월 1,000회까지 무료로 사용할 수 있는 요금제가 제공됩니다.",
+          "tavily-link":
+            "Tavily에서 무료 API 키를 발급받을 수 있습니다. (클릭)",
         },
+        apikey: "API 키",
+        engine: "엔진",
       },
       "sql-agent": {
         title: "SQL 커넥터",
+        title2: "SQL 에이전트",
         description:
           "에이전트가 다양한 SQL 데이터베이스 제공자에 연결하여 SQL을 활용해 질문에 답변할 수 있도록 합니다.",
+        connections: "데이터베이스 연결",
+        new: "새 SQL 연결",
+        new_description:
+          "아래에 데이터베이스 연결 정보를 추가하면 향후 SQL 에이전트 호출에서 사용할 수 있습니다.",
+        warning_message:
+          "<strong>경고:</strong> SQL 에이전트는 수정하지 않는 쿼리만 수행하도록 <i>지시</i>받았습니다. 하지만 이것이 환각(hallucination)으로 인한 데이터 삭제를 <strong>완전히 방지하지는 못합니다</strong>. <strong>읽기 전용</strong> 권한을 가진 사용자로만 연결하세요.",
+        select: "SQL 엔진 선택",
+        name: "연결 이름",
+        name_description: "이 SQL 연결을 식별할 수 있는 고유한 이름",
+        user: "데이터베이스 사용자",
+        password: "데이터베이스 사용자 비밀번호",
+        endpoint: "서버 엔드포인트",
+        endpoint_description: "데이터베이스의 호스트 또는 엔드포인트",
+        database: "데이터베이스",
+        database_description: "연결할 데이터베이스의 이름",
+        encryption: "암호화 활성화",
+        oracle_mode: "Oracle 연결 모드",
+        oracle_client_path: "Oracle Instant Client 경로",
+        fill: "모든 필드를 입력해주세요.",
+        save: "연결 저장",
+        validating: "검증 중...",
+        "failed-to-connect":
+          "데이터베이스 연결을 설정할 수 없습니다. 연결 정보를 확인해주세요.",
+        "failed-to-validate":
+          "연결 검증에 실패했습니다. 연결 정보를 확인해주세요.",
+        delete_confirmation:
+          "{{database_id}}를 사용 가능한 SQL 연결 목록에서 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+        cancel: "취소",
       },
       On: "켜짐",
       Off: "꺼짐",

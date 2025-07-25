@@ -5,6 +5,7 @@ import { WarningOctagon, X } from "@phosphor-icons/react";
 import { DB_LOGOS } from "./DBConnection";
 import System from "@/models/system";
 import showToast from "@/utils/toast";
+import { Trans, useTranslation } from "react-i18next";
 
 function assembleConnectionString({
   engine,
@@ -16,7 +17,7 @@ function assembleConnectionString({
   encrypt = false,
 }) {
   if ([username, password, host, database].every((i) => !!i) === false)
-    return `Please fill out all the fields above.`;
+    return "agent.skill.sql-agent.fill";
   switch (engine) {
     case "postgresql":
       return `postgres://${username}:${password}@${host}:${port}/${database}`;
@@ -50,6 +51,7 @@ export default function NewSQLConnection({
   onSubmit,
   setHasChanges,
 }) {
+  const { t } = useTranslation();
   const [engine, setEngine] = useState(DEFAULT_ENGINE);
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [oracleMode, setOracleMode] = useState(DEFAULT_ORACLE_MODE);
@@ -91,8 +93,7 @@ export default function NewSQLConnection({
       );
       if (!success) {
         showToast(
-          error ||
-            "Failed to establish database connection. Please check your connection details.",
+          error || t("agent.skill.sql-agent.failed-to-connect"),
           "error",
           { clear: true }
         );
@@ -120,8 +121,7 @@ export default function NewSQLConnection({
     } catch (error) {
       console.error("Error validating connection:", error);
       showToast(
-        error?.message ||
-          "Failed to validate connection. Please check your connection details.",
+        error?.message || t("agent.skill.sql-agent.failed-to-validate"),
         "error",
         { clear: true }
       );
@@ -140,7 +140,7 @@ export default function NewSQLConnection({
           <div className="relative p-6 border-b rounded-t border-theme-modal-border">
             <div className="w-full flex gap-x-2 items-center">
               <h3 className="text-xl font-semibold text-white overflow-hidden overflow-ellipsis whitespace-nowrap">
-                New SQL Connection
+                {t("agent.skill.sql-agent.new")}
               </h3>
             </div>
             <button
@@ -159,23 +159,26 @@ export default function NewSQLConnection({
             <div className="px-7 py-6">
               <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
                 <p className="text-sm text-white/60">
-                  Add the connection information for your database below and it
-                  will be available for future SQL agent calls.
+                  {t("agent.skill.sql-agent.new_description")}
                 </p>
                 <div className="flex flex-col w-full">
                   <div className="border border-red-800 bg-zinc-800 light:bg-red-200/50 p-4 rounded-lg flex items-center gap-x-2 text-sm text-red-400 light:text-red-500">
                     <WarningOctagon size={28} className="shrink-0" />
                     <p>
-                      <b>WARNING:</b> The SQL agent has been <i>instructed</i>{" "}
-                      to only perform non-modifying queries. This{" "}
-                      <b>does not</b> prevent a hallucination from still
-                      deleting data. Only connect with a user who has{" "}
-                      <b>READ_ONLY</b> permissions.
+                      <Trans
+                        i18nKey="agent.skill.sql-agent.warning_message"
+                        components={{
+                          1: <strong />,
+                          2: <i />,
+                          3: <strong />,
+                          4: <strong />,
+                        }}
+                      />
                     </p>
                   </div>
 
                   <label className="block mb-2 text-sm font-medium text-white mt-4">
-                    Select your SQL engine
+                    {t("agent.skill.sql-agent.select")}
                   </label>
                   <div className="grid md:grid-cols-4 gap-4 grid-cols-2">
                     <DBEngine
@@ -203,13 +206,13 @@ export default function NewSQLConnection({
 
                 <div className="flex flex-col w-full">
                   <label className="block mb-2 text-sm font-medium text-white">
-                    Connection name
+                    {t("agent.skill.sql-agent.name")}
                   </label>
                   <input
                     type="text"
                     name="name"
                     className="border-none bg-theme-settings-input-bg w-full text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
-                    placeholder="a unique name to identify this SQL connection"
+                    placeholder={t("agent.skill.sql-agent.name_description")}
                     required={true}
                     autoComplete="off"
                     spellCheck={false}
@@ -219,7 +222,7 @@ export default function NewSQLConnection({
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="flex flex-col">
                     <label className="block mb-2 text-sm font-medium text-white">
-                      Database user
+                      {t("agent.skill.sql-agent.user")}
                     </label>
                     <input
                       type="text"
@@ -233,15 +236,15 @@ export default function NewSQLConnection({
                   </div>
                   <div className="flex flex-col">
                     <label className="block mb-2 text-sm font-medium text-white">
-                      Database user password
+                      {t("agent.skill.sql-agent.password")}
                     </label>
                     <input
-                      type="text"
+                      type="password"
                       name="password"
                       className="border-none bg-theme-settings-input-bg w-full text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
                       placeholder="password123"
                       required={true}
-                      autoComplete="off"
+                      autoComplete="new-password"
                       spellCheck={false}
                     />
                   </div>
@@ -250,13 +253,15 @@ export default function NewSQLConnection({
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                   <div className="sm:col-span-2">
                     <label className="block mb-2 text-sm font-medium text-white">
-                      Server endpoint
+                      {t("agent.skill.sql-agent.endpoint")}
                     </label>
                     <input
                       type="text"
                       name="host"
                       className="border-none bg-theme-settings-input-bg w-full text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
-                      placeholder="the hostname or endpoint for your database"
+                      placeholder={t(
+                        "agent.skill.sql-agent.endpoint_description"
+                      )}
                       required={true}
                       autoComplete="off"
                       spellCheck={false}
@@ -280,13 +285,15 @@ export default function NewSQLConnection({
 
                 <div className="flex flex-col">
                   <label className="block mb-2 text-sm font-medium text-white">
-                    Database
+                    {t("agent.skill.sql-agent.database")}
                   </label>
                   <input
                     type="text"
                     name="database"
                     className="border-none bg-theme-settings-input-bg w-full text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
-                    placeholder="the database the agent will interact with"
+                    placeholder={t(
+                      "agent.skill.sql-agent.database_description"
+                    )}
                     required={true}
                     autoComplete="off"
                     spellCheck={false}
@@ -296,7 +303,7 @@ export default function NewSQLConnection({
                 {engine === "oracle" && (
                   <div className="flex flex-col w-full">
                     <label className="block mb-2 text-sm font-medium text-white mt-4">
-                      Oracle Connection Mode
+                      {t("agent.skill.sql-agent.oracle_mode")}
                     </label>
                     <div className="flex gap-x-4 mb-2">
                       <label className="flex items-center gap-x-2">
@@ -323,7 +330,7 @@ export default function NewSQLConnection({
                     {oracleMode === "thick" && (
                       <div className="flex flex-col">
                         <label className="block mb-2 text-sm font-medium text-white">
-                          Oracle Instant Client Path
+                          {t("agent.skill.sql-agent.oracle_client_path")}
                         </label>
                         <input
                           type="text"
@@ -350,14 +357,14 @@ export default function NewSQLConnection({
                       />
                       <div className="w-11 h-6 bg-theme-settings-input-bg peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                       <span className="ml-3 text-sm font-medium text-white">
-                        Enable Encryption
+                        {t("agent.skill.sql-agent.encryption")}
                       </span>
                     </label>
                   </div>
                 )}
 
                 <p className="text-theme-text-secondary text-sm">
-                  {assembleConnectionString({ engine, ...config })}
+                  {t(assembleConnectionString({ engine, ...config }))}
                 </p>
               </div>
             </div>
@@ -367,7 +374,7 @@ export default function NewSQLConnection({
                 onClick={handleClose}
                 className="transition-all duration-300 text-white hover:bg-zinc-700 light:hover:bg-theme-bg-primary px-4 py-2 rounded-lg text-sm"
               >
-                Cancel
+                {t("agent.skill.sql-agent.cancel")}
               </button>
               <button
                 type="submit"
@@ -375,7 +382,9 @@ export default function NewSQLConnection({
                 disabled={isValidating}
                 className="transition-all duration-300 bg-white text-black hover:opacity-60 px-4 py-2 rounded-lg text-sm disabled:opacity-50"
               >
-                {isValidating ? "Validating..." : "Save connection"}
+                {isValidating
+                  ? t("agent.skill.sql-agent.validating")
+                  : t("agent.skill.sql-agent.save")}
               </button>
             </div>
           </form>
