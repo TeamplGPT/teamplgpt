@@ -1946,6 +1946,59 @@ const TRANSLATIONS = {
     },
   },
   community_hub: {
+    trending: {
+      description: "Share and collaborate with the AnythingLLM community.",
+      "recently-added": "Recently Added on AnythingLLM Community Hub",
+      "explore-latest":
+        "Explore the latest additions to the AnythingLLM Community Hub",
+      "agent-skills": "Agent Skills",
+      "system-prompts": "System Prompts",
+      "slash-commands": "Slash Commands",
+      "agent-flows": "Agent Flows",
+      "explore-more": "Explore More",
+      import: "Import",
+      prompt: "Prompt",
+      verified: "Verified",
+      unverified: "Unverified",
+      skill: "Skill",
+      command: "Command",
+      steps: "Steps",
+      visibility: {
+        tooltip: "This item is {{visibility}}",
+        public: "Public",
+        private: "Private",
+      },
+      "files-found_one": "{{count}} file found",
+      "files-found_other": "{{count}} files found",
+    },
+    account: {
+      title: "Your AnythingLLM Community Hub Account",
+      description:
+        "Connecting your AnythingLLM Community Hub account allows you to access your private AnythingLLM Community Hub items as well as upload your own items to the AnythingLLM Community Hub.",
+      "why-connect": "Why connect my AnythingLLM Community Hub account?",
+      "why-connect-description-1":
+        "Connecting your AnythingLLM Community Hub account allows you to pull in your private items from the AnythingLLM Community Hub as well as upload your own items to the AnythingLLM Community Hub.",
+      "why-connect-description-2":
+        "You do not need to connect your AnythingLLM Community Hub account to pull in public items from the AnythingLLM Community Hub.",
+      "fail-save": "Failed to save API key",
+      "success-save": "API key saved successfully",
+      api_key: "AnythingLLM Hub API Key",
+      "api-key-placeholder": "Enter your AnythingLLM Hub API key",
+      api_description:
+        "You can get your API key from your AnythingLLM Community Hub profile page.",
+      disconnect: "Disconnect",
+      "fail-disconnect": "Failed to disconnect from hub",
+      "success-disconnect": "Disconnected from AnythingLLM Community Hub",
+      created: "Created by me",
+      created_description:
+        "Items you have created and shared publicly on the AnythingLLM Community Hub.",
+      private_items: "Why can't I see my private items?",
+      noprivate: "You haven't created any items yet.",
+      "items-by-team": "Items by team",
+      "items-by-team-description":
+        "Public and private items shared with teams you belong to.",
+      "no-items": "No items shared with this team yet.",
+    },
     publish: {
       system_prompt: {
         success_title: "Success!",

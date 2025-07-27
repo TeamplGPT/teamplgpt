@@ -7,16 +7,16 @@ export function readableType(type) {
   switch (type) {
     case "agentSkills":
     case "agentSkill":
-      return "Agent Skills";
+      return "community_hub.trending.agent-skills";
     case "systemPrompt":
     case "systemPrompts":
-      return "System Prompts";
+      return "community_hub.trending.system-prompts";
     case "slashCommand":
     case "slashCommands":
-      return "Slash Commands";
+      return "community_hub.trending.slash-commands";
     case "agentFlows":
     case "agentFlow":
-      return "Agent Flows";
+      return "community_hub.trending.agent-flows";
   }
 }
 

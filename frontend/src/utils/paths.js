@@ -176,8 +176,9 @@ export default {
   communityHub: {
     website: () => {
       return import.meta.env.DEV
-        ? `http://localhost:5173`
-        : `https://hub.anythingllm.com`;
+        ? `https://hub.anythingllm.com`
+        : //? `http://localhost:5173`
+          `https://hub.anythingllm.com`;
     },
     /**
      * View more items of a given type on the community hub.

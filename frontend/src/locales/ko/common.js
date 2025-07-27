@@ -107,7 +107,7 @@ const TRANSLATIONS = {
     "experimental-features": "실험적 기능",
     contact: "지원팀 연락",
     "browser-extension": "브라우저 확장 프로그램",
-    "system-prompt-variables": "System Prompt Variables",
+    "system-prompt-variables": "시스템 프롬프트 변수",
     interface: "UI 환경 설정",
     branding: "브랜딩 및 화이트라벨링",
     chat: "채팅",
@@ -1918,6 +1918,59 @@ const TRANSLATIONS = {
   },
 
   community_hub: {
+    trending: {
+      description: "AnythingLLM 커뮤니티와 공유하고 협업하세요.",
+      "recently-added": "AnythingLLM 커뮤니티 허브에 최근 추가된 아이템",
+      "explore-latest":
+        "AnythingLLM 커뮤니티 허브의 최신 추가 아이템을 탐색해보세요",
+      "agent-skills": "에이전트 스킬",
+      "system-prompts": "시스템 프롬프트",
+      "slash-commands": "슬래시 커맨드",
+      "agent-flows": "에이전트 플로우",
+      "explore-more": "더 보기",
+      import: "가져오기",
+      prompt: "프롬프트",
+      verified: "인증됨",
+      unverified: "인증되지 않음",
+      skill: "스킬",
+      command: "커맨드",
+      steps: "단계",
+      visibility: {
+        tooltip: "이 아이템은 {{visibility}} 입니다",
+        public: "공개",
+        private: "비공개",
+      },
+      "files-found_one": "{{count}}개 파일 발견됨",
+      "files-found_other": "{{count}}개 파일 발견됨",
+    },
+    account: {
+      title: "AnythingLLM 커뮤니티 허브 계정",
+      description:
+        "AnythingLLM 커뮤니티 허브 계정을 연결하면 비공개 아이템에 접근하고 자신만의 아이템을 커뮤니티 허브에 업로드할 수 있습니다.",
+      "why-connect": "AnythingLLM 커뮤니티 허브 계정을 연결하는 이유는?",
+      "why-connect-description-1":
+        "AnythingLLM 커뮤니티 허브 계정을 연결하면 커뮤니티 허브에서 비공개 아이템을 가져오고 자신만의 아이템을 업로드할 수 있습니다.",
+      "why-connect-description-2":
+        "AnythingLLM 커뮤니티 허브의 공개 아이템을 가져오는 데는 계정 연결이 필요하지 않습니다.",
+      "fail-save": "API 키 저장 실패",
+      "success-save": "API 키 저장 성공",
+      api_key: "AnythingLLM 허브 API 키",
+      "api-key-placeholder": "AnythingLLM 허브 API 키를 입력하세요",
+      api_description:
+        "AnythingLLM 커뮤니티 허브 프로필 페이지에서 API 키를 받을 수 있습니다.",
+      disconnect: "연결 해제",
+      "fail-disconnect": "허브 연결 해제 실패",
+      "success-disconnect": "AnythingLLM 커뮤니티 허브 연결이 해제되었습니다",
+      created: "내가 만든 아이템",
+      created_description:
+        "AnythingLLM 커뮤니티 허브에서 공개적으로 생성하고 공유한 아이템들입니다.",
+      private_items: "내 비공개 아이템이 보이지 않는 이유는?",
+      noprivate: "아직 생성한 아이템이 없습니다.",
+      "items-by-team": "팀별 아이템",
+      "items-by-team-description":
+        "소속된 팀과 공유하는 공개 및 비공개 아이템들입니다.",
+      "no-items": "아직 팀과 공유한 아이템이 없습니다.",
+    },
     publish: {
       system_prompt: {
         success_title: "성공!",
@@ -2008,7 +2061,7 @@ const TRANSLATIONS = {
         unauthenticated: {
           title: "인증 필요",
           description:
-            "항목을 게시하려면 AnythingLLM 커뮤니티 허브에 인증해야 합니다.",
+            "아이템을 게시하려면 AnythingLLM 커뮤니티 허브에 인증해야 합니다.",
           button: "커뮤니티 허브에 연결",
         },
       },
