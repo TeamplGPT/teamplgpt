@@ -2039,7 +2039,13 @@ const TRANSLATIONS = {
           importing: "Importing...",
           import: "Import agent skill",
           success: "Agent skill imported successfully!",
-          error: "Failed to import agent skill. {{error}}",
+          error: {
+            fallback: "Failed to import agent skill. {{error}}",
+            hub_bundle_downloads_not_enabled:
+              "Failed to import agent skill. Community Hub bundle downloads are not enabled. The system administrator must enable this feature manually to allow this instance to download these types of items. See https://docs.anythingllm.com/configuration#anythingllm-hub-agent-skills",
+            hub_bundle_downloads_limited:
+              "Failed to import agent skill. Community hub bundle downloads are limited to verified public items or private team items only. Please contact the system administrator to review or modify this setting. See https://docs.anythingllm.com/configuration#anythingllm-hub-agent-skills",
+          },
         },
       },
       complete: {

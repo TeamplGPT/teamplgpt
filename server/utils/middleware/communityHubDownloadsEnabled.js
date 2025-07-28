@@ -24,6 +24,7 @@ function communityHubDownloadsEnabled(request, response, next) {
     return response.status(422).json({
       error:
         "Community Hub bundle downloads are not enabled. The system administrator must enable this feature manually to allow this instance to download these types of items. See https://docs.anythingllm.com/configuration#anythingllm-hub-agent-skills",
+      errorCode: "COMMUNITY_HUB_BUNDLE_DOWNLOADS_NOT_ENABLED",
     });
   }
 
@@ -38,6 +39,7 @@ function communityHubDownloadsEnabled(request, response, next) {
     return response.status(422).json({
       error:
         "Community hub bundle downloads are limited to verified public items or private team items only. Please contact the system administrator to review or modify this setting. See https://docs.anythingllm.com/configuration#anythingllm-hub-agent-skills",
+      errorCode: "COMMUNITY_HUB_BUNDLE_DOWNLOADS_LIMITED",
     });
   }
   next();

@@ -21,21 +21,30 @@ export default function AgentSkill({ item, settings, setStep }) {
   async function importAgentSkill() {
     try {
       setLoading(true);
-      const { error } = await CommunityHub.importBundleItem(settings.itemId);
-      if (error) throw new Error(error);
+      const result = await CommunityHub.importBundleItem(settings.itemId);
+      if (result.error) {
+        const error = new Error(result.error);
+        error.errorCode = result.errorCode;
+        throw error;
+      }
       showToast(
         `${t("community_hub.import.review.agent_skill.success")}`,
         "success"
       );
       setStep(CommunityHubImportItemSteps.completed.key);
     } catch (e) {
-      console.error(e);
-      showToast(
-        `${t("community_hub.import.review.agent_skill.error", {
-          error: e.message,
-        })}`,
-        "error"
-      );
+      console.error("Error importing agent skill : ", e);
+      if (e.errorCode) {
+        const errorKey = `community_hub.import.review.agent_skill.error.${e.errorCode.toLowerCase()}`;
+        showToast(t(errorKey), "error");
+      } else {
+        showToast(
+          t("community_hub.import.review.agent_skill.error.fallback", {
+            error: e.message,
+          }),
+          "error"
+        );
+      }
     } finally {
       setLoading(false);
     }

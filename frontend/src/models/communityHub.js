@@ -58,12 +58,17 @@ const CommunityHub = {
     })
       .then(async (res) => {
         const response = await res.json();
-        if (!res.ok) throw new Error(response?.error ?? res.statusText);
+        if (!res.ok) {
+          const error = new Error(response?.error ?? res.statusText);
+          error.errorCode = response?.errorCode;
+          throw error;
+        }
         return response;
       })
       .catch((e) => {
         return {
           error: e.message,
+          errorCode: e.errorCode,
           item: null,
         };
       });

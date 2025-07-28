@@ -2011,7 +2011,13 @@ const TRANSLATIONS = {
           importing: "가져오는 중...",
           import: "에이전트 스킬 가져오기",
           success: "에이전트 스킬이 성공적으로 가져와졌습니다!",
-          error: "에이전트 스킬 가져오기에 실패했습니다. {{error}}",
+          error: {
+            fallback: "에이전트 스킬 가져오기에 실패했습니다. {{error}}",
+            community_hub_bundle_downloads_not_enabled:
+              "에이전트 스킬 가져오기에 실패했습니다. 커뮤니티 허브 번들 다운로드가 활성화되지 않았습니다. 시스템 관리자가 이 인스턴스에서 이러한 유형의 아이템을 다운로드할 수 있도록 수동으로 이 기능을 활성화해야 합니다. https://docs.anythingllm.com/configuration#anythingllm-hub-agent-skills 를 참조하세요.",
+            community_hub_bundle_downloads_limited:
+              "에이전트 스킬 가져오기에 실패했습니다. 커뮤니티 허브 번들 다운로드는 검증된 공개 아이템 또는 비공개 팀 아이템으로만 제한됩니다. 이 설정을 검토하거나 수정하려면 시스템 관리자에게 문의하세요. https://docs.anythingllm.com/configuration#anythingllm-hub-agent-skills 를 참조하세요.",
+          },
         },
       },
       complete: {
