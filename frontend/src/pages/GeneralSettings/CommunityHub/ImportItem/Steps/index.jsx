@@ -9,7 +9,7 @@ import useQuery from "@/hooks/useQuery";
 const CommunityHubImportItemSteps = {
   itemId: {
     key: "itemId",
-    name: "1. Paste in Item ID",
+    name: "community_hub.import.paste.menu",
     next: () => "validation",
     component: ({ settings, setSettings, setStep }) => (
       <Introduction
@@ -21,7 +21,7 @@ const CommunityHubImportItemSteps = {
   },
   validation: {
     key: "validation",
-    name: "2. Review item",
+    name: "community_hub.import.review.menu",
     next: () => "completed",
     component: ({ settings, setSettings, setStep }) => (
       <PullAndReview
@@ -33,7 +33,7 @@ const CommunityHubImportItemSteps = {
   },
   completed: {
     key: "completed",
-    name: "3. Completed",
+    name: "community_hub.import.complete.menu",
     component: ({ settings, setSettings, setStep }) => (
       <Completed
         settings={settings}

@@ -73,6 +73,7 @@ const TRANSLATIONS = {
     no: "아니오",
     "your-admin-password": "관리자 비밀번호",
     search: "검색",
+    learn_more: "자세히 보기",
   },
 
   // Setting Sidebar menu items.
@@ -1970,6 +1971,52 @@ const TRANSLATIONS = {
       "items-by-team-description":
         "소속된 팀과 공유하는 공개 및 비공개 아이템들입니다.",
       "no-items": "아직 팀과 공유한 아이템이 없습니다.",
+    },
+    import: {
+      title: "커뮤니티 아이템 가져오기",
+      description:
+        "AnythingLLM 커뮤니티 허브에서 프롬프트, 스킬, 커맨드 등 커뮤니티가 만든 아이템을 가져와 내 인스턴스를 더욱 풍부하게 만들어보세요.",
+      paste: {
+        menu: "1. 아이템 ID 붙여넣기",
+        title: "커뮤니티 허브에서 아이템 가져오기",
+        description:
+          "커뮤니티 허브는 에이전트 스킬, 시스템 프롬프트, 슬래시 커맨드 등 다양한 아이템을 찾고, 공유하고, 가져올 수 있는 공간입니다!",
+        description_2:
+          "이 아이템들은 AnythingLLM 팀과 커뮤니티가 직접 만든 것으로, AnythingLLM을 시작하거나 내 필요에 맞게 확장하는 데 매우 유용합니다.",
+        description_3:
+          "커뮤니티 허브에는 비공개 아이템과 공개 아이템이 모두 있습니다. 비공개 아이템은 본인만 볼 수 있고, 공개 아이템은 모든 사용자가 볼 수 있습니다.",
+        warning_message:
+          "비공개 아이템을 가져오려면 해당 아이템이 내가 속한 팀과 공유되어 있고, 연결 키를 추가했는지 확인하세요.",
+        key_link: "연결 키.",
+        item_id_label: "커뮤니티 허브 아이템 가져오기 ID",
+        button: "가져오기 계속하기",
+      },
+      review: {
+        menu: "2. 아이템 검토",
+        title: "아이템 검토",
+        pulling: "커뮤니티 허브에서 아이템 정보를 불러오는 중...",
+        error:
+          "아이템을 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+        try_again: "다른 아이템 시도하기",
+        agent_skill: {
+          title: "신뢰할 수 있는 에이전트 스킬만 가져오세요",
+          description:
+            "에이전트 스킬은 AnythingLLM 인스턴스에서 코드를 실행할 수 있으므로, 반드시 신뢰할 수 있는 출처의 스킬만 가져오세요. 가져오기 전에 코드를 직접 검토하는 것이 좋습니다. 스킬의 동작이 확실하지 않다면 가져오지 마세요!",
+          review_title: "에이전트 스킬 검토",
+          creator: "제작자",
+          verified: "검증된 코드",
+          unverified: "이 스킬은 검증되지 않았습니다.",
+          description_2:
+            "<1>@agent</1> 스킬을 통해 AnythingLLM 워크스페이스에 새로운 기능을 추가할 수 있습니다. 호출 시 특정 작업을 자동으로 수행하는 에이전트 스킬을 활용해보세요.",
+          importing: "가져오는 중...",
+          import: "에이전트 스킬 가져오기",
+          success: "에이전트 스킬이 성공적으로 가져와졌습니다!",
+          error: "에이전트 스킬 가져오기에 실패했습니다. {{error}}",
+        },
+      },
+      complete: {
+        menu: "3. 완료",
+      },
     },
     publish: {
       system_prompt: {

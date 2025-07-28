@@ -75,6 +75,7 @@ const TRANSLATIONS = {
     no: "No",
     "your-admin-password": "Your admin password",
     search: "Search",
+    learn_more: "Learn more",
   },
 
   // Setting Sidebar menu items.
@@ -1998,6 +1999,52 @@ const TRANSLATIONS = {
       "items-by-team-description":
         "Public and private items shared with teams you belong to.",
       "no-items": "No items shared with this team yet.",
+    },
+    import: {
+      title: "Import a Community Item",
+      description:
+        "Import items from the AnythingLLM Community Hub to enhance your instance with community-created prompts, skills, and commands.",
+      paste: {
+        menu: "1. Paste in Item ID",
+        title: "Import an item from the community hub",
+        description:
+          "The community hub is a place where you can find, share, and import agent-skills, system prompts, slash commands, and more!",
+        description_2:
+          "These items are created by the AnythingLLM team and community, and are a great way to get started with AnythingLLM as well as extend AnythingLLM in a way that is customized to your needs.",
+        description_3:
+          "There are both private and public items in the community hub. Private items are only visible to you, while public items are visible to everyone.",
+        warning_message:
+          "If you are pulling in a private item, make sure it is shared with a team you belong to, and you have added a Connection Key.",
+        key_link: "Connection Key.",
+        item_id_label: "Community Hub Item Import ID",
+        button: "Continue with import",
+      },
+      review: {
+        menu: "2. Review item",
+        title: "Review item",
+        pulling: "Pulling item details from community hub...",
+        error:
+          "An error occurred while fetching the item. Please try again later.",
+        try_again: "Try another item",
+        agent_skill: {
+          title: "Only import agent skills you trust",
+          description:
+            "Agent skills can execute code on your AnythingLLM instance, so only import agent skills from sources you trust. You should also review the code before importing. If you are unsure about what a skill does - don't import it!",
+          review_title: "Review Agent Skill",
+          creator: "Created by",
+          verified: "Verified code",
+          unverified: "This skill is not verified.",
+          description_2:
+            "Agent skills unlock new capabilities for your AnythingLLM workspace via <1>@agent</1> skills that can do specific tasks when invoked.",
+          importing: "Importing...",
+          import: "Import agent skill",
+          success: "Agent skill imported successfully!",
+          error: "Failed to import agent skill. {{error}}",
+        },
+      },
+      complete: {
+        menu: "3. Completed",
+      },
     },
     publish: {
       system_prompt: {

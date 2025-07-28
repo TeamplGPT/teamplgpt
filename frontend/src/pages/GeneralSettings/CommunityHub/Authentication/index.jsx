@@ -170,6 +170,8 @@ export default function CommunityHubAuthentication() {
                 <p className="text-theme-text-secondary text-xs">
                   <a
                     href={paths.communityHub.profile()}
+                    target="_blank"
+                    rel="noreferrer"
                     className="border-none text-theme-text-secondary hover:text-cta-button"
                   >
                     {t("community_hub.account.api_description")}
