@@ -41,6 +41,7 @@ const CommunityHub = {
         return {
           success: false,
           error: e.message,
+          errorCode: e.errorCode || "UNKNOWN",
         };
       });
   },

@@ -2018,6 +2018,7 @@ const TRANSLATIONS = {
         key_link: "Connection Key.",
         item_id_label: "Community Hub Item Import ID",
         button: "Continue with import",
+        error: "Please enter an item ID",
       },
       review: {
         menu: "2. Review item",
@@ -2068,6 +2069,17 @@ const TRANSLATIONS = {
               "Failed to apply system prompt. Unsupported item type. Nothing to apply.",
             UNKNOWN: "Failed to apply system prompt. {{error}}",
           },
+        },
+        slash_command: {
+          title: "Review Slash Command",
+          description:
+            "Slash commands are used to prefill information into a prompt while chatting with a AnythingLLM workspace.",
+          description_2:
+            "The slash command will be available during chatting by simply invoking it with <code>{{command}}</code> like you would any other command.",
+          creator: "Created by",
+          importing: "Importing...",
+          import: "Import slash command",
+          success: "Slash command {{command}} imported successfully!",
         },
       },
       complete: {

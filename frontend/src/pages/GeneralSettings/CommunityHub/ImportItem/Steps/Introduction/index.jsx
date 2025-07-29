@@ -9,7 +9,8 @@ export default function Introduction({ settings, setSettings, setStep }) {
   const { t } = useTranslation();
   const [itemId, setItemId] = useState(settings.itemId);
   const handleContinue = () => {
-    if (!itemId) return showToast("Please enter an item ID", "error");
+    if (!itemId)
+      return showToast(t("community_hub.import.paste.error"), "error");
     setSettings((prev) => ({ ...prev, itemId }));
     setStep(CommunityHubImportItemSteps.itemId.next());
   };

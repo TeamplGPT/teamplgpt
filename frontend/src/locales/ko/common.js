@@ -1990,6 +1990,7 @@ const TRANSLATIONS = {
         key_link: "연결 키.",
         item_id_label: "커뮤니티 허브 아이템 가져오기 ID",
         button: "가져오기 계속하기",
+        error: "아이템 ID를 입력해 주세요",
       },
       review: {
         menu: "2. 아이템 검토",
@@ -2041,6 +2042,17 @@ const TRANSLATIONS = {
               "시스템 프롬프트를 적용할 수 없습니다. 지원하지 않는 아이템 유형입니다.",
             UNKNOWN: "시스템 프롬프트 적용 중 오류가 발생했습니다. {{error}}",
           },
+        },
+        slash_command: {
+          title: "슬래시 커맨드 검토",
+          description:
+            "슬래시 커맨드는 AnythingLLM 워크스페이스에서 채팅할 때 프롬프트에 정보를 미리 입력하는 데 사용됩니다.",
+          description_2:
+            "이 슬래시 커맨드는 채팅 중에 <code>{{command}}</code>와 같이 입력하면 다른 명령어처럼 바로 사용할 수 있습니다.",
+          creator: "제작자",
+          importing: "슬래시 커맨드 가져오는 중...",
+          import: "슬래시 커맨드 가져오기",
+          success: "슬래시 커맨드 {{command}}을(를) 성공적으로 가져왔습니다!",
         },
       },
       complete: {
