@@ -2047,9 +2047,38 @@ const TRANSLATIONS = {
               "Failed to import agent skill. Community hub bundle downloads are limited to verified public items or private team items only. Please contact the system administrator to review or modify this setting. See https://docs.anythingllm.com/configuration#anythingllm-hub-agent-skills",
           },
         },
+        system_prompt: {
+          title: "Review System Prompt",
+          description:
+            "System prompts are used to guide the behavior of the AI agents and can be applied to any existing workspace.",
+          provided_system_prompt: "Provided system prompt",
+          creator: "Created by",
+          apply_to_workspace: "Apply to workspace",
+          available_workspaces: "Available workspaces",
+          apply_button: "Apply system prompt to workspace",
+          applying: "Applying system prompt to workspace...",
+          success: "System prompt applied to workspace.",
+          errors: {
+            ITEM_REQUIRED: "Failed to apply system prompt. Item is required.",
+            WORKSPACE_SLUG_REQUIRED:
+              "Failed to apply system prompt. Workspace slug is required.",
+            WORKSPACE_NOT_FOUND:
+              "Failed to apply system prompt. Workspace not found.",
+            UNSUPPORTED_ITEM_TYPE:
+              "Failed to apply system prompt. Unsupported item type. Nothing to apply.",
+            UNKNOWN: "Failed to apply system prompt. {{error}}",
+          },
+        },
       },
       complete: {
         menu: "3. Completed",
+        title: "Community Hub Item Imported",
+        success:
+          'The "{{name}}" {{type}} has been imported successfully! It is now available in your AnythingLLM instance.',
+        view_in_agent_skills: 'View "{{name}}" in Agent Skills',
+        changes_not_reflected:
+          "Any changes you make to this {{type}} will not be reflected in the community hub. You can now modify as needed.",
+        import_another: "Import another item",
       },
     },
     publish: {

@@ -95,11 +95,18 @@ function communityHubEndpoints(app) {
       try {
         const { options = {} } = reqBody(request);
         const item = response.locals.bundleItem;
-        const { error: applyError } = await CommunityHub.applyItem(item, {
-          ...options,
-          currentUser: response.locals?.user,
-        });
-        if (applyError) throw new Error(applyError);
+        const { error: applyError, errorCode } = await CommunityHub.applyItem(
+          item,
+          {
+            ...options,
+            currentUser: response.locals?.user,
+          }
+        );
+        if (applyError) {
+          const err = new Error(applyError);
+          err.errorCode = errorCode;
+          throw err;
+        }
 
         await Telemetry.sendTelemetry("community_hub_import", {
           itemType: response.locals.bundleItem.itemType,
@@ -117,7 +124,11 @@ function communityHubEndpoints(app) {
         response.status(200).json({ success: true, error: null });
       } catch (error) {
         console.error(error);
-        response.status(500).json({ success: false, error: error.message });
+        response.status(500).json({
+          success: false,
+          error: error.message,
+          errorCode: error.errorCode || null,
+        });
       }
     }
   );

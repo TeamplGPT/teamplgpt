@@ -108,17 +108,31 @@ const CommunityHub = {
    * @returns {Promise<{success: boolean, error: string | null}>}
    */
   applyItem: async function (item, options = {}) {
-    if (!item) return { success: false, error: "Item is required" };
+    if (!item)
+      return {
+        success: false,
+        error: "Item is required",
+        errorCode: "ITEM_REQUIRED",
+      };
 
     if (item.itemType === "system-prompt") {
       if (!options?.workspaceSlug)
-        return { success: false, error: "Workspace slug is required" };
+        return {
+          success: false,
+          error: "Workspace slug is required",
+          errorCode: "WORKSPACE_SLUG_REQUIRED",
+        };
 
       const { Workspace } = require("./workspace");
       const workspace = await Workspace.get({
         slug: String(options.workspaceSlug),
       });
-      if (!workspace) return { success: false, error: "Workspace not found" };
+      if (!workspace)
+        return {
+          success: false,
+          error: "Workspace not found",
+          errorCode: "WORKSPACE_NOT_FOUND",
+        };
       await Workspace.update(workspace.id, { openAiPrompt: item.prompt });
       return { success: true, error: null };
     }
@@ -136,6 +150,7 @@ const CommunityHub = {
     return {
       success: false,
       error: "Unsupported item type. Nothing to apply.",
+      errorCode: "UNSUPPORTED_ITEM_TYPE",
     };
   },
 

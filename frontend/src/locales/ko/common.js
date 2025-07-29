@@ -2019,9 +2019,39 @@ const TRANSLATIONS = {
               "에이전트 스킬 가져오기에 실패했습니다. 커뮤니티 허브 번들 다운로드는 검증된 공개 아이템 또는 비공개 팀 아이템으로만 제한됩니다. 이 설정을 검토하거나 수정하려면 시스템 관리자에게 문의하세요. https://docs.anythingllm.com/configuration#anythingllm-hub-agent-skills 를 참조하세요.",
           },
         },
+        system_prompt: {
+          title: "시스템 프롬프트 검토",
+          description:
+            "시스템 프롬프트는 AI 에이전트의 동작을 안내하는 역할을 하며, 모든 기존 워크스페이스에 적용할 수 있습니다.",
+          provided_system_prompt: "제공된 시스템 프롬프트",
+          creator: "제작자",
+          apply_to_workspace: "적용할 워크스페이스",
+          available_workspaces: "사용 가능한 워크스페이스",
+          apply_button: "시스템 프롬프트를 워크스페이스에 적용",
+          applying: "시스템 프롬프트를 워크스페이스에 적용하는 중...",
+          success: "시스템 프롬프트가 워크스페이스에 적용되었습니다.",
+          errors: {
+            ITEM_REQUIRED:
+              "시스템 프롬프트를 적용할 수 없습니다. 아이템 정보가 필요합니다.",
+            WORKSPACE_SLUG_REQUIRED:
+              "시스템 프롬프트를 적용할 수 없습니다. 워크스페이스 식별자가 필요합니다.",
+            WORKSPACE_NOT_FOUND:
+              "시스템 프롬프트를 적용할 수 없습니다. 해당 워크스페이스를 찾을 수 없습니다.",
+            UNSUPPORTED_ITEM_TYPE:
+              "시스템 프롬프트를 적용할 수 없습니다. 지원하지 않는 아이템 유형입니다.",
+            UNKNOWN: "시스템 프롬프트 적용 중 오류가 발생했습니다. {{error}}",
+          },
+        },
       },
       complete: {
         menu: "3. 완료",
+        title: "커뮤니티 허브 아이템 가져오기 완료",
+        success:
+          '"{{name}}" {{type}}을(를) 성공적으로 가져왔습니다! 이제 AnythingLLM 인스턴스에서 사용할 수 있습니다.',
+        view_in_agent_skills: '"{{name}}" 아이템을 에이전트 스킬에서 보기',
+        changes_not_reflected:
+          "이 {{type}}에 대한 변경 사항은 커뮤니티 허브에 반영되지 않습니다. 이제 자유롭게 수정할 수 있습니다.",
+        import_another: "다른 아이템 가져오기",
       },
     },
     publish: {
