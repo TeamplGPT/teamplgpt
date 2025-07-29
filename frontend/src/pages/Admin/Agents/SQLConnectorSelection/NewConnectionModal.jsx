@@ -39,6 +39,7 @@ const DEFAULT_CONFIG = {
   host: null,
   port: null,
   database: null,
+  schema: null,
   encrypt: false,
 };
 
@@ -345,6 +346,23 @@ export default function NewSQLConnection({
                     )}
                   </div>
                 )}
+                {engine === "postgresql" && (
+                  <div className="flex flex-col">
+                    <label className="block mb-2 text-sm font-medium text-white">
+                      Schema (optional)
+                    </label>
+                    <input
+                      type="text"
+                      name="schema"
+                      className="border-none bg-theme-settings-input-bg w-full text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
+                      placeholder="public (default schema if not specified)"
+                      required={false}
+                      autoComplete="off"
+                      spellCheck={false}
+                    />
+                  </div>
+                )}
+
                 {engine === "sql-server" && (
                   <div className="flex items-center justify-between">
                     <label className="relative inline-flex items-center cursor-pointer">
