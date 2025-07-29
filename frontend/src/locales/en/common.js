@@ -557,6 +557,8 @@ const TRANSLATIONS = {
         encryption: "Enable Encryption",
         oracle_mode: "Oracle Connection Mode",
         oracle_client_path: "Oracle Instant Client Path",
+        schema: "Schema (optional)",
+        "schema-placeholder": "public (default schema if not specified)",
         fill: "Please fill out all the fields above.",
         save: "Save connection",
         validating: "Validating...",

@@ -548,6 +548,8 @@ const TRANSLATIONS = {
         encryption: "암호화 활성화",
         oracle_mode: "Oracle 연결 모드",
         oracle_client_path: "Oracle Instant Client 경로",
+        schema: "스키마 (선택사항)",
+        "schema-placeholder": "public (지정하지 않으면 기본 스키마)",
         fill: "모든 필드를 입력해주세요.",
         save: "연결 저장",
         validating: "검증 중...",

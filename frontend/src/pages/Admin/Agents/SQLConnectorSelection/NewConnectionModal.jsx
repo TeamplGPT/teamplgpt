@@ -349,13 +349,15 @@ export default function NewSQLConnection({
                 {engine === "postgresql" && (
                   <div className="flex flex-col">
                     <label className="block mb-2 text-sm font-medium text-white">
-                      Schema (optional)
+                      {t("agent.skill.sql-agent.schema")}
                     </label>
                     <input
                       type="text"
                       name="schema"
                       className="border-none bg-theme-settings-input-bg w-full text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
-                      placeholder="public (default schema if not specified)"
+                      placeholder={t(
+                        "agent.skill.sql-agent.schema-placeholder"
+                      )}
                       required={false}
                       autoComplete="off"
                       spellCheck={false}
