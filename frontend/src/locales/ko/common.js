@@ -2056,6 +2056,26 @@ const TRANSLATIONS = {
           import: "슬래시 커맨드 가져오기",
           success: "슬래시 커맨드 {{command}}을(를) 성공적으로 가져왔습니다!",
         },
+        agent_flow: {
+          title: "에이전트 플로우 가져오기",
+          description:
+            "에이전트 플로우를 사용하면 에이전트가 실행할 수 있는 재사용 가능한 작업 시퀀스를 만들 수 있습니다.",
+          flow_details: "플로우 세부 정보",
+          description_label: "설명",
+          steps: "단계",
+          creator: "제작자",
+          importing: "가져오는 중...",
+          import: "에이전트 플로우 가져오기",
+          success: "에이전트 플로우를 성공적으로 가져왔습니다!",
+          error: {
+            UNSUPPORTED_BLOCKS:
+              "이 플로우에는 지원되지 않는 블록이 포함되어 있습니다. AnythingLLM 버전에서 지원되지 않거나 이 플랫폼에서 사용할 수 없는 기능일 수 있습니다.",
+            REQUIRED_FIELDS_MISSING: "이름과 설정이 필요합니다.",
+            SAVE_FAILED: "플로우 저장에 실패했습니다.",
+            SERVER_ERROR: "서버 오류가 발생했습니다.",
+            UNKNOWN: "에이전트 플로우 가져오기에 실패했습니다. {{error}}",
+          },
+        },
       },
       complete: {
         menu: "3. 완료",

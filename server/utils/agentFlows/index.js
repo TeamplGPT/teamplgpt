@@ -109,16 +109,23 @@ class AgentFlows {
       const supportsAllBlocks = config.steps.every((step) =>
         supportedFlowTypes.includes(step.type)
       );
-      if (!supportsAllBlocks)
-        throw new Error(
+      if (!supportsAllBlocks) {
+        const error = new Error(
           "This flow includes unsupported blocks. They may not be supported by your version of AnythingLLM or are not available on this platform."
         );
+        error.code = "UNSUPPORTED_BLOCKS";
+        throw error;
+      }
 
       fs.writeFileSync(filePath, JSON.stringify({ ...config, name }, null, 2));
       return { success: true, uuid };
     } catch (error) {
       console.error("Failed to save flow:", error);
-      return { success: false, error: error.message };
+      return {
+        success: false,
+        error: error.message,
+        errorCode: error.code || "SAVE_FAILED",
+      };
     }
   }
 

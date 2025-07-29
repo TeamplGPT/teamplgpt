@@ -2083,6 +2083,26 @@ const TRANSLATIONS = {
           import: "Import slash command",
           success: "Slash command {{command}} imported successfully!",
         },
+        agent_flow: {
+          title: "Import Agent Flow",
+          description:
+            "Agent flows allow you to create reusable sequences of actions that can be triggered by your agent.",
+          flow_details: "Flow Details",
+          description_label: "Description",
+          steps: "Steps",
+          creator: "Created by",
+          importing: "Importing...",
+          import: "Import agent flow",
+          success: "Agent flow imported successfully!",
+          errors: {
+            UNSUPPORTED_BLOCKS:
+              "This flow includes unsupported blocks. They may not be supported by your version of AnythingLLM or are not available on this platform.",
+            REQUIRED_FIELDS_MISSING: "Name and config are required.",
+            SAVE_FAILED: "Failed to save flow.",
+            SERVER_ERROR: "A server error occurred.",
+            UNKNOWN: "Failed to import agent flow. {{error}}",
+          },
+        },
       },
       complete: {
         menu: "3. Completed",

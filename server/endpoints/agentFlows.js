@@ -21,14 +21,17 @@ function agentFlowEndpoints(app) {
           return response.status(400).json({
             success: false,
             error: "Name and config are required",
+            errorCode: "REQUIRED_FIELDS_MISSING",
           });
         }
 
         const flow = AgentFlows.saveFlow(name, config, uuid);
         if (!flow || !flow.success)
-          return response
-            .status(200)
-            .json({ flow: null, error: flow.error || "Failed to save flow" });
+          return response.status(200).json({
+            flow: null,
+            error: flow.error || "Failed to save flow",
+            errorCode: flow.errorCode || "SAVE_FAILED",
+          });
 
         if (!uuid) {
           await Telemetry.sendTelemetry("agent_flow_created", {
@@ -45,6 +48,7 @@ function agentFlowEndpoints(app) {
         return response.status(500).json({
           success: false,
           error: error.message,
+          errorCode: "SERVER_ERROR",
         });
       }
     }
