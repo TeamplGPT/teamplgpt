@@ -5,8 +5,10 @@ import paths from "@/utils/paths";
 import { userFromStorage } from "@/utils/request";
 import System from "@/models/system";
 import showToast from "@/utils/toast";
+import { useTranslation } from "react-i18next";
 
 export default function NewApiKeyModal({ closeModal, onSuccess }) {
+  const { t } = useTranslation();
   const [apiKey, setApiKey] = useState(null);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -29,7 +31,7 @@ export default function NewApiKeyModal({ closeModal, onSuccess }) {
     if (!apiKey) return false;
     window.navigator.clipboard.writeText(apiKey.secret);
     setCopied(true);
-    showToast("API key copied to clipboard", "success", {
+    showToast(t("api.create.copy_success"), "success", {
       clear: true,
     });
   };
@@ -50,7 +52,7 @@ export default function NewApiKeyModal({ closeModal, onSuccess }) {
         <div className="relative p-6 border-b rounded-t border-theme-modal-border">
           <div className="w-full flex gap-x-2 items-center">
             <h3 className="text-xl font-semibold text-white overflow-hidden overflow-ellipsis whitespace-nowrap">
-              Create new API key
+              {t("api.create.title")}
             </h3>
           </div>
           <button
@@ -92,8 +94,7 @@ export default function NewApiKeyModal({ closeModal, onSuccess }) {
                 </div>
               )}
               <p className="text-white text-opacity-60 text-xs md:text-sm">
-                Once created the API key can be used to programmatically access
-                and configure this AnythingLLM instance.
+                {t("api.create.description")}
               </p>
               <a
                 href={paths.apiDocs()}
@@ -101,7 +102,7 @@ export default function NewApiKeyModal({ closeModal, onSuccess }) {
                 rel="noreferrer"
                 className="text-blue-400 hover:underline"
               >
-                Read the API documentation &rarr;
+                {t("api.create.read_more")} &rarr;
               </a>
             </div>
             <div className="flex justify-end items-center mt-6 pt-6 border-t border-theme-modal-border">
@@ -112,13 +113,13 @@ export default function NewApiKeyModal({ closeModal, onSuccess }) {
                     type="button"
                     className="transition-all duration-300 text-white hover:bg-zinc-700 px-4 py-2 rounded-lg text-sm mr-2"
                   >
-                    Cancel
+                    {t("common.cancel")}
                   </button>
                   <button
                     type="submit"
                     className="transition-all duration-300 bg-white text-black hover:opacity-60 px-4 py-2 rounded-lg text-sm"
                   >
-                    Create API Key
+                    {t("api.create.create_button")}
                   </button>
                 </>
               ) : (
@@ -127,7 +128,7 @@ export default function NewApiKeyModal({ closeModal, onSuccess }) {
                   type="button"
                   className="transition-all duration-300 text-white hover:bg-zinc-700 px-4 py-2 rounded-lg text-sm"
                 >
-                  Close
+                  {t("common.close")}
                 </button>
               )}
             </div>

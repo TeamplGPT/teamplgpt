@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { X } from "@phosphor-icons/react";
 import System from "@/models/system";
 import showToast from "@/utils/toast";
+import { useTranslation } from "react-i18next";
 
 export default function EditVariableModal({ variable, closeModal, onRefresh }) {
+  const { t } = useTranslation();
   const [error, setError] = useState(null);
 
   const handleUpdate = async (e) => {
@@ -16,18 +18,20 @@ export default function EditVariableModal({ variable, closeModal, onRefresh }) {
       updatedVariable[key] = value.trim();
 
     if (!updatedVariable.key || !updatedVariable.value) {
-      setError("Key and value are required");
+      setError(t("system_prompt_variables.add.key-value-required"));
       return;
     }
 
     try {
       await System.promptVariables.update(variable.id, updatedVariable);
-      showToast("Variable updated successfully", "success", { clear: true });
+      showToast(t("system_prompt_variables.edit.success"), "success", {
+        clear: true,
+      });
       if (onRefresh) onRefresh();
       closeModal();
     } catch (error) {
       console.error("Error updating variable:", error);
-      setError("Failed to update variable");
+      setError(t("system_prompt_variables.edit.failed"));
     }
   };
 
@@ -37,7 +41,7 @@ export default function EditVariableModal({ variable, closeModal, onRefresh }) {
         <div className="relative p-6 border-b rounded-t border-theme-modal-border">
           <div className="w-full flex gap-x-2 items-center">
             <h3 className="text-xl font-semibold text-white overflow-hidden overflow-ellipsis whitespace-nowrap">
-              Edit {variable.key}
+              {t("system_prompt_variables.edit.title")} {variable.key}
             </h3>
           </div>
           <button
@@ -56,7 +60,7 @@ export default function EditVariableModal({ variable, closeModal, onRefresh }) {
                   htmlFor="key"
                   className="block mb-2 text-sm font-medium text-white"
                 >
-                  Key
+                  {t("system_prompt_variables.table.key")}
                 </label>
                 <input
                   name="key"
@@ -71,8 +75,7 @@ export default function EditVariableModal({ variable, closeModal, onRefresh }) {
                   pattern="^[a-zA-Z0-9_]+$"
                 />
                 <p className="mt-2 text-xs text-white/60">
-                  Key must be unique and will be used in prompts as {"{key}"}.
-                  Only letters, numbers and underscores are allowed.
+                  {t("system_prompt_variables.add.key_description")}
                 </p>
               </div>
               <div>
@@ -80,7 +83,7 @@ export default function EditVariableModal({ variable, closeModal, onRefresh }) {
                   htmlFor="value"
                   className="block mb-2 text-sm font-medium text-white"
                 >
-                  Value
+                  {t("system_prompt_variables.table.value")}
                 </label>
                 <input
                   name="value"
@@ -97,13 +100,13 @@ export default function EditVariableModal({ variable, closeModal, onRefresh }) {
                   htmlFor="description"
                   className="block mb-2 text-sm font-medium text-white"
                 >
-                  Description
+                  {t("system_prompt_variables.table.description")}
                 </label>
                 <input
                   name="description"
                   type="text"
                   className="border-none bg-theme-settings-input-bg w-full text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
-                  placeholder="Optional description"
+                  placeholder={t("system_prompt_variables.add.optional")}
                   defaultValue={variable.description}
                   autoComplete="off"
                 />
@@ -116,13 +119,13 @@ export default function EditVariableModal({ variable, closeModal, onRefresh }) {
                 type="button"
                 className="transition-all duration-300 text-white hover:bg-zinc-700 px-4 py-2 rounded-lg text-sm"
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 type="submit"
                 className="transition-all duration-300 bg-white text-black hover:opacity-60 px-4 py-2 rounded-lg text-sm"
               >
-                Update variable
+                {t("system_prompt_variables.edit.update")}
               </button>
             </div>
           </form>

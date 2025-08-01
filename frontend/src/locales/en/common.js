@@ -67,6 +67,7 @@ const TRANSLATIONS = {
     saving: "Saving...",
     save: "Save changes",
     cancel: "Cancel",
+    close: "Close",
     unsavedChanges: "Unsaved Changes",
     previous: "Previous Page",
     next: "Next Page",
@@ -865,6 +866,21 @@ const TRANSLATIONS = {
       key: "API Key",
       by: "Created By",
       created: "Created",
+      delete_confirm:
+        "Are you sure you want to deactivate this api key?\nAfter you do this it will not longer be useable.\n\nThis action is irreversible.",
+      delete_success: "API Key permanently deleted",
+      copy_success: "API Key copied to clipboard",
+      copy: "Copy API Key",
+      copied: "Copied",
+    },
+    "no-keys": "No API keys found",
+    create: {
+      title: "Create new API key",
+      description:
+        "Once created the API key can be used to programmatically access and configure this AnythingLLM instance.",
+      read_more: "Read the API documentation",
+      create_button: "Create API Key",
+      copy_success: "API key copied to clipboard",
     },
   },
 
@@ -2273,6 +2289,41 @@ const TRANSLATIONS = {
           button: "Connect to Community Hub",
         },
       },
+    },
+  },
+  system_prompt_variables: {
+    title: "System Prompt Variables",
+    description:
+      "System prompt variables are used to store configuration values that can be referenced in your system prompt to enable dynamic content in your prompts.",
+    "no-variables": "No variables found",
+    table: {
+      key: "Key",
+      value: "Value",
+      description: "Description",
+      type: "Type",
+      edit: "Edit",
+      delete_confirm:
+        'Are you sure you want to delete the variable "{{key}}"?\nThis action is irreversible.',
+      delete_success: "Variable deleted successfully",
+      delete_failed: "Failed to delete variable",
+    },
+    add: {
+      button: "Add Variable",
+      title: "Add New Variable",
+      key_description:
+        "Key must be unique and will be used in prompts as {key}. Only letters, numbers and underscores are allowed.",
+      optional: "Optional description",
+      create: "Create Variable",
+      "key-value-required": "Key and value are required",
+      success: "Variable created successfully",
+      failed: "Failed to create variable",
+    },
+    edit: {
+      title: "Edit",
+      update: "Update Variable",
+      "key-value-required": "Key and value are required",
+      success: "Variable updated successfully",
+      failed: "Failed to update variable",
     },
   },
 };

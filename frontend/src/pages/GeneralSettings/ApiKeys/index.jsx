@@ -105,7 +105,7 @@ export default function AdminApiKeys() {
                   {apiKeys.length === 0 ? (
                     <tr className="bg-transparent text-theme-text-secondary text-sm font-medium">
                       <td colSpan="4" className="px-6 py-4 text-center">
-                        No API keys found
+                        {t("api.no-keys")}
                       </td>
                     </tr>
                   ) : (

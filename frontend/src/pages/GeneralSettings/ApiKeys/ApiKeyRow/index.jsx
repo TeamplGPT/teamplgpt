@@ -4,28 +4,25 @@ import showToast from "@/utils/toast";
 import { Trash } from "@phosphor-icons/react";
 import { userFromStorage } from "@/utils/request";
 import System from "@/models/system";
+import { useTranslation } from "react-i18next";
 
 export default function ApiKeyRow({ apiKey, removeApiKey }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const handleDelete = async () => {
-    if (
-      !window.confirm(
-        `Are you sure you want to deactivate this api key?\nAfter you do this it will not longer be useable.\n\nThis action is irreversible.`
-      )
-    )
-      return false;
+    if (!window.confirm(`${t("api.table.delete_confirm")}`)) return false;
 
     const user = userFromStorage();
     const Model = !!user ? Admin : System;
     await Model.deleteApiKey(apiKey.id);
-    showToast("API Key permanently deleted", "info");
+    showToast(t("api.table.delete_success"), "info");
     removeApiKey(apiKey.id);
   };
 
   const copyApiKey = () => {
     if (!apiKey) return false;
     window.navigator.clipboard.writeText(apiKey.secret);
-    showToast("API Key copied to clipboard", "success");
+    showToast(t("api.table.copy_success"), "success");
     setCopied(true);
   };
 
@@ -53,7 +50,7 @@ export default function ApiKeyRow({ apiKey, removeApiKey }) {
             disabled={copied}
             className="text-xs font-medium text-blue-300 rounded-lg hover:text-white hover:light:text-blue-500 hover:text-opacity-60 hover:underline"
           >
-            {copied ? "Copied" : "Copy API Key"}
+            {copied ? t("api.table.copied") : t("api.table.copy")}
           </button>
           <button
             onClick={handleDelete}

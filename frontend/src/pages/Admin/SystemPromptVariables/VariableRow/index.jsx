@@ -7,7 +7,7 @@ import EditVariableModal from "./EditVariableModal";
 import { titleCase } from "text-case";
 import truncate from "truncate";
 import { Trash } from "@phosphor-icons/react";
-
+import { useTranslation } from "react-i18next";
 /**
  * A row component for displaying a system prompt variable
  * @param {{id: number|null, key: string, value: string, description: string, type: string}} variable - The system prompt variable to display
@@ -15,6 +15,7 @@ import { Trash } from "@phosphor-icons/react";
  * @returns {JSX.Element} A JSX element for displaying the variable
  */
 export default function VariableRow({ variable, onRefresh }) {
+  const { t } = useTranslation();
   const rowRef = useRef(null);
   const { isOpen, openModal, closeModal } = useModal();
 
@@ -22,7 +23,7 @@ export default function VariableRow({ variable, onRefresh }) {
     if (!variable.id) return;
     if (
       !window.confirm(
-        `Are you sure you want to delete the variable "${variable.key}"?\nThis action is irreversible.`
+        t("system_prompt_variables.table.delete_confirm", { key: variable.key })
       )
     )
       return false;
@@ -30,11 +31,15 @@ export default function VariableRow({ variable, onRefresh }) {
     try {
       await System.promptVariables.delete(variable.id);
       rowRef?.current?.remove();
-      showToast("Variable deleted successfully", "success", { clear: true });
+      showToast(t("system_prompt_variables.table.delete_success"), "success", {
+        clear: true,
+      });
       if (onRefresh) onRefresh();
     } catch (error) {
       console.error("Error deleting variable:", error);
-      showToast("Failed to delete variable", "error", { clear: true });
+      showToast(t("system_prompt_variables.table.delete_failed"), "error", {
+        clear: true,
+      });
     }
   };
 
@@ -91,7 +96,7 @@ export default function VariableRow({ variable, onRefresh }) {
                 onClick={openModal}
                 className="text-xs font-medium text-white/80 light:text-black/80 rounded-lg hover:text-white hover:light:text-gray-500 px-2 py-1 hover:bg-white hover:bg-opacity-10"
               >
-                Edit
+                {t("system_prompt_variables.table.edit")}
               </button>
               <button
                 onClick={handleDelete}

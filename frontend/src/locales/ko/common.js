@@ -65,6 +65,7 @@ const TRANSLATIONS = {
     saving: "저장 중...",
     save: "저장",
     cancel: "취소",
+    close: "닫기",
     unsavedChanges: "저장되지 않은 변경사항",
     previous: "이전",
     next: "다음",
@@ -851,6 +852,21 @@ const TRANSLATIONS = {
       key: "API 키",
       by: "생성한 사람",
       created: "생성일",
+      delete_confirm:
+        "이 API 키를 비활성화하시겠습니까?\n비활성화하면 더 이상 사용할 수 없습니다.\n\n이 작업은 되돌릴 수 없습니다.",
+      delete_success: "API 키가 영구적으로 삭제되었습니다.",
+      copy_success: "API 키가 클립보드에 복사되었습니다.",
+      copy: "API 키 복사",
+      copied: "복사됨",
+    },
+    "no-keys": "API 키가 없습니다",
+    create: {
+      title: "새 API 키 생성",
+      description:
+        "생성된 API 키는 이 AnythingLLM 인스턴스에 프로그래밍 방식으로 액세스하고 구성하는 데 사용할 수 있습니다.",
+      read_more: "API 문서 읽기",
+      create_button: "API 키 생성",
+      copy_success: "API 키가 클립보드에 복사되었습니다.",
     },
   },
 
@@ -2246,6 +2262,41 @@ const TRANSLATIONS = {
           button: "커뮤니티 허브에 연결",
         },
       },
+    },
+  },
+  system_prompt_variables: {
+    title: "시스템 프롬프트 변수",
+    description:
+      "시스템 프롬프트 변수는 시스템 프롬프트에서 참조할 수 있는 설정 값 기능입니다. 이를 통해 프롬프트 내용을 동적으로 변경할 수 있습니다.",
+    "no-variables": "변수가 없습니다",
+    table: {
+      key: "키",
+      value: "값",
+      description: "설명",
+      type: "타입",
+      edit: "수정",
+      delete_confirm:
+        '변수 "{{key}}"를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
+      delete_success: "변수가 성공적으로 삭제되었습니다",
+      delete_failed: "변수 삭제에 실패했습니다",
+    },
+    add: {
+      button: "변수 추가",
+      title: "새 변수 추가",
+      key_description:
+        "키는 고유해야 하며 프롬프트에서 {key} 형태로 사용됩니다. 영문자, 숫자, 밑줄(_)만 사용할 수 있습니다.",
+      optional: "선택사항 설명",
+      create: "변수 생성",
+      "key-value-required": "키와 값은 필수 입력 항목입니다",
+      success: "변수가 성공적으로 생성되었습니다",
+      failed: "변수 생성에 실패했습니다",
+    },
+    edit: {
+      title: "편집",
+      update: "변수 업데이트",
+      "key-value-required": "키와 값은 필수 입력 항목입니다",
+      success: "변수가 성공적으로 업데이트되었습니다",
+      failed: "변수 업데이트에 실패했습니다",
     },
   },
 };
