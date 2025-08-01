@@ -20,7 +20,7 @@ export default function ChatEmbedWidgets() {
             className="flex flex-col gap-y-[18px] overflow-y-scroll no-scroll"
           >
             <div className="text-theme-text-primary flex items-center gap-x-2">
-              <p className="text-lg font-medium">Chat Embed</p>
+              <p className="text-lg font-medium">{t("settings.embeds")}</p>
             </div>
             <WidgetList
               selectedView={selectedView}
@@ -71,7 +71,7 @@ export default function ChatEmbedWidgets() {
         <div className="flex flex-col min-w-[360px] h-[calc(100vh-90px)]">
           <div className="flex-none mb-4">
             <div className="text-theme-text-primary flex items-center gap-x-2">
-              <p className="text-lg font-medium">Chat Embed</p>
+              <p className="text-lg font-medium">{t("settings.embeds")}</p>
             </div>
           </div>
 
@@ -116,12 +116,13 @@ function WidgetLayout({ children }) {
 }
 
 function WidgetList({ selectedView, handleClick }) {
+  const { t } = useTranslation();
   const views = {
     configs: {
-      title: "Widgets",
+      title: "embeddable.widget",
     },
     chats: {
-      title: "History",
+      title: "embed-chats.history",
     },
   };
 
@@ -143,7 +144,7 @@ function WidgetList({ selectedView, handleClick }) {
           }`}
           onClick={() => handleClick?.(view)}
         >
-          <div className="text-sm font-light">{settings.title}</div>
+          <div className="text-sm font-light">{t(settings.title)}</div>
           <CaretRight
             size={14}
             weight="bold"

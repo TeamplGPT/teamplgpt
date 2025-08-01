@@ -74,6 +74,7 @@ const TRANSLATIONS = {
     "your-admin-password": "관리자 비밀번호",
     search: "검색",
     learn_more: "자세히 보기",
+    rows_per_page: "페이지당 행 수",
   },
 
   // Setting Sidebar menu items.
@@ -1351,21 +1352,75 @@ const TRANSLATIONS = {
 
   // Embeddable Chat Widgets
   embeddable: {
+    widget: "위젯",
     title: "임베드 가능한 채팅 위젯",
     description:
       "임베드 가능한 채팅 위젯은 하나의 워크스페이스에 연결된 공개용 채팅방입니다. 이를 통해 워크스페이스 설정이 적용된 채팅방을 일반인들에게 공개할 수 있습니다.",
-    create: "임베드 생성",
+    create: {
+      button: "임베드 생성",
+      update: "임베드 수정",
+      title: "워크스페이스용 새 임베드 생성",
+      workspace: "워크스페이스",
+      workspace_description:
+        "채팅 창이 기반으로 할 워크스페이스입니다. 이 설정에서 재정의하지 않는 한 모든 기본값은 워크스페이스에서 상속됩니다.",
+      "allowed-chat-method": "허용된 채팅 방식",
+      "allowed-chat-method-description":
+        "챗봇이 어떻게 작동할지 설정합니다. 쿼리는 문서가 질문에 답하는 데 도움이 될 때만 응답합니다.",
+      "allowed-chat-method-description-2":
+        "채팅은 일반적인 질문에도 열려 있으며 워크스페이스와 전혀 관련 없는 질문에도 답할 수 있습니다.",
+      chat: "채팅: 맥락에 관계없이 모든 질문에 응답",
+      query: "쿼리: 워크스페이스 문서와 관련된 채팅에만 응답",
+      restrict: "도메인 요청 제한",
+      restrict_description:
+        "이 필터는 아래 목록에 없는 도메인에서 오는 모든 요청을 차단합니다.",
+      restrict_description_2:
+        "이를 비워두면 누구나 어떤 사이트에서든 임베드를 사용할 수 있습니다.",
+      max_day: "일일 최대 채팅 수",
+      max_day_description:
+        "이 임베드 채팅이 24시간 동안 처리할 수 있는 채팅 수를 제한합니다. 0은 무제한입니다.",
+      max_session: "세션당 최대 채팅 수",
+      max_session_desciption:
+        "세션 사용자가 24시간 동안 이 임베드로 보낼 수 있는 채팅 수를 제한합니다. 0은 무제한입니다.",
+      message_limit: "메시지 기록 제한",
+      message_limit_desciption:
+        "채팅 컨텍스트에 포함할 이전 메시지 수입니다. 기본값은 20입니다.",
+      enable_dynamic_model_use: "동적 모델 사용 활성화",
+      enable_dynamic_model_use_desciption:
+        "워크스페이스 기본값을 재정의하여 선호하는 LLM 모델을 설정할 수 있도록 허용합니다.",
+      enable_dynamic_temperature_use: "동적 LLM 온도 활성화",
+      enable_dynamic_temperature_use_desciption:
+        "워크스페이스 기본값을 재정의하여 LLM 온도를 설정할 수 있도록 허용합니다.",
+      enable_prompt_override: "프롬프트 재정의 활성화",
+      enable_prompt_override_desciption:
+        "워크스페이스 기본값을 재정의하여 시스템 프롬프트를 설정할 수 있도록 허용합니다.",
+      "after-creating-embed":
+        "임베드를 생성한 후 간단한 <1>script</1> 태그로 웹사이트에 게시할 수 있는 링크가 제공됩니다.",
+      "updated-successfully": "임베드가 성공적으로 수정되었습니다.",
+    },
     table: {
       workspace: "워크스페이스",
       chats: "보낸 채팅",
       active: "활성 도메인",
       created: "생성일",
+      all: "모두",
+      code: "코드",
+      disable: "비활성화",
+      enable: "활성화",
+      delete: "삭제",
+      edit: "수정",
     },
+    disable_confirm:
+      "이 임베드를 비활성화하시겠습니까?\n비활성화되면 임베드는 더 이상 채팅 요청에 응답하지 않습니다.",
+    disable_success: "임베드가 비활성화되었습니다",
+    enable_success: "임베드가 활성화되었습니다",
+    delete_confirm:
+      "이 임베드를 삭제하시겠습니까?\n삭제되면 이 임베드는 더 이상 채팅에 응답하지 않으며 비활성화됩니다.\n\n이 작업은 되돌릴 수 없습니다.",
+    delete_success: "시스템에서 임베드가 삭제되었습니다.",
   },
 
   "embed-chats": {
-    title: "임베드 채팅",
-    export: "내보내기",
+    history: "기록",
+    title: "임베드 채팅 기록",
     description: "게시한 임베드에서의 모든 채팅과 메시지의 기록입니다.",
     table: {
       embed: "임베드",
@@ -1373,6 +1428,11 @@ const TRANSLATIONS = {
       message: "메시지",
       response: "응답",
       at: "보낸 시각",
+    },
+    export: {
+      button: "내보내기",
+      "export-success": "임베드 채팅이 {{name}}으로 성공적으로 내보내졌습니다.",
+      "export-failed": "임베드 채팅 내보내기에 실패했습니다.",
     },
   },
 
@@ -1412,6 +1472,10 @@ const TRANSLATIONS = {
       user: "사용자",
       occurred: "발생 시각",
     },
+    "clear-confirm":
+      "이벤트 로그를 모두 지우시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+    "clear-success": "이벤트 로그가 성공적으로 지워졌습니다.",
+    "clear-failed": "로그 지우기 실패: {{error}}",
   },
 
   // Privacy & Data-Handling

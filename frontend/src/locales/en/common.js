@@ -76,6 +76,7 @@ const TRANSLATIONS = {
     "your-admin-password": "Your admin password",
     search: "Search",
     learn_more: "Learn more",
+    rows_per_page: "Rows per page",
   },
 
   // Setting Sidebar menu items.
@@ -1373,21 +1374,75 @@ const TRANSLATIONS = {
 
   // Embeddable Chat Widgets
   embeddable: {
+    widget: "Widget",
     title: "Embeddable Chat Widgets",
     description:
       "Embeddable chat widgets are public facing chat interfaces that are tied to a single workspace. These allow you to build workspaces that then you can publish to the world.",
-    create: "Create embed",
+    create: {
+      button: "Create embed",
+      update: "Update embed",
+      title: "Create new embed for workspace",
+      workspace: "Workspace",
+      workspace_description:
+        "This is the workspace your chat window will be based on. All defaults will be inherited from the workspace unless overridden by this config.",
+      "allowed-chat-method": "Allowed chat method",
+      "allowed-chat-method-description":
+        "Set how your chatbot should operate. Query means it will only respond if a document helps answer the query.",
+      "allowed-chat-method-description-2":
+        "Chat opens the chat to even general questions and can answer totally unrelated queries to your workspace.",
+      chat: "Chat: Respond to all questions regardless of context",
+      query: "Query: Only respond to chats related to documents in workspace",
+      restrict: "Restrict requests from domains",
+      restrict_description:
+        "This filter will block any requests that come from a domain other than the list below.",
+      restrict_description_2:
+        "Leaving this empty means anyone can use your embed on any site.",
+      max_day: "Max chats per day",
+      max_day_description:
+        "Limit the amount of chats this embedded chat can process in a 24 hour period. Zero is unlimited.",
+      max_session: "Max chats per session",
+      max_session_desciption:
+        "Limit the amount of chats a session user can send with this embed in a 24 hour period. Zero is unlimited.",
+      message_limit: "Message History Limit",
+      message_limit_desciption:
+        "The number of previous messages to include in the chat context. Default is 20.",
+      enable_dynamic_model_use: "Enable dynamic model use",
+      enable_dynamic_model_use_desciption:
+        "Allow setting of the preferred LLM model to override the workspace default.",
+      enable_dynamic_temperature_use: "Enable dynamic LLM temperature",
+      enable_dynamic_temperature_use_desciption:
+        "Allow setting of the LLM temperature to override the workspace default.",
+      enable_prompt_override: "Enable Prompt Override",
+      enable_prompt_override_desciption:
+        "Allow setting of the system prompt to override the workspace default.",
+      "after-creating-embed":
+        "After creating an embed you will be provided a link that you can publish on your website with a simple <1>script</1> tag.",
+      "updated-successfully": "Embed updated successfully.",
+    },
     table: {
       workspace: "Workspace",
       chats: "Sent Chats",
       active: "Active Domains",
       created: "Created",
+      all: "all",
+      code: "Code",
+      disable: "Disable",
+      enable: "Enable",
+      delete: "Delete",
+      edit: "Edit",
     },
+    disable_confirm:
+      "Are you sure you want to disabled this embed?\nOnce disabled the embed will no longer respond to any chat requests.",
+    disable_success: "Embed has been disabled",
+    enable_success: "Embed is active",
+    delete_confirm:
+      "Are you sure you want to delete this embed?\nOnce deleted this embed will no longer respond to chats or be active.\n\nThis action is irreversible.",
+    delete_success: "Embed deleted from system.",
   },
 
   "embed-chats": {
+    history: "History",
     title: "Embed Chat History",
-    export: "Export",
     description:
       "These are all the recorded chats and messages from any embed that you have published.",
     table: {
@@ -1396,6 +1451,11 @@ const TRANSLATIONS = {
       message: "Message",
       response: "Response",
       at: "Sent At",
+    },
+    export: {
+      button: "Export",
+      "export-success": "Embed chats exported successfully as {{name}}.",
+      "export-failed": "Failed to export embed chats.",
     },
   },
 
@@ -1435,6 +1495,10 @@ const TRANSLATIONS = {
       user: "User",
       occurred: "Occurred At",
     },
+    "clear-confirm":
+      "Are you sure you want to clear all event logs? This action is irreversible.",
+    "clear-success": "Event logs cleared successfully.",
+    "clear-failed": "Failed to clear logs: {{error}}",
   },
 
   // Privacy & Data-Handling

@@ -63,9 +63,9 @@ export default function EmbedChatsView() {
         exportOptions[exportType];
       const blob = new Blob([chats], { type: mimeType });
       saveAs(blob, `${filenameFunc()}.${fileExtension}`);
-      showToast(`Embed chats exported successfully as ${name}.`, "success");
+      showToast(t("embed-chats.export.export-success", { name }), "success");
     } else {
-      showToast("Failed to export embed chats.", "error");
+      showToast(t("embed-chats.export.export-failed"), "error");
     }
   };
 
@@ -140,7 +140,7 @@ export default function EmbedChatsView() {
               className="flex items-center gap-x-2 px-4 py-1 rounded-lg text-theme-bg-chat bg-primary-button hover:bg-secondary hover:text-white text-xs font-semibold h-[34px] w-fit"
             >
               <Download size={18} weight="bold" />
-              {t("embed-chats.export")}
+              {t("embed-chats.export.button")}
               <CaretDown size={18} weight="bold" />
             </button>
             <div
@@ -211,7 +211,7 @@ export default function EmbedChatsView() {
                   : "bg-theme-bg-secondary text-theme-text-primary hover:bg-theme-hover"
               }`}
             >
-              {t("embed-chats.previous")}
+              {t("common.previous")}
             </button>
             <button
               onClick={handleNext}
@@ -222,7 +222,7 @@ export default function EmbedChatsView() {
                   : "bg-theme-bg-secondary text-theme-text-primary hover:bg-theme-hover"
               }`}
             >
-              {t("embed-chats.next")}
+              {t("common.next")}
             </button>
           </div>
         )}

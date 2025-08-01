@@ -15,33 +15,32 @@ export default function AdminLogs() {
   const [logs, setLogs] = useState([]);
   const [offset, setOffset] = useState(Number(query.get("offset") || 0));
   const [canNext, setCanNext] = useState(false);
+  const [limit, setLimit] = useState(10);
   const { t } = useTranslation();
 
   useEffect(() => {
     async function fetchLogs() {
-      const { logs: _logs, hasPages = false } = await System.eventLogs(offset);
+      const { logs: _logs, hasPages = false } = await System.eventLogs(
+        offset,
+        limit
+      );
       setLogs(_logs);
       setCanNext(hasPages);
       setLoading(false);
     }
     fetchLogs();
-  }, [offset]);
+  }, [offset, limit]); // limit 의존성 추가
 
   const handleResetLogs = async () => {
-    if (
-      !window.confirm(
-        "Are you sure you want to clear all event logs? This action is irreversible."
-      )
-    )
-      return;
+    if (!window.confirm(t("event.clear-confirm"))) return;
     const { success, error } = await System.clearEventLogs();
     if (success) {
-      showToast("Event logs cleared successfully.", "success");
+      showToast(t("event.clear-success"), "success");
       setLogs([]);
       setCanNext(false);
       setOffset(0);
     } else {
-      showToast(`Failed to clear logs: ${error}`, "error");
+      showToast(t("event.clear-failed", { error }), "error");
     }
   };
 
@@ -51,6 +50,11 @@ export default function AdminLogs() {
 
   const handleNext = () => {
     setOffset(offset + 1);
+  };
+
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    setOffset(0);
   };
 
   return (
@@ -71,11 +75,23 @@ export default function AdminLogs() {
               {t("event.description")}
             </p>
           </div>
-          <div className="w-full justify-end flex">
-            <CTAButton
-              onClick={handleResetLogs}
-              className="mt-3 mr-0 mb-4 md:-mb-14 z-10"
-            >
+          <div className="w-full justify-between flex items-center mt-4">
+            <div className="flex items-center gap-2">
+              <label className="text-theme-text-secondary text-sm">
+                {t("common.rows_per_page", "Rows per page")}:
+              </label>
+              <select
+                value={limit}
+                onChange={(e) => handleLimitChange(Number(e.target.value))}
+                className="bg-theme-settings-input-bg text-white px-3 py-1 rounded border border-theme-modal-border focus:outline-none focus:border-theme-primary text-sm"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+            </div>
+            <CTAButton onClick={handleResetLogs} className="z-10">
               {t("event.clear")}
             </CTAButton>
           </div>
@@ -149,6 +165,11 @@ function LogsContainer({
         >
           {t("common.previous")}
         </button>
+        <div className="flex items-center gap-4 text-theme-text-secondary text-sm">
+          <span>
+            {t("common.page", "Page")} {offset + 1}
+          </span>
+        </div>
         <button
           onClick={handleNext}
           className="px-4 py-2 rounded-lg border border-slate-200 text-slate-200 light:text-theme-text-secondary light:border-theme-sidebar-border text-sm items-center flex gap-x-2 hover:bg-slate-200 hover:text-slate-800 disabled:invisible"
