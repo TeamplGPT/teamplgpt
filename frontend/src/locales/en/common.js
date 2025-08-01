@@ -2326,6 +2326,39 @@ const TRANSLATIONS = {
       failed: "Failed to update variable",
     },
   },
+  browser_extension: {
+    title: "Browser Extension API Keys",
+    description:
+      "Manage API keys for browser extensions connecting to your AnythingLLM instance.",
+    "no-keys": "No API keys found",
+    "add-key": "Generate New API Key",
+    table: {
+      "connection-string": "Extension Connection String",
+      "created-at": "Created At",
+      actions: "Actions",
+      delete_confirm:
+        "Are you sure you want to revoke this browser extension API key?\nAfter you do this it will no longer be useable.\n\nThis action is irreversible.",
+      delete_success: "Browser Extension API Key permanently revoked",
+      delete_failed: "Failed to revoke API Key",
+      copy_success: "Connection string copied to clipboard",
+      "attempting-to-connect": "Attempting to connect to browser extension...",
+      "copy-connection-text": "Copy connection string",
+      "auto-connection": "Automatically connect to extension",
+    },
+    "failed-fetch": "Failed to fetch API keys",
+    "add-key-modal": {
+      title: "New Browser Extension API Key",
+      description:
+        'After clicking "Create API Key", AnythingLLM will attempt to connect to your browser extension automatically.',
+      description2:
+        'If you see "Connected to AnythingLLM" in the extension, the connection was successful. If not, please copy the connection string and paste it into the extension manually.',
+      "create-api": "Create API Key",
+      "api-key-copied": "API Key Copied!",
+      "copy-api-key": "Copy API Key",
+      "multi-user-warning":
+        "Warning: You are in multi-user mode, this API key will allow access to all workspaces associated with your account. Please share it cautiously.",
+    },
+  },
 };
 
 export default TRANSLATIONS;

@@ -2299,6 +2299,40 @@ const TRANSLATIONS = {
       failed: "변수 업데이트에 실패했습니다",
     },
   },
+  browser_extension: {
+    title: "브라우저 확장 프로그램 API 키",
+    description:
+      "AnythingLLM 인스턴스에 연결하는 브라우저 확장 프로그램용 API 키를 관리합니다.",
+    "no-keys": "API 키가 없습니다",
+    "add-key": "새 API 키 생성",
+    table: {
+      "connection-string": "확장 프로그램 연결 문자열",
+      "created-at": "생성일",
+      actions: "작업",
+      delete_confirm:
+        "이 브라우저 확장 프로그램 API 키를 취소하시겠습니까?\n취소하면 더 이상 사용할 수 없습니다.\n\n이 작업은 되돌릴 수 없습니다.",
+      delete_success:
+        "브라우저 확장 프로그램 API 키가 영구적으로 취소되었습니다",
+      delete_failed: "API 키 취소에 실패했습니다",
+      copy_success: "연결 문자열이 클립보드에 복사되었습니다",
+      "attempting-to-connect": "브라우저 확장 프로그램에 연결을 시도하는 중...",
+      "copy-connection-text": "연결 문자열 복사",
+      "auto-connection": "확장 프로그램에 자동 연결",
+    },
+    "failed-fetch": "API 키를 불러오는 중 오류가 발생했습니다",
+    "add-key-modal": {
+      title: "새 브라우저 확장 프로그램 API 키",
+      description:
+        '"API 키 생성" 버튼을 클릭하면 AnythingLLM이 자동으로 브라우저 확장 프로그램에 연결을 시도합니다.',
+      description2:
+        '확장 프로그램에서 "AnythingLLM에 연결됨"이 표시되면 연결이 성공한 것입니다. 그렇지 않으면 연결 문자열을 복사하여 확장 프로그램에 수동으로 붙여넣기 해주세요.',
+      "create-api": "API 키 생성",
+      "api-key-copied": "API 키가 복사되었습니다!",
+      "copy-api-key": "API 키 복사",
+      "multi-user-warning":
+        "경고: 다중 사용자 모드입니다. 이 API 키는 귀하의 계정과 연결된 모든 워크스페이스에 대한 접근을 허용합니다. 신중하게 공유해 주세요.",
+    },
+  },
 };
 
 export default TRANSLATIONS;

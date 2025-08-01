@@ -3,6 +3,7 @@ import BrowserExtensionApiKey from "@/models/browserExtensionApiKey";
 import showToast from "@/utils/toast";
 import { Trash, Copy, Check, Plug } from "@phosphor-icons/react";
 import { POPUP_BROWSER_EXTENSION_EVENT } from "@/utils/constants";
+import { useTranslation } from "react-i18next";
 
 export default function BrowserExtensionApiKeyRow({
   apiKey,
@@ -10,25 +11,22 @@ export default function BrowserExtensionApiKeyRow({
   connectionString,
   isMultiUser,
 }) {
+  const { t } = useTranslation();
   const rowRef = useRef(null);
   const [copied, setCopied] = useState(false);
 
   const handleRevoke = async () => {
-    if (
-      !window.confirm(
-        `Are you sure you want to revoke this browser extension API key?\nAfter you do this it will no longer be useable.\n\nThis action is irreversible.`
-      )
-    )
+    if (!window.confirm(t("browser_extension.table.delete_confirm")))
       return false;
 
     const result = await BrowserExtensionApiKey.revoke(apiKey.id);
     if (result.success) {
       removeApiKey(apiKey.id);
-      showToast("Browser Extension API Key permanently revoked", "info", {
+      showToast(t("browser_extension.table.delete_success"), "info", {
         clear: true,
       });
     } else {
-      showToast("Failed to revoke API Key", "error", {
+      showToast(t("browser_extension.table.delete_failed"), "error", {
         clear: true,
       });
     }
@@ -36,7 +34,7 @@ export default function BrowserExtensionApiKeyRow({
 
   const handleCopy = () => {
     navigator.clipboard.writeText(connectionString);
-    showToast("Connection string copied to clipboard", "success", {
+    showToast(t("browser_extension.table.copy_success"), "success", {
       clear: true,
     });
     setCopied(true);
@@ -50,7 +48,7 @@ export default function BrowserExtensionApiKeyRow({
       { type: POPUP_BROWSER_EXTENSION_EVENT, apiKey: connectionString },
       "*"
     );
-    showToast("Attempting to connect to browser extension...", "info", {
+    showToast(t("browser_extension.table.attempting-to-connect"), "info", {
       clear: true,
     });
   };
@@ -67,7 +65,9 @@ export default function BrowserExtensionApiKeyRow({
             <button
               onClick={handleCopy}
               data-tooltip-id="copy-connection-text"
-              data-tooltip-content="Copy connection string"
+              data-tooltip-content={t(
+                "browser_extension.table.copy-connection-text"
+              )}
               className="border-none text-theme-text-primary hover:text-theme-text-secondary transition-colors duration-200 p-1 rounded"
             >
               {copied ? (
@@ -80,7 +80,9 @@ export default function BrowserExtensionApiKeyRow({
             <button
               onClick={handleConnect}
               data-tooltip-id="auto-connection"
-              data-tooltip-content="Automatically connect to extension"
+              data-tooltip-content={t(
+                "browser_extension.table.auto-connection"
+              )}
               className="border-none text-theme-text-primary hover:text-theme-text-secondary transition-colors duration-200 p-1 rounded"
             >
               <Plug className="h-4 w-4" />
