@@ -103,7 +103,7 @@ const TRANSLATIONS = {
     "agent-skills": "에이전트 스킬",
     "community-hub": "커뮤니티 허브",
     "explore-trending": "트렌딩 탐색",
-    "your-account": "내 계정",
+    "your-account": "커뮤니티 허브 계정",
     "import-item": "아이템 가져오기",
     admin: "관리자",
     tools: "도구",
@@ -135,8 +135,12 @@ const TRANSLATIONS = {
       title: "비밀번호 재설정",
       description: "비밀번호를 재설정하려면 아래에 필요한 정보를 입력하세요.",
       "recovery-codes": "복구 코드",
+      "recovery-codes-description":
+        "향후 비밀번호를 재설정하려면 이 복구 코드가 필요합니다. 복구 코드를 다운로드하거나 복사하여 저장하세요.",
+      "recovery-codes-description2": "이 복구 코드는 한 번만 표시됩니다!",
       "recovery-code": "복구 코드 {{index}}",
       "back-to-login": "로그인으로 돌아가기",
+      download: "다운로드",
     },
   },
 
@@ -711,6 +715,66 @@ const TRANSLATIONS = {
       notRunning:
         "이 MCP 서버가 실행 중이 아닙니다. 중지되었거나 시작 시 오류가 발생했을 수 있습니다.",
       toolCallArguments: "도구 호출 인수",
+    },
+  },
+
+  users: {
+    title: "사용자",
+    description:
+      "이 인스턴스에 계정을 가진 모든 사용자 목록입니다. 계정을 제거하면 해당 사용자의 인스턴스 접근 권한이 즉시 제거됩니다.",
+    table: {
+      add: "사용자 추가",
+      edit: "편집",
+      delete: "사용자 삭제",
+      name: "사용자명",
+      role: "역할",
+      date: "추가된 날짜",
+      update: "사용자 업데이트",
+      suspend: "정지",
+      unsuspend: "정지 해제",
+      suspend_confirm:
+        "{{username}} 사용자를 정지하시겠습니까?\n정지 후 해당 사용자는 로그아웃되며 관리자가 정지를 해제할 때까지 AnythingLLM 인스턴스에 다시 로그인할 수 없습니다.",
+      unsuspend_confirm:
+        "{{username}} 사용자의 정지를 해제하시겠습니까?\n정지 해제 후 해당 사용자는 다시 AnythingLLM 인스턴스에 로그인할 수 있습니다.",
+      suspend_success: "사용자가 정지되었습니다.",
+      unsuspend_success: "사용자 정지가 해제되었습니다.",
+      delete_confirm:
+        "{{username}} 사용자를 삭제하시겠습니까?\n삭제 후 해당 사용자는 로그아웃되며 이 AnythingLLM 인스턴스를 사용할 수 없습니다.\n\n이 작업은 되돌릴 수 없습니다.",
+      delete_success: "사용자가 시스템에서 삭제되었습니다.",
+    },
+    role: {
+      admin: "관리자",
+      manager: "매니저",
+      default: "일반 사용자",
+      descriptions: {
+        admin1: "최고 수준의 사용자 권한입니다.",
+        admin2: "시스템 전체에서 모든 것을 보고 수행할 수 있습니다.",
+        manager1:
+          "모든 워크스페이스를 보고, 생성하고, 삭제할 수 있으며 워크스페이스별 설정을 수정할 수 있습니다.",
+        manager2:
+          "인스턴스에 새 사용자를 생성, 업데이트 및 초대할 수 있습니다.",
+        manager3: "LLM, vectorDB, 임베딩 또는 기타 연결을 수정할 수 없습니다.",
+        default1:
+          "관리자나 매니저가 추가한 워크스페이스에서만 채팅을 보낼 수 있습니다.",
+        default2: "어떤 설정도 수정할 수 없습니다.",
+      },
+    },
+    add: {
+      title: "인스턴스에 사용자 추가",
+      username: "사용자명",
+      username_description:
+        "사용자명은 소문자, 마침표, 숫자, 밑줄, 하이픈만 포함할 수 있으며 공백은 사용할 수 없습니다",
+      password: "비밀번호",
+      password_description: "비밀번호는 최소 8자 이상이어야 합니다",
+      bio: "소개",
+      role: "역할",
+      permissions: "권한",
+      "limit-messages-per-day": "일일 메시지 제한",
+      "limit-messages-per-day-description":
+        "24시간 내에 이 사용자가 성공적으로 수행할 수 있는 쿼리나 채팅 수를 제한합니다.",
+      "messages-limit-per-day": "일일 메시지 제한 수",
+      "after-creating-user":
+        "사용자를 생성한 후, 해당 사용자는 초기 로그인 정보로 로그인해야 접근할 수 있습니다.",
     },
   },
 
@@ -2331,6 +2395,39 @@ const TRANSLATIONS = {
       "copy-api-key": "API 키 복사",
       "multi-user-warning":
         "경고: 다중 사용자 모드입니다. 이 API 키는 귀하의 계정과 연결된 모든 워크스페이스에 대한 접근을 허용합니다. 신중하게 공유해 주세요.",
+    },
+  },
+  experimental_features: {
+    title: "실험적 기능",
+    "live-document-sync": {
+      menu: "실시간 문서 동기화",
+      title: "자동 문서 동기화",
+      description: `문서를 "감시" 대상으로 지정할 수 있는 기능을 활성화합니다. 감시 대상 문서의 내용은 정기적으로 가져와서 AnythingLLM에서 업데이트됩니다.`,
+      description2:
+        "감시 대상 문서는 업데이트와 동시에 참조된 모든 워크스페이스에서 자동으로 업데이트됩니다.",
+      description3:
+        "이 기능은 웹사이트, Confluence, YouTube, GitHub 파일과 같은 웹 기반 콘텐츠에만 적용됩니다.",
+      "read-warning": "기능 문서 및 경고사항",
+      "manage-watched-documents": "감시 대상 문서 관리",
+      "select-feature": "실험적 기능을 선택하세요",
+      "failed-to-update-status": "기능 상태 업데이트에 실패했습니다.",
+      "toggle-enabled": "자동 문서 동기화가 활성화되었습니다.",
+      "toggle-disabled": "자동 문서 동기화가 비활성화되었습니다.",
+      "experimental-feature-set-enabled":
+        "실험적 기능 세트가 활성화되었습니다. 페이지를 다시 로드합니다.",
+      on: "켜짐",
+      off: "꺼짐",
+      "watched-documents": {
+        title: "감시 대상 문서",
+        description:
+          "현재 인스턴스에서 감시되고 있는 모든 문서들입니다. 이 문서들의 내용은 주기적으로 동기화됩니다.",
+        table: {
+          "document-name": "문서 이름",
+          "last-synced": "마지막 동기화",
+          "next-refresh": "다음 새로고침까지 시간",
+          "created-on": "생성일",
+        },
+      },
     },
   },
 };

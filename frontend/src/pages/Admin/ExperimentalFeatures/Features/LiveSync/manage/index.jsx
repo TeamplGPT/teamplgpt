@@ -5,8 +5,10 @@ import * as Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import System from "@/models/system";
 import DocumentSyncQueueRow from "./DocumentSyncQueueRow";
+import { useTranslation } from "react-i18next";
 
 export default function LiveDocumentSyncManager() {
+  const { t } = useTranslation();
   return (
     <div className="w-screen h-screen overflow-hidden bg-theme-bg-container flex">
       <Sidebar />
@@ -18,13 +20,15 @@ export default function LiveDocumentSyncManager() {
           <div className="w-full flex flex-col gap-y-1 pb-6 border-white/10 border-b-2">
             <div className="items-center flex gap-x-4">
               <p className="text-lg leading-6 font-bold text-theme-text-primary">
-                Watched documents
+                {t(
+                  "experimental_features.live-document-sync.watched-documents.title"
+                )}
               </p>
             </div>
             <p className="text-xs leading-[18px] font-base text-theme-text-secondary">
-              These are all the documents that are currently being watched in
-              your instance. The content of these documents will be periodically
-              synced.
+              {t(
+                "experimental_features.live-document-sync.watched-documents.description"
+              )}
             </p>
           </div>
           <div className="overflow-x-auto">
@@ -37,6 +41,7 @@ export default function LiveDocumentSyncManager() {
 }
 
 function WatchedDocumentsContainer() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [queues, setQueues] = useState([]);
 
@@ -68,16 +73,24 @@ function WatchedDocumentsContainer() {
       <thead className="text-theme-text-secondary text-xs leading-[18px] font-bold uppercase border-white/10 border-b">
         <tr>
           <th scope="col" className="px-6 py-3 rounded-tl-lg">
-            Document Name
+            {t(
+              "experimental_features.live-document-sync.watched-documents.table.document-name"
+            )}
           </th>
           <th scope="col" className="px-6 py-3">
-            Last Synced
+            {t(
+              "experimental_features.live-document-sync.watched-documents.table.last-synced"
+            )}
           </th>
           <th scope="col" className="px-6 py-3">
-            Time until next refresh
+            {t(
+              "experimental_features.live-document-sync.watched-documents.table.next-refresh"
+            )}
           </th>
           <th scope="col" className="px-6 py-3">
-            Created On
+            {t(
+              "experimental_features.live-document-sync.watched-documents.table.created-on"
+            )}
           </th>
           <th scope="col" className="px-6 py-3 rounded-tr-lg">
             {" "}

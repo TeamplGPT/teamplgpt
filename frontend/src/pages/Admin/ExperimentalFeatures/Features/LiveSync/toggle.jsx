@@ -4,25 +4,33 @@ import showToast from "@/utils/toast";
 import { ArrowSquareOut } from "@phosphor-icons/react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function LiveSyncToggle({ enabled = false, onToggle }) {
+  const { t } = useTranslation();
   const [status, setStatus] = useState(enabled);
 
   async function toggleFeatureFlag() {
     const updated =
       await System.experimentalFeatures.liveSync.toggleFeature(!status);
     if (!updated) {
-      showToast("Failed to update status of feature.", "error", {
-        clear: true,
-      });
+      showToast(
+        t("experimental_features.live-document-sync.failed-to-update-status"),
+        "error",
+        {
+          clear: true,
+        }
+      );
       return false;
     }
 
     setStatus(!status);
     showToast(
-      `Live document content sync has been ${
-        !status ? "enabled" : "disabled"
-      }.`,
+      t(
+        !status
+          ? "experimental_features.live-document-sync.toggle-enabled"
+          : "experimental_features.live-document-sync.toggle-disabled"
+      ),
       "success",
       { clear: true }
     );
@@ -34,7 +42,7 @@ export default function LiveSyncToggle({ enabled = false, onToggle }) {
       <div className="flex flex-col gap-y-6 max-w-[500px]">
         <div className="flex items-center justify-between">
           <h2 className="text-theme-text-primary text-md font-bold">
-            Automatic Document Content Sync
+            {t("experimental_features.live-document-sync.title")}
           </h2>
           <label className="relative inline-flex cursor-pointer items-center">
             <input
@@ -48,17 +56,13 @@ export default function LiveSyncToggle({ enabled = false, onToggle }) {
         </div>
         <div className="flex flex-col space-y-4">
           <p className="text-theme-text-secondary text-sm">
-            Enable the ability to specify a document to be "watched". Watched
-            document's content will be regularly fetched and updated in
-            AnythingLLM.
+            {t("experimental_features.live-document-sync.description")}
           </p>
           <p className="text-theme-text-secondary text-sm">
-            Watched documents will automatically update in all workspaces they
-            are referenced in at the same time of update.
+            {t("experimental_features.live-document-sync.description2")}
           </p>
           <p className="text-theme-text-secondary text-xs italic">
-            This feature only applies to web-based content, such as websites,
-            Confluence, YouTube, and GitHub files.
+            {t("experimental_features.live-document-sync.description3")}
           </p>
         </div>
       </div>
@@ -68,10 +72,13 @@ export default function LiveSyncToggle({ enabled = false, onToggle }) {
             <a
               href="https://docs.anythingllm.com/beta-preview/active-features/live-document-sync"
               target="_blank"
+              rel="noreferrer"
               className="text-sm text-blue-400 light:text-blue-500 hover:underline flex items-center gap-x-1"
             >
               <ArrowSquareOut size={14} />
-              <span>Feature Documentation and Warnings</span>
+              <span>
+                {t("experimental_features.live-document-sync.read-warning")}
+              </span>
             </a>
           </li>
           <li>
@@ -79,7 +86,10 @@ export default function LiveSyncToggle({ enabled = false, onToggle }) {
               to={paths.experimental.liveDocumentSync.manage()}
               className="text-sm text-blue-400 light:text-blue-500 hover:underline"
             >
-              Manage Watched Documents &rarr;
+              {t(
+                "experimental_features.live-document-sync.manage-watched-documents"
+              )}
+              &rarr;
             </Link>
           </li>
         </ul>

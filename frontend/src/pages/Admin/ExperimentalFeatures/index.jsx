@@ -8,8 +8,10 @@ import { configurableFeatures } from "./features";
 import ModalWrapper from "@/components/ModalWrapper";
 import paths from "@/utils/paths";
 import showToast from "@/utils/toast";
+import { useTranslation } from "react-i18next";
 
 export default function ExperimentalFeatures() {
+  const { t } = useTranslation();
   const [featureFlags, setFeatureFlags] = useState({});
   const [loading, setLoading] = useState(true);
   const [selectedFeature, setSelectedFeature] = useState(
@@ -49,7 +51,9 @@ export default function ExperimentalFeatures() {
         <div className="flex flex-col gap-y-[18px]">
           <div className="text-white flex items-center gap-x-2">
             <Flask size={24} />
-            <p className="text-lg font-medium">Experimental Features</p>
+            <p className="text-lg font-medium">
+              {t("experimental_features.title")}
+            </p>
           </div>
           {/* Feature list */}
           <FeatureList
@@ -75,7 +79,9 @@ export default function ExperimentalFeatures() {
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-white/60">
                   <Flask size={40} />
-                  <p className="font-medium">Select an experimental feature</p>
+                  <p className="font-medium">
+                    {t("experimental_features.select-feature")}
+                  </p>
                 </div>
               )}
             </div>
@@ -109,6 +115,7 @@ function FeatureList({
   handleClick = null,
   activeFeatures = [],
 }) {
+  const { t } = useTranslation();
   if (Object.keys(features).length === 0) return null;
 
   return (
@@ -133,10 +140,12 @@ function FeatureList({
           }`}
           onClick={() => handleClick?.(feature)}
         >
-          <div className="text-sm font-light">{settings.title}</div>
+          <div className="text-sm font-light">{t(settings.title)}</div>
           <div className="flex items-center gap-x-2">
             <div className="text-sm text-theme-text-secondary font-medium">
-              {activeFeatures.includes(settings.key) ? "On" : "Off"}
+              {activeFeatures.includes(settings.key)
+                ? t("experimental_features.live-document-sync.on")
+                : t("experimental_features.live-document-sync.off")}
             </div>
             <CaretRight
               size={14}
@@ -162,6 +171,7 @@ function SelectedFeatureComponent({ feature, settings, refresh }) {
 }
 
 function FeatureVerification({ children }) {
+  const { t } = useTranslation();
   if (
     !window.localStorage.getItem("anythingllm_tos_experimental_feature_set")
   ) {
@@ -173,7 +183,7 @@ function FeatureVerification({ children }) {
         "accepted"
       );
       showToast(
-        "Experimental Feature set enabled. Reloading the page.",
+        t("experimental_features.experimental-feature-set-enabled"),
         "success"
       );
       setTimeout(() => {

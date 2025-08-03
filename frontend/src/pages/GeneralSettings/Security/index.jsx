@@ -164,12 +164,12 @@ function MultiUserMode() {
                       </label>
                       <input
                         name="password"
-                        type="text"
+                        type="password"
                         className="border-none bg-theme-settings-input-bg text-white text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5 placeholder:text-theme-settings-input-placeholder focus:ring-blue-500"
                         placeholder="Your admin password"
                         minLength={8}
                         required={true}
-                        autoComplete="off"
+                        autoComplete="new-password"
                         defaultValue={multiUserModeEnabled ? "********" : ""}
                       />
                     </div>

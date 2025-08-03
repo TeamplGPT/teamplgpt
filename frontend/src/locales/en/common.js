@@ -138,8 +138,13 @@ const TRANSLATIONS = {
       description:
         "Provide the necessary information below to reset your password.",
       "recovery-codes": "Recovery Codes",
+      "recovery-codes-description":
+        "In order to reset your password in the future, you will need these recovery codes. Download or copy your recovery codes to save them.",
+      "recovery-codes-description2":
+        "These recovery codes are only shown once!",
       "recovery-code": "Recovery Code {{index}}",
       "back-to-login": "Back to Login",
+      download: "Download",
     },
   },
 
@@ -722,6 +727,66 @@ const TRANSLATIONS = {
       notRunning:
         "This MCP server is not running - it may be stopped or experiencing an error on startup.",
       toolCallArguments: "Tool call arguments",
+    },
+  },
+
+  users: {
+    title: "Users",
+    description:
+      "These are all the accounts which have an account on this instance. Removing an account will instantly remove their access to this instance.",
+    table: {
+      add: "Add User",
+      edit: "Edit",
+      delete: "Delete User",
+      name: "Username",
+      role: "Role",
+      date: "Date Added",
+      update: "Update User",
+      suspend: "Suspend",
+      unsuspend: "Unsuspend",
+      suspend_confirm:
+        "Are you sure you want to suspend {{username}}?\nAfter you do this they will be logged out and unable to log back into this instance of AnythingLLM until unsuspended by an admin.",
+      unsuspend_confirm:
+        "Are you sure you want to unsuspend {{username}}?\nAfter you do this they will be able to log back into this instance of AnythingLLM.",
+      suspend_success: "User has been suspended.",
+      unsuspend_success: "User is no longer suspended.",
+      delete_confirm:
+        "Are you sure you want to delete {{username}}?\nAfter you do this they will be logged out and unable to use this instance of AnythingLLM.\n\nThis action is irreversible.",
+      delete_success: "User deleted from system.",
+    },
+    role: {
+      admin: "Admin",
+      manager: "Manager",
+      default: "Default",
+      descriptions: {
+        admin1: "Highest user level privilege.",
+        admin2: "Can see and do everything across the system.",
+        manager1:
+          "Can view, create, and delete any workspaces and modify workspace-specific settings.",
+        manager2: "Can create, update and invite new users to the instance.",
+        manager3:
+          "Cannot modify LLM, vectorDB, embedding, or other connections.",
+        default1:
+          "Can only send chats with workspaces they are added to by admin or managers.",
+        default2: "Cannot modify any settings at all.",
+      },
+    },
+    add: {
+      title: "Add user to instance",
+      username: "Username",
+      username_description:
+        "Username must only contain lowercase letters, periods, numbers, underscores, and hyphens with no spaces",
+      password: "Password",
+      password_description: "Password must be at least 8 characters long",
+      bio: "Bio",
+      role: "Role",
+      permissions: "Permissions",
+      "limit-messages-per-day": "Limit messages per day",
+      "limit-messages-per-day-description":
+        "Restrict this user to a number of successful queries or chats within a 24 hour window.",
+      "messages-limit-per-day": "Message limit per day",
+      "after-creating-user":
+        "After creating a user they will need to login with their initial login to get access.",
     },
   },
 
@@ -2357,6 +2422,39 @@ const TRANSLATIONS = {
       "copy-api-key": "Copy API Key",
       "multi-user-warning":
         "Warning: You are in multi-user mode, this API key will allow access to all workspaces associated with your account. Please share it cautiously.",
+    },
+  },
+  experimental_features: {
+    title: "Experimental Features",
+    "live-document-sync": {
+      menu: "Live Document Sync",
+      title: "Automatic Document Content Sync",
+      description: `Enable the ability to specify a document to be "watched". Watched document's content will be regularly fetched and updated in AnythingLLM.`,
+      description2:
+        "Watched documents will automatically update in all workspaces they are referenced in at the same time of update.",
+      description3:
+        "This feature only applies to web-based content, such as websites, Confluence, YouTube, and GitHub files.",
+      "read-warning": "Feature Documentation and Warnings",
+      "manage-watched-documents": "Manage Watched Documents",
+      "select-feature": "Select an experimental feature",
+      "failed-to-update-status": "Failed to update status of feature.",
+      "toggle-enabled": "Live document content sync has been enabled.",
+      "toggle-disabled": "Live document content sync has been disabled.",
+      "experimental-feature-set-enabled":
+        "Experimental Feature set enabled. Reloading the page.",
+      on: "On",
+      off: "Off",
+      "watched-documents": {
+        title: "Watched documents",
+        description:
+          "These are all the documents that are currently being watched in your instance. The content of these documents will be periodically synced.",
+        table: {
+          "document-name": "Document Name",
+          "last-synced": "Last Synced",
+          "next-refresh": "Time until next refresh",
+          "created-on": "Created On",
+        },
+      },
     },
   },
 };
