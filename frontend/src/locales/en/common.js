@@ -790,6 +790,30 @@ const TRANSLATIONS = {
     },
   },
 
+  workspaces: {
+    title: "Instance Workspaces",
+    description:
+      "These are all the workspaces that exist on this instance. Removing a workspace will delete all of its associated chats and settings.",
+    new: "New Workspace",
+    table: {
+      name: "Name",
+      link: "Link",
+      users: "Users",
+      created: "Created On",
+      delete: "Delete",
+      delete_confirm:
+        "Are you sure you want to delete {{name}}?\nAfter you do this it will be unavailable in this instance of AnythingLLM.\n\nThis action is irreversible.",
+    },
+    add: {
+      title: "Create new workspace",
+      "workspaces-name": "Workspaces Name",
+      placeholder: "My Workspace",
+      description:
+        "After creating this workspace only admins will be able to see it. You can add users after it has been created.",
+      create: "Create Workspace",
+    },
+  },
+
   // Workspace Chats
   recorded: {
     title: "Workspace Chats",

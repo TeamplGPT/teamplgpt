@@ -778,6 +778,30 @@ const TRANSLATIONS = {
     },
   },
 
+  workspaces: {
+    title: "인스턴스 워크스페이스",
+    description:
+      "이 인스턴스에 존재하는 모든 워크스페이스입니다. 워크스페이스를 삭제하면 관련된 모든 채팅과 설정이 함께 삭제됩니다.",
+    new: "새 워크스페이스",
+    table: {
+      name: "사용자명",
+      link: "링크",
+      users: "사용자 수",
+      created: "생성일",
+      delete: "삭제",
+      delete_confirm:
+        "{{name}} 워크스페이스를 삭제하시겠습니까?\n삭제하면 이 AnythingLLM 인스턴스에서 사용할 수 없게 됩니다.\n\n이 작업은 되돌릴 수 없습니다.",
+    },
+    add: {
+      title: "새 워크스페이스 생성",
+      "workspaces-name": "워크스페이스 이름",
+      placeholder: "내 워크스페이스",
+      description:
+        "워크스페이스를 생성한 후에는 관리자만 볼 수 있습니다. 생성 후에 사용자를 추가할 수 있습니다.",
+      create: "워크스페이스 생성",
+    },
+  },
+
   // Workspace Chats
   recorded: {
     title: "워크스페이스 채팅",

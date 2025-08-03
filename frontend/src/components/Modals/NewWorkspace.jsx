@@ -29,7 +29,7 @@ export default function NewWorkspaceModal({ hideModal = noop }) {
         <div className="relative p-6 border-b rounded-t border-theme-modal-border">
           <div className="w-full flex gap-x-2 items-center">
             <h3 className="text-xl font-semibold text-white overflow-hidden overflow-ellipsis whitespace-nowrap">
-              {t("new-workspace.title")}
+              {t("workspaces.add.title")}
             </h3>
           </div>
           <button
@@ -52,14 +52,14 @@ export default function NewWorkspaceModal({ hideModal = noop }) {
                     htmlFor="name"
                     className="block mb-2 text-sm font-medium text-white"
                   >
-                    {t("common.workspaces-name")}
+                    {t("workspaces.add.workspaces-name")}
                   </label>
                   <input
                     name="name"
                     type="text"
                     id="name"
                     className="border-none bg-theme-settings-input-bg w-full text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
-                    placeholder={t("new-workspace.placeholder")}
+                    placeholder={t("workspaces.add.placeholder")}
                     required={true}
                     autoComplete="off"
                     autoFocus={true}
