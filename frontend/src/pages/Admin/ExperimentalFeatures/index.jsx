@@ -138,20 +138,34 @@ function FeatureList({
               ? "bg-white/10 light:bg-theme-bg-sidebar  "
               : ""
           }`}
-          onClick={() => handleClick?.(feature)}
+          onClick={() => {
+            if (settings?.href) window.location.replace(settings.href);
+            else handleClick?.(feature);
+          }}
         >
           <div className="text-sm font-light">{t(settings.title)}</div>
           <div className="flex items-center gap-x-2">
-            <div className="text-sm text-theme-text-secondary font-medium">
-              {activeFeatures.includes(settings.key)
-                ? t("experimental_features.live-document-sync.on")
-                : t("experimental_features.live-document-sync.off")}
-            </div>
-            <CaretRight
-              size={14}
-              weight="bold"
-              className="text-theme-text-secondary"
-            />
+            {settings.autoEnabled ? (
+              <>
+                <div className="text-sm text-theme-text-secondary font-medium">
+                  {t("experimental_features.live-document-sync.on")}
+                </div>
+                <div className="w-[14px]" />
+              </>
+            ) : (
+              <>
+                <div className="text-sm text-theme-text-secondary font-medium">
+                  {activeFeatures.includes(settings.key)
+                    ? t("experimental_features.live-document-sync.on")
+                    : t("experimental_features.live-document-sync.off")}
+                </div>
+                <CaretRight
+                  size={14}
+                  weight="bold"
+                  className="text-theme-text-secondary"
+                />
+              </>
+            )}
           </div>
         </div>
       ))}
