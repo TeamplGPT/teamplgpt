@@ -2,18 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { titleCase } from "text-case";
 import Admin from "@/models/admin";
 import { Trash } from "@phosphor-icons/react";
+import { useTranslation } from "react-i18next";
 
 export default function InviteRow({ invite }) {
+  const { t } = useTranslation();
   const rowRef = useRef(null);
   const [status, setStatus] = useState(invite.status);
   const [copied, setCopied] = useState(false);
   const handleDelete = async () => {
-    if (
-      !window.confirm(
-        `Are you sure you want to deactivate this invite?\nAfter you do this it will not longer be useable.\n\nThis action is irreversible.`
-      )
-    )
-      return false;
+    if (!window.confirm(t("invitations.table.delete_confirm"))) return false;
     if (rowRef?.current) {
       rowRef.current.children[0].innerText = "Disabled";
     }
@@ -62,7 +59,9 @@ export default function InviteRow({ invite }) {
                 disabled={copied}
                 className="text-xs font-medium text-blue-300 rounded-lg hover:text-blue-400 hover:underline"
               >
-                {copied ? "Copied" : "Copy Invite Link"}
+                {copied
+                  ? t("invitations.table.copied")
+                  : t("invitations.table.copy-invite-link")}
               </button>
               <button
                 onClick={handleDelete}

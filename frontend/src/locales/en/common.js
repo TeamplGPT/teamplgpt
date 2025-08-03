@@ -844,6 +844,34 @@ const TRANSLATIONS = {
     },
   },
 
+  invitations: {
+    title: "Invitations",
+    description:
+      "Create invitation links for people in your organization to accept and sign up with. Invitations can only be used by a single user.",
+    create: "Create Invite Link",
+    table: {
+      status: "Status",
+      acceptedBy: "Accepted By",
+      createdBy: "Created By",
+      created: "Created",
+      "copy-invite-link": "Copy Invite Link",
+      copied: "Copied",
+      "no-invitations": "No invitations found",
+      delete_confirm:
+        "Are you sure you want to deactivate this invite?\nAfter you do this it will not longer be useable.\n\nThis action is irreversible.",
+    },
+    add: {
+      title: "Create new invite",
+      description:
+        "After creation you will be able to copy the invite and send it to a new user where they can create an account as the default role and automatically be added to workspaces selected.",
+      "auto-add-workspaces": "Auto-add invitee to workspaces",
+      "auto-add-workspaces-description":
+        "You can optionally automatically assign the user to the workspaces below by selecting them. By default, the user will not have any workspaces visible. You can assign workspaces later post-invite acceptance.",
+      create: "Create Invite",
+      copy_success: "Invite link copied to clipboard",
+    },
+  },
+
   customization: {
     interface: {
       title: "UI Preferences",

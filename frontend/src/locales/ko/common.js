@@ -832,6 +832,34 @@ const TRANSLATIONS = {
     },
   },
 
+  invitations: {
+    title: "초대",
+    description:
+      "조직 내 사람들이 수락하고 가입할 수 있는 초대 링크를 생성합니다. 초대장은 한 명의 사용자만 사용할 수 있습니다.",
+    create: "초대 링크 생성",
+    table: {
+      status: "상태",
+      acceptedBy: "수락한 사람",
+      createdBy: "생성한 사람",
+      created: "생성일",
+      "copy-invite-link": "초대 링크 복사",
+      copied: "복사됨",
+      "no-invitations": "초대 링크가 없습니다",
+      delete_confirm:
+        "이 초대를 비활성화하시겠습니까?\n비활성화하면 더 이상 사용할 수 없습니다.\n\n이 작업은 되돌릴 수 없습니다.",
+    },
+    add: {
+      title: "새 초대 생성",
+      description:
+        "생성 후에는 초대 링크를 복사하여 새 사용자에게 보낼 수 있습니다. 사용자는 기본 역할로 계정을 생성하고 선택된 워크스페이스에 자동으로 추가됩니다.",
+      "auto-add-workspaces": "초대받은 사용자를 워크스페이스에 자동 추가",
+      "auto-add-workspaces-description":
+        "아래 워크스페이스를 선택하여 사용자를 자동으로 할당할 수 있습니다. 기본적으로 사용자에게는 워크스페이스가 표시되지 않습니다. 초대 수락 후에도 워크스페이스를 할당할 수 있습니다.",
+      create: "초대 생성",
+      copy_success: "초대 링크가 클립보드에 복사되었습니다",
+    },
+  },
+
   customization: {
     interface: {
       title: "UI 환경 설정",

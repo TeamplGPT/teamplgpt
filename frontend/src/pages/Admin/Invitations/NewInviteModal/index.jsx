@@ -3,8 +3,10 @@ import { X, Copy, Check } from "@phosphor-icons/react";
 import Admin from "@/models/admin";
 import Workspace from "@/models/workspace";
 import showToast from "@/utils/toast";
+import { useTranslation } from "react-i18next";
 
 export default function NewInviteModal({ closeModal, onSuccess }) {
+  const { t } = useTranslation();
   const [invite, setInvite] = useState(null);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -32,7 +34,7 @@ export default function NewInviteModal({ closeModal, onSuccess }) {
       `${window.location.origin}/accept-invite/${invite.code}`
     );
     setCopied(true);
-    showToast("Invite link copied to clipboard", "success", {
+    showToast(t("invitations.add.copy_success"), "success", {
       clear: true,
     });
   };
@@ -71,7 +73,7 @@ export default function NewInviteModal({ closeModal, onSuccess }) {
         <div className="relative p-6 border-b rounded-t border-theme-modal-border">
           <div className="w-full flex gap-x-2 items-center">
             <h3 className="text-xl font-semibold text-white overflow-hidden overflow-ellipsis whitespace-nowrap">
-              Create new invite
+              {t("invitations.add.title")}
             </h3>
           </div>
           <button
@@ -113,10 +115,7 @@ export default function NewInviteModal({ closeModal, onSuccess }) {
                 </div>
               )}
               <p className="text-white text-opacity-60 text-xs md:text-sm">
-                After creation you will be able to copy the invite and send it
-                to a new user where they can create an account as the{" "}
-                <b>default</b> role and automatically be added to workspaces
-                selected.
+                {t("invitations.add.description")}
               </p>
             </div>
 
@@ -128,13 +127,10 @@ export default function NewInviteModal({ closeModal, onSuccess }) {
                       htmlFor="workspaces"
                       className="block text-sm font-medium text-white"
                     >
-                      Auto-add invitee to workspaces
+                      {t("invitations.add.auto-add-workspaces")}
                     </label>
                     <p className="text-white text-opacity-60 text-xs">
-                      You can optionally automatically assign the user to the
-                      workspaces below by selecting them. By default, the user
-                      will not have any workspaces visible. You can assign
-                      workspaces later post-invite acceptance.
+                      {t("invitations.add.auto-add-workspaces-description")}
                     </p>
                   </div>
 
@@ -160,13 +156,13 @@ export default function NewInviteModal({ closeModal, onSuccess }) {
                     type="button"
                     className="transition-all duration-300 text-white hover:bg-zinc-700 px-4 py-2 rounded-lg text-sm mr-2"
                   >
-                    Cancel
+                    {t("common.cancel")}
                   </button>
                   <button
                     type="submit"
                     className="transition-all duration-300 bg-white text-black hover:opacity-60 px-4 py-2 rounded-lg text-sm"
                   >
-                    Create Invite
+                    {t("invitations.add.create")}
                   </button>
                 </>
               ) : (
@@ -175,7 +171,7 @@ export default function NewInviteModal({ closeModal, onSuccess }) {
                   type="button"
                   className="transition-all duration-300 text-white hover:bg-zinc-700 px-4 py-2 rounded-lg text-sm"
                 >
-                  Close
+                  {t("common.close")}
                 </button>
               )}
             </div>
