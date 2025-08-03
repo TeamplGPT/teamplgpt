@@ -25,7 +25,7 @@ const LLM_DEFAULT = {
   value: "default",
   logo: AnythingLLMIcon,
   options: () => <React.Fragment />,
-  description: "Use the system LLM preference for this workspace.",
+  description: "llm.providers.llm_default.description",
   requiredConfig: [],
 };
 
@@ -150,7 +150,7 @@ export default function WorkspaceLLMSelection({
                   {selectedLLMObject.name}
                 </div>
                 <div className="mt-1 text-xs text-description">
-                  {selectedLLMObject.description}
+                  {t(selectedLLMObject.description)}
                 </div>
               </div>
             </div>

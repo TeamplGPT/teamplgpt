@@ -76,6 +76,8 @@ const TRANSLATIONS = {
     search: "검색",
     learn_more: "자세히 보기",
     rows_per_page: "페이지당 행 수",
+    "hide-sidebar": "사이드바 숨기기",
+    "show-sidebar": "사이드바 보이기",
   },
 
   // Setting Sidebar menu items.
@@ -992,6 +994,11 @@ const TRANSLATIONS = {
       "이것은 채팅과 임베딩을 하기 위한 선호하는 LLM 제공자의 인증입니다. 이 키가 현재 활성 상태이고 정확해야 AnythingLLM이 제대로 작동합니다.",
     provider: "LLM 제공자",
     providers: {
+      llm_default: {
+        name: "시스템 기본값",
+        description:
+          "이 워크스페이스에 대한 시스템 LLM 기본 설정을 사용합니다.",
+      },
       azure_openai: {
         description:
           "Azure 서비스에서 호스팅되는 OpenAI의 엔터프라이즈 옵션입니다.",
@@ -2446,6 +2453,8 @@ const TRANSLATIONS = {
   },
   experimental_features: {
     title: "실험적 기능",
+    on: "켜짐",
+    off: "꺼짐",
     "live-document-sync": {
       menu: "실시간 문서 동기화",
       title: "자동 문서 동기화",
@@ -2460,10 +2469,6 @@ const TRANSLATIONS = {
       "failed-to-update-status": "기능 상태 업데이트에 실패했습니다.",
       "toggle-enabled": "자동 문서 동기화가 활성화되었습니다.",
       "toggle-disabled": "자동 문서 동기화가 비활성화되었습니다.",
-      "experimental-feature-set-enabled":
-        "실험적 기능 세트가 활성화되었습니다. 페이지를 다시 로드합니다.",
-      on: "켜짐",
-      off: "꺼짐",
       "watched-documents": {
         title: "감시 대상 문서",
         description:
@@ -2475,6 +2480,35 @@ const TRANSLATIONS = {
           "created-on": "생성일",
         },
       },
+    },
+    terms: {
+      title: "실험적 기능 사용 약관",
+      intro:
+        "AnythingLLM의 실험적 기능은 저희가 시범 운영 중인 기능으로 <1>선택 사항</1>입니다. 저희는 모든 기능 승인 전에 잠재적인 우려사항이 있을 경우 사전에 조건을 제시하거나 경고를 드립니다.",
+      usage_warning:
+        "이 페이지의 모든 기능 사용은 다음과 같은 가능성을 포함하되 이에 국한되지 않는 결과를 초래할 수 있습니다.",
+      warninglist1: "데이터 손실.",
+      warninglist2: "결과 품질 변화.",
+      warninglist3: "저장 공간 증가.",
+      warninglist4: "리소스 사용량 증가.",
+      warninglist5: "연결된 LLM 또는 임베딩 제공업체의 비용 또는 사용량 증가.",
+      warninglist6: "AnythingLLM 사용 시 잠재적인 버그나 문제 발생.",
+      conditions:
+        "실험적 기능 사용 시 다음과 같은 포괄적이지 않은 조건 목록도 함께 적용됩니다.",
+      conditionslist1: "기능이 향후 업데이트에서 존재하지 않을 수 있습니다.",
+      conditionslist2: "사용 중인 기능이 현재 안정적이지 않습니다.",
+      conditionslist3:
+        "이 기능은 향후 버전, 구성 또는 AnythingLLM 구독에서 사용할 수 없을 수 있습니다.",
+      conditionslist4:
+        "베타 기능 사용 시 귀하의 개인정보 설정은 <1>반드시 준수됩니다</1>.",
+      conditionslist5: "이러한 조건들은 향후 업데이트에서 변경될 수 있습니다.",
+      access_modal: "모든 기능에 대한 접근은 이 모달의 승인이 필요합니다.",
+      access_more_info:
+        "더 자세한 내용을 원하시면 <1>docs.anythingllm.com</1>을 참조하거나 <2>team@mintplexlabs.com</2>으로 이메일을 보내주세요.",
+      reject_and_close: "거부 및 닫기",
+      i_understand: "이해했습니다",
+      "experimental-feature-set-enabled":
+        "실험적 기능 세트가 활성화되었습니다. 페이지를 다시 로드합니다.",
     },
   },
 };

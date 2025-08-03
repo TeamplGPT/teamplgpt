@@ -8,6 +8,7 @@ import { X, Gear } from "@phosphor-icons/react";
 import System from "@/models/system";
 import showToast from "@/utils/toast";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const NO_SETTINGS_NEEDED = ["default"];
 export default function WorkspaceLLM({
@@ -17,6 +18,7 @@ export default function WorkspaceLLM({
   checked,
   onClick,
 }) {
+  const { t } = useTranslation();
   const { isOpen, openModal, closeModal } = useModal();
   const { name, value, logo, description } = llm;
   const [currentSettings, setCurrentSettings] = useState(settings);
@@ -71,7 +73,7 @@ export default function WorkspaceLLM({
             />
             <div className="flex flex-col">
               <div className="text-sm font-semibold text-white">{name}</div>
-              <div className="mt-1 text-xs text-white/60">{description}</div>
+              <div className="mt-1 text-xs text-white/60">{t(description)}</div>
             </div>
           </div>
           {checked && !NO_SETTINGS_NEEDED.includes(value) && (

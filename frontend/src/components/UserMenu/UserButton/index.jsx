@@ -75,14 +75,14 @@ export default function UserButton() {
             {mode === "multi" && !!user && (
               <button
                 onClick={handleOpenAccountModal}
-                className="border-none text-white hover:bg-theme-action-menu-item-hover w-full text-left px-4 py-1.5 rounded-md"
+                className="border-none text-white hover:bg-theme-action-menu-item-hover w-full text-left px-4 py-1.5 rounded-md whitespace-nowrap"
               >
                 {t("profile_settings.account")}
               </button>
             )}
             <a
               href={supportEmail}
-              className="text-white hover:bg-theme-action-menu-item-hover w-full text-left px-4 py-1.5 rounded-md"
+              className="text-white hover:bg-theme-action-menu-item-hover w-full text-left px-4 py-1.5 rounded-md whitespace-nowrap"
             >
               {t("profile_settings.support")}
             </a>
@@ -94,7 +94,7 @@ export default function UserButton() {
                 window.location.replace(paths.home());
               }}
               type="button"
-              className="text-white hover:bg-theme-action-menu-item-hover w-full text-left px-4 py-1.5 rounded-md"
+              className="text-white hover:bg-theme-action-menu-item-hover w-full text-left px-4 py-1.5 rounded-md whitespace-nowrap"
             >
               {t("profile_settings.signout")}
             </button>

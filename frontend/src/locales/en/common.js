@@ -78,6 +78,8 @@ const TRANSLATIONS = {
     search: "Search",
     learn_more: "Learn more",
     rows_per_page: "Rows per page",
+    "hide-sidebar": "Hide Sidebar",
+    "show-sidebar": "Show Sidebar",
   },
 
   // Setting Sidebar menu items.
@@ -1007,6 +1009,10 @@ const TRANSLATIONS = {
       "These are the credentials and settings for your preferred LLM chat & embedding provider. It is important that these keys are current and correct, or else AnythingLLM will not function properly.",
     provider: "LLM Provider",
     providers: {
+      llm_default: {
+        name: "System default",
+        description: "Use the system LLM preference for this workspace.",
+      },
       azure_openai: {
         description:
           "The enterprise option of OpenAI hosted on Azure services.",
@@ -2473,6 +2479,8 @@ const TRANSLATIONS = {
   },
   experimental_features: {
     title: "Experimental Features",
+    on: "On",
+    off: "Off",
     "live-document-sync": {
       menu: "Live Document Sync",
       title: "Automatic Document Content Sync",
@@ -2487,10 +2495,6 @@ const TRANSLATIONS = {
       "failed-to-update-status": "Failed to update status of feature.",
       "toggle-enabled": "Live document content sync has been enabled.",
       "toggle-disabled": "Live document content sync has been disabled.",
-      "experimental-feature-set-enabled":
-        "Experimental Feature set enabled. Reloading the page.",
-      on: "On",
-      off: "Off",
       "watched-documents": {
         title: "Watched documents",
         description:
@@ -2502,6 +2506,36 @@ const TRANSLATIONS = {
           "created-on": "Created On",
         },
       },
+    },
+    terms: {
+      title: "Terms of use for experimental features",
+      intro:
+        "Experimental features of AnythingLLM are features that we are piloting and are <1>opt-in</1>. We proactively will condition or warn you on any potential concerns should any exist prior to approval of any feature.",
+      usage_warning:
+        "Use of any feature on this page can result in, but not limited to, the following possibilities.",
+      warninglist1: "Loss of data.",
+      warninglist2: "Change in quality of results.",
+      warninglist3: "Increased storage.",
+      warninglist4: "Increased resource consumption.",
+      warninglist5:
+        "Increased cost or use of any connected LLM or embedding provider.",
+      warninglist6: "Potential bugs or issues using AnythingLLM.",
+      conditions:
+        "Use of an experimental feature also comes with the following list of non-exhaustive conditions.",
+      conditionslist1: "Feature may not exist in future updates.",
+      conditionslist2: "The feature being used is not currently stable.",
+      conditionslist3:
+        "The feature may not be available in future versions, configurations, or subscriptions of AnythingLLM.",
+      conditionslist4:
+        "Your privacy settings <1>will be honored</1> with use of any beta feature.",
+      conditionslist5: "These conditions may change in future updates.",
+      access_modal: "Access to any features requires approval of this modal.",
+      access_more_info:
+        "If you would like to read more you can refer to <1>docs.anythingllm.com</1> or email <2>team@mintplexlabs.com</2>.",
+      reject_and_close: "Reject & close",
+      i_understand: "I understand",
+      "experimental-feature-set-enabled":
+        "Experimental Feature set enabled. Reloading the page.",
     },
   },
 };
