@@ -197,7 +197,7 @@ function NewWorkspaceButton({ user, showNewWsModal }) {
       >
         <Plus className="h-5 w-5" />
         <p className="text-sidebar text-sm font-semibold">
-          {t("new-workspace.title")}
+          {t("workspaces.new")}
         </p>
       </button>
     </div>
