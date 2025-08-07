@@ -346,7 +346,15 @@ const TRANSLATIONS = {
       title: "시스템 프롬프트",
       description:
         "이 워크스페이스에서 사용할 프롬프트입니다. AI가 응답을 생성하기 위해 문맥과 지침을 정의합니다. AI가 질문에 대하여 정확한 응답을 생성할 수 있도록 신중하게 프롬프트를 제공해야 합니다.",
+      variables_instruction_start: "다음과 같은",
+      variables_link_text: "프롬프트 변수",
+      variables_instruction_end: "를 삽입할 수 있습니다:",
+      more: "더 보기...",
+      clear: "지우기",
+      publish: "커뮤니티 허브에 게시",
       history: {
+        hide: "기록 숨기기",
+        view: "기록 보기",
         title: "시스템 프롬프트 기록",
         clearAll: "전체 삭제",
         noHistory: "저장된 시스템 프롬프트 기록이 없습니다",
@@ -358,6 +366,8 @@ const TRANSLATIONS = {
           "모든 기록을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
         expand: "확장",
       },
+      default:
+        "아래의 대화 내용, 관련 문맥, 그리고 추가 질문을 참고하여 사용자가 현재 묻는 질문에 대한 답변만을 작성해 주세요. 위의 정보와 사용자의 지침을 바탕으로 정확하고 간결하게 답변만 제공해 주세요.",
     },
     refusal: {
       title: "쿼리 모드 거부 응답 메시지",
@@ -367,6 +377,8 @@ const TRANSLATIONS = {
       "tooltip-title": "왜 이 메시지가 표시되나요?",
       "tooltip-description":
         "현재 쿼리 모드에서는 문서의 정보만을 사용합니다. 더 자유로운 대화를 원하시면 채팅 모드로 전환하거나, 채팅 모드에 대한 자세한 내용은 문서를 참고하세요.",
+      response:
+        "이 워크스페이스에는 해당 질문에 답변할 수 있는 관련 정보가 없습니다.",
     },
     temperature: {
       title: "LLM 온도",
@@ -380,6 +392,15 @@ const TRANSLATIONS = {
   // Vector Database
   "vector-workspace": {
     identifier: "벡터 데이터베이스 식별자",
+    search: {
+      title: "검색 선호도",
+      default: "기본값",
+      default_description:
+        "가장 빠른 성능을 제공하지만, 가장 관련성 높은 결과를 반환하지 않을 수 있어 모델이 잘못된 답변(환각)을 할 수 있습니다.",
+      rerank: "정확도 최적화",
+      rerank_description:
+        "LLM 응답이 더 오래 걸릴 수 있지만, 응답이 더 정확하고 관련성 높은 결과를 반환합니다.",
+    },
     snippets: {
       title: "최대 문맥 조각",
       description:
@@ -801,6 +822,11 @@ const TRANSLATIONS = {
       description:
         "워크스페이스를 생성한 후에는 관리자만 볼 수 있습니다. 생성 후에 사용자를 추가할 수 있습니다.",
       create: "워크스페이스 생성",
+    },
+    update: {
+      button: "워크스페이스 업데이트",
+      updating: "업데이트 중...",
+      "update-success": "워크스페이스가 업데이트되었습니다!",
     },
   },
 

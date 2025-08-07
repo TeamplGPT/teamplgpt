@@ -354,7 +354,15 @@ const TRANSLATIONS = {
       title: "System Prompt",
       description:
         "The prompt that will be used on this workspace. Define the context and instructions for the AI to generate a response. You should to provide a carefully crafted prompt so the AI can generate a relevant and accurate response.",
+      variables_instruction_start: "You can insert",
+      variables_link_text: "prompt variables",
+      variables_instruction_end: "like:",
+      more: "more...",
+      clear: "Clear",
+      publish: "Publish to Community Hub",
       history: {
+        hide: "Hide History",
+        view: "View History",
         title: "System Prompt History",
         clearAll: "Clear All",
         noHistory: "No system prompt history available",
@@ -366,6 +374,8 @@ const TRANSLATIONS = {
           "Are you sure you want to clear all history? This action cannot be undone.",
         expand: "Expand",
       },
+      default:
+        "Given the following conversation, relevant context, and a follow up question, reply with an answer to the current question the user is asking. Return only your response to the question given the above information following the users instructions as needed.",
     },
     refusal: {
       title: "Query mode refusal response",
@@ -376,6 +386,8 @@ const TRANSLATIONS = {
       "tooltip-title": "Why am I seeing this?",
       "tooltip-description":
         "You are in query mode, which only uses information from your documents. Switch to chat mode for more flexible conversations, or click here to visit our documentation to learn more about chat modes.",
+      response:
+        "There is no relevant information in this workspace to answer your query.",
     },
     temperature: {
       title: "LLM Temperature",
@@ -390,6 +402,15 @@ const TRANSLATIONS = {
   // Vector Database
   "vector-workspace": {
     identifier: "Vector database identifier",
+    search: {
+      title: "Search Preference",
+      default: "Default",
+      default_description:
+        "This is the fastest performance, but may not return the most relevant results leading to model hallucinations.",
+      rerank: "Accuracy optimized",
+      rerank_description:
+        "LLM responses may take longer to generate, but your responses will be more accurate and relevant.",
+    },
     snippets: {
       title: "Max Context Snippets",
       description:
@@ -813,6 +834,11 @@ const TRANSLATIONS = {
       description:
         "After creating this workspace only admins will be able to see it. You can add users after it has been created.",
       create: "Create Workspace",
+    },
+    update: {
+      button: "Update Workspace",
+      updating: "Updating...",
+      "update-success": "Workspace updated!",
     },
   },
 

@@ -102,14 +102,14 @@ export default function ChatPromptSettings({ workspace, setHasChanges }) {
             {t("chat.prompt.description")}
           </p>
           <p className="text-white text-opacity-60 text-xs font-medium mb-2">
-            You can insert{" "}
+            {t("chat.prompt.variables_instruction_start")}{" "}
             <Link
               to={paths.settings.systemPromptVariables()}
               className="text-primary-button"
             >
-              prompt variables
+              {t("chat.prompt.variables_link_text")}
             </Link>{" "}
-            like:{" "}
+            {t("chat.prompt.variables_instruction_end")}{" "}
             {availableVariables.slice(0, 3).map((v, i) => (
               <Fragment key={v.key}>
                 <span className="bg-theme-settings-input-bg px-1 py-0.5 rounded">
@@ -123,7 +123,7 @@ export default function ChatPromptSettings({ workspace, setHasChanges }) {
                 to={paths.settings.systemPromptVariables()}
                 className="text-primary-button"
               >
-                +{availableVariables.length - 3} more...
+                +{availableVariables.length - 3} {t("chat.prompt.more")}
               </Link>
             )}
           </p>
@@ -140,7 +140,9 @@ export default function ChatPromptSettings({ workspace, setHasChanges }) {
               setShowPromptHistory(!showPromptHistory);
             }}
           >
-            {showPromptHistory ? "Hide History" : "View History"}
+            {showPromptHistory
+              ? t("chat.prompt.history.hide")
+              : t("chat.prompt.history.view")}
           </button>
           <div className="relative w-full">
             <span
@@ -206,7 +208,7 @@ export default function ChatPromptSettings({ workspace, setHasChanges }) {
                   onClick={() => handleRestore(DEFAULT_PROMPT)}
                   className="text-theme-text-primary hover:text-white light:hover:text-black text-xs font-medium"
                 >
-                  Clear
+                  {t("chat.prompt.clear")}
                 </button>
                 <PublishPromptCTA
                   hidden={
@@ -235,6 +237,7 @@ export default function ChatPromptSettings({ workspace, setHasChanges }) {
 }
 
 function PublishPromptCTA({ hidden = false, onClick }) {
+  const { t } = useTranslation();
   if (hidden) return null;
   return (
     <button
@@ -242,7 +245,7 @@ function PublishPromptCTA({ hidden = false, onClick }) {
       onClick={onClick}
       className="border-none text-primary-button hover:text-white light:hover:text-black text-xs font-medium"
     >
-      Publish to Community Hub
+      {t("chat.prompt.publish")}
     </button>
   );
 }

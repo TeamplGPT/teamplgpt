@@ -7,8 +7,10 @@ import SuggestedChatMessages from "./SuggestedChatMessages";
 import DeleteWorkspace from "./DeleteWorkspace";
 import WorkspacePfp from "./WorkspacePfp";
 import CTAButton from "@/components/lib/CTAButton";
+import { useTranslation } from "react-i18next";
 
 export default function GeneralInfo({ slug }) {
+  const { t } = useTranslation();
   const [workspace, setWorkspace] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -35,7 +37,9 @@ export default function GeneralInfo({ slug }) {
       data
     );
     if (!!updatedWorkspace) {
-      showToast("Workspace updated!", "success", { clear: true });
+      showToast(t("workspaces.update.update-success"), "success", {
+        clear: true,
+      });
     } else {
       showToast(`Error: ${message}`, "error", { clear: true });
     }
@@ -54,7 +58,9 @@ export default function GeneralInfo({ slug }) {
         {hasChanges && (
           <div className="absolute top-0 right-0">
             <CTAButton type="submit">
-              {saving ? "Updating..." : "Update Workspace"}
+              {saving
+                ? t("workspaces.update.updating")
+                : t("workspaces.update.button")}
             </CTAButton>
           </div>
         )}
