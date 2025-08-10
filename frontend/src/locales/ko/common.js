@@ -257,11 +257,6 @@ const TRANSLATIONS = {
     },
   },
 
-  "new-workspace": {
-    title: "새 워크스페이스",
-    placeholder: "내 워크스페이스",
-  },
-
   // Workspace Settings menu items
   "workspaces—settings": {
     general: "일반 설정",
@@ -319,6 +314,14 @@ const TRANSLATIONS = {
       description:
         "이 워크스페이스에서 사용할 특정 채팅 모델입니다. 비어 있으면 시스템 LLM 기본 설정을 사용합니다.",
       wait: "-- 모델 기다리는 중 --",
+    },
+    settings: {
+      title: "설정",
+      "edit-settings": "설정 수정",
+      setupMessage:
+        "{{name}}을(를) 이 워크스페이스의 LLM으로 사용하려면 먼저 설정해야 합니다.",
+      save: "{{name}} 설정 저장",
+      saveError: "{{name}} 설정 저장에 실패했습니다: {{error}}",
     },
     mode: {
       title: "채팅 모드",
@@ -426,6 +429,19 @@ const TRANSLATIONS = {
     },
   },
 
+  members: {
+    username: "사용자 이름",
+    role: "역할",
+    dateAdded: "추가된 날짜",
+    "manage-members": "사용자 관리",
+    users: "사용자",
+    search: "사용자 검색",
+    sellectall: "모두 선택",
+    unselect: "선택 해제",
+    "no-members": "워크스페이스 구성원이 없습니다",
+    "users-updated-successfully": "사용자 업데이트 완료!",
+  },
+
   // Agent Configuration
   agent: {
     "performance-warning":
@@ -435,6 +451,21 @@ const TRANSLATIONS = {
       description:
         "이 워크스페이스의 @agent 에이전트에 사용할 특정 LLM 제공자 및 모델입니다.",
     },
+    settings: {
+      title: "에이전트 설정",
+      "edit-settings": "에이전트 설정 수정",
+      setupMessage:
+        "{{name}}을(를) 이 워크스페이스의 에이전트 LLM으로 사용하려면 먼저 설정해야 합니다.",
+      save: "{{name}} 에이전트 설정 저장",
+    },
+    default:
+      "별도로 지정하지 않는 한 에이전트는 워크스페이스 또는 시스템 LLM을 사용합니다.",
+    updatingAgent: "에이전트 업데이트 중...",
+    updateWorkspaceAgent: "워크스페이스 에이전트 업데이트",
+    "update-success": "워크스페이스 에이전트 업데이트 완료!",
+    configureAgentSkills: "에이전트 스킬 구성",
+    configureAgentSkillsDescription:
+      "특정 스킬을 활성화하거나 비활성화하여 기본 에이전트의 기능을 사용자 정의하고 향상시킬 수 있습니다. 이 설정은 모든 워크스페이스에 적용됩니다.",
     mode: {
       chat: {
         title: "워크스페이스 에이전트 채팅 모델",

@@ -54,8 +54,7 @@ const LLM_DEFAULT = {
   value: "none",
   logo: AnythingLLMIcon,
   options: () => <React.Fragment />,
-  description:
-    "Agents will use the workspace or system LLM unless otherwise specified.",
+  description: "agent.default",
   requiredConfig: [],
 };
 
@@ -132,7 +131,7 @@ export default function AgentLLMSelection({
           />
         )}
         {searchMenuOpen ? (
-          <div className="absolute top-0 left-0 w-full max-w-[640px] max-h-[310px] min-h-[64px] bg-theme-settings-input-bg rounded-lg flex flex-col justify-between cursor-pointer border-2 border-primary-button z-20">
+          <div className="absolute top-0 left-0 w-full max-w-[640px] max-h-[610px] min-h-[64px] bg-theme-settings-input-bg rounded-lg flex flex-col justify-between cursor-pointer border-2 border-primary-button z-20">
             <div className="w-full flex flex-col gap-y-1">
               <div className="flex items-center sticky top-0 z-10 border-b border-[#9CA3AF] mx-4 bg-theme-settings-input-bg">
                 <MagnifyingGlass
@@ -144,7 +143,7 @@ export default function AgentLLMSelection({
                   type="text"
                   name="llm-search"
                   autoComplete="off"
-                  placeholder="Search available LLM providers"
+                  placeholder={t("chat.llm.search")}
                   className="border-none -ml-4 my-2 bg-transparent z-20 pl-12 h-[38px] w-full px-4 py-1 text-sm outline-none text-theme-text-primary placeholder:text-theme-text-primary placeholder:font-medium"
                   onChange={(e) => setSearchQuery(e.target.value)}
                   ref={searchInputRef}
@@ -159,7 +158,7 @@ export default function AgentLLMSelection({
                   onClick={handleXButton}
                 />
               </div>
-              <div className="flex-1 pl-4 pr-2 flex flex-col gap-y-1 overflow-y-auto white-scrollbar pb-4 max-h-[245px]">
+              <div className="flex-1 pl-4 pr-2 flex flex-col gap-y-1 overflow-y-auto white-scrollbar pb-4 max-h-[545px]">
                 {filteredLLMs.map((llm) => {
                   return (
                     <AgentLLMItem
@@ -192,7 +191,7 @@ export default function AgentLLMSelection({
                   {selectedLLMObject.name}
                 </div>
                 <div className="mt-1 text-xs text-description">
-                  {selectedLLMObject.description}
+                  {t(selectedLLMObject.description)}
                 </div>
               </div>
             </div>

@@ -262,11 +262,6 @@ const TRANSLATIONS = {
     },
   },
 
-  "new-workspace": {
-    title: "New Workspace",
-    placeholder: "My Workspace",
-  },
-
   // Workspace Settings menu items
   "workspaces—settings": {
     general: "General Settings",
@@ -326,6 +321,14 @@ const TRANSLATIONS = {
       description:
         "The specific chat model that will be used for this workspace. If empty, will use the system LLM preference.",
       wait: "-- waiting for models --",
+    },
+    settings: {
+      title: "Settings",
+      "edit-settings": "Edit Settings",
+      setupMessage:
+        "To use {{name}} as this workspace's LLM you need to set it up first.",
+      save: "Save {{name}} settings",
+      saveError: "Failed to save {{name}} settings: {{error}}",
     },
     mode: {
       title: "Chat mode",
@@ -436,6 +439,19 @@ const TRANSLATIONS = {
     },
   },
 
+  members: {
+    username: "Username",
+    role: "Role",
+    dateAdded: "Date Added",
+    "manage-members": "Manage Users",
+    users: "Users",
+    search: "Search for a user",
+    sellectall: "Select all",
+    unselect: "Unselect",
+    "no-members": "No workspace members",
+    "users-updated-successfully": "Users updated successfully.",
+  },
+
   // Agent Configuration
   agent: {
     "performance-warning":
@@ -445,6 +461,21 @@ const TRANSLATIONS = {
       description:
         "The specific LLM provider & model that will be used for this workspace's @agent agent.",
     },
+    settings: {
+      title: "Agent Settings",
+      "edit-settings": "Edit Agent Settings",
+      setupMessage:
+        "To use {{name}} as this workspace's agent LLM you need to set it up first.",
+      save: "Save {{name}} Agent Settings",
+    },
+    default:
+      "Agents will use the workspace or system LLM unless otherwise specified.",
+    updatingAgent: "Updating agent...",
+    updateWorkspaceAgent: "Update workspace agent",
+    "update-success": "Workspace agent updated!",
+    configureAgentSkills: "Configure Agent Skills",
+    configureAgentSkillsDescription:
+      "Customize and enhance the default agent's capabilities by enabling or disabling specific skills. These settings will be applied across all workspaces.",
     mode: {
       chat: {
         title: "Workspace Agent Chat model",

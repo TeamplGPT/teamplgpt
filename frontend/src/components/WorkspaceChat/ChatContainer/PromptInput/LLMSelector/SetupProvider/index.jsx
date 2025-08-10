@@ -12,6 +12,7 @@ export default function SetupProvider({
   settings,
   llmProvider,
 }) {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   async function handleUpdate(e) {
@@ -23,7 +24,7 @@ export default function SetupProvider({
     const { error } = await System.updateSystem(data);
     if (error) {
       showToast(
-        `Failed to save ${llmProvider.name} settings: ${error}`,
+        t("chat.settings.saveError", { name: llmProvider.name, error: error }),
         "error"
       );
       return;
@@ -41,7 +42,7 @@ export default function SetupProvider({
           <div className="relative p-6 border-b rounded-t border-theme-modal-border">
             <div className="w-full flex gap-x-2 items-center">
               <h3 className="text-xl font-semibold text-white overflow-hidden overflow-ellipsis whitespace-nowrap">
-                {llmProvider.name} Settings
+                {llmProvider.name} {t("chat.settings.title")}
               </h3>
             </div>
             <button
@@ -56,8 +57,7 @@ export default function SetupProvider({
             <div className="px-7 py-6">
               <div className="space-y-6 max-h-[60vh] overflow-y-auto p-1">
                 <p className="text-sm text-white/60">
-                  To use {llmProvider.name} as this workspace's LLM you need to
-                  set it up first.
+                  {t("chat.settings.setupMessage", { name: llmProvider.name })}
                 </p>
                 <div>
                   {llmProvider.options(settings, { credentialsOnly: true })}
@@ -70,14 +70,14 @@ export default function SetupProvider({
                 onClick={closeModal}
                 className="transition-all duration-300 text-white hover:bg-zinc-700 px-4 py-2 rounded-lg text-sm"
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 type="submit"
                 form="provider-form"
                 className="transition-all duration-300 bg-white text-black hover:opacity-60 px-4 py-2 rounded-lg text-sm"
               >
-                Save settings
+                {t("chat.settings.save", { name: llmProvider.name })}
               </button>
             </div>
           </form>

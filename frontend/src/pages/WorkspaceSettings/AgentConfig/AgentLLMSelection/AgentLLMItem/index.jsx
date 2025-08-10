@@ -8,6 +8,7 @@ import { X, Gear } from "@phosphor-icons/react";
 import System from "@/models/system";
 import showToast from "@/utils/toast";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const NO_SETTINGS_NEEDED = ["default", "none"];
 export default function AgentLLMItem({
@@ -17,6 +18,7 @@ export default function AgentLLMItem({
   checked,
   onClick,
 }) {
+  const { t } = useTranslation();
   const { isOpen, openModal, closeModal } = useModal();
   const { name, value, logo, description } = llm;
   const [currentSettings, setCurrentSettings] = useState(settings);
@@ -71,7 +73,7 @@ export default function AgentLLMItem({
             />
             <div className="flex flex-col">
               <div className="text-sm font-semibold text-white">{name}</div>
-              <div className="mt-1 text-xs text-white/60">{description}</div>
+              <div className="mt-1 text-xs text-white/60">{t(description)}</div>
             </div>
           </div>
           {checked &&
@@ -82,8 +84,8 @@ export default function AgentLLMItem({
                   e.preventDefault();
                   openModal();
                 }}
-                className="border-none p-2 text-white/60 hover:text-white hover:bg-theme-bg-hover rounded-md transition-all duration-300"
-                title="Edit Settings"
+                className="border-none p-2 text-white/60 hover:text-green-500 hover:bg-theme-bg-hover rounded-md transition-all duration-300"
+                title={t("agent.settings.edit-settings")}
               >
                 <Gear size={20} weight="bold" />
               </button>
@@ -110,6 +112,7 @@ function SetupProvider({
   postSubmit,
   settings,
 }) {
+  const { t } = useTranslation();
   if (!isOpen) return null;
   const LLMOption = availableLLMs.find((llm) => llm.value === provider);
   if (!LLMOption) return null;
@@ -140,7 +143,7 @@ function SetupProvider({
           <div className="relative p-6 border-b rounded-t border-theme-modal-border">
             <div className="w-full flex gap-x-2 items-center">
               <h3 className="text-xl font-semibold text-white overflow-hidden overflow-ellipsis whitespace-nowrap">
-                {LLMOption.name} Settings
+                {LLMOption.name} {t("agent.settings.title")}
               </h3>
             </div>
             <button
@@ -155,8 +158,7 @@ function SetupProvider({
             <div className="px-7 py-6">
               <div className="space-y-6 max-h-[60vh] overflow-y-auto p-1">
                 <p className="text-sm text-white/60">
-                  To use {LLMOption.name} as this workspace's agent LLM you need
-                  to set it up first.
+                  {t("agent.settings.setupMessage", { name: LLMOption.name })}
                 </p>
                 <div>
                   {LLMOption.options(settings, { credentialsOnly: true })}
@@ -169,14 +171,14 @@ function SetupProvider({
                 onClick={closeModal}
                 className="transition-all duration-300 text-white hover:bg-zinc-700 px-4 py-2 rounded-lg text-sm"
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 type="submit"
                 form="provider-form"
                 className="transition-all duration-300 bg-white text-black hover:opacity-60 px-4 py-2 rounded-lg text-sm"
               >
-                Save {LLMOption.name} settings
+                {t("agent.settings.save", { name: LLMOption.name })}
               </button>
             </div>
           </form>
