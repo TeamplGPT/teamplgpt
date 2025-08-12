@@ -25,6 +25,7 @@ function WorkspaceDirectory({
   saveChanges,
   embeddingCosts,
   movedItems,
+  setMovedItems,
 }) {
   const { t } = useTranslation();
   const [selectedItems, setSelectedItems] = useState({});
@@ -56,30 +57,90 @@ function WorkspaceDirectory({
   };
 
   const removeSelectedItems = async () => {
-    setLoading(true);
-    setLoadingMessage("Removing selected files from workspace");
+    const selectedIds = Object.keys(selectedItems);
 
-    const itemsToRemove = Object.keys(selectedItems).map((itemId) => {
-      const folder = files.items.find((f) =>
-        f.items.some((i) => i.id === itemId)
+    const movedItemsToRemove = selectedIds.filter((id) =>
+      movedItems.some((item) => item.id === id)
+    );
+    const embeddedItemsToRemove = selectedIds.filter(
+      (id) => !movedItems.some((item) => item.id === id)
+    );
+
+    if (movedItemsToRemove.length > 0) {
+      const newMovedItems = movedItems.filter(
+        (item) => !movedItemsToRemove.includes(item.id)
       );
-      const item = folder.items.find((i) => i.id === itemId);
-      return `${folder.name}/${item.name}`;
-    });
-
-    try {
-      await Workspace.modifyEmbeddings(workspace.slug, {
-        adds: [],
-        deletes: itemsToRemove,
-      });
-      await fetchKeys(true);
-      setSelectedItems({});
-    } catch (error) {
-      console.error("Failed to remove documents:", error);
+      setMovedItems(newMovedItems);
     }
 
-    setLoadingMessage("");
-    setLoading(false);
+    if (embeddedItemsToRemove.length > 0) {
+      setLoading(true);
+      setLoadingMessage(t("connectors.directory.removing-selected"));
+
+      const itemsToRemove = embeddedItemsToRemove.map((itemId) => {
+        const folder = files.items.find((f) =>
+          f.items.some((i) => i.id === itemId)
+        );
+        const item = folder.items.find((i) => i.id === itemId);
+        return `${folder.name}/${item.name}`;
+      });
+
+      try {
+        await Workspace.modifyEmbeddings(workspace.slug, {
+          adds: [],
+          deletes: itemsToRemove,
+        });
+        await fetchKeys(true);
+      } catch (error) {
+        console.error(
+          t("connectors.directory.failed-to-remove-documents"),
+          error
+        );
+      }
+
+      setLoadingMessage("");
+      setLoading(false);
+    }
+
+    setSelectedItems({});
+
+    if (
+      movedItemsToRemove.length > 0 &&
+      movedItems.filter((item) => !movedItemsToRemove.includes(item.id))
+        .length === 0
+    ) {
+      await fetchKeys(true);
+    }
+  };
+
+  const getSelectedItemsType = () => {
+    const selectedIds = Object.keys(selectedItems);
+    if (selectedIds.length === 0) return null;
+
+    const hasMovedItems = selectedIds.some((id) =>
+      movedItems.some((item) => item.id === id)
+    );
+    const hasEmbeddedItems = selectedIds.some(
+      (id) => !movedItems.some((item) => item.id === id)
+    );
+
+    if (hasMovedItems && hasEmbeddedItems) return "mixed";
+    if (hasMovedItems) return "moved";
+    return "embedded";
+  };
+
+  const getRemoveButtonText = () => {
+    const type = getSelectedItemsType();
+    switch (type) {
+      case "moved":
+        return t("connectors.directory.remove-from-embedding-queue");
+      case "embedded":
+        return t("connectors.directory.remove_selected");
+      case "mixed":
+        return t("connectors.directory.remove_selected");
+      default:
+        return t("connectors.directory.remove_selected");
+    }
   };
 
   const handleSaveChanges = (e) => {
@@ -99,7 +160,9 @@ function WorkspaceDirectory({
           <div className="text-white/80 text-xs grid grid-cols-12 py-2 px-3.5 border-b border-white/20 light:border-theme-modal-border bg-theme-settings-input-bg sticky top-0 z-10 rounded-t-2xl">
             <div className="col-span-10 flex items-center gap-x-[4px]">
               <div className="shrink-0 w-3 h-3" />
-              <p className="ml-[7px] text-theme-text-primary">Name</p>
+              <p className="ml-[7px] text-theme-text-primary">
+                {t("connectors.directory.name")}
+              </p>
             </div>
             <p className="col-span-2" />
           </div>
@@ -131,8 +194,7 @@ function WorkspaceDirectory({
           <div className="relative w-full h-full bg-theme-settings-input-bg rounded-2xl overflow-hidden border border-theme-modal-border">
             <div className="text-white/80 text-xs grid grid-cols-12 py-2 px-3.5 border-b border-white/20 light:border-theme-modal-border bg-theme-settings-input-bg sticky top-0 z-10">
               <div className="col-span-10 flex items-center gap-x-[4px]">
-                {!hasChanges &&
-                files.items.some((folder) => folder.items.length > 0) ? (
+                {files.items.some((folder) => folder.items.length > 0) ? (
                   <div
                     className={`shrink-0 w-3 h-3 rounded border-[1px] border-solid border-white text-theme-text-primary light:invert flex justify-center items-center cursor-pointer`}
                     role="checkbox"
@@ -155,7 +217,9 @@ function WorkspaceDirectory({
                 ) : (
                   <div className="shrink-0 w-3 h-3" />
                 )}
-                <p className="ml-[7px] text-theme-text-primary">Name</p>
+                <p className="ml-[7px] text-theme-text-primary">
+                  {t("connectors.directory.name")}
+                </p>
               </div>
               <p className="col-span-2" />
             </div>
@@ -180,7 +244,7 @@ function WorkspaceDirectory({
                       movedItems={movedItems}
                       selected={selectedItems[item.id]}
                       toggleSelection={() => toggleSelection(item)}
-                      disableSelection={hasChanges}
+                      disableSelection={false}
                       setSelectedItems={setSelectedItems}
                     />
                   )}
@@ -194,7 +258,7 @@ function WorkspaceDirectory({
               )}
             </div>
 
-            {Object.keys(selectedItems).length > 0 && !hasChanges && (
+            {Object.keys(selectedItems).length > 0 && (
               <div className="absolute bottom-[12px] left-0 right-0 flex justify-center pointer-events-none">
                 <div className="mx-auto bg-white/40 light:bg-white rounded-lg py-1 px-2 pointer-events-auto light:shadow-lg">
                   <div className="flex flex-row items-center gap-x-2">
@@ -214,7 +278,7 @@ function WorkspaceDirectory({
                       onClick={removeSelectedItems}
                       className="border-none text-sm font-semibold bg-white light:bg-[#E0F2FE] h-[30px] px-2.5 rounded-lg hover:bg-neutral-800/80 hover:text-white light:text-[#026AA2] light:hover:bg-[#026AA2] light:hover:text-white"
                     >
-                      {t("connectors.directory.remove_selected")}
+                      {getRemoveButtonText()}
                     </button>
                   </div>
                 </div>

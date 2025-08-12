@@ -224,6 +224,7 @@ export default function DocumentSettings({ workspace, systemSettings }) {
         saveChanges={updateWorkspace}
         embeddingCosts={embeddingsCost}
         movedItems={movedItems}
+        setMovedItems={setMovedItems}
       />
     </div>
   );

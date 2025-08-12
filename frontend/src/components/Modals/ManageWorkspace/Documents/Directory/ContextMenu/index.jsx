@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function ContextMenu({
   contextMenu,
@@ -7,6 +8,7 @@ export default function ContextMenu({
   selectedItems,
   setSelectedItems,
 }) {
+  const { t } = useTranslation();
   const contextMenuRef = useRef(null);
 
   useEffect(() => {
@@ -66,13 +68,15 @@ export default function ContextMenu({
         onClick={toggleSelectAll}
         className="block w-full text-left px-4 py-2 text-sm text-theme-text-primary hover:bg-theme-file-picker-hover"
       >
-        {isAllSelected() ? "Unselect All" : "Select All"}
+        {isAllSelected()
+          ? t("connectors.directory.deselect_all")
+          : t("connectors.directory.select_all")}
       </button>
       <button
         onClick={closeContextMenu}
         className="block w-full text-left px-4 py-2 text-sm text-theme-text-primary hover:bg-theme-file-picker-hover"
       >
-        Cancel
+        {t("common.cancel")}
       </button>
     </div>
   );
