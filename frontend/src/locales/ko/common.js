@@ -1884,6 +1884,7 @@ const TRANSLATIONS = {
   connectors: {
     "search-placeholder": "데이터 커넥터 검색",
     "no-connectors": "데이터 커넥터를 찾을 수 없습니다.",
+    submit: "실행",
     obsidian: {
       name: "Obsidian",
       description: "Obsidian 볼트를 한 번에 가져옵니다.",
@@ -1917,13 +1918,15 @@ const TRANSLATIONS = {
         "수집 중 무시할 파일을 .gitignore 형식으로 입력하세요. 저장하려면 각 항목 입력 후 엔터를 누르세요.",
       task_explained:
         "가져오기가 완료되면 모든 파일이 문서 선택기에서 워크스페이스에 임베딩할 수 있도록 제공됩니다.",
-      branch: "가져올 브랜치",
+      branch: "브랜치",
+      branch_collection: "가져올 브랜치",
       branch_loading: "-- 사용 가능한 브랜치 불러오는 중 --",
       branch_explained: "가져오려는 브랜치를 선택하세요.",
       token_information:
         "<b>GitHub 액세스 토큰</b>을 입력하지 않으면 GitHub의 공개 API 요청 제한으로 인해 이 데이터 커넥터는 저장소의 <b>최상위</b> 파일만 수집할 수 있습니다.",
       token_personal:
         "여기에서 GitHub 계정으로 무료 개인 액세스 토큰을 발급받을 수 있습니다.",
+      collecting_files: "파일 수집 중...",
     },
     gitlab: {
       name: "GitLab 저장소",
@@ -1941,19 +1944,27 @@ const TRANSLATIONS = {
         "이 없으면 GitLab API의 요청 제한으로 인해 가져올 수 있는 파일 수가 제한될 수 있습니다. ",
       token_explained_link2: "임시 액세스 토큰을 생성",
       token_explained_end: "하여 이 문제를 피할 수 있습니다.",
+      settings: "설정",
       fetch_issues: "이슈를 문서로 가져오기",
+      fetch_wikis: "위키를 문서로 가져오기",
       ignores: "파일 무시 목록",
       git_ignore:
         "수집 중 무시할 파일을 .gitignore 형식으로 입력하세요. 저장하려면 각 항목 입력 후 엔터를 누르세요.",
       task_explained:
         "가져오기가 완료되면 모든 파일이 문서 선택기에서 워크스페이스에 임베딩할 수 있도록 제공됩니다.",
-      branch: "가져올 브랜치",
+      branch: "브랜치",
+      branch_collection: "가져올 브랜치",
       branch_loading: "-- 사용 가능한 브랜치 불러오는 중 --",
       branch_explained: "가져오려는 브랜치를 선택하세요.",
       token_information:
         "<b>GitLab 액세스 토큰</b>을 입력하지 않으면 GitLab의 공개 API 요청 제한으로 인해 이 데이터 커넥터는 저장소의 <b>최상위</b> 파일만 수집할 수 있습니다.",
       token_personal:
         "여기에서 GitLab 계정으로 무료 개인 액세스 토큰을 발급받을 수 있습니다.",
+      collecting_files: "파일 수집 중...",
+      fetching_files:
+        "저장소의 모든 파일을 가져오는 중입니다. 이 작업은 시간이 소요될 수 있습니다.",
+      collection_success:
+        "{{author}}/{{repo}}:{{branch}}에서 {{fileCount}}개의 {{fileLabel}}을(를) 수집했습니다. 출력 폴더: {{destination}}",
     },
     youtube: {
       name: "YouTube 자막 가져오기",
@@ -1967,7 +1978,13 @@ const TRANSLATIONS = {
         "가져오기가 완료되면 자막이 문서 선택기에서 워크스페이스에 임베딩할 수 있도록 제공됩니다.",
       language: "자막 언어",
       language_explained: "가져오려는 자막의 언어를 선택하세요.",
+      auto_detect: "자동 감지",
       loading_languages: "-- 사용 가능한 언어 불러오는 중 --",
+      collecting_transcript: "자막 수집 중...",
+      collect_transcript: "자막 수집",
+      fetching_transcript: "YouTube 동영상의 자막을 가져오는 중입니다.",
+      transcription_success:
+        "{{author}}의 {{title}} 자막 수집이 완료되었습니다. 출력 폴더: {{destination}}",
     },
     "website-depth": {
       name: "웹사이트 대량 링크 수집",
@@ -1982,6 +1999,11 @@ const TRANSLATIONS = {
       max_pages_explained: "수집할 최대 링크(페이지) 개수를 설정합니다.",
       task_explained:
         "수집이 완료되면 모든 크롤링된 콘텐츠가 문서 선택기에서 워크스페이스에 임베딩할 수 있도록 제공됩니다.",
+      scraping_website: "웹사이트 크롤링 중...",
+      scraping_info:
+        "웹사이트를 크롤링하는 중입니다 - 시간이 다소 소요될 수 있습니다.",
+      scraping_success:
+        "{{pageCount}}개의 {{pageLabel}}을(를) 성공적으로 수집했습니다!",
     },
     confluence: {
       name: "Confluence",
@@ -2010,6 +2032,34 @@ const TRANSLATIONS = {
       pat_token_explained: "Confluence 계정의 개인 액세스 토큰입니다.",
       task_explained:
         "가져오기가 완료되면 페이지 내용이 문서 선택기에서 워크스페이스에 임베딩할 수 있도록 제공됩니다.",
+      collecting_pages: "페이지 수집 중...",
+    },
+    drupalwiki: {
+      description: "Drupal Wiki 공간을 한 번의 클릭으로 가져옵니다.",
+      base_url: "Drupal Wiki 기본 URL",
+      base_url_explained: "Drupal Wiki의 기본 URL을 입력하세요.",
+      base_url_explained_start: "",
+      base_url_explained_link: "Drupal Wiki",
+      base_url_explained_end: "의 기본 URL을 입력하세요.",
+      id: "Drupal Wiki 스페이스 ID",
+      id_explained_start:
+        "추출하려는 스페이스 ID를 쉼표로 구분하여 입력하세요. 스페이스 ID를 확인하는 방법은 ",
+      id_explained_manual: "매뉴얼",
+      id_explained_middle:
+        "을 참조하세요. 'API 토큰 사용자'가 해당 스페이스에 접근 권한이 있는지 확인하세요.",
+      token: "Drupal Wiki API 토큰",
+      token_explained: "인증을 위한 액세스 토큰입니다.",
+      token_tooltip_start:
+        "인증을 위해 API 토큰을 제공해야 합니다. 사용자의 API 토큰을 생성하는 방법은 Drupal Wiki ",
+      token_tooltip_manual: "매뉴얼",
+      token_tooltip_end: "을 참조하세요.",
+      collecting_pages: "페이지 수집 중...",
+      collecting_pages_info:
+        "수집이 완료되면 모든 페이지가 문서 선택기에서 워크스페이스에 임베딩할 수 있도록 제공됩니다.",
+      fetching_pages:
+        "주어진 Drupal Wiki 스페이스의 모든 페이지를 가져오는 중입니다 - 시간이 다소 소요될 수 있습니다.",
+      collection_success:
+        "Drupal Wiki 스페이스 {{spaceIds}}에서 페이지를 수집했습니다. 출력 폴더: {{destination}}",
     },
 
     manage: {

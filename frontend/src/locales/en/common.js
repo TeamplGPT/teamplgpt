@@ -1910,6 +1910,7 @@ const TRANSLATIONS = {
   connectors: {
     "search-placeholder": "Search data connectors",
     "no-connectors": "No data connectors found.",
+    submit: "Submit",
     obsidian: {
       name: "Obsidian",
       description: "Import Obsidian vault in a single click.",
@@ -1944,13 +1945,15 @@ const TRANSLATIONS = {
         "List in .gitignore format to ignore specific files during collection. Press enter after each entry you want to save.",
       task_explained:
         "Once complete, all files will be available for embedding into workspaces in the document picker.",
-      branch: "Branch you wish to collect files from.",
+      branch: "Branch",
+      branch_collection: "Branch you wish to collect files from.",
       branch_loading: "-- loading available branches --",
       branch_explained: "Branch you wish to collect files from.",
       token_information:
         "Without filling out the <b>GitHub Access Token</b> this data connector will only be able to collect the <b>top-level</b> files of the repo due to GitHub's public API rate-limits.",
       token_personal:
         "Get a free Personal Access Token with a GitHub account here.",
+      collecting_files: "Collecting files...",
     },
     gitlab: {
       name: "GitLab Repo",
@@ -1969,19 +1972,27 @@ const TRANSLATIONS = {
         ", the GitLab API may limit the number of files that can be collected due to rate limits. You can ",
       token_explained_link2: "create a temporary Access Token",
       token_explained_end: " to avoid this issue.",
+      settings: "Settings",
       fetch_issues: "Fetch Issues as Documents",
+      fetch_wikis: "Fetch Wikis as Documents",
       ignores: "File Ignores",
       git_ignore:
         "List in .gitignore format to ignore specific files during collection. Press enter after each entry you want to save.",
       task_explained:
         "Once complete, all files will be available for embedding into workspaces in the document picker.",
-      branch: "Branch you wish to collect files from",
+      branch: "Branch",
+      branch_collection: "Branch you wish to collect files from",
       branch_loading: "-- loading available branches --",
       branch_explained: "Branch you wish to collect files from.",
       token_information:
         "Without filling out the <b>GitLab Access Token</b> this data connector will only be able to collect the <b>top-level</b> files of the repo due to GitLab's public API rate-limits.",
       token_personal:
         "Get a free Personal Access Token with a GitLab account here.",
+      collecting_files: "Collecting files...",
+      fetching_files:
+        "Fetching all files from the repository. This may take a while.",
+      collection_success:
+        "{{fileCount}} {{fileLabel}} collected from {{author}}/{{repo}}:{{branch}}. Output folder is {{destination}}.",
     },
     youtube: {
       name: "YouTube Transcript",
@@ -1997,7 +2008,13 @@ const TRANSLATIONS = {
       language: "Transcript Language",
       language_explained:
         "Select the language of the transcript you want to collect.",
+      auto_detect: "Auto Detect",
       loading_languages: "-- loading available languages --",
+      collecting_transcript: "Collecting transcript...",
+      collect_transcript: "Collect transcript",
+      fetching_transcript: "Fetching transcript for YouTube video.",
+      transcription_success:
+        "{{title}} by {{author}} transcription completed. Output folder is {{destination}}.",
     },
     "website-depth": {
       name: "Bulk Link Scraper",
@@ -2011,6 +2028,9 @@ const TRANSLATIONS = {
       max_pages_explained: "Maximum number of links to scrape.",
       task_explained:
         "Once complete, all scraped content will be available for embedding into workspaces in the document picker.",
+      scraping_website: "Scraping website...",
+      scraping_info: "Scraping website - this may take a while.",
+      scraping_success: "Successfully scraped {{pageCount}} {{pageLabel}}!",
     },
     confluence: {
       name: "Confluence",
@@ -2039,6 +2059,34 @@ const TRANSLATIONS = {
       pat_token_explained: "Your Confluence personal access token.",
       task_explained:
         "Once complete, the page content will be available for embedding into workspaces in the document picker.",
+      collecting_pages: "Collecting pages...",
+    },
+    drupalwiki: {
+      description: "Import Drupal Wiki spaces in a single click.",
+      base_url: "Drupal Wiki base URL",
+      base_url_explained: "This is the base URL of your Drupal Wiki.",
+      base_url_explained_start: "This is the base URL of your ",
+      base_url_explained_link: "Drupal Wiki",
+      base_url_explained_end: ".",
+      id: "Drupal Wiki Space IDs",
+      id_explained_start:
+        "Comma separated Space IDs you want to extract. See the ",
+      id_explained_manual: "manual",
+      id_explained_middle:
+        " on how to retrieve the Space IDs. Be sure that your 'API-Token User' has access to those spaces.",
+      token: "Drupal Wiki API Token",
+      token_explained: "Access token for authentication.",
+      token_tooltip_start:
+        "You need to provide an API token for authentication. See the Drupal Wiki ",
+      token_tooltip_manual: "manual",
+      token_tooltip_end: " on how to generate an API-Token for your user.",
+      collecting_pages: "Collecting pages...",
+      collecting_pages_info:
+        "Once complete, all pages will be available for embedding into workspaces.",
+      fetching_pages:
+        "Fetching all pages for the given Drupal Wiki spaces - this may take a while.",
+      collection_success:
+        "Pages collected from Drupal Wiki spaces {{spaceIds}}. Output folder is {{destination}}.",
     },
 
     manage: {

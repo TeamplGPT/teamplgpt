@@ -106,12 +106,12 @@ export default function GithubOptions() {
                   </p>
                 </div>
                 <input
-                  type="text"
+                  type="password"
                   name="accessToken"
                   className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
                   placeholder="github_pat_1234_abcdefg"
                   required={false}
-                  autoComplete="off"
+                  autoComplete="new-password"
                   spellCheck={false}
                   onChange={(e) => setAccessToken(e.target.value)}
                   onBlur={() => setSettings({ ...settings, accessToken })}
@@ -138,7 +138,7 @@ export default function GithubOptions() {
                 value={ignores}
                 onChange={setIgnores}
                 name="ignores"
-                placeholder="!*.js, images/*, .DS_Store, bin/*"
+                placeHolder="!*.js, images/*, .DS_Store, bin/*"
                 classNames={{
                   tag: "bg-theme-settings-input-bg light:bg-black/10 bg-blue-300/10 text-zinc-800",
                   input:
@@ -155,7 +155,9 @@ export default function GithubOptions() {
               disabled={loading}
               className="mt-2 w-full justify-center border-none px-4 py-2 rounded-lg text-dark-text light:text-white text-sm font-bold items-center flex gap-x-2 bg-theme-home-button-primary hover:bg-theme-home-button-primary-hover disabled:bg-theme-home-button-primary-hover disabled:cursor-not-allowed"
             >
-              {loading ? "Collecting files..." : "Submit"}
+              {loading
+                ? t("connectors.github.collecting_files")
+                : t("connectors.submit")}
             </button>
             {loading && (
               <p className="text-xs text-white/50">
@@ -197,9 +199,11 @@ function GitHubBranchSelection({ repo, accessToken }) {
     return (
       <div className="flex flex-col w-60">
         <div className="flex flex-col gap-y-1 mb-4">
-          <label className="text-white text-sm font-bold">Branch</label>
-          <p className="text-xs font-normal text-theme-text-secondary">
+          <label className="text-white text-sm font-bold">
             {t("connectors.github.branch")}
+          </label>
+          <p className="text-xs font-normal text-theme-text-secondary">
+            {t("connectors.github.branch_collection")}
           </p>
         </div>
         <select
@@ -218,7 +222,9 @@ function GitHubBranchSelection({ repo, accessToken }) {
   return (
     <div className="flex flex-col w-60">
       <div className="flex flex-col gap-y-1 mb-4">
-        <label className="text-white text-sm font-bold">Branch</label>
+        <label className="text-white text-sm font-bold">
+          {t("connectors.github.branch")}
+        </label>
         <p className="text-xs font-normal text-theme-text-secondary">
           {t("connectors.github.branch_explained")}
         </p>

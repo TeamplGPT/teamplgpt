@@ -10,8 +10,10 @@ import System from "@/models/system";
 import showToast from "@/utils/toast";
 import { Warning } from "@phosphor-icons/react";
 import { Tooltip } from "react-tooltip";
+import { useTranslation } from "react-i18next";
 
 export default function DrupalWikiOptions() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -20,14 +22,10 @@ export default function DrupalWikiOptions() {
 
     try {
       setLoading(true);
-      showToast(
-        "Fetching all pages for the given Drupal Wiki spaces - this may take a while.",
-        "info",
-        {
-          clear: true,
-          autoClose: false,
-        }
-      );
+      showToast(t("connectors.drupalwiki.fetching_pages"), "info", {
+        clear: true,
+        autoClose: false,
+      });
       const { data, error } = await System.dataConnectors.drupalwiki.collect({
         baseUrl: form.get("baseUrl"),
         spaceIds: form.get("spaceIds"),
@@ -41,7 +39,10 @@ export default function DrupalWikiOptions() {
       }
 
       showToast(
-        `Pages collected from Drupal Wiki spaces ${data.spaceIds}. Output folder is ${data.destination}.`,
+        t("connectors.drupalwiki.collection_success", {
+          spaceIds: data.spaceIds,
+          destination: data.destination,
+        }),
         "success",
         { clear: true }
       );
@@ -63,19 +64,21 @@ export default function DrupalWikiOptions() {
               <div className="flex flex-col pr-10">
                 <div className="flex flex-col gap-y-1 mb-4">
                   <label className="text-white text-sm font-bold flex gap-x-2 items-center">
-                    <p className="font-bold text-white">Drupal Wiki base URL</p>
+                    <p className="font-bold text-white">
+                      {t("connectors.drupalwiki.base_url")}
+                    </p>
                   </label>
                   <p className="text-xs font-normal text-theme-text-secondary">
-                    This is the base URL of your&nbsp;
+                    {t("connectors.drupalwiki.base_url_explained_start")}
                     <a
                       href="https://drupal-wiki.com"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="underline"
                     >
-                      Drupal Wiki
+                      {t("connectors.drupalwiki.base_url_explained_link")}
                     </a>
-                    .
+                    {t("connectors.drupalwiki.base_url_explained_end")}
                   </p>
                 </div>
                 <input
@@ -91,10 +94,10 @@ export default function DrupalWikiOptions() {
               <div className="flex flex-col pr-10">
                 <div className="flex flex-col gap-y-1 mb-4">
                   <label className="text-white text-sm font-bold">
-                    Drupal Wiki Space IDs
+                    {t("connectors.drupalwiki.id")}
                   </label>
                   <p className="text-xs font-normal text-theme-text-secondary">
-                    Comma separated Space IDs you want to extract. See the&nbsp;
+                    {t("connectors.drupalwiki.id_explained_start")}
                     <a
                       href="https://help.drupal-wiki.com/node/606"
                       target="_blank"
@@ -102,10 +105,9 @@ export default function DrupalWikiOptions() {
                       className="underline"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      manual
+                      {t("connectors.drupalwiki.id_explained_manual")}
                     </a>
-                    &nbsp; on how to retrieve the Space IDs. Be sure that your
-                    'API-Token User' has access to those spaces.
+                    {t("connectors.drupalwiki.id_explained_middle")}
                   </p>
                 </div>
                 <input
@@ -122,7 +124,7 @@ export default function DrupalWikiOptions() {
                 <div className="flex flex-col gap-y-1 mb-4">
                   <label className="text-white text-sm font-bold flex gap-x-2 items-center">
                     <p className="font-bold text-white">
-                      Drupal Wiki API Token
+                      {t("connectors.drupalwiki.token")}
                     </p>
                     <Warning
                       size={14}
@@ -136,23 +138,23 @@ export default function DrupalWikiOptions() {
                       className="max-w-xs z-99"
                       clickable={true}
                     >
-                      <p className="text-sm font-light text-theme-text-primary">
-                        You need to provide an API token for authentication. See
-                        the Drupal Wiki&nbsp;
+                      <p className="text-sm">
+                        {t("connectors.drupalwiki.token_tooltip_start")}
                         <a
                           href="https://help.drupal-wiki.com/node/605#2-Zugriffs-Token-generieren"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="underline"
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          manual
+                          {t("connectors.drupalwiki.token_tooltip_manual")}
                         </a>
-                        &nbsp;on how to generate an API-Token for your user.
+                        {t("connectors.drupalwiki.token_tooltip_end")}
                       </p>
                     </Tooltip>
                   </label>
                   <p className="text-xs font-normal text-theme-text-secondary">
-                    Access token for authentication.
+                    {t("connectors.drupalwiki.token_explained")}
                   </p>
                 </div>
                 <input
@@ -161,7 +163,7 @@ export default function DrupalWikiOptions() {
                   className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
                   placeholder="pat:123"
                   required={true}
-                  autoComplete="off"
+                  autoComplete="new-password"
                   spellCheck={false}
                 />
               </div>
@@ -174,12 +176,13 @@ export default function DrupalWikiOptions() {
               disabled={loading}
               className="mt-2 w-full justify-center border-none px-4 py-2 rounded-lg text-dark-text light:text-white text-sm font-bold items-center flex gap-x-2 bg-theme-home-button-primary hover:bg-theme-home-button-primary-hover disabled:bg-theme-home-button-primary-hover disabled:cursor-not-allowed"
             >
-              {loading ? "Collecting pages..." : "Submit"}
+              {loading
+                ? t("connectors.drupalwiki.collecting_pages")
+                : t("connectors.submit")}
             </button>
             {loading && (
               <p className="text-xs text-theme-text-secondary">
-                Once complete, all pages will be available for embedding into
-                workspaces.
+                {t("connectors.drupalwiki.collecting_pages_info")}
               </p>
             )}
           </div>

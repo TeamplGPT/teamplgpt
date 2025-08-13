@@ -220,7 +220,7 @@ export default function ConfluenceOptions() {
                       className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
                       placeholder="abcd1234"
                       required={true}
-                      autoComplete="off"
+                      autoComplete="new-password"
                       spellCheck={false}
                     />
                   </div>
@@ -242,7 +242,7 @@ export default function ConfluenceOptions() {
                     className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
                     placeholder="abcd1234"
                     required={true}
-                    autoComplete="off"
+                    autoComplete="new-password"
                     spellCheck={false}
                   />
                 </div>
@@ -256,7 +256,9 @@ export default function ConfluenceOptions() {
               disabled={loading}
               className="mt-2 w-full justify-center border-none px-4 py-2 rounded-lg text-dark-text light:text-white text-sm font-bold items-center flex gap-x-2 bg-theme-home-button-primary hover:bg-theme-home-button-primary-hover disabled:bg-theme-home-button-primary-hover disabled:cursor-not-allowed"
             >
-              {loading ? "Collecting pages..." : "Submit"}
+              {loading
+                ? t("connectors.confluence.collecting_pages")
+                : t("connectors.submit")}
             </button>
             {loading && (
               <p className="text-xs text-theme-text-secondary">

@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 export default function YoutubeOptions() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("auto");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -13,13 +14,14 @@ export default function YoutubeOptions() {
 
     try {
       setLoading(true);
-      showToast("Fetching transcript for YouTube video.", "info", {
+      showToast(t("connectors.youtube.fetching_transcript"), "info", {
         clear: true,
         autoClose: false,
       });
 
       const { data, error } = await System.dataConnectors.youtube.transcribe({
         url: form.get("url"),
+        language: form.get("language"),
       });
 
       if (!!error) {
@@ -29,7 +31,11 @@ export default function YoutubeOptions() {
       }
 
       showToast(
-        `${data.title} by ${data.author} transcription completed. Output folder is ${data.destination}.`,
+        t("connectors.youtube.transcription_success", {
+          title: data.title,
+          author: data.author,
+          destination: data.destination,
+        }),
         "success",
         { clear: true }
       );
@@ -78,6 +84,36 @@ export default function YoutubeOptions() {
                   spellCheck={false}
                 />
               </div>
+              <div className="flex flex-col pr-10">
+                <div className="flex flex-col gap-y-1 mb-4">
+                  <label className="text-white text-sm font-bold">
+                    {t("connectors.youtube.language")}
+                  </label>
+                  <p className="text-xs font-normal text-theme-text-secondary">
+                    {t("connectors.youtube.language_explained")}
+                  </p>
+                </div>
+                <select
+                  name="language"
+                  className="border-none bg-theme-settings-input-bg text-white text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
+                  value={selectedLanguage}
+                  onChange={(e) => setSelectedLanguage(e.target.value)}
+                >
+                  <option value="auto">
+                    {t("connectors.youtube.auto_detect")}
+                  </option>
+                  <option value="ko">한국어</option>
+                  <option value="en">English</option>
+                  <option value="ja">日本語</option>
+                  <option value="zh">中文</option>
+                  <option value="es">Español</option>
+                  <option value="fr">Français</option>
+                  <option value="de">Deutsch</option>
+                  <option value="pt">Português</option>
+                  <option value="ru">Русский</option>
+                  <option value="ar">العربية</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -87,7 +123,9 @@ export default function YoutubeOptions() {
               disabled={loading}
               className="mt-2 w-full justify-center border-none px-4 py-2 rounded-lg text-dark-text light:text-white text-sm font-bold items-center flex gap-x-2 bg-theme-home-button-primary hover:bg-theme-home-button-primary-hover disabled:bg-theme-home-button-primary-hover disabled:cursor-not-allowed"
             >
-              {loading ? "Collecting transcript..." : "Collect transcript"}
+              {loading
+                ? t("connectors.youtube.collecting_transcript")
+                : t("connectors.youtube.collect_transcript")}
             </button>
             {loading && (
               <p className="text-xs text-theme-text-secondary max-w-sm">

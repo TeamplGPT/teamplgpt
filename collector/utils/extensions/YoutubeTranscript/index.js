@@ -30,7 +30,7 @@ function validYoutubeVideoUrl(link) {
   return false;
 }
 
-async function fetchVideoTranscriptContent({ url }) {
+async function fetchVideoTranscriptContent({ url, language = "auto" }) {
   if (!validYoutubeVideoUrl(url)) {
     return {
       success: false,
@@ -41,45 +41,88 @@ async function fetchVideoTranscriptContent({ url }) {
   }
 
   console.log(`-- Working YouTube ${url} --`);
-  const loader = YoutubeLoader.createFromUrl(url, { addVideoInfo: true });
-  const { docs, error } = await loader
-    .load()
-    .then((docs) => {
-      return { docs, error: null };
-    })
-    .catch((e) => {
-      return {
-        docs: [],
-        error: e.message?.split("Error:")?.[1] || e.message,
-      };
+
+  if (language === "auto") {
+    const languagesToTry = [
+      "ko",
+      "en",
+      "ja",
+      "zh",
+      "es",
+      "fr",
+      "de",
+      "pt",
+      "ru",
+      "ar",
+    ];
+
+    for (const lang of languagesToTry) {
+      console.log(`Trying to fetch transcript in ${lang}...`);
+      const loader = YoutubeLoader.createFromUrl(url, {
+        addVideoInfo: true,
+        language: lang,
+      });
+
+      const { docs, error } = await loader
+        .load()
+        .then((docs) => ({ docs, error: null }))
+        .catch((e) => ({
+          docs: [],
+          error: e.message?.split("Error:")?.[1] || e.message,
+        }));
+
+      if (docs.length && !error) {
+        console.log(`Successfully fetched transcript in ${lang}`);
+        const metadata = { ...docs[0].metadata, detectedLanguage: lang };
+        return {
+          success: true,
+          reason: null,
+          content: docs[0].pageContent,
+          metadata,
+        };
+      }
+    }
+
+    return {
+      success: false,
+      reason:
+        "No transcript found in any supported language. The video may not have captions enabled.",
+      content: null,
+      metadata: {},
+    };
+  } else {
+    const loader = YoutubeLoader.createFromUrl(url, {
+      addVideoInfo: true,
+      language: language,
     });
 
-  if (!docs.length || !!error) {
+    const { docs, error } = await loader
+      .load()
+      .then((docs) => ({ docs, error: null }))
+      .catch((e) => ({
+        docs: [],
+        error: e.message?.split("Error:")?.[1] || e.message,
+      }));
+
+    if (!docs.length || !!error) {
+      return {
+        success: false,
+        reason: error ?? `No transcript found for language: ${language}`,
+        content: null,
+        metadata: {},
+      };
+    }
+
+    const metadata = docs[0].metadata;
+    const content = docs[0].pageContent;
+
     return {
-      success: false,
-      reason: error ?? "No transcript found for that YouTube video.",
-      content: null,
-      metadata: {},
+      success: true,
+      reason: null,
+      content,
+      metadata,
     };
   }
-
-  const metadata = docs[0].metadata;
-  const content = docs[0].pageContent;
-  if (!content.length) {
-    return {
-      success: false,
-      reason: "No transcript could be parsed for that YouTube video.",
-      content: null,
-      metadata: {},
-    };
-  }
-
-  return {
-    success: true,
-    reason: null,
-    content,
-    metadata,
-  };
 }
 
 async function loadYouTubeTranscript({ url }) {

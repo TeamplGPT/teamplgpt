@@ -25,11 +25,10 @@ export default function GitlabOptions() {
 
     try {
       setLoading(true);
-      showToast(
-        "Fetching all files for repo - this may take a while.",
-        "info",
-        { clear: true, autoClose: false }
-      );
+      showToast(t("connectors.gitlab.fetching_files"), "info", {
+        clear: true,
+        autoClose: false,
+      });
       const { data, error } = await System.dataConnectors.gitlab.collect({
         repo: form.get("repo"),
         accessToken: form.get("accessToken"),
@@ -46,9 +45,14 @@ export default function GitlabOptions() {
       }
 
       showToast(
-        `${data.files} ${pluralize("file", data.files)} collected from ${
-          data.author
-        }/${data.repo}:${data.branch}. Output folder is ${data.destination}.`,
+        t("connectors.gitlab.collection_success", {
+          fileCount: data.files,
+          fileLabel: pluralize("file", data.files),
+          author: data.author,
+          repo: data.repo,
+          branch: data.branch,
+          destination: data.destination,
+        }),
         "success",
         { clear: true }
       );
@@ -107,12 +111,12 @@ export default function GitlabOptions() {
                   </p>
                 </div>
                 <input
-                  type="text"
+                  type="password"
                   name="accessToken"
                   className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
                   placeholder="glpat-XXXXXXXXXXXXXXXXXXXX"
                   required={false}
-                  autoComplete="off"
+                  autoComplete="new-password"
                   spellCheck={false}
                   onChange={(e) => setAccessToken(e.target.value)}
                   onBlur={() => setSettings({ ...settings, accessToken })}
@@ -121,7 +125,9 @@ export default function GitlabOptions() {
               <div className="flex flex-col pr-10">
                 <div className="flex flex-col gap-y-1 mb-4">
                   <label className="text-white font-bold text-sm flex gap-x-2 items-center">
-                    <p className="font-bold text-white">Settings</p>
+                    <p className="font-bold text-white">
+                      {t("connectors.gitlab.settings")}
+                    </p>
                   </label>
                   <p className="text-xs font-normal text-white">
                     {t("connectors.gitlab.token_description")}
@@ -151,7 +157,7 @@ export default function GitlabOptions() {
                     />
                     <div className="peer-disabled:opacity-50 pointer-events-none peer h-6 w-11 rounded-full bg-[#CFCFD0] after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:shadow-xl after:border-none after:bg-white after:box-shadow-md after:transition-all after:content-[''] peer-checked:bg-[#32D583] peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-transparent"></div>
                     <span className="ml-3 text-sm font-medium text-white">
-                      Fetch Wikis as Documents
+                      {t("connectors.gitlab.fetch_wikis")}
                     </span>
                   </label>
                 </div>
@@ -177,7 +183,7 @@ export default function GitlabOptions() {
                 value={ignores}
                 onChange={setIgnores}
                 name="ignores"
-                placeholder="!*.js, images/*, .DS_Store, bin/*"
+                placeHolder="!*.js, images/*, .DS_Store, bin/*"
                 classNames={{
                   tag: "bg-theme-settings-input-bg light:bg-black/10 bg-blue-300/10 text-zinc-800",
                   input:
@@ -194,7 +200,9 @@ export default function GitlabOptions() {
               disabled={loading}
               className="mt-2 w-full justify-center border-none px-4 py-2 rounded-lg text-dark-text light:text-white text-sm font-bold items-center flex gap-x-2 bg-theme-home-button-primary hover:bg-theme-home-button-primary-hover disabled:bg-theme-home-button-primary-hover disabled:cursor-not-allowed"
             >
-              {loading ? "Collecting files..." : "Submit"}
+              {loading
+                ? t("connectors.gitlab.collecting_files")
+                : t("connectors.submit")}
             </button>
             {loading && (
               <p className="text-xs text-white/50">
@@ -240,7 +248,7 @@ function GitLabBranchSelection({ repo, accessToken }) {
             {t("connectors.gitlab.branch")}
           </label>
           <p className="text-xs font-normal text-theme-text-secondary">
-            {t("connectors.gitlab.branch_explained")}
+            {t("connectors.gitlab.branch_collection")}
           </p>
         </div>
         <select
@@ -259,7 +267,9 @@ function GitLabBranchSelection({ repo, accessToken }) {
   return (
     <div className="flex flex-col w-60">
       <div className="flex flex-col gap-y-1 mb-4">
-        <label className="text-white text-sm font-bold">Branch</label>
+        <label className="text-white text-sm font-bold">
+          {t("connectors.gitlab.branch")}
+        </label>
         <p className="text-xs font-normal text-theme-text-secondary">
           {t("connectors.gitlab.branch_explained")}
         </p>

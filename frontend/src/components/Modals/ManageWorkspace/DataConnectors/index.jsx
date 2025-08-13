@@ -45,13 +45,13 @@ export const getDataConnectors = (t) => ({
   drupalwiki: {
     name: "Drupal Wiki",
     image: ConnectorImages.drupalwiki,
-    description: "Import Drupal Wiki spaces in a single click.",
+    description: t("connectors.drupalwiki.description"),
     options: <DrupalWikiOptions />,
   },
   obsidian: {
     name: "Obsidian",
     image: ConnectorImages.obsidian,
-    description: "Import Obsidian vault in a single click.",
+    description: t("connectors.obsidian.description"),
     options: <ObsidianOptions />,
   },
 });
