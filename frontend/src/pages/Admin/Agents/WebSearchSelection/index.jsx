@@ -9,6 +9,7 @@ import SerplySearchIcon from "./icons/serply.png";
 import SearXNGSearchIcon from "./icons/searxng.png";
 import TavilySearchIcon from "./icons/tavily.svg";
 import DuckDuckGoIcon from "./icons/duckduckgo.png";
+import ExaIcon from "./icons/exa.png";
 import {
   CaretUpDown,
   MagnifyingGlass,
@@ -26,6 +27,7 @@ import {
   SearXNGOptions,
   TavilySearchOptions,
   DuckDuckGoOptions,
+  ExaSearchOptions,
 } from "./SearchProviderOptions";
 import { useTranslation } from "react-i18next";
 
@@ -92,6 +94,13 @@ const SEARCH_PROVIDERS = [
     logo: TavilySearchIcon,
     options: (settings) => <TavilySearchOptions settings={settings} />,
     description: "agent.skill.web-browsing.tavily-search.description",
+  },
+  {
+    name: "Exa Search",
+    value: "exa-search",
+    logo: ExaIcon,
+    options: (settings) => <ExaSearchOptions settings={settings} />,
+    description: "AI-powered search engine optimized for LLM use cases.",
   },
 ];
 

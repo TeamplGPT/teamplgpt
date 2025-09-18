@@ -39,6 +39,7 @@ import PPIOLogo from "@/media/llmprovider/ppio.png";
 import PGVectorLogo from "@/media/vectordbs/pgvector.png";
 import DPAISLogo from "@/media/llmprovider/dpais.png";
 import MoonshotAiLogo from "@/media/llmprovider/moonshotai.png";
+import CometApiLogo from "@/media/llmprovider/cometapi.png";
 
 import React, { useState, useEffect } from "react";
 import paths from "@/utils/paths";
@@ -207,6 +208,14 @@ export const LLM_SELECTION_PRIVACY = {
     ],
     logo: MoonshotAiLogo,
   },
+  cometapi: {
+    name: "CometAPI",
+    description: [
+      "Your chats will not be used for training",
+      "Your prompts and document text used in response creation are visible to CometAPI",
+    ],
+    logo: CometApiLogo,
+  },
 };
 
 export const VECTOR_DB_PRIVACY = {
@@ -223,6 +232,14 @@ export const VECTOR_DB_PRIVACY = {
     description: [
       "privacy.vector.chroma.description",
       "privacy.vector.description",
+    ],
+    logo: ChromaLogo,
+  },
+  chromacloud: {
+    name: "Chroma Cloud",
+    description: [
+      "Your vectors and document text are stored on Chroma's cloud service",
+      "Access to your data is managed by Chroma",
     ],
     logo: ChromaLogo,
   },
