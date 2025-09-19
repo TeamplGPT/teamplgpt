@@ -2,7 +2,7 @@ const { SystemSettings } = require("../../../../../../models/systemSettings");
 const { safeJsonParse } = require("../../../../../http");
 
 /**
- * @typedef {('postgresql'|'mysql'|'sql-server')} SQLEngine
+ * @typedef {('postgresql'|'mysql'|'sql-server'|'oracle')} SQLEngine
  */
 
 /**
@@ -27,15 +27,22 @@ const { safeJsonParse } = require("../../../../../http");
  */
 function getDBClient(identifier = "", connectionConfig = {}) {
   switch (identifier) {
-    case "mysql":
+    case "mysql": {
       const { MySQLConnector } = require("./MySQL");
       return new MySQLConnector(connectionConfig);
-    case "postgresql":
+    }
+    case "postgresql": {
       const { PostgresSQLConnector } = require("./Postgresql");
       return new PostgresSQLConnector(connectionConfig);
-    case "sql-server":
+    }
+    case "sql-server": {
       const { MSSQLConnector } = require("./MSSQL");
       return new MSSQLConnector(connectionConfig);
+    }
+    case "oracle": {
+      const { OracleConnector } = require("./Oracle");
+      return new OracleConnector(connectionConfig);
+    }
     default:
       throw new Error(
         `There is no supported database connector for ${identifier}`

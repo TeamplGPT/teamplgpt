@@ -7346,6 +7346,11 @@ optionator@^0.9.3:
     type-check "^0.4.0"
     word-wrap "^1.2.5"
 
+oracledb@^6.8.0:
+  version "6.9.0"
+  resolved "https://registry.yarnpkg.com/oracledb/-/oracledb-6.9.0.tgz#53909307016239b019b6c292e2af21cf9745ec32"
+  integrity sha512-NwPbIGPv6m0GTFSbyy4/5WEjsKMiiJRxztLmYUcfD3oyh/uXdmVmKOwEWr84wFwWJ/0wQrYQh4PjnzvShibRaA==
+
 os-tmpdir@~1.0.2:
   version "1.0.2"
   resolved "https://registry.npmjs.org/os-tmpdir/-/os-tmpdir-1.0.2.tgz"
