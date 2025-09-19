@@ -777,13 +777,24 @@ const System = {
    * Validates a SQL connection string.
    * @param {'postgresql'|'mysql'|'sql-server'} engine - the database engine identifier
    * @param {string} connectionString - the connection string to validate
+   * @param {object} additionalConfig - Additional configuration (e.g., Oracle mode/path)
    * @returns {Promise<{success: boolean, error: string | null}>}
    */
-  validateSQLConnection: async function (engine, connectionString) {
+  validateSQLConnection: async function (
+    engine,
+    connectionString,
+    additionalConfig = {}
+  ) {
+    const body = {
+      engine,
+      connectionString,
+      ...additionalConfig,
+    };
+
     return fetch(`${API_BASE}/system/validate-sql-connection`, {
       method: "POST",
       headers: baseHeaders(),
-      body: JSON.stringify({ engine, connectionString }),
+      body: JSON.stringify(body),
     })
       .then((res) => res.json())
       .catch((e) => {
