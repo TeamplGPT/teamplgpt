@@ -551,6 +551,7 @@ const TRANSLATIONS = {
     description:
       "이것은 채팅과 임베딩을 하기 위한 선호하는 LLM 제공자의 인증입니다. 이 키가 현재 활성 상태이고 정확해야 AnythingLLM이 제대로 작동합니다.",
     provider: "LLM 제공자",
+    search: "LLM 제공자 검색",
     providers: {
       azure_openai: {
         azure_service_endpoint: "Azure 서비스 엔드포인트",
