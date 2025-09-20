@@ -13,7 +13,7 @@ export default function LLMSelectorSidePanel({
       <input
         id="llm-search-input"
         type="search"
-        placeholder={t("chat_window.workspace_llm_manager.search")}
+        placeholder={t("llm.search")}
         onChange={onSearchChange}
         className="search-input bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder outline-none text-sm rounded-lg px-2 py-2 w-full h-[32px] border-theme-modal-border border border-solid"
       />

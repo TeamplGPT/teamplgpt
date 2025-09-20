@@ -586,6 +586,7 @@ const TRANSLATIONS = {
     description:
       "These are the credentials and settings for your preferred LLM chat & embedding provider. It is important that these keys are current and correct, or else AnythingLLM will not function properly.",
     provider: "LLM Provider",
+    search: "Search all LLM providers",
     providers: {
       azure_openai: {
         azure_service_endpoint: "Azure Service Endpoint",
