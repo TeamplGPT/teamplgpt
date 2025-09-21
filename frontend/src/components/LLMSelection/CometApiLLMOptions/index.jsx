@@ -17,7 +17,7 @@ export default function CometApiLLMOptions({ settings }) {
             placeholder="CometAPI API Key"
             defaultValue={settings?.CometApiLLMApiKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>

@@ -68,7 +68,7 @@ export default function GenericOpenAiEmbeddingOptions({ settings }) {
             defaultValue={
               settings?.GenericOpenAiEmbeddingApiKey ? "*".repeat(20) : ""
             }
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>

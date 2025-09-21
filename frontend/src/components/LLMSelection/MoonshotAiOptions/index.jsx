@@ -20,7 +20,7 @@ export default function MoonshotAiOptions({ settings }) {
           placeholder="Moonshot AI API Key"
           defaultValue={settings?.MoonshotAiApiKey ? "*".repeat(20) : ""}
           required={true}
-          autoComplete="off"
+          autoComplete="new-password"
           spellCheck={false}
           onChange={(e) => setInputValue(e.target.value)}
           onBlur={() => setMoonshotAiKey(inputValue)}

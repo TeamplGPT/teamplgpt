@@ -161,7 +161,7 @@ export default function DrupalWikiOptions() {
                   className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
                   placeholder="pat:123"
                   required={true}
-                  autoComplete="off"
+                  autoComplete="new-password"
                   spellCheck={false}
                 />
               </div>

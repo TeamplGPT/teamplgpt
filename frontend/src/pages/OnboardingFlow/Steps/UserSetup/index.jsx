@@ -212,7 +212,7 @@ const JustMe = ({
               placeholder="Your admin password"
               minLength={6}
               required={true}
-              autoComplete="off"
+              autoComplete="new-password"
               onChange={handlePasswordChange}
             />
             <div className="mt-4 text-white text-opacity-80 text-xs font-base -mb-2">
@@ -314,7 +314,7 @@ const MyTeam = ({ setMultiUserLoginValid, myTeamSubmitRef, navigate }) => {
                   placeholder="Your admin password"
                   minLength={8}
                   required={true}
-                  autoComplete="off"
+                  autoComplete="new-password"
                   onChange={handlePasswordChange}
                 />
               </div>
