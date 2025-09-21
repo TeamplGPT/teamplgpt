@@ -13,6 +13,7 @@ export default function AgentFlowsList({
         <a
           href="https://docs.anythingllm.com/agent-flows/getting-started"
           target="_blank"
+          rel="noreferrer"
           className="text-theme-text-secondary underline hover:text-cta-button"
         >
           Learn more about Agent Flows.

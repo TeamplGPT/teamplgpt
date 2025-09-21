@@ -15,6 +15,7 @@ export default function DataConnectorOption({ slug }) {
         <a
           href={link}
           target="_blank"
+          rel="noreferrer"
           className="mt-2 text-xs text-white font-medium underline"
         >
           {link}
