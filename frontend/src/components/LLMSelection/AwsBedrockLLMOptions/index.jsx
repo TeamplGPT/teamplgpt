@@ -20,6 +20,7 @@ export default function AwsBedrockLLMOptions({ settings }) {
               <a
                 href="https://docs.anythingllm.com/setup/llm-configuration/cloud/aws-bedrock"
                 target="_blank"
+                rel="noreferrer"
                 className="underline flex gap-x-1 items-center"
               >
                 Read more on how to use AWS Bedrock in AnythingLLM

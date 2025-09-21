@@ -15,6 +15,7 @@ export default function ImportedSkillList({
           <a
             href="https://docs.anythingllm.com/agent/custom/developer-guide"
             target="_blank"
+            rel="noreferrer"
             className="text-theme-text-secondary underline hover:text-cta-button"
           >
             AnythingLLM Agent Docs
