@@ -18,7 +18,7 @@ export default function XAILLMOptions({ settings }) {
           placeholder="xAI API Key"
           defaultValue={settings?.XAIApiKey ? "*".repeat(20) : ""}
           required={true}
-          autoComplete="off"
+          autoComplete="new-password"
           spellCheck={false}
           onChange={(e) => setInputValue(e.target.value)}
           onBlur={() => setApiKey(inputValue)}

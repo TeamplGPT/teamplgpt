@@ -77,11 +77,11 @@ export default function NewUserModal({ closeModal }) {
                 </label>
                 <input
                   name="password"
-                  type="text"
+                  type="password"
                   className="border-none bg-theme-settings-input-bg w-full text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
                   placeholder="User's initial password"
                   required={true}
-                  autoComplete="off"
+                  autoComplete="new-password"
                   minLength={8}
                 />
                 <p className="mt-2 text-xs text-white/60">

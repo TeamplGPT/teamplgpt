@@ -35,7 +35,7 @@ export default function OpenAiGenericTextToSpeechOptions({ settings }) {
             defaultValue={
               settings?.TTSOpenAICompatibleKey ? "*".repeat(20) : ""
             }
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
           <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">

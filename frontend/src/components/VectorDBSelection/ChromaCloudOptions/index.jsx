@@ -13,7 +13,7 @@ export default function ChromaCloudOptions({ settings }) {
             placeholder="ck-your-api-key-here"
             defaultValue={settings?.ChromaCloudApiKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>

@@ -13,7 +13,7 @@ export default function PineconeDBOptions({ settings }) {
             placeholder="Pinecone API Key"
             defaultValue={settings?.PineConeKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>

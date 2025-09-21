@@ -28,7 +28,7 @@ export default function GeminiOptions({ settings }) {
             placeholder="Gemini API Key"
             defaultValue={settings?.GeminiEmbeddingApiKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>

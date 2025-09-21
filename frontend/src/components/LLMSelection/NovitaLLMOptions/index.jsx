@@ -17,7 +17,7 @@ export default function NovitaLLMOptions({ settings }) {
             placeholder="Novita API Key"
             defaultValue={settings?.NovitaLLMApiKey ? "*".repeat(20) : ""}
             required={true}
-            autoComplete="off"
+            autoComplete="new-password"
             spellCheck={false}
           />
         </div>

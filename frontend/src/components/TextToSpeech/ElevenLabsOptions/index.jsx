@@ -20,7 +20,7 @@ export default function ElevenLabsOptions({ settings }) {
           placeholder="ElevenLabs API Key"
           defaultValue={settings?.TTSElevenLabsKey ? "*".repeat(20) : ""}
           required={true}
-          autoComplete="off"
+          autoComplete="new-password"
           spellCheck={false}
           onChange={(e) => setInputValue(e.target.value)}
           onBlur={() => setElevenLabsKey(inputValue)}

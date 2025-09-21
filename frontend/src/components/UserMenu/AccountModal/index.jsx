@@ -160,10 +160,11 @@ export default function AccountModal({ user, hideModal }) {
                 </label>
                 <input
                   name="password"
-                  type="text"
+                  type="password"
                   className="border-none bg-theme-settings-input-bg placeholder:text-theme-settings-input-placeholder border-gray-500 text-white text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
                   placeholder={`${user.username}'s new password`}
                   minLength={8}
+                  autoComplete="new-password"
                 />
                 <p className="mt-2 text-xs text-white/60">
                   {t("profile_settings.password_description")}
