@@ -1,16 +1,18 @@
 import System from "@/models/system";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function GeminiLLMOptions({ settings }) {
   const [inputValue, setInputValue] = useState(settings?.GeminiLLMApiKey);
   const [geminiApiKey, setGeminiApiKey] = useState(settings?.GeminiLLMApiKey);
+  const { t } = useTranslation();
 
   return (
     <div className="w-full flex flex-col">
       <div className="w-full flex items-center gap-[36px] mt-1.5">
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            Google AI API Key
+            Google AI {t("llm.providers.api_key")}
           </label>
           <input
             type="password"
@@ -64,6 +66,7 @@ export default function GeminiLLMOptions({ settings }) {
 function GeminiModelSelection({ apiKey, settings }) {
   const [groupedModels, setGroupedModels] = useState({});
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -88,7 +91,7 @@ function GeminiModelSelection({ apiKey, settings }) {
     return (
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-3">
-          Chat Model Selection
+          {t("llm.providers.chat_model_selection")}
         </label>
         <select
           name="GeminiLLMModelPref"
@@ -96,7 +99,7 @@ function GeminiModelSelection({ apiKey, settings }) {
           className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- loading available models --
+            -- {t("llm.providers.loading_models")} --
           </option>
         </select>
       </div>
@@ -106,7 +109,7 @@ function GeminiModelSelection({ apiKey, settings }) {
   return (
     <div className="flex flex-col w-60">
       <label className="text-white text-sm font-semibold block mb-3">
-        Chat Model Selection
+        {t("llm.providers.chat_model_selection")}
       </label>
       <select
         name="GeminiLLMModelPref"

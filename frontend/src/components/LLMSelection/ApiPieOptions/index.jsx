@@ -1,13 +1,15 @@
 import System from "@/models/system";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function ApiPieLLMOptions({ settings }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-y-4 mt-1.5">
       <div className="flex gap-[36px]">
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            APIpie API Key
+            {t("llm.providers.api_key")}
           </label>
           <input
             type="password"
@@ -31,6 +33,7 @@ export default function ApiPieLLMOptions({ settings }) {
 function APIPieModelSelection({ settings }) {
   const [groupedModels, setGroupedModels] = useState({});
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -55,7 +58,7 @@ function APIPieModelSelection({ settings }) {
     return (
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-3">
-          Chat Model Selection
+          {t("llm.providers.chat_model_selection")}
         </label>
         <select
           name="ApipieLLMModelPref"
@@ -63,7 +66,7 @@ function APIPieModelSelection({ settings }) {
           className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- loading available models --
+            -- {t("llm.providers.loading_models")} --
           </option>
         </select>
       </div>
@@ -73,7 +76,7 @@ function APIPieModelSelection({ settings }) {
   return (
     <div className="flex flex-col w-60">
       <label className="text-white text-sm font-semibold block mb-3">
-        Chat Model Selection
+        {t("llm.providers.chat_model_selection")}
       </label>
       <select
         name="ApipieLLMModelPref"

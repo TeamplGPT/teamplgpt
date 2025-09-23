@@ -552,16 +552,223 @@ const TRANSLATIONS = {
       "이것은 채팅과 임베딩을 하기 위한 선호하는 LLM 제공자의 인증입니다. 이 키가 현재 활성 상태이고 정확해야 AnythingLLM이 제대로 작동합니다.",
     provider: "LLM 제공자",
     search: "LLM 제공자 검색",
+    messages: {
+      saveSuccess: "LLM 설정이 성공적으로 저장되었습니다.",
+      saveError: "LLM 설정 저장에 실패했습니다: {error}",
+    },
     providers: {
+      llm_default: {
+        name: "시스템 기본값",
+        description:
+          "이 워크스페이스에 대한 시스템 LLM 기본 설정을 사용합니다.",
+      },
       azure_openai: {
+        description:
+          "Azure 서비스에서 호스팅되는 OpenAI의 엔터프라이즈 옵션입니다.",
         azure_service_endpoint: "Azure 서비스 엔드포인트",
-        api_key: "API 키",
         chat_deployment_name: "채팅 배포 이름",
         chat_model_token_limit: "채팅 모델 토큰 한도",
         model_type: "모델 유형",
         default: "기본값",
         reasoning: "추론",
       },
+      openai: {
+        description: "대부분의 비상업적 용도에 대한 표준 옵션입니다.",
+      },
+      anthropic: {
+        description: "Anthropic에서 제공하는 친근한 AI 어시스턴트입니다.",
+      },
+      gemini: {
+        description: "Google이 제공하는 가장 크고 강력한 AI 모델입니다.",
+      },
+      nvidia_nim: {
+        description:
+          "NVIDIA NIM을 사용하여 NVIDIA RTX GPU에서 직접 대규모 LLM을 실행하세요.",
+        base_url_description: "NVIDIA NIM이 실행되는 URL을 입력하세요.",
+      },
+      huggingface: {
+        description:
+          "150,000개 이상의 오픈소스 LLM과 전 세계 AI 커뮤니티에 접근하세요.",
+        inference_endpoint: "HuggingFace 추론 엔드포인트",
+        access_token: "HuggingFace 액세스 토큰",
+        model_token_limit: "모델 토큰 한도",
+      },
+      ollama: {
+        description: "자신의 컴퓨터에서 LLM을 로컬로 실행하세요.",
+        model: "Ollama 모델",
+        model_description:
+          "사용하려는 Ollama 모델을 선택하세요. 유효한 Ollama URL을 입력한 후 모델이 로드됩니다.",
+        model_description_2: "대화에 사용하려는 Ollama 모델을 선택하세요.",
+        enter_ollama_url_first: "Ollama URL을 먼저 입력하세요",
+        model_token_limit: "최대 토큰",
+        model_token_limit_description:
+          "컨텍스트와 응답에 사용할 최대 토큰 수입니다.",
+        base_url_description: "Ollama가 실행되는 URL을 입력하세요.",
+        performance_mode: "성능 모드",
+        performance_mode_description: "Ollama 모델의 성능 모드를 선택하세요.",
+        base_mode: "기본 (기본값)",
+        maximum_mode: "최대",
+        note: "주의:",
+        note_description:
+          "최대 모드 사용 시 리소스 사용량이 크게 증가할 수 있으니 주의하세요.",
+        maximum_mode_description:
+          "전체 컨텍스트 윈도우(최대 토큰 수까지)를 사용합니다. 리소스 사용량이 크게 증가하지만 더 긴 대화가 가능합니다.<br /><br /> 대부분의 사용자에게는 권장하지 않습니다.",
+        base_mode_description:
+          "Ollama는 자동으로 컨텍스트를 2048 토큰으로 제한하여 리소스 사용을 최소화하면서도 우수한 성능을 유지합니다. 대부분의 사용자와 모델에 적합한 설정입니다.",
+        keep_alive: "Ollama 캐시 유지 시간",
+        no_cache: "캐시 없음",
+        five_minutes: "5분",
+        one_hour: "1시간",
+        forever: "영구",
+        keep_alive_description:
+          "Ollama가 모델을 메모리에 유지할 시간을 선택하세요.",
+        learn_more: "자세히 보기",
+        auth_token: "인증 토큰",
+        auth_token_description:
+          "Ollama 서버와 상호작용하기 위한 <code>Bearer</code> 인증 토큰을 입력하세요.",
+        auth_token_description_2:
+          "인증 서버 뒤에서 Ollama를 실행할 때만 사용됩니다.",
+      },
+      dpais: {
+        description:
+          "Dell Pro AI Studio의 NPU를 활용해 강력한 LLM을 빠르게 실행하세요.",
+        dell_pro_ai_studio_base_url: "Dell Pro AI Studio 기본 URL",
+      },
+      lmstudio: {
+        description:
+          "몇 번의 클릭만으로 수천 개의 최신 LLM을 탐색, 다운로드, 실행하세요.",
+        alert:
+          "LMStudio를 LLM으로 사용하려면 임베딩 서비스를 반드시 설정해야 합니다.",
+        manage_embedding: "임베딩 관리",
+        max_tokens_description: "컨텍스트와 응답에 사용할 최대 토큰 수입니다.",
+        hide_endpoint_input: "엔드포인트 관리 숨기기",
+        show_endpoint_input: "엔드포인트 관리 보이기",
+        base_url_description: "LM Studio가 실행되는 URL을 입력하세요.",
+        model: "LM Studio 모델",
+        enter_url_first: "LM Studio URL을 먼저 입력하세요",
+        model_description:
+          "사용할 LM Studio 모델을 선택하세요. 올바른 LM Studio URL을 입력하면 모델 목록을 불러옵니다.",
+        model_description_2: "대화에 사용할 LM Studio 모델을 선택하세요.",
+      },
+      localai: {
+        description: "자신의 컴퓨터에서 LLM을 로컬로 실행하세요.",
+        alert: {
+          message:
+            "LLM으로 LocalAI를 사용하려면 사용할 임베딩 서비스를 설정해야 합니다.",
+          manageEmbedding: "임베딩 관리",
+        },
+      },
+      novita: {
+        description:
+          "Novita AI의 신뢰할 수 있고 확장 가능하며 비용 효율적인 LLM을 사용하세요.",
+      },
+      togetherai: {
+        description: "Together AI에서 제공하는 오픈소스 모델을 실행하세요.",
+      },
+      fireworksai: {
+        description:
+          "프로덕션 수준의 복합 AI 시스템 구축을 위한 가장 빠르고 효율적인 추론 엔진입니다.",
+      },
+      mistral: {
+        description: "Mistral AI의 오픈소스 모델을 실행하세요.",
+      },
+      perplexity: {
+        description:
+          "Perplexity AI에서 호스팅하는 강력하고 인터넷 연결된 모델을 실행하세요.",
+      },
+      openrouter: {
+        description: "여러 LLM을 위한 통합 인터페이스입니다.",
+      },
+      groq: {
+        description:
+          "실시간 AI 애플리케이션을 위한 가장 빠른 LLM 추론을 제공합니다.",
+      },
+      koboldcpp: {
+        description: "koboldcpp를 사용해 로컬 LLM을 실행하세요.",
+        max_tokens_description: "컨텍스트와 응답에 사용할 최대 토큰 수입니다.",
+        max_response_tokens: "최대 응답 토큰",
+        max_response_tokens_description: "응답에 사용할 최대 토큰 수입니다.",
+        hide_manual_endpoint_input: "수동 엔드포인트 입력 숨기기",
+        show_manual_endpoint_input: "수동 엔드포인트 입력 보이기",
+        base_url_description: "KoboldCPP가 실행되는 URL을 입력하세요.",
+        model: "KoboldCPP 모델",
+        model_description:
+          "사용할 KoboldCPP 모델을 선택하세요. 유효한 KoboldCPP URL을 입력하면 모델을 불러옵니다.",
+        model_description_2: "대화에 사용할 KoboldCPP 모델을 선택하세요.",
+      },
+      textgenwebui: {
+        description: "Oobabooga의 문자 생성 웹 UI로 로컬 LLM을 실행하세요.",
+      },
+      cohere: {
+        description: "Cohere의 강력한 Command 모델을 실행하세요.",
+      },
+      litellm: {
+        description: "여러 LLM을 위한 OpenAI 호환 LiteLLM 프록시를 실행하세요.",
+      },
+      deepseek: {
+        description: "DeepSeek의 강력한 LLM을 실행하세요.",
+      },
+      ppio: {
+        description:
+          "DeepSeek, Llama, Qwen 등과 같은 안정적이고 비용 효율적인 오픈소스 LLM API를 실행하세요.",
+      },
+      bedrock: {
+        description:
+          "AWS Bedrock을 통해 강력한 파운데이션 모델을 프라이빗하게 실행하세요.",
+        alert:
+          "AWS Bedrock을 사용하려면 적절하게 정의된 IAM 사용자를 사용해야 합니다.",
+        read_more:
+          "AnythingLLM에서 AWS Bedrock을 사용하는 방법에 대해 자세히 알아보세요",
+        use_session_token: "세션 토큰 사용",
+        select_method: "AWS Bedrock에 인증하는 방법을 선택하세요.",
+        iam_explicit_credentials: "IAM (명시적 자격 증명)",
+        session_token: "Session Token (임시 자격 증명)",
+        iam_role: "IAM Role (암시적 자격 증명)",
+        iam_access_id: "AWS Bedrock IAM 액세스 ID",
+        iam_access_key: "AWS Bedrock IAM 액세스 키",
+        session_token_placeholder: "AWS Bedrock 세션 토큰",
+        aws_region: "AWS 리전",
+        model_id: "모델 ID",
+        model_id_placeholder: "AWS에서 모델 ID (예: meta.llama3.1-v0.1)",
+        model_context_window: "모델 컨텍스트 창",
+        model_context_window_placeholder: "컨텍스트 창 한도 (예: 8192)",
+        model_max_output_tokens: "모델 최대 출력 토큰",
+        model_max_output_tokens_placeholder: "최대 출력 토큰 (예: 4096)",
+      },
+      apipie: {
+        description: "주요 제공업체의 AI 서비스를 통합한 통합 API입니다.",
+      },
+      generic_openai: {
+        description: "커스텀 설정을 통해 OpenAI 호환 서비스를 연결하세요.",
+        chat_model_name: "채팅 모델 이름",
+        model_id_used_for_chat_requests: "채팅 요청에 사용되는 모델 ID",
+        max_tokens_per_request_placeholder: "요청당 최대 토큰 (예: 1024)",
+      },
+      xai: {
+        description: "Grok-2 등 xAI의 강력한 LLM을 실행하세요.",
+        model_selection_description: "대화에 사용할 xAI 모델을 선택하세요.",
+      },
+      api_key: "API 키",
+      chat_model_selection: "채팅 모델 선택",
+      loading_models: "사용 가능한 모델을 불러오는 중...",
+      enter_valid_api_key:
+        "계정에 유효한 API 키를 입력하면 사용 가능한 모든 모델을 볼 수 있습니다.",
+      model_type: "모델 유형",
+      default: "기본",
+      token_context_window: "토큰 컨텍스트 창",
+      show_advanced_settings: "고급 설정 보이기",
+      hide_advanced_settings: "고급 설정 숨기기",
+      auto_detect: "자동 감지",
+      base_url: "기본 URL",
+      waiting_for_url: "URL 대기 중...",
+      waiting_for_api_key: "API 키 대기 중...",
+      optional: "선택 사항",
+      select_llm_required: "LLM을 선택해야 합니다.",
+      stream_timeout: "스트림 타임아웃 (ms)",
+      stream_timeout_description:
+        "토큰 응답 간 시간을 초과하면 자동으로 스트림을 종료합니다.",
+      max_tokens: "최대 토큰",
+      token_context_window_placeholder: "컨텍스트 창 한도 (예: 4096)",
     },
   },
   transcription: {

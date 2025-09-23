@@ -76,7 +76,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "openai",
     logo: OpenAiLogo,
     options: (settings) => <OpenAiOptions settings={settings} />,
-    description: "The standard option for most non-commercial use.",
+    description: "llm.providers.openai.description",
     requiredConfig: ["OpenAiKey"],
   },
   {
@@ -84,7 +84,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "azure",
     logo: AzureOpenAiLogo,
     options: (settings) => <AzureAiOptions settings={settings} />,
-    description: "The enterprise option of OpenAI hosted on Azure services.",
+    description: "llm.providers.azure_openai.description",
     requiredConfig: ["AzureOpenAiEndpoint"],
   },
   {
@@ -92,7 +92,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "anthropic",
     logo: AnthropicLogo,
     options: (settings) => <AnthropicAiOptions settings={settings} />,
-    description: "A friendly AI Assistant hosted by Anthropic.",
+    description: "llm.providers.anthropic.description",
     requiredConfig: ["AnthropicApiKey"],
   },
   {
@@ -100,7 +100,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "gemini",
     logo: GeminiLogo,
     options: (settings) => <GeminiLLMOptions settings={settings} />,
-    description: "Google's largest and most capable AI model",
+    description: "llm.providers.gemini.description",
     requiredConfig: ["GeminiLLMApiKey"],
   },
   {
@@ -108,8 +108,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "nvidia-nim",
     logo: NvidiaNimLogo,
     options: (settings) => <NvidiaNimOptions settings={settings} />,
-    description:
-      "Run full parameter LLMs directly on your NVIDIA RTX GPU using NVIDIA NIM.",
+    description: "llm.providers.nvidia_nim.description",
     requiredConfig: ["NvidiaNimLLMBasePath"],
   },
   {
@@ -117,8 +116,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "huggingface",
     logo: HuggingFaceLogo,
     options: (settings) => <HuggingFaceOptions settings={settings} />,
-    description:
-      "Access 150,000+ open-source LLMs and the world's AI community",
+    description: "llm.providers.huggingface.description",
     requiredConfig: [
       "HuggingFaceLLMEndpoint",
       "HuggingFaceLLMAccessToken",
@@ -130,7 +128,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "ollama",
     logo: OllamaLogo,
     options: (settings) => <OllamaLLMOptions settings={settings} />,
-    description: "Run LLMs locally on your own machine.",
+    description: "llm.providers.ollama.description",
     requiredConfig: ["OllamaLLMBasePath"],
   },
   {
@@ -138,8 +136,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "dpais",
     logo: DellProAiStudioLogo,
     options: (settings) => <DellProAiStudioOptions settings={settings} />,
-    description:
-      "Run powerful LLMs quickly on NPU powered by Dell Pro AI Studio.",
+    description: "llm.providers.dpais.description",
     requiredConfig: [
       "DellProAiStudioBasePath",
       "DellProAiStudioModelPref",
@@ -151,8 +148,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "lmstudio",
     logo: LMStudioLogo,
     options: (settings) => <LMStudioOptions settings={settings} />,
-    description:
-      "Discover, download, and run thousands of cutting edge LLMs in a few clicks.",
+    description: "llm.providers.lmstudio.description",
     requiredConfig: ["LMStudioBasePath"],
   },
   {
@@ -160,7 +156,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "localai",
     logo: LocalAiLogo,
     options: (settings) => <LocalAiOptions settings={settings} />,
-    description: "Run LLMs locally on your own machine.",
+    description: "llm.providers.localai.description",
     requiredConfig: ["LocalAiApiKey", "LocalAiBasePath", "LocalAiTokenLimit"],
   },
   {
@@ -168,7 +164,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "togetherai",
     logo: TogetherAILogo,
     options: (settings) => <TogetherAiOptions settings={settings} />,
-    description: "Run open source models from Together AI.",
+    description: "llm.providers.togetherai.description",
     requiredConfig: ["TogetherAiApiKey"],
   },
   {
@@ -176,8 +172,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "fireworksai",
     logo: FireworksAILogo,
     options: (settings) => <FireworksAiOptions settings={settings} />,
-    description:
-      "The fastest and most efficient inference engine to build production-ready, compound AI systems.",
+    description: "llm.providers.fireworksai.description",
     requiredConfig: ["FireworksAiLLMApiKey"],
   },
   {
@@ -185,7 +180,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "mistral",
     logo: MistralLogo,
     options: (settings) => <MistralOptions settings={settings} />,
-    description: "Run open source models from Mistral AI.",
+    description: "llm.providers.mistral.description",
     requiredConfig: ["MistralApiKey"],
   },
   {
@@ -193,8 +188,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "perplexity",
     logo: PerplexityLogo,
     options: (settings) => <PerplexityOptions settings={settings} />,
-    description:
-      "Run powerful and internet-connected models hosted by Perplexity AI.",
+    description: "llm.providers.perplexity.description",
     requiredConfig: ["PerplexityApiKey"],
   },
   {
@@ -202,7 +196,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "openrouter",
     logo: OpenRouterLogo,
     options: (settings) => <OpenRouterOptions settings={settings} />,
-    description: "A unified interface for LLMs.",
+    description: "llm.providers.openrouter.description",
     requiredConfig: ["OpenRouterApiKey"],
   },
   {
@@ -210,8 +204,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "groq",
     logo: GroqLogo,
     options: (settings) => <GroqAiOptions settings={settings} />,
-    description:
-      "The fastest LLM inferencing available for real-time AI applications.",
+    description: "llm.providers.groq.description",
     requiredConfig: ["GroqApiKey"],
   },
   {
@@ -219,7 +212,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "koboldcpp",
     logo: KoboldCPPLogo,
     options: (settings) => <KoboldCPPOptions settings={settings} />,
-    description: "Run local LLMs using koboldcpp.",
+    description: "llm.providers.koboldcpp.description",
     requiredConfig: [
       "KoboldCPPModelPref",
       "KoboldCPPBasePath",
@@ -231,7 +224,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "textgenwebui",
     logo: TextGenWebUILogo,
     options: (settings) => <TextGenWebUIOptions settings={settings} />,
-    description: "Run local LLMs using Oobabooga's Text Generation Web UI.",
+    description: "llm.providers.textgenwebui.description",
     requiredConfig: ["TextGenWebUIBasePath", "TextGenWebUITokenLimit"],
   },
   {
@@ -239,7 +232,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "cohere",
     logo: CohereLogo,
     options: (settings) => <CohereAiOptions settings={settings} />,
-    description: "Run Cohere's powerful Command models.",
+    description: "llm.providers.cohere.description",
     requiredConfig: ["CohereApiKey"],
   },
   {
@@ -247,7 +240,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "litellm",
     logo: LiteLLMLogo,
     options: (settings) => <LiteLLMOptions settings={settings} />,
-    description: "Run LiteLLM's OpenAI compatible proxy for various LLMs.",
+    description: "  Run LiteLLM's OpenAI compatible proxy for various LLMs.",
     requiredConfig: ["LiteLLMBasePath"],
   },
   {
@@ -255,7 +248,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "deepseek",
     logo: DeepSeekLogo,
     options: (settings) => <DeepSeekOptions settings={settings} />,
-    description: "Run DeepSeek's powerful LLMs.",
+    description: "llm.providers.deepseek.description",
     requiredConfig: ["DeepSeekApiKey"],
   },
   {
@@ -263,8 +256,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "ppio",
     logo: PPIOLogo,
     options: (settings) => <PPIOLLMOptions settings={settings} />,
-    description:
-      "Run stable and cost-efficient open-source LLM APIs, such as DeepSeek, Llama, Qwen etc.",
+    description: "llm.providers.ppio.description",
     requiredConfig: ["PPIOApiKey"],
   },
   {
@@ -272,7 +264,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "bedrock",
     logo: AWSBedrockLogo,
     options: (settings) => <AWSBedrockLLMOptions settings={settings} />,
-    description: "Run powerful foundation models privately with AWS Bedrock.",
+    description: "llm.providers.bedrock.description",
     requiredConfig: [
       "AwsBedrockLLMAccessKeyId",
       "AwsBedrockLLMAccessKey",
@@ -285,7 +277,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "apipie",
     logo: APIPieLogo,
     options: (settings) => <ApiPieLLMOptions settings={settings} />,
-    description: "A unified API of AI services from leading providers",
+    description: "llm.providers.apipie.description",
     requiredConfig: ["ApipieLLMApiKey", "ApipieLLMModelPref"],
   },
   {
@@ -293,7 +285,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "moonshotai",
     logo: MoonshotAiLogo,
     options: (settings) => <MoonshotAiOptions settings={settings} />,
-    description: "Run Moonshot AI's powerful LLMs.",
+    description: "llm.providers.moonshotai.description",
     requiredConfig: ["MoonshotAiApiKey"],
   },
   {
@@ -301,8 +293,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "novita",
     logo: NovitaLogo,
     options: (settings) => <NovitaLLMOptions settings={settings} />,
-    description:
-      "Reliable, Scalable, and Cost-Effective for LLMs from Novita AI",
+    description: "llm.providers.novita.description",
     requiredConfig: ["NovitaLLMApiKey"],
   },
   {
@@ -310,7 +301,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "cometapi",
     logo: CometApiLogo,
     options: (settings) => <CometApiLLMOptions settings={settings} />,
-    description: "500+ AI Models all in one API.",
+    description: "llm.providers.cometapi.description",
     requiredConfig: ["CometApiLLMApiKey"],
   },
   {
@@ -318,7 +309,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "xai",
     logo: XAILogo,
     options: (settings) => <XAILLMOptions settings={settings} />,
-    description: "Run xAI's powerful LLMs like Grok-2 and more.",
+    description: "llm.providers.xai.description",
     requiredConfig: ["XAIApiKey", "XAIModelPref"],
   },
   {
@@ -326,8 +317,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "generic-openai",
     logo: GenericOpenAiLogo,
     options: (settings) => <GenericOpenAiOptions settings={settings} />,
-    description:
-      "Connect to any OpenAi-compatible service via a custom configuration",
+    description: "llm.providers.generic_openai.description",
     requiredConfig: [
       "GenericOpenAiBasePath",
       "GenericOpenAiModelPref",
@@ -360,9 +350,9 @@ export default function GeneralLLMPreference() {
     setSaving(true);
 
     if (error) {
-      showToast(`Failed to save LLM settings: ${error}`, "error");
+      showToast(t("llm.messages.saveError", { error }), "error");
     } else {
-      showToast("LLM preferences saved successfully.", "success");
+      showToast(t("llm.messages.saveSuccess"), "success");
     }
     setSaving(false);
     setHasChanges(!!error);
@@ -489,7 +479,7 @@ export default function GeneralLLMPreference() {
                               name={llm.name}
                               value={llm.value}
                               image={llm.logo}
-                              description={llm.description}
+                              description={t(llm.description)}
                               checked={selectedLLM === llm.value}
                               onClick={() => updateLLMChoice(llm.value)}
                             />
@@ -515,8 +505,9 @@ export default function GeneralLLMPreference() {
                           {selectedLLMObject?.name || "None selected"}
                         </div>
                         <div className="mt-1 text-xs text-description">
-                          {selectedLLMObject?.description ||
-                            "You need to select an LLM"}
+                          {selectedLLMObject
+                            ? t(selectedLLMObject.description)
+                            : t("llm.providers.select_llm_required")}
                         </div>
                       </div>
                     </div>

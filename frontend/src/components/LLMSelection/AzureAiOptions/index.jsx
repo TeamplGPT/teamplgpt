@@ -24,7 +24,7 @@ export default function AzureAiOptions({ settings }) {
 
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            {t("llm.providers.azure_openai.api_key")}
+            {t("llm.providers.api_key")}
           </label>
           <input
             type="password"

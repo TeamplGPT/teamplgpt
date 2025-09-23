@@ -1,12 +1,15 @@
 import System from "@/models/system";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function FireworksAiOptions({ settings }) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex gap-[36px] mt-1.5">
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-3">
-          Fireworks AI API Key
+          Fireworks AI {t("llm.providers.api_key")}
         </label>
         <input
           type="password"
@@ -28,6 +31,7 @@ export default function FireworksAiOptions({ settings }) {
 function FireworksAiModelSelection({ settings }) {
   const [groupedModels, setGroupedModels] = useState({});
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -53,7 +57,7 @@ function FireworksAiModelSelection({ settings }) {
     return (
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-3">
-          Chat Model Selection
+          {t("llm.providers.chat_model_selection")}
         </label>
         <select
           name="FireworksAiLLMModelPref"
@@ -61,7 +65,7 @@ function FireworksAiModelSelection({ settings }) {
           className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- loading available models --
+            -- {t("llm.providers.loading_models")} --
           </option>
         </select>
       </div>
@@ -71,7 +75,7 @@ function FireworksAiModelSelection({ settings }) {
   return (
     <div className="flex flex-col w-60">
       <label className="text-white text-sm font-semibold block mb-3">
-        Chat Model Selection
+        {t("llm.providers.chat_model_selection")}
       </label>
       <select
         name="FireworksAiLLMModelPref"
