@@ -587,16 +587,226 @@ const TRANSLATIONS = {
       "These are the credentials and settings for your preferred LLM chat & embedding provider. It is important that these keys are current and correct, or else AnythingLLM will not function properly.",
     provider: "LLM Provider",
     search: "Search all LLM providers",
+    messages: {
+      saveSuccess: "LLM preferences saved successfully.",
+      saveError: "Failed to save LLM settings: {error}",
+    },
     providers: {
+      llm_default: {
+        name: "System default",
+        description: "Use the system LLM preference for this workspace.",
+      },
       azure_openai: {
+        description:
+          "The enterprise option of OpenAI hosted on Azure services.",
         azure_service_endpoint: "Azure Service Endpoint",
-        api_key: "API Key",
         chat_deployment_name: "Chat Deployment Name",
         chat_model_token_limit: "Chat Model Token Limit",
         model_type: "Model Type",
         default: "Default",
         reasoning: "Reasoning",
       },
+      openai: {
+        description: "The standard option for most non-commercial use.",
+      },
+      anthropic: {
+        description: "A friendly AI Assistant hosted by Anthropic.",
+      },
+      gemini: {
+        description: "Google's largest and most capable AI model",
+      },
+      nvidia_nim: {
+        description:
+          "Run full parameter LLMs directly on your NVIDIA RTX GPU using NVIDIA NIM.",
+        base_url_description: "Enter the URL where NVIDIA NIM is running.",
+      },
+      huggingface: {
+        description:
+          "Access 150,000+ open-source LLMs and the world's AI community",
+        inference_endpoint: "HuggingFace Inference Endpoint",
+        access_token: "HuggingFace Access Token",
+        model_token_limit: "Model Token Limit",
+      },
+      ollama: {
+        description: "Run LLMs locally on your own machine.",
+        model: "Ollama Model",
+        model_description:
+          "Select the Ollama model you want to use. Models will load after entering a valid Ollama URL.",
+        model_description_2:
+          "Choose the Ollama model you want to use for your conversations.",
+        enter_ollama_url_first: "Enter Ollama URL first",
+        model_token_limit: "Max Tokens",
+        model_token_limit_description:
+          "Maximum number of tokens for context and response.",
+        base_url_description: "Enter the URL where Ollama is running.",
+        performance_mode: "Performance Mode",
+        performance_mode_description:
+          "Choose the performance mode for the Ollama model.",
+        base_mode: "Base (Default)",
+        maximum_mode: "Maximum",
+        note: "Note:",
+        note_description:
+          "Be careful with the Maximum mode. It may increase resource usage significantly.",
+        maximum_mode_description:
+          "Uses the full context window (up to Max Tokens). Will result in increased resource usage but allows for larger context conversations. <br /><br /> This is not recommended for most users.",
+        base_mode_description:
+          "Ollama automatically limits the context to 2048 tokens, keeping resources usage low while maintaining good performance. Suitable for most users and models.",
+        keep_alive: "Ollama Keep Alive",
+        no_cache: "No cache",
+        five_minutes: "5 minutes",
+        one_hour: "1 hour",
+        forever: "Forever",
+        keep_alive_description:
+          "Choose how long Ollama should keep your model in memory before unloading.",
+        learn_more: "Learn more",
+        auth_token: "Auth Token",
+        auth_token_description:
+          "Enter a <code>Bearer</code> Auth Token for interacting with your Ollama server.",
+        auth_token_description_2:
+          "Used <b>only</b> if running Ollama behind an authentication server.",
+      },
+      dpais: {
+        description:
+          "Run powerful LLMs quickly on NPU powered by Dell Pro AI Studio.",
+        dell_pro_ai_studio_base_url: "Dell Pro AI Studio Base URL",
+      },
+      lmstudio: {
+        description:
+          "Discover, download, and run thousands of cutting edge LLMs in a few clicks.",
+        alert:
+          "LMStudio as your LLM requires you to set an embedding service to use.",
+        manage_embedding: "Manage embedding",
+        max_tokens_description:
+          "Maximum number of tokens for context and response.",
+        hide_endpoint_input: "Hide Manual Endpoint Input",
+        show_endpoint_input: "Show Manual Endpoint Input",
+        base_url_description: "Enter the URL where LM Studio is running.",
+        model: "LM Studio Model",
+        enter_url_first: "Enter LM Studio URL first",
+        model_description:
+          "Select the LM Studio model you want to use. Models will load after entering a valid LM Studio URL.",
+        model_description_2:
+          "Choose the LM Studio model you want to use for your conversations.",
+      },
+      localai: {
+        description: "Run LLMs locally on your own machine.",
+        alert: {
+          message:
+            "LocalAI as your LLM requires you to set an embedding service to use.",
+          manageEmbedding: "Manage embedding",
+        },
+      },
+      novita: {
+        description:
+          "Reliable, Scalable, and Cost-Effective for LLMs from Novita AI",
+      },
+      togetherai: {
+        description: "Run open source models from Together AI.",
+      },
+      fireworksai: {
+        description:
+          "The fastest and most efficient inference engine to build production-ready, compound AI systems.",
+      },
+      mistral: {
+        description: "Run open source models from Mistral AI.",
+      },
+      perplexity: {
+        description:
+          "Run powerful and internet-connected models hosted by Perplexity AI.",
+      },
+      openrouter: {
+        description: "A unified interface for LLMs.",
+      },
+      groq: {
+        description:
+          "The fastest LLM inferencing available for real-time AI applications.",
+      },
+      koboldcpp: {
+        description: "Run local LLMs using KoboldCPP.",
+        max_tokens_description:
+          "Maximum number of tokens for context and response.",
+        max_response_tokens: "Max response tokens",
+        max_response_tokens_description:
+          "Maximum number of tokens for the response.",
+        hide_manual_endpoint_input: "Hide Manual Endpoint Input",
+        show_manual_endpoint_input: "Show Manual Endpoint Input",
+        base_url_description: "Enter the URL where KoboldCPP is running.",
+        model: "KoboldCPP Model",
+        model_description:
+          "Select the KoboldCPP model you want to use. Models will load after entering a valid KoboldCPP URL.",
+        model_description_2:
+          "Choose the KoboldCPP model you want to use for your conversations.",
+      },
+      textgenwebui: {
+        description: "Run local LLMs using Oobabooga's Text Generation Web UI.",
+      },
+      cohere: {
+        description: "Run Cohere's powerful Command models.",
+      },
+      litellm: {
+        description: "Run LiteLLM's OpenAI compatible proxy for various LLMs.",
+      },
+      deepseek: {
+        description: "Run DeepSeek's powerful LLMs.",
+      },
+      ppio: {
+        description:
+          "Run stable and cost-efficient open-source LLM APIs, such as DeepSeek, Llama, Qwen etc.",
+      },
+      bedrock: {
+        description:
+          "Run powerful foundation models privately with AWS Bedrock.",
+        alert: "You should use a properly defined IAM user for inferencing.",
+        read_more: "Read more on how to use AWS Bedrock in AnythingLLM",
+        use_session_token: "Use session token",
+        select_method: "Select the method to authenticate with AWS Bedrock.",
+        iam_explicit_credentials: "IAM (Explicit Credentials)",
+        session_token: "Session Token (Temporary Credentials)",
+        iam_role: "IAM Role (Implied Credentials)",
+        iam_access_id: "AWS Bedrock IAM Access ID",
+        iam_access_key: "AWS Bedrock IAM Access Key",
+        session_token_placeholder: "AWS Bedrock Session Token",
+        aws_region: "AWS region",
+        model_id: "Model ID",
+        model_id_placeholder: "Model id from AWS eg: meta.llama3.1-v0.1",
+        model_context_window: "Model context window",
+        model_context_window_placeholder: "Content window limit (eg: 8192)",
+        model_max_output_tokens: "Model max output tokens",
+        model_max_output_tokens_placeholder: "Max output tokens (eg: 4096)",
+      },
+      apipie: {
+        description: "A unified API of AI services from leading providers",
+      },
+      generic_openai: {
+        description:
+          "Connect to any OpenAi-compatible service via a custom configuration",
+        chat_model_name: "Chat Model Name",
+        model_id_used_for_chat_requests: "Model id used for chat requests",
+        max_tokens_per_request_placeholder: "Max tokens per request (eg: 1024)",
+      },
+      xai: {
+        description: "Run xAI's powerful LLMs like Grok-2 and more.",
+        model_selection_description:
+          "Select the xAI model you want to use for your conversations.",
+      },
+      api_key: "API Key",
+      chat_model_selection: "Chat Model Selection",
+      loading_models: "Loading available models...",
+      enter_valid_api_key:
+        "Enter a valid API key to view all available models for your account.",
+      model_type: "Model Type",
+      default: "Default",
+      token_context_window: "Token Context Window",
+      show_advanced_settings: "Show Advanced Settings",
+      hide_advanced_settings: "Hide Advanced Settings",
+      auto_detect: "Auto-Detect",
+      base_url: "Base URL",
+      waiting_for_url: "Waiting for URL",
+      waiting_for_api_key: "Waiting for API Key",
+      optional: "optional",
+      select_llm_required: "You need to select an LLM",
+      max_tokens: "Max Tokens",
+      token_context_window_placeholder: "Content window limit (eg: 4096)",
     },
   },
 

@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import System from "@/models/system";
+import { useTranslation } from "react-i18next";
 
 export default function LiteLLMOptions({ settings }) {
   const [basePathValue, setBasePathValue] = useState(settings?.LiteLLMBasePath);
   const [basePath, setBasePath] = useState(settings?.LiteLLMBasePath);
   const [apiKeyValue, setApiKeyValue] = useState(settings?.LiteLLMAPIKey);
   const [apiKey, setApiKey] = useState(settings?.LiteLLMAPIKey);
+  const { t } = useTranslation();
 
   return (
     <div className="w-full flex flex-col gap-y-7 mt-1.5">
       <div className="w-full flex items-center gap-[36px]">
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            Base URL
+            {t("llm.providers.base_url")}
           </label>
           <input
             type="url"
@@ -34,7 +36,7 @@ export default function LiteLLMOptions({ settings }) {
         />
         <div className="flex flex-col w-60">
           <label className="text-white text-sm font-semibold block mb-3">
-            Token context window
+            {t("llm.providers.token_context_window")}
           </label>
           <input
             type="number"
@@ -53,7 +55,10 @@ export default function LiteLLMOptions({ settings }) {
         <div className="flex flex-col w-60">
           <div className="flex flex-col gap-y-1 mb-4">
             <label className="text-white text-sm font-semibold flex items-center gap-x-2">
-              API Key <p className="!text-xs !italic !font-thin">optional</p>
+              {t("llm.providers.api_key")}{" "}
+              <p className="!text-xs !italic !font-thin">
+                {t("llm.providers.optional")}
+              </p>
             </label>
           </div>
           <input
@@ -76,6 +81,7 @@ export default function LiteLLMOptions({ settings }) {
 function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
   const [customModels, setCustomModels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -100,7 +106,7 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
     return (
       <div className="flex flex-col w-60">
         <label className="text-white text-sm font-semibold block mb-3">
-          Chat Model Selection
+          {t("llm.providers.chat_model_selection")}
         </label>
         <select
           name="LiteLLMModelPref"
@@ -109,8 +115,8 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
         >
           <option disabled={true} selected={true}>
             {basePath?.includes("/v1")
-              ? "-- loading available models --"
-              : "-- waiting for URL --"}
+              ? `-- ${t("llm.providers.loading_models")} --`
+              : `-- ${t("llm.providers.waiting_for_url")} --`}
           </option>
         </select>
       </div>
@@ -120,7 +126,7 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
   return (
     <div className="flex flex-col w-60">
       <label className="text-white text-sm font-semibold block mb-3">
-        Chat Model Selection
+        {t("llm.providers.chat_model_selection")}
       </label>
       <select
         name="LiteLLMModelPref"
