@@ -951,9 +951,228 @@ const TRANSLATIONS = {
     title: "Privacy & Data-Handling",
     description:
       "This is your configuration for how connected third party providers and AnythingLLM handle your data.",
-    llm: "LLM Selection",
-    embedding: "Embedding Preference",
-    vector: "Vector Database",
+    llm: {
+      title: "LLM Selection",
+      openai: {
+        description:
+          "Your prompts and document text used in response creation are visible to OpenAI",
+      },
+      azure: {
+        description:
+          "Your text and embedding text are not visible to OpenAI or Microsoft",
+      },
+      anthropic: {
+        description:
+          "Your prompts and document text used in response creation are visible to Anthropic",
+      },
+      gemini: {
+        description: "Your chats are de-identified and used in training",
+        description2:
+          "Your prompts and document text used in response creation are visible to Google",
+      },
+      nvidia_nim: {
+        description:
+          "Your model and chats are only accessible on the machine running the NVIDIA NIM",
+      },
+      lmstudio: {
+        description:
+          "Your model and chats are only accessible on the server running LMStudio",
+      },
+      localai: {
+        description:
+          "Your model and chats are only accessible on the server running LocalAI",
+      },
+      ollama: {
+        description:
+          "Your model and chats are only accessible on the machine running Ollama models",
+      },
+      togetherai: {
+        description:
+          "Your prompts and document text used in response creation are visible to TogetherAI",
+      },
+      fireworksai: {
+        description2:
+          "Your prompts and document text used in response creation are visible to Fireworks AI",
+      },
+      mistral: {
+        description:
+          "Your prompts and document text used in response creation are visible to Mistral",
+      },
+      huggingface: {
+        description:
+          "Your prompts and document text used in response are sent to your HuggingFace managed endpoint",
+      },
+      perplexity: {
+        description:
+          "Your prompts and document text used in response creation are visible to Perplexity AI",
+      },
+      openrouter: {
+        description:
+          "Your prompts and document text used in response creation are visible to OpenRouter",
+      },
+      novita: {
+        description:
+          "Your prompts and document text used in response creation are visible to Novita AI",
+      },
+      groq: {
+        description:
+          "Your prompts and document text used in response creation are visible to Groq",
+      },
+      koboldcpp: {
+        description:
+          "Your model and chats are only accessible on the server running KoboldCPP",
+      },
+      textgenwebui: {
+        description:
+          "Your model and chats are only accessible on the server running the Oobabooga Text Generation Web UI",
+      },
+      generic_openai: {
+        description:
+          "Data is shared according to the terms of service applicable with your generic endpoint provider.",
+      },
+      cohere: {
+        description:
+          "Data is shared according to the terms of service of cohere.com and your localities privacy laws.",
+      },
+      litellm: {
+        description:
+          "Your model and chats are only accessible on the server running LiteLLM",
+      },
+      bedrock: {
+        description:
+          "You model and chat contents are subject to the agreed EULA for AWS and the model provider on aws.amazon.com",
+      },
+      deepseek: {
+        description: "Your model and chat contents are visible to DeepSeek",
+      },
+      apipie: {
+        description:
+          "Your model and chat contents are visible to APIpie in accordance with their terms of service.",
+      },
+      xai: {
+        description:
+          "Your model and chat contents are visible to xAI in accordance with their terms of service.",
+      },
+      ppio: {
+        description:
+          "Your prompts and document text used in response creation are visible to PPIO",
+      },
+      dpais: {
+        description:
+          "Your model and chat contents are only accessible on the computer running Dell Pro AI Studio",
+      },
+      moonshotai: {
+        description:
+          "Your chats may be used by Moonshot AI for training and model refinement",
+        description2:
+          "Your prompts and document text used in response creation are visible to Moonshot AI",
+      },
+      cometapi: {
+        description: "Your chats will not be used for training",
+        description2:
+          "Your prompts and document text used in response creation are visible to CometAPI",
+      },
+      description: "Your chats will not be used for training",
+    },
+    embedding: {
+      title: "Embedding Preference",
+      native: {
+        description:
+          "Your document text is embedded privately on this instance of AnythingLLM",
+      },
+      openai: {
+        description: "Your document text is sent to OpenAI servers",
+      },
+      azure: {
+        description:
+          "Your document text is sent to your Microsoft Azure service",
+      },
+      localai: {
+        description:
+          "Your document text is embedded privately on the server running LocalAI",
+      },
+      ollama: {
+        description:
+          "Your document text is embedded privately on the server running Ollama",
+      },
+      lmstudio: {
+        description:
+          "Your document text is embedded privately on the server running LMStudio",
+      },
+      cohere: {
+        description:
+          "Data is shared according to the terms of service of cohere.com and your localities privacy laws.",
+      },
+      voyageai: {
+        description:
+          "Data sent to Voyage AI's servers is shared according to the terms of service of voyageai.com.",
+      },
+      mistral: {
+        description:
+          "Data sent to Mistral AI's servers is shared according to the terms of service of https://mistral.ai.",
+      },
+      litellm: {
+        description:
+          "Your document text is only accessible on the server running LiteLLM and to the providers you configured in LiteLLM.",
+      },
+      generic_openai: {
+        description:
+          "Data is shared according to the terms of service applicable with your generic endpoint provider.",
+      },
+      gemini: {
+        description:
+          "Your document text is sent to Google Gemini's servers for processing",
+        description2:
+          "Your document text is stored or managed according to the terms of service of Google Gemini API Terms of Service",
+      },
+      description: "Your documents are not used for training",
+    },
+    vector: {
+      title: "Vector Database",
+      pgvector: {
+        description:
+          "Your vectors and document text are stored on your PostgreSQL instance",
+      },
+      chroma: {
+        description:
+          "Your vectors and document text are stored on your Chroma instance",
+      },
+      chromacloud: {
+        description:
+          "Your vectors and document text are stored on Chroma's cloud service",
+        description2: "Access to your data is managed by Chroma",
+      },
+      pinecone: {
+        description:
+          "Your vectors and document text are stored on Pinecone's servers",
+        description2: "Access to your data is managed by Pinecone",
+      },
+      qdrant: {
+        description:
+          "Your vectors and document text are stored on your Qdrant instance (cloud or self-hosted)",
+      },
+      weaviate: {
+        description:
+          "Your vectors and document text are stored on your Weaviate instance (cloud or self-hosted)",
+      },
+      milvus: {
+        description:
+          "Your vectors and document text are stored on your Milvus instance (cloud or self-hosted)",
+      },
+      zilliz: {
+        description:
+          "Your vectors and document text are stored on your Zilliz cloud cluster.",
+      },
+      astra: {
+        description:
+          "Your vectors and document text are stored on your cloud AstraDB database.",
+      },
+      lancedb: {
+        description:
+          "Your vectors and document text are stored privately on this instance of AnythingLLM",
+      },
+      description: "Access to your instance is managed by you",
+    },
     anonymous: "Anonymous Telemetry Enabled",
   },
 

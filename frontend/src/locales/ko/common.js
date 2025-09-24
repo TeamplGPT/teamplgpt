@@ -870,10 +870,226 @@ const TRANSLATIONS = {
     title: "개인정보와 데이터 처리",
     description:
       "연결된 타사 제공자와 AnythingLLM이 데이터를 처리하는 방식을 구성합니다.",
-    llm: "LLM 선택",
-    embedding: "임베딩 기본 설정",
-    vector: "벡터 데이터베이스",
-    anonymous: "익명 원격 분석 활성화",
+    llm: {
+      title: "LLM 선택",
+      openai: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 OpenAI에 노출될 수 있습니다",
+      },
+      azure: {
+        description:
+          "입력한 텍스트와 임베딩 데이터는 OpenAI 또는 Microsoft에 노출되지 않습니다",
+      },
+      anthropic: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 Anthropic에 노출될 수 있습니다",
+      },
+      gemini: {
+        description: "대화 내용은 식별되지 않고 학습에 사용됩니다",
+        description2:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 Google에 노출될 수 있습니다",
+      },
+      nvidia_nim: {
+        description:
+          "NVIDIA NIM을 실행하는 머신에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      lmstudio: {
+        description:
+          "LMStudio를 실행하는 서버에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      localai: {
+        description:
+          "LocalAI를 실행하는 서버에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      ollama: {
+        description:
+          "Ollama 모델을 실행하는 머신에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      togetherai: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 TogetherAI에 노출될 수 있습니다",
+      },
+      fireworksai: {
+        description2:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 Fireworks AI에 노출될 수 있습니다",
+      },
+      mistral: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 Mistral에 노출될 수 있습니다",
+      },
+      huggingface: {
+        description:
+          "응답에 사용된 프롬프트와 문서 내용이 사용자의 HuggingFace 관리 엔드포인트로 전송됩니다",
+      },
+      perplexity: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 Perplexity AI에 노출될 수 있습니다",
+      },
+      openrouter: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 OpenRouter에 노출될 수 있습니다",
+      },
+      novita: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 Novita AI에 노출될 수 있습니다",
+      },
+      groq: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 Groq에 노출될 수 있습니다",
+      },
+      koboldcpp: {
+        description:
+          "KoboldCPP를 실행하는 서버에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      textgenwebui: {
+        description:
+          "Oobabooga Text Generation Web UI를 실행하는 서버에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      generic_openai: {
+        description:
+          "데이터는 사용 중인 Generic Openai 엔드포인트 제공업체의 서비스 약관에 따라 공유됩니다.",
+      },
+      cohere: {
+        description:
+          "cohere.com의 서비스 약관과 지역 개인정보 보호법에 따라 데이터가 공유됩니다.",
+      },
+      litellm: {
+        description:
+          "LiteLLM를 실행하는 서버에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      bedrock: {
+        description:
+          "모델과 대화 내용은 AWS 및 aws.amazon.com의 모델 제공업체와 체결한 EULA(최종 사용자 라이선스 계약)에 따라 처리됩니다.",
+      },
+      deepseek: {
+        description: "모델과 대화 내용은 DeepSeek에 노출될 수 있습니다",
+      },
+      apipie: {
+        description:
+          "모델과 대화 내용은 APIpie의 서비스 약관에 따라 노출될 수 있습니다.",
+      },
+      xai: {
+        description:
+          "모델과 대화 내용은 xAI의 서비스 약관에 따라 노출될 수 있습니다.",
+      },
+      ppio: {
+        description:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 PPIO에 노출될 수 있습니다",
+      },
+      dpais: {
+        description:
+          "Dell Pro AI Studio를 실행하는 머신에서만 모델과 대화 내용에 접근할 수 있습니다",
+      },
+      moonshotai: {
+        description:
+          "대화 내용은 Moonshot AI에서 학습과 모델 개선에 사용될 수 있습니다",
+        description2:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 Moonshot AI에 노출될 수 있습니다",
+      },
+      cometapi: {
+        description: "대화 내용은 학습에 사용되지 않습니다",
+        description2:
+          "응답 생성에 사용된 프롬프트와 문서 내용이 CometAPI에 노출될 수 있습니다",
+      },
+      description: "대화 내용은 학습에 사용되지 않습니다",
+    },
+    embedding: {
+      title: "임베딩 기본 설정",
+      native: {
+        description:
+          "문서의 텍스트는 이 AnythingLLM 인스턴스에서만 비공개로 임베딩됩니다",
+      },
+      openai: {
+        description: "문서의 텍스트가 OpenAI 서버로 전송됩니다",
+      },
+      azure: {
+        description: "문서의 텍스트가 Microsoft Azure 서비스로 전송됩니다",
+      },
+      localai: {
+        description:
+          "문서의 텍스트는 LocalAI가 실행 중인 서버에서만 비공개로 임베딩됩니다",
+      },
+      ollama: {
+        description:
+          "문서의 텍스트는 Ollama가 실행 중인 서버에서만 비공개로 임베딩됩니다",
+      },
+      lmstudio: {
+        description:
+          "문서의 텍스트는 LMStudio가 실행 중인 서버에서만 비공개로 임베딩됩니다",
+      },
+      cohere: {
+        description:
+          "데이터는 cohere.com의 서비스 약관과 거주 지역의 개인정보 보호법에 따라 처리 및 공유됩니다.",
+      },
+      voyageai: {
+        description:
+          "문서의 텍스트가 Voyage AI 서버로 전송되며, voyageai.com의 서비스 약관에 따라 처리 및 공유됩니다.",
+      },
+      mistral: {
+        description:
+          "문서의 텍스트는 Mistral AI 서버로 전송되며, https://mistral.ai의 서비스 약관에 따라 처리 및 공유됩니다.",
+      },
+      litellm: {
+        description:
+          "문서의 텍스트는 LiteLLM이 실행 중인 서버와 LiteLLM에 설정한 공급자만 접근할 수 있습니다.",
+      },
+      generic_openai: {
+        description:
+          "데이터는 사용 중인 일반 엔드포인트 공급자의 서비스 약관에 따라 처리 및 공유됩니다.",
+      },
+      gemini: {
+        description:
+          "문서의 텍스트가 처리 목적으로 Google Gemini 서버로 전송됩니다",
+        description2:
+          "문서의 텍스트는 Google Gemini API 서비스 약관에 따라 저장되거나 관리됩니다",
+      },
+      description: "문서는 AI 모델 학습에 사용되지 않습니다",
+    },
+    vector: {
+      title: "벡터 데이터베이스",
+      pgvector: {
+        description:
+          "벡터와 문서 텍스트가 사용자의 PostgreSQL 인스턴스에 저장됩니다",
+      },
+      chroma: {
+        description:
+          "벡터와 문서 텍스트가 사용자의 Chroma 인스턴스에 저장됩니다",
+      },
+      chromacloud: {
+        description: "벡터와 문서 텍스트가 Chroma 클라우드 서비스에 저장됩니다",
+        description2: "데이터 접근 권한은 Chroma에서 관리됩니다",
+      },
+      pinecone: {
+        description: "벡터와 문서 텍스트가 Pinecone 서버에 저장됩니다",
+        description2: "데이터 접근 권한은 Pinecone에서 관리됩니다",
+      },
+      qdrant: {
+        description:
+          "벡터와 문서 텍스트가 사용자의 Qdrant 인스턴스(클라우드 또는 자체 호스팅)에 저장됩니다",
+      },
+      weaviate: {
+        description:
+          "벡터와 문서 텍스트가 사용자의 Weaviate 인스턴스(클라우드 또는 자체 호스팅)에 저장됩니다",
+      },
+      milvus: {
+        description:
+          "벡터와 문서 텍스트가 사용자의 Milvus 인스턴스(클라우드 또는 자체 호스팅)에 저장됩니다",
+      },
+      zilliz: {
+        description:
+          "벡터와 문서 텍스트가 사용자의 Zilliz 클라우드 클러스터에 저장됩니다.",
+      },
+      astra: {
+        description:
+          "벡터와 문서 텍스트가 클라우드 AstraDB 데이터베이스에 저장됩니다.",
+      },
+      lancedb: {
+        description:
+          "벡터와 문서 텍스트는 이 AnythingLLM 인스턴스에 안전하게 저장됩니다",
+      },
+      description: "인스턴스에 대한 접근 권한은 사용자가 직접 관리합니다",
+    },
+    anonymous: "익명 원격 분석 활성화됨",
   },
   connectors: {
     "search-placeholder": "데이터 커넥터 검색",
