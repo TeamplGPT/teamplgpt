@@ -696,6 +696,9 @@ const TRANSLATIONS = {
           manageEmbedding: "Manage embedding",
         },
       },
+      moonshotai: {
+        description: "Run Moonshot AI's powerful LLMs.",
+      },
       novita: {
         description:
           "Reliable, Scalable, and Cost-Effective for LLMs from Novita AI",
@@ -796,6 +799,7 @@ const TRANSLATIONS = {
       api_key: "API Key",
       chat_model_selection: "Chat Model Selection",
       loading_models: "Loading available models...",
+      enter_api_key: "Enter API key",
       enter_valid_api_key:
         "Enter a valid API key to view all available models for your account.",
       model_type: "Model Type",
@@ -808,6 +812,7 @@ const TRANSLATIONS = {
       waiting_for_url: "Waiting for URL",
       waiting_for_api_key: "Waiting for API Key",
       optional: "optional",
+      none_selected: "None selected",
       select_llm_required: "You need to select an LLM",
       stream_timeout: "Stream Timeout (ms)",
       stream_timeout_description:
