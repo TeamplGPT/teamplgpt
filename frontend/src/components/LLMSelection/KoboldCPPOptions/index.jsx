@@ -4,8 +4,10 @@ import PreLoader from "@/components/Preloader";
 import { KOBOLDCPP_COMMON_URLS } from "@/utils/constants";
 import { CaretDown, CaretUp } from "@phosphor-icons/react";
 import useProviderEndpointAutoDiscovery from "@/hooks/useProviderEndpointAutoDiscovery";
+import { useTranslation } from "react-i18next";
 
 export default function KoboldCPPOptions({ settings }) {
+  const { t } = useTranslation();
   const {
     autoDetecting: loading,
     basePath,
@@ -41,9 +43,9 @@ export default function KoboldCPPOptions({ settings }) {
           settings={settings}
           basePath={basePath.value}
         />
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-2">
-            Token context window
+            {t("llm.providers.token_context_window")}
           </label>
           <input
             type="number"
@@ -58,12 +60,12 @@ export default function KoboldCPPOptions({ settings }) {
             autoComplete="off"
           />
           <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-            Maximum number of tokens for context and response.
+            {t("llm.providers.koboldcpp.max_tokens_description")}
           </p>
         </div>
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-2">
-            Max response tokens
+            {t("llm.providers.koboldcpp.max_response_tokens")}
           </label>
           <input
             type="number"
@@ -78,7 +80,7 @@ export default function KoboldCPPOptions({ settings }) {
             autoComplete="off"
           />
           <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-            Maximum number of tokens for the response.
+            {t("llm.providers.koboldcpp.max_response_tokens_description")}
           </p>
         </div>
       </div>
@@ -90,7 +92,9 @@ export default function KoboldCPPOptions({ settings }) {
           }}
           className="border-none text-theme-text-primary hover:text-theme-text-secondary flex items-center text-sm"
         >
-          {showAdvancedControls ? "Hide" : "Show"} Manual Endpoint Input
+          {showAdvancedControls
+            ? t("llm.providers.koboldcpp.hide_manual_endpoint_input")
+            : t("llm.providers.koboldcpp.show_manual_endpoint_input")}
           {showAdvancedControls ? (
             <CaretUp size={14} className="ml-1" />
           ) : (
@@ -101,10 +105,10 @@ export default function KoboldCPPOptions({ settings }) {
 
       <div hidden={!showAdvancedControls}>
         <div className="w-full flex items-start gap-4">
-          <div className="flex flex-col w-60">
+          <div className="flex flex-col w-72">
             <div className="flex justify-between items-center mb-2">
               <label className="text-white text-sm font-semibold">
-                KoboldCPP Base URL
+                KoboldCPP {t("llm.providers.base_url")}
               </label>
               {loading ? (
                 <PreLoader size="6" />
@@ -115,7 +119,7 @@ export default function KoboldCPPOptions({ settings }) {
                       onClick={handleAutoDetectClick}
                       className="border-none bg-primary-button text-xs font-medium px-2 py-1 rounded-lg hover:bg-secondary hover:text-white shadow-[0_4px_14px_rgba(0,0,0,0.25)]"
                     >
-                      Auto-Detect
+                      {t("llm.providers.auto_detect")}
                     </button>
                   )}
                 </>
@@ -134,7 +138,7 @@ export default function KoboldCPPOptions({ settings }) {
               onBlur={basePath.onBlur}
             />
             <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-              Enter the URL where KoboldCPP is running.
+              {t("llm.providers.koboldcpp.base_url_description")}
             </p>
           </div>
         </div>
@@ -146,6 +150,7 @@ export default function KoboldCPPOptions({ settings }) {
 function KoboldCPPModelSelection({ settings, basePath = null }) {
   const [customModels, setCustomModels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -173,9 +178,9 @@ function KoboldCPPModelSelection({ settings, basePath = null }) {
 
   if (loading || customModels.length === 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-2">
-          KoboldCPP Model
+          {t("llm.providers.koboldcpp.model")}
         </label>
         <select
           name="KoboldCPPModelPref"
@@ -184,20 +189,19 @@ function KoboldCPPModelSelection({ settings, basePath = null }) {
         >
           <option disabled={true} selected={true}>
             {basePath?.includes("/v1")
-              ? "--loading available models--"
-              : "Enter KoboldCPP URL first"}
+              ? t("llm.providers.loading_available_models")
+              : t("llm.providers.koboldcpp.enter_url_first")}
           </option>
         </select>
         <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-          Select the KoboldCPP model you want to use. Models will load after
-          entering a valid KoboldCPP URL.
+          {t("llm.providers.koboldcpp.model_description")}
         </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-72">
       <label className="text-white text-sm font-semibold block mb-2">
         KoboldCPP Model
       </label>

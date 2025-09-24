@@ -9,7 +9,7 @@ export default function NovitaLLMOptions({ settings }) {
   return (
     <div className="w-full flex flex-col gap-y-7">
       <div className="w-full flex items-start gap-[36px] mt-1.5">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-theme-text-primary text-sm font-semibold block mb-3">
             Novita {t("llm.providers.api_key")}
           </label>
@@ -56,7 +56,7 @@ function AdvancedControls({ settings }) {
         </button>
       </div>
       <div hidden={!showAdvancedControls}>
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-theme-text-primary text-sm font-semibold block mb-3">
             {t("llm.providers.stream_timeout")} (ms)
           </label>
@@ -104,7 +104,7 @@ function NovitaModelSelection({ settings }) {
 
   if (loading || Object.keys(groupedModels).length === 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-theme-text-primary text-sm font-semibold block mb-3">
           {t("llm.providers.chat_model_selection")}
         </label>
@@ -114,7 +114,7 @@ function NovitaModelSelection({ settings }) {
           className="border-none bg-theme-settings-input-bg text-theme-text-primary border-theme-border text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- ${t("llm.providers.loading_models")} --
+            -- {t("llm.providers.loading_models")} --
           </option>
         </select>
       </div>
@@ -122,7 +122,7 @@ function NovitaModelSelection({ settings }) {
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-72">
       <label className="text-theme-text-primary text-sm font-semibold block mb-3">
         {t("llm.providers.chat_model_selection")}
       </label>

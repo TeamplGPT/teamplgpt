@@ -10,7 +10,7 @@ export default function GeminiLLMOptions({ settings }) {
   return (
     <div className="w-full flex flex-col">
       <div className="w-full flex items-center gap-[36px] mt-1.5">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
             Google AI {t("llm.providers.api_key")}
           </label>
@@ -36,7 +36,7 @@ export default function GeminiLLMOptions({ settings }) {
             Safety setting is not supported for Gemini yet due to the openai compatible Gemini API.
             We are not using the generativeAPI endpoint and therefore cannot set the safety threshold.
 
-            <div className="flex flex-col w-60">
+            <div className="flex flex-col w-72">
               <label className="text-white text-sm font-semibold block mb-3">
                 Safety Setting
               </label>
@@ -87,9 +87,9 @@ function GeminiModelSelection({ apiKey, settings }) {
     findCustomModels();
   }, [apiKey]);
 
-  if (loading) {
+  if (loading || Object.keys(groupedModels).length === 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
           {t("llm.providers.chat_model_selection")}
         </label>
@@ -107,7 +107,7 @@ function GeminiModelSelection({ apiKey, settings }) {
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-72">
       <label className="text-white text-sm font-semibold block mb-3">
         {t("llm.providers.chat_model_selection")}
       </label>

@@ -12,7 +12,7 @@ export default function LiteLLMOptions({ settings }) {
   return (
     <div className="w-full flex flex-col gap-y-7 mt-1.5">
       <div className="w-full flex items-center gap-[36px]">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
             {t("llm.providers.base_url")}
           </label>
@@ -34,7 +34,7 @@ export default function LiteLLMOptions({ settings }) {
           basePath={basePath}
           apiKey={apiKey}
         />
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
             {t("llm.providers.token_context_window")}
           </label>
@@ -52,7 +52,7 @@ export default function LiteLLMOptions({ settings }) {
         </div>
       </div>
       <div className="w-full flex items-center gap-[36px]">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <div className="flex flex-col gap-y-1 mb-4">
             <label className="text-white text-sm font-semibold flex items-center gap-x-2">
               {t("llm.providers.api_key")}{" "}
@@ -104,7 +104,7 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
 
   if (loading || customModels.length == 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
           {t("llm.providers.chat_model_selection")}
         </label>
@@ -124,7 +124,7 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-72">
       <label className="text-white text-sm font-semibold block mb-3">
         {t("llm.providers.chat_model_selection")}
       </label>

@@ -33,7 +33,7 @@ export default function DellProAIStudioOptions({
               settings={settings}
               basePath={basePath.value}
             />
-            <div className="flex flex-col w-60">
+            <div className="flex flex-col w-72">
               <label className="text-white text-sm font-semibold block mb-2">
                 {t("llm.providers.token_context_window")}
               </label>
@@ -75,7 +75,7 @@ export default function DellProAIStudioOptions({
           <div className="flex flex-col w-fit">
             <div className="flex justify-between items-center mb-2 gap-x-2">
               <label className="text-white text-sm font-semibold">
-                {t("llm.providers.base_url")}
+                Dell Pro AI Studio {t("llm.providers.base_url")}
               </label>
               {loading ? (
                 <PreLoader size="6" />
@@ -138,7 +138,7 @@ function DellProAiStudioModelSelection({ settings, basePath = null }) {
 
   if (loading || customModels.length == 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-2">
           {t("llm.providers.chat_model_selection")}
         </label>
@@ -156,7 +156,7 @@ function DellProAiStudioModelSelection({ settings, basePath = null }) {
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-72">
       <label className="text-white text-sm font-semibold block mb-2">
         {t("llm.providers.chat_model_selection")}
       </label>

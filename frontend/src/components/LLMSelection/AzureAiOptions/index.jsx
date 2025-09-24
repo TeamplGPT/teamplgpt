@@ -6,7 +6,7 @@ export default function AzureAiOptions({ settings }) {
   return (
     <div className="w-full flex flex-col gap-y-7 mt-1.5">
       <div className="w-full flex items-center gap-[36px]">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
             {t("llm.providers.azure_openai.azure_service_endpoint")}
           </label>
@@ -22,7 +22,7 @@ export default function AzureAiOptions({ settings }) {
           />
         </div>
 
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
             {t("llm.providers.api_key")}
           </label>
@@ -38,7 +38,7 @@ export default function AzureAiOptions({ settings }) {
           />
         </div>
 
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
             {t("llm.providers.azure_openai.chat_deployment_name")}
           </label>
@@ -56,7 +56,7 @@ export default function AzureAiOptions({ settings }) {
       </div>
 
       <div className="w-full flex items-center gap-[36px]">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
             {t("llm.providers.azure_openai.chat_model_token_limit")}
           </label>
@@ -78,7 +78,7 @@ export default function AzureAiOptions({ settings }) {
           </select>
         </div>
 
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
             {t("llm.providers.azure_openai.model_type")}
           </label>

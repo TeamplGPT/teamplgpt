@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import System from "@/models/system";
 import showToast from "@/utils/toast";
+import { useTranslation } from "react-i18next";
 
 export default function useProviderEndpointAutoDiscovery({
   provider = null,
@@ -8,6 +9,7 @@ export default function useProviderEndpointAutoDiscovery({
   initialAuthToken = null,
   ENDPOINTS = [],
 }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [basePath, setBasePath] = useState(initialBasePath);
   const [basePathValue, setBasePathValue] = useState(initialBasePath);
@@ -48,7 +50,7 @@ export default function useProviderEndpointAutoDiscovery({
       setBasePath(endpoint);
       setBasePathValue(endpoint);
       setLoading(false);
-      showToast("Provider endpoint discovered automatically.", "success", {
+      showToast(t("llm.providers.endpoint_discovery.success"), "success", {
         clear: true,
       });
       setShowAdvancedControls(false);
@@ -57,11 +59,9 @@ export default function useProviderEndpointAutoDiscovery({
 
     setLoading(false);
     setShowAdvancedControls(true);
-    showToast(
-      "Couldn't automatically discover the provider endpoint. Please enter it manually.",
-      "info",
-      { clear: true }
-    );
+    showToast(t("llm.providers.endpoint_discovery.manual_required"), "info", {
+      clear: true,
+    });
   }
 
   function handleAutoDetectClick(e) {

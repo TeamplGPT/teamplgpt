@@ -11,7 +11,7 @@ export default function DeepSeekOptions({ settings }) {
 
   return (
     <div className="flex gap-[36px] mt-1.5">
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
           {t("llm.providers.api_key")}
         </label>
@@ -61,7 +61,7 @@ function DeepSeekModelSelection({ apiKey, settings }) {
 
   if (loading) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
           {t("llm.providers.chat_model_selection")}
         </label>
@@ -79,7 +79,7 @@ function DeepSeekModelSelection({ apiKey, settings }) {
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-72">
       <label className="text-white text-sm font-semibold block mb-3">
         {t("llm.providers.chat_model_selection")}
       </label>

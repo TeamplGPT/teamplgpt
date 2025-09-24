@@ -1,14 +1,17 @@
 import System from "@/models/system";
 import { CaretDown, CaretUp } from "@phosphor-icons/react";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function CometApiLLMOptions({ settings }) {
+  const { t } = useTranslation();
+
   return (
     <div className="w-full flex flex-col gap-y-7">
       <div className="w-full flex items-start gap-[36px] mt-1.5">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-theme-text-primary text-sm font-semibold block mb-3">
-            CometAPI API Key
+            CometAPI {t("llm.providers.api_key")}
           </label>
           <input
             type="password"
@@ -32,6 +35,7 @@ export default function CometApiLLMOptions({ settings }) {
 
 function AdvancedControls({ settings }) {
   const [showAdvancedControls, setShowAdvancedControls] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col gap-y-4">
@@ -41,7 +45,9 @@ function AdvancedControls({ settings }) {
           onClick={() => setShowAdvancedControls(!showAdvancedControls)}
           className="border-none text-theme-text-primary hover:text-theme-text-secondary flex items-center text-sm"
         >
-          {showAdvancedControls ? "Hide" : "Show"} advanced settings
+          {showAdvancedControls
+            ? t("llm.providers.hide_advanced_settings")
+            : t("llm.providers.show_advanced_settings")}
           {showAdvancedControls ? (
             <CaretUp size={14} className="ml-1" />
           ) : (
@@ -50,15 +56,15 @@ function AdvancedControls({ settings }) {
         </button>
       </div>
       <div hidden={!showAdvancedControls}>
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-theme-text-primary text-sm font-semibold block mb-3">
-            Stream Timeout (ms)
+            {t("llm.providers.stream_timeout")}
           </label>
           <input
             type="number"
             name="CometApiLLMTimeout"
             className="border-none bg-theme-settings-input-bg text-theme-text-primary placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-full p-2.5"
-            placeholder="Timeout value between token responses to auto-timeout the stream"
+            placeholder={t("llm.providers.stream_timeout_description")}
             defaultValue={settings?.CometApiLLMTimeout ?? 3_000}
             autoComplete="off"
             onScroll={(e) => e.target.blur()}
@@ -66,7 +72,7 @@ function AdvancedControls({ settings }) {
             step={1}
           />
           <p className="text-xs leading-[18px] font-base text-theme-text-primary text-opacity-60 mt-2">
-            Timeout value between token responses to auto-timeout the stream.
+            {t("llm.providers.stream_timeout_description")}
           </p>
         </div>
       </div>
@@ -79,6 +85,7 @@ function CometApiModelSelection({ settings }) {
   // Revisit after CometAPI model list API provides better categorization/metadata.
   const [models, setModels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -109,15 +116,15 @@ function CometApiModelSelection({ settings }) {
 
   if (loading || models.length === 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-theme-text-primary text-sm font-semibold block mb-3">
-          Chat Model Selection
+          {t("llm.providers.chat_model_selection")}
         </label>
         <input
           type="text"
           name="CometApiLLMModelPref"
           className="border-none bg-theme-settings-input-bg text-theme-text-primary placeholder:text-theme-settings-input-placeholder text-sm rounded-lg block w-full p-2.5"
-          placeholder="-- loading available models --"
+          placeholder={`-- ${t("llm.providers.loading_models")} --`}
           disabled
         />
       </div>
@@ -125,9 +132,9 @@ function CometApiModelSelection({ settings }) {
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-72">
       <label className="text-theme-text-primary text-sm font-semibold block mb-3">
-        Chat Model Selection
+        {t("llm.providers.chat_model_selection")}
       </label>
       <input
         type="text"

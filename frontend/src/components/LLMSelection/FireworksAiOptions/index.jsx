@@ -7,7 +7,7 @@ export default function FireworksAiOptions({ settings }) {
 
   return (
     <div className="flex gap-[36px] mt-1.5">
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
           Fireworks AI {t("llm.providers.api_key")}
         </label>
@@ -55,7 +55,7 @@ function FireworksAiModelSelection({ settings }) {
 
   if (loading || Object.keys(groupedModels).length === 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
           {t("llm.providers.chat_model_selection")}
         </label>
@@ -73,7 +73,7 @@ function FireworksAiModelSelection({ settings }) {
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-72">
       <label className="text-white text-sm font-semibold block mb-3">
         {t("llm.providers.chat_model_selection")}
       </label>

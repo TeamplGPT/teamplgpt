@@ -9,7 +9,7 @@ export default function XAILLMOptions({ settings }) {
 
   return (
     <div className="flex gap-[36px] mt-1.5">
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
           xAI {t("llm.providers.api_key")}
         </label>
@@ -63,7 +63,7 @@ function XAIModelSelection({ apiKey, settings }) {
 
   if (loading) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-theme-text-primary text-sm font-semibold block mb-3">
           {t("llm.providers.chat_model_selection")}
         </label>
@@ -73,7 +73,7 @@ function XAIModelSelection({ apiKey, settings }) {
           className="border-none bg-theme-settings-input-bg text-theme-text-primary border-theme-border text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- ${t("llm.providers.loading_models")} --
+            -- {t("llm.providers.loading_models")} --
           </option>
         </select>
         <p className="text-xs leading-[18px] font-base text-theme-text-primary opacity-60 mt-2">
@@ -84,7 +84,7 @@ function XAIModelSelection({ apiKey, settings }) {
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-72">
       <label className="text-theme-text-primary text-sm font-semibold block mb-3">
         {t("llm.providers.chat_model_selection")}
       </label>

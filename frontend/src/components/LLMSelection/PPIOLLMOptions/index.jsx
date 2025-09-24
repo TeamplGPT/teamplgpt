@@ -8,7 +8,7 @@ export default function PPIOLLMOptions({ settings }) {
   return (
     <div className="w-full flex flex-col gap-y-7">
       <div className="w-full flex items-start gap-[36px] mt-1.5">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-theme-text-primary text-sm font-semibold block mb-3">
             PPIO {t("llm.providers.api_key")}
           </label>
@@ -55,7 +55,7 @@ function PPIOModelSelection({ settings }) {
 
   if (loading || Object.keys(groupedModels).length === 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-theme-text-primary text-sm font-semibold block mb-3">
           {t("llm.providers.chat_model_selection")}
         </label>
@@ -66,7 +66,7 @@ function PPIOModelSelection({ settings }) {
           className="bg-theme-settings-input-bg text-theme-text-primary text-sm rounded-lg focus:ring-primary-button focus:border-primary-button block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- ${t("llm.providers.loading_models")} --
+            -- {t("llm.providers.loading_models")} --
           </option>
         </select>
       </div>
