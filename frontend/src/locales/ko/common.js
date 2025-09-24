@@ -658,6 +658,9 @@ const TRANSLATIONS = {
           manageEmbedding: "임베딩 관리",
         },
       },
+      moonshotai: {
+        description: "Moonshot AI의 강력한 LLM을 실행하세요.",
+      },
       novita: {
         description:
           "Novita AI의 신뢰할 수 있고 확장 가능하며 비용 효율적인 LLM을 사용하세요.",
@@ -755,6 +758,7 @@ const TRANSLATIONS = {
       api_key: "API 키",
       chat_model_selection: "채팅 모델 선택",
       loading_models: "사용 가능한 모델을 불러오는 중...",
+      enter_api_key: "API 키 입력",
       enter_valid_api_key:
         "계정에 유효한 API 키를 입력하면 사용 가능한 모든 모델을 볼 수 있습니다.",
       model_type: "모델 유형",
@@ -767,6 +771,7 @@ const TRANSLATIONS = {
       waiting_for_url: "URL 대기 중...",
       waiting_for_api_key: "API 키 대기 중...",
       optional: "선택 사항",
+      none_selected: "LLM 선택 안 함",
       select_llm_required: "LLM을 선택해야 합니다.",
       stream_timeout: "스트림 타임아웃 (ms)",
       stream_timeout_description:

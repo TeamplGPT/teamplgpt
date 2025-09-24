@@ -429,7 +429,7 @@ export default function GeneralLLMPreference() {
                     onClick={() => handleSubmit()}
                     className="mt-3 mr-0 -mb-14 z-10"
                   >
-                    {saving ? "Saving..." : "Save changes"}
+                    {saving ? t("common.saving") : t("common.save")}
                   </CTAButton>
                 )}
               </div>
@@ -502,7 +502,8 @@ export default function GeneralLLMPreference() {
                       />
                       <div className="flex flex-col text-left">
                         <div className="text-sm font-semibold text-white">
-                          {selectedLLMObject?.name || "None selected"}
+                          {selectedLLMObject?.name ||
+                            t("llm.providers.none_selected")}
                         </div>
                         <div className="mt-1 text-xs text-description">
                           {selectedLLMObject

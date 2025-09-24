@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import System from "@/models/system";
+import { useTranslation } from "react-i18next";
 
 export default function MoonshotAiOptions({ settings }) {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(settings?.MoonshotAiApiKey);
   const [moonshotAiKey, setMoonshotAiKey] = useState(
     settings?.MoonshotAiApiKey
@@ -11,7 +13,7 @@ export default function MoonshotAiOptions({ settings }) {
     <div className="flex gap-[36px] mt-1.5">
       <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
-          API Key
+          {t("llm.providers.api_key")}
         </label>
         <input
           type="password"
@@ -36,6 +38,7 @@ export default function MoonshotAiOptions({ settings }) {
 function MoonshotAiModelSelection({ apiKey, settings }) {
   const [models, setModels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -58,7 +61,7 @@ function MoonshotAiModelSelection({ apiKey, settings }) {
     return (
       <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
-          Chat Model Selection
+          {t("llm.providers.chat_model_selection")}
         </label>
         <select
           name="MoonshotAiModelPref"
@@ -66,7 +69,7 @@ function MoonshotAiModelSelection({ apiKey, settings }) {
           className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- Enter API key --
+            -- {t("llm.providers.enter_api_key")} --
           </option>
         </select>
       </div>
@@ -77,7 +80,7 @@ function MoonshotAiModelSelection({ apiKey, settings }) {
     return (
       <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
-          Chat Model Selection
+          {t("llm.providers.chat_model_selection")}
         </label>
         <select
           name="MoonshotAiModelPref"
@@ -85,7 +88,7 @@ function MoonshotAiModelSelection({ apiKey, settings }) {
           className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- loading available models --
+            -- {t("llm.providers.loading_models")} --
           </option>
         </select>
       </div>
