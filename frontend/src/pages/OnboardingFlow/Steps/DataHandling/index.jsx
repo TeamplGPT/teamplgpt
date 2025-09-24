@@ -49,215 +49,170 @@ import { useTranslation } from "react-i18next";
 export const LLM_SELECTION_PRIVACY = {
   openai: {
     name: "OpenAI",
-    description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to OpenAI",
-    ],
+    description: ["privacy.llm.description", "privacy.llm.openai.description"],
     logo: OpenAiLogo,
   },
   azure: {
     name: "Azure OpenAI",
-    description: [
-      "Your chats will not be used for training",
-      "Your text and embedding text are not visible to OpenAI or Microsoft",
-    ],
+    description: ["privacy.llm.description", "privacy.llm.azure.description"],
     logo: AzureOpenAiLogo,
   },
   anthropic: {
     name: "Anthropic",
     description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to Anthropic",
+      "privacy.llm.description",
+      "privacy.llm.anthropic.description",
     ],
     logo: AnthropicLogo,
   },
   gemini: {
     name: "Google Gemini",
     description: [
-      "Your chats are de-identified and used in training",
-      "Your prompts and document text used in response creation are visible to Google",
+      "privacy.llm.gemini.description",
+      "privacy.llm.gemini.description2",
     ],
     logo: GeminiLogo,
   },
   "nvidia-nim": {
     name: "NVIDIA NIM",
-    description: [
-      "Your model and chats are only accessible on the machine running the NVIDIA NIM",
-    ],
+    description: ["privacy.llm.nvidia_nim.description"],
     logo: NvidiaNimLogo,
   },
   lmstudio: {
     name: "LMStudio",
-    description: [
-      "Your model and chats are only accessible on the server running LMStudio",
-    ],
+    description: ["privacy.llm.lmstudio.description"],
     logo: LMStudioLogo,
   },
   localai: {
     name: "LocalAI",
-    description: [
-      "Your model and chats are only accessible on the server running LocalAI",
-    ],
+    description: ["privacy.llm.localai.description"],
     logo: LocalAiLogo,
   },
   ollama: {
     name: "Ollama",
-    description: [
-      "Your model and chats are only accessible on the machine running Ollama models",
-    ],
+    description: ["privacy.llm.ollama.description"],
     logo: OllamaLogo,
   },
   togetherai: {
     name: "TogetherAI",
     description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to TogetherAI",
+      "privacy.llm.description",
+      "privacy.llm.togetherai.description",
     ],
     logo: TogetherAILogo,
   },
   fireworksai: {
     name: "FireworksAI",
     description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to Fireworks AI",
+      "privacy.llm.description",
+      "privacy.llm.fireworksai.description",
     ],
     logo: FireworksAILogo,
   },
   mistral: {
     name: "Mistral",
-    description: [
-      "Your prompts and document text used in response creation are visible to Mistral",
-    ],
+    description: ["privacy.llm.mistral.description"],
     logo: MistralLogo,
   },
   huggingface: {
     name: "HuggingFace",
-    description: [
-      "Your prompts and document text used in response are sent to your HuggingFace managed endpoint",
-    ],
+    description: ["privacy.llm.huggingface.description"],
     logo: HuggingFaceLogo,
   },
   perplexity: {
     name: "Perplexity AI",
     description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to Perplexity AI",
+      "privacy.llm.description",
+      "privacy.llm.perplexity.description",
     ],
     logo: PerplexityLogo,
   },
   openrouter: {
     name: "OpenRouter",
     description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to OpenRouter",
+      "privacy.llm.description",
+      "privacy.llm.openrouter.description",
     ],
     logo: OpenRouterLogo,
   },
   novita: {
     name: "Novita AI",
-    description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to Novita AI",
-    ],
+    description: ["privacy.llm.description", "privacy.llm.novita.description"],
     logo: NovitaLogo,
   },
   groq: {
     name: "Groq",
-    description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to Groq",
-    ],
+    description: ["privacy.llm.description", "privacy.llm.groq.description"],
     logo: GroqLogo,
   },
   koboldcpp: {
     name: "KoboldCPP",
-    description: [
-      "Your model and chats are only accessible on the server running KoboldCPP",
-    ],
+    description: ["privacy.llm.koboldcpp.description"],
     logo: KoboldCPPLogo,
   },
   textgenwebui: {
     name: "Oobabooga Web UI",
-    description: [
-      "Your model and chats are only accessible on the server running the Oobabooga Text Generation Web UI",
-    ],
+    description: ["privacy.llm.textgenwebui.description"],
     logo: TextGenWebUILogo,
   },
   "generic-openai": {
     name: "Generic OpenAI compatible service",
-    description: [
-      "Data is shared according to the terms of service applicable with your generic endpoint provider.",
-    ],
+    description: ["privacy.llm.generic_openai.description"],
     logo: GenericOpenAiLogo,
   },
   cohere: {
     name: "Cohere",
-    description: [
-      "Data is shared according to the terms of service of cohere.com and your localities privacy laws.",
-    ],
+    description: ["privacy.llm.cohere.description"],
     logo: CohereLogo,
   },
   litellm: {
     name: "LiteLLM",
-    description: [
-      "Your model and chats are only accessible on the server running LiteLLM",
-    ],
+    description: ["privacy.llm.litellm.description"],
     logo: LiteLLMLogo,
   },
   bedrock: {
     name: "AWS Bedrock",
-    description: [
-      "You model and chat contents are subject to the agreed EULA for AWS and the model provider on aws.amazon.com",
-    ],
+    description: ["privacy.llm.bedrock.description"],
     logo: AWSBedrockLogo,
   },
   deepseek: {
     name: "DeepSeek",
-    description: ["Your model and chat contents are visible to DeepSeek"],
+    description: ["privacy.llm.deepseek.description"],
     logo: DeepSeekLogo,
   },
   apipie: {
     name: "APIpie.AI",
-    description: [
-      "Your model and chat contents are visible to APIpie in accordance with their terms of service.",
-    ],
+    description: ["privacy.llm.apipie.description"],
     logo: APIPieLogo,
   },
   xai: {
     name: "xAI",
-    description: [
-      "Your model and chat contents are visible to xAI in accordance with their terms of service.",
-    ],
+    description: ["privacy.llm.xai.description"],
     logo: XAILogo,
   },
   ppio: {
     name: "PPIO",
-    description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to PPIO",
-    ],
+    description: ["privacy.llm.description", "privacy.llm.ppio.description"],
     logo: PPIOLogo,
   },
   dpais: {
     name: "Dell Pro AI Studio",
-    description: [
-      "Your model and chat contents are only accessible on the computer running Dell Pro AI Studio",
-    ],
+    description: ["privacy.llm.dpais.description"],
     logo: DPAISLogo,
   },
   moonshotai: {
     name: "Moonshot AI",
     description: [
-      "Your chats may be used by Moonshot AI for training and model refinement",
-      "Your prompts and document text used in response creation are visible to Moonshot AI",
+      "privacy.llm.moonshotai.description",
+      "privacy.llm.moonshotai.description2",
     ],
     logo: MoonshotAiLogo,
   },
   cometapi: {
     name: "CometAPI",
     description: [
-      "Your chats will not be used for training",
-      "Your prompts and document text used in response creation are visible to CometAPI",
+      "privacy.llm.cometapi.description",
+      "privacy.llm.cometapi.description2",
     ],
     logo: CometApiLogo,
   },
@@ -267,75 +222,63 @@ export const VECTOR_DB_PRIVACY = {
   pgvector: {
     name: "PGVector",
     description: [
-      "Your vectors and document text are stored on your PostgreSQL instance",
-      "Access to your instance is managed by you",
+      "privacy.vector.pgvector.description",
+      "privacy.vector.description",
     ],
     logo: PGVectorLogo,
   },
   chroma: {
     name: "Chroma",
     description: [
-      "Your vectors and document text are stored on your Chroma instance",
-      "Access to your instance is managed by you",
+      "privacy.vector.chroma.description",
+      "privacy.vector.description",
     ],
     logo: ChromaLogo,
   },
   chromacloud: {
     name: "Chroma Cloud",
     description: [
-      "Your vectors and document text are stored on Chroma's cloud service",
-      "Access to your data is managed by Chroma",
+      "privacy.vector.chromacloud.description",
+      "privacy.vector.chromacloud.description2",
     ],
     logo: ChromaLogo,
   },
   pinecone: {
     name: "Pinecone",
     description: [
-      "Your vectors and document text are stored on Pinecone's servers",
-      "Access to your data is managed by Pinecone",
+      "privacy.vector.pinecone.description",
+      "privacy.vector.pinecone.description2",
     ],
     logo: PineconeLogo,
   },
   qdrant: {
     name: "Qdrant",
-    description: [
-      "Your vectors and document text are stored on your Qdrant instance (cloud or self-hosted)",
-    ],
+    description: ["privacy.vector.qdrant.description"],
     logo: QDrantLogo,
   },
   weaviate: {
     name: "Weaviate",
-    description: [
-      "Your vectors and document text are stored on your Weaviate instance (cloud or self-hosted)",
-    ],
+    description: ["privacy.vector.weaviate.description"],
     logo: WeaviateLogo,
   },
   milvus: {
     name: "Milvus",
-    description: [
-      "Your vectors and document text are stored on your Milvus instance (cloud or self-hosted)",
-    ],
+    description: ["privacy.vector.milvus.description"],
     logo: MilvusLogo,
   },
   zilliz: {
     name: "Zilliz Cloud",
-    description: [
-      "Your vectors and document text are stored on your Zilliz cloud cluster.",
-    ],
+    description: ["privacy.vector.zilliz.description"],
     logo: ZillizLogo,
   },
   astra: {
     name: "AstraDB",
-    description: [
-      "Your vectors and document text are stored on your cloud AstraDB database.",
-    ],
+    description: ["privacy.vector.astra.description"],
     logo: AstraDBLogo,
   },
   lancedb: {
     name: "LanceDB",
-    description: [
-      "Your vectors and document text are stored privately on this instance of AnythingLLM",
-    ],
+    description: ["privacy.vector.lancedb.description"],
     logo: LanceDbLogo,
   },
 };
@@ -343,88 +286,70 @@ export const VECTOR_DB_PRIVACY = {
 export const EMBEDDING_ENGINE_PRIVACY = {
   native: {
     name: "AnythingLLM Embedder",
-    description: [
-      "Your document text is embedded privately on this instance of AnythingLLM",
-    ],
+    description: ["privacy.embedding.native.description"],
     logo: AnythingLLMIcon,
   },
   openai: {
     name: "OpenAI",
     description: [
-      "Your document text is sent to OpenAI servers",
-      "Your documents are not used for training",
+      "privacy.embedding.openai.description",
+      "privacy.embedding.description",
     ],
     logo: OpenAiLogo,
   },
   azure: {
     name: "Azure OpenAI",
     description: [
-      "Your document text is sent to your Microsoft Azure service",
-      "Your documents are not used for training",
+      "privacy.embedding.azure.description",
+      "privacy.embedding.description",
     ],
     logo: AzureOpenAiLogo,
   },
   localai: {
     name: "LocalAI",
-    description: [
-      "Your document text is embedded privately on the server running LocalAI",
-    ],
+    description: ["privacy.embedding.localai.description"],
     logo: LocalAiLogo,
   },
   ollama: {
     name: "Ollama",
-    description: [
-      "Your document text is embedded privately on the server running Ollama",
-    ],
+    description: ["privacy.embedding.ollama.description"],
     logo: OllamaLogo,
   },
   lmstudio: {
     name: "LMStudio",
-    description: [
-      "Your document text is embedded privately on the server running LMStudio",
-    ],
+    description: ["privacy.embedding.lmstudio.description"],
     logo: LMStudioLogo,
   },
   cohere: {
     name: "Cohere",
-    description: [
-      "Data is shared according to the terms of service of cohere.com and your localities privacy laws.",
-    ],
+    description: ["privacy.embedding.cohere.description"],
     logo: CohereLogo,
   },
   voyageai: {
     name: "Voyage AI",
-    description: [
-      "Data sent to Voyage AI's servers is shared according to the terms of service of voyageai.com.",
-    ],
+    description: ["privacy.embedding.voyageai.description"],
     logo: VoyageAiLogo,
   },
   mistral: {
     name: "Mistral AI",
-    description: [
-      "Data sent to Mistral AI's servers is shared according to the terms of service of https://mistral.ai.",
-    ],
+    description: ["privacy.embedding.mistral.description"],
     logo: MistralLogo,
   },
   litellm: {
     name: "LiteLLM",
-    description: [
-      "Your document text is only accessible on the server running LiteLLM and to the providers you configured in LiteLLM.",
-    ],
+    description: ["privacy.embedding.litellm.description"],
     logo: LiteLLMLogo,
   },
   "generic-openai": {
     name: "Generic OpenAI compatible service",
-    description: [
-      "Data is shared according to the terms of service applicable with your generic endpoint provider.",
-    ],
+    description: ["privacy.embedding.generic_openai.description"],
     logo: GenericOpenAiLogo,
   },
   gemini: {
     name: "Google Gemini",
     description: [
-      "Your document text is sent to Google Gemini's servers for processing",
-      "Your document text is stored or managed according to the terms of service of Google Gemini API Terms of Service",
+      "privacy.embedding.gemini.description",
+      "privacy.embedding.gemini.description2",
     ],
     logo: GeminiLogo,
   },
@@ -507,7 +432,7 @@ export default function DataHandling({ setHeader, setForwardBtn, setBackBtn }) {
       <div className="p-8 flex flex-col gap-8">
         <div className="flex flex-col gap-y-2 border-b border-theme-sidebar-border pb-4">
           <div className="text-theme-text-primary text-base font-bold">
-            LLM Selection
+            {t("privacy.llm.title")}
           </div>
           <div className="flex items-center gap-2.5">
             <img
@@ -521,13 +446,15 @@ export default function DataHandling({ setHeader, setForwardBtn, setBackBtn }) {
           </div>
           <ul className="flex flex-col list-disc ml-4">
             {LLMSelection.description.map((desc) => (
-              <li className="text-theme-text-primary text-sm">{desc}</li>
+              <li className="text-theme-text-primary text-sm" key={desc}>
+                {t(desc)}
+              </li>
             ))}
           </ul>
         </div>
         <div className="flex flex-col gap-y-2 border-b border-theme-sidebar-border pb-4">
           <div className="text-theme-text-primary text-base font-bold">
-            Embedding Preference
+            {t("privacy.embedding.title")}
           </div>
           <div className="flex items-center gap-2.5">
             <img
@@ -541,14 +468,16 @@ export default function DataHandling({ setHeader, setForwardBtn, setBackBtn }) {
           </div>
           <ul className="flex flex-col list-disc ml-4">
             {EmbeddingEngine.description.map((desc) => (
-              <li className="text-theme-text-primary text-sm">{desc}</li>
+              <li className="text-theme-text-primary text-sm" key={desc}>
+                {t(desc)}
+              </li>
             ))}
           </ul>
         </div>
 
         <div className="flex flex-col gap-y-2 pb-4">
           <div className="text-theme-text-primary text-base font-bold">
-            Vector Database
+            {t("privacy.vector.title")}
           </div>
           <div className="flex items-center gap-2.5">
             <img
@@ -562,7 +491,9 @@ export default function DataHandling({ setHeader, setForwardBtn, setBackBtn }) {
           </div>
           <ul className="flex flex-col list-disc ml-4">
             {VectorDb.description.map((desc) => (
-              <li className="text-theme-text-primary text-sm">{desc}</li>
+              <li className="text-theme-text-primary text-sm" key={desc}>
+                {t(desc)}
+              </li>
             ))}
           </ul>
         </div>

@@ -240,7 +240,7 @@ export const AVAILABLE_LLM_PROVIDERS = [
     value: "litellm",
     logo: LiteLLMLogo,
     options: (settings) => <LiteLLMOptions settings={settings} />,
-    description: "  Run LiteLLM's OpenAI compatible proxy for various LLMs.",
+    description: "llm.providers.litellm.description",
     requiredConfig: ["LiteLLMBasePath"],
   },
   {
