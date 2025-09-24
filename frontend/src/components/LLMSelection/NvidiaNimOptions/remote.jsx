@@ -25,7 +25,7 @@ export default function RemoteNvidiaNimOptions({ settings }) {
 
   return (
     <div className="flex gap-[36px] mt-1.5">
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <div className="flex justify-between items-center mb-2">
           <label className="text-white text-sm font-semibold">
             NVIDIA Nim {t("llm.providers.base_url")}
@@ -58,7 +58,7 @@ export default function RemoteNvidiaNimOptions({ settings }) {
           onBlur={basePath.onBlur}
         />
         <p className="text-xs leading-[18px] font-base text-white text-opacity-60 mt-2">
-          {t("llm.providers.base_url_description")}
+          {t("llm.providers.nvidia_nim.base_url_description")}
         </p>
       </div>
       {!settings?.credentialsOnly && (
@@ -91,7 +91,7 @@ function NvidiaNimModelSelection({ settings, basePath }) {
 
   if (loading || models.length === 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
           {t("llm.providers.chat_model_selection")}
         </label>
@@ -101,7 +101,7 @@ function NvidiaNimModelSelection({ settings, basePath }) {
           className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- ${t("llm.providers.loading_models")} --
+            -- {t("llm.providers.loading_models")} --
           </option>
         </select>
       </div>
@@ -109,7 +109,7 @@ function NvidiaNimModelSelection({ settings, basePath }) {
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-72">
       <label className="text-white text-sm font-semibold block mb-3">
         {t("llm.providers.chat_model_selection")}
       </label>

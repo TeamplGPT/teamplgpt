@@ -732,6 +732,7 @@ const TRANSLATIONS = {
         show_manual_endpoint_input: "Show Manual Endpoint Input",
         base_url_description: "Enter the URL where KoboldCPP is running.",
         model: "KoboldCPP Model",
+        enter_url_first: "Enter KoboldCPP URL first",
         model_description:
           "Select the KoboldCPP model you want to use. Models will load after entering a valid KoboldCPP URL.",
         model_description_2:
@@ -784,6 +785,9 @@ const TRANSLATIONS = {
         model_id_used_for_chat_requests: "Model id used for chat requests",
         max_tokens_per_request_placeholder: "Max tokens per request (eg: 1024)",
       },
+      cometapi: {
+        description: "500+ AI Models all in one API.",
+      },
       xai: {
         description: "Run xAI's powerful LLMs like Grok-2 and more.",
         model_selection_description:
@@ -805,8 +809,16 @@ const TRANSLATIONS = {
       waiting_for_api_key: "Waiting for API Key",
       optional: "optional",
       select_llm_required: "You need to select an LLM",
+      stream_timeout: "Stream Timeout (ms)",
+      stream_timeout_description:
+        "Timeout value between token responses to auto-timeout the stream.",
       max_tokens: "Max Tokens",
       token_context_window_placeholder: "Content window limit (eg: 4096)",
+      endpoint_discovery: {
+        success: "Provider endpoint discovered automatically.",
+        manual_required:
+          "Couldn't automatically discover the provider endpoint. Please enter it manually.",
+      },
     },
   },
 

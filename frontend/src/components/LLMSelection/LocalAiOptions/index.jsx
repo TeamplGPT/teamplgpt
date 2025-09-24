@@ -50,7 +50,7 @@ export default function LocalAiOptions({ settings, showAlert = false }) {
               basePath={basePath.value}
               apiKey={apiKey}
             />
-            <div className="flex flex-col w-60">
+            <div className="flex flex-col w-72">
               <label className="text-white text-sm font-semibold block mb-2">
                 {t("llm.providers.token_context_window")}
               </label>
@@ -68,7 +68,7 @@ export default function LocalAiOptions({ settings, showAlert = false }) {
             </div>
           </>
         )}
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <div className="flex flex-col gap-y-1 mb-2">
             <label className="text-white text-sm font-semibold flex items-center gap-x-2">
               Local AI {t("llm.providers.api_key")}{" "}
@@ -110,7 +110,7 @@ export default function LocalAiOptions({ settings, showAlert = false }) {
       </div>
       <div hidden={!showAdvancedControls}>
         <div className="w-full flex items-center gap-4">
-          <div className="flex flex-col w-60">
+          <div className="flex flex-col w-72">
             <div className="flex justify-between items-center mb-2">
               <label className="text-white text-sm font-semibold">
                 Local AI {t("llm.providers.base_url")}
@@ -175,7 +175,7 @@ function LocalAIModelSelection({ settings, basePath = null, apiKey = null }) {
 
   if (loading || customModels.length == 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-2">
           {t("llm.providers.chat_model_selection")}
         </label>
@@ -195,7 +195,7 @@ function LocalAIModelSelection({ settings, basePath = null, apiKey = null }) {
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-72">
       <label className="text-white text-sm font-semibold block mb-2">
         {t("llm.providers.chat_model_selection")}
       </label>

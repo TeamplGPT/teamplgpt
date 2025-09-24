@@ -1,10 +1,14 @@
+import { useTranslation } from "react-i18next";
+
 export default function HuggingFaceOptions({ settings }) {
+  const { t } = useTranslation();
+
   return (
     <div className="w-full flex flex-col">
       <div className="w-full flex items-center gap-[36px] mt-1.5">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
-            HuggingFace Inference Endpoint
+            {t("llm.providers.huggingface.inference_endpoint")}
           </label>
           <input
             type="url"
@@ -17,9 +21,9 @@ export default function HuggingFaceOptions({ settings }) {
             spellCheck={false}
           />
         </div>
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
-            HuggingFace Access Token
+            {t("llm.providers.huggingface.access_token")}
           </label>
           <input
             type="password"
@@ -34,9 +38,9 @@ export default function HuggingFaceOptions({ settings }) {
             spellCheck={false}
           />
         </div>
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
-            Model Token Limit
+            {t("llm.providers.huggingface.model_token_limit")}
           </label>
           <input
             type="number"

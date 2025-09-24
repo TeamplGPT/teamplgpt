@@ -6,7 +6,7 @@ export default function CohereAiOptions({ settings }) {
   return (
     <div className="w-full flex flex-col">
       <div className="w-full flex items-center gap-[36px] mt-1.5">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
             Cohere {t("llm.providers.api_key")}
           </label>
@@ -21,7 +21,7 @@ export default function CohereAiOptions({ settings }) {
             spellCheck={false}
           />
         </div>
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
             {t("llm.providers.chat_model_selection")}
           </label>

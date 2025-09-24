@@ -9,7 +9,7 @@ export default function MoonshotAiOptions({ settings }) {
 
   return (
     <div className="flex gap-[36px] mt-1.5">
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
           API Key
         </label>
@@ -56,7 +56,7 @@ function MoonshotAiModelSelection({ apiKey, settings }) {
 
   if (!apiKey) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
           Chat Model Selection
         </label>
@@ -75,7 +75,7 @@ function MoonshotAiModelSelection({ apiKey, settings }) {
 
   if (loading) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
           Chat Model Selection
         </label>
@@ -93,7 +93,7 @@ function MoonshotAiModelSelection({ apiKey, settings }) {
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-72">
       <label className="text-white text-sm font-semibold block mb-3">
         Chat Model Selection
       </label>

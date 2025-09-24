@@ -7,7 +7,7 @@ export default function PerplexityOptions({ settings }) {
 
   return (
     <div className="flex gap-[36px] mt-1.5">
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
           Perplexity {t("llm.providers.api_key")}
         </label>
@@ -46,7 +46,7 @@ function PerplexityModelSelection({ settings }) {
 
   if (loading || customModels.length == 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
           {t("llm.providers.chat_model_selection")}
         </label>
@@ -56,7 +56,7 @@ function PerplexityModelSelection({ settings }) {
           className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- ${t("llm.providers.loading_models")} --
+            -- {t("llm.providers.loading_models")} --
           </option>
         </select>
       </div>
@@ -64,7 +64,7 @@ function PerplexityModelSelection({ settings }) {
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-72">
       <label className="text-white text-sm font-semibold block mb-3">
         {t("llm.providers.chat_model_selection")}
       </label>

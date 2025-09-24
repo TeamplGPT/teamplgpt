@@ -692,6 +692,7 @@ const TRANSLATIONS = {
         show_manual_endpoint_input: "수동 엔드포인트 입력 보이기",
         base_url_description: "KoboldCPP가 실행되는 URL을 입력하세요.",
         model: "KoboldCPP 모델",
+        enter_url_first: "KoboldCPP URL을 먼저 입력하세요",
         model_description:
           "사용할 KoboldCPP 모델을 선택하세요. 유효한 KoboldCPP URL을 입력하면 모델을 불러옵니다.",
         model_description_2: "대화에 사용할 KoboldCPP 모델을 선택하세요.",
@@ -744,6 +745,9 @@ const TRANSLATIONS = {
         model_id_used_for_chat_requests: "채팅 요청에 사용되는 모델 ID",
         max_tokens_per_request_placeholder: "요청당 최대 토큰 (예: 1024)",
       },
+      cometapi: {
+        description: "500+ AI 모델을 한 번의 API로 실행하세요.",
+      },
       xai: {
         description: "Grok-2 등 xAI의 강력한 LLM을 실행하세요.",
         model_selection_description: "대화에 사용할 xAI 모델을 선택하세요.",
@@ -769,6 +773,11 @@ const TRANSLATIONS = {
         "토큰 응답 간 시간을 초과하면 자동으로 스트림을 종료합니다.",
       max_tokens: "최대 토큰",
       token_context_window_placeholder: "컨텍스트 창 한도 (예: 4096)",
+      endpoint_discovery: {
+        success: "엔드포인트가 자동으로 감지되었습니다.",
+        manual_required:
+          "엔드포인트를 자동으로 감지할 수 없습니다. 수동으로 입력하세요.",
+      },
     },
   },
   transcription: {

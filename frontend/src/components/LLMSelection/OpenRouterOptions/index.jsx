@@ -9,7 +9,7 @@ export default function OpenRouterOptions({ settings }) {
   return (
     <div className="flex flex-col gap-y-4 mt-1.5">
       <div className="flex gap-[36px]">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
             OpenRouter {t("llm.providers.api_key")}
           </label>
@@ -54,7 +54,7 @@ function AdvancedControls({ settings }) {
         )}
       </button>
       <div hidden={!showAdvancedControls}>
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
             {t("llm.providers.stream_timeout")}
           </label>
@@ -104,7 +104,7 @@ function OpenRouterModelSelection({ settings }) {
 
   if (loading || Object.keys(groupedModels).length === 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
           {t("llm.providers.chat_model_selection")}
         </label>
@@ -114,7 +114,7 @@ function OpenRouterModelSelection({ settings }) {
           className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            -- ${t("llm.providers.loading_models")} --
+            -- {t("llm.providers.loading_models")} --
           </option>
         </select>
       </div>
@@ -122,7 +122,7 @@ function OpenRouterModelSelection({ settings }) {
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-72">
       <label className="text-white text-sm font-semibold block mb-3">
         {t("llm.providers.chat_model_selection")}
       </label>
