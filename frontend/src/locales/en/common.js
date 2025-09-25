@@ -589,7 +589,7 @@ const TRANSLATIONS = {
     search: "Search all LLM providers",
     messages: {
       saveSuccess: "LLM preferences saved successfully.",
-      saveError: "Failed to save LLM settings: {error}",
+      saveError: "Failed to save LLM settings: {{error}}",
     },
     providers: {
       llm_default: {
@@ -876,9 +876,91 @@ const TRANSLATIONS = {
     title: "Vector Database",
     description:
       "These are the credentials and settings for how your AnythingLLM instance will function. It's important these keys are current and correct.",
+    switchWarning: {
+      title: "WARNING - This action is irreversible",
+      message:
+        "Switching the vector database will reset all previously embedded documents in all workspaces.\n\nConfirming will clear all embeddings from your vector database and remove all documents from your workspaces. Your uploaded documents will not be deleted, they will be available for re-embedding.",
+      confirm: "Confirm",
+      cancel: "Cancel",
+      proceed: "Are you sure you want to proceed?",
+    },
+    messages: {
+      saveSuccess: "Vector database preferences saved successfully.",
+      saveError: "Failed to save vector database settings: {{error}}",
+    },
     provider: {
       title: "Vector Database Provider",
       description: "There is no configuration needed for LanceDB.",
+      search: "Search all vector database providers",
+      lancedb: {
+        description:
+          "100% local vector DB that runs on the same instance as AnythingLLM.",
+      },
+      pgvector: {
+        description: "Vector search powered by PostgreSQL.",
+        connectionString: "Postgres Connection String",
+        tableName: "Vector Table Name",
+        tooltip: {
+          intro:
+            "This is the connection string for the Postgres database in the format of <br /><code>postgresql://username:password@host:port/database</code>",
+          permissions:
+            "The user for the database must have the following permissions:",
+          permission_db: "Read access to the database",
+          permission_schema: "Read access to the database schem",
+          permission_create: "Create access to the database",
+          pgvector:
+            "You must have the pgvector extension installed on the database.",
+          desc_1:
+            "This is the name of the table in the Postgres database that will store the vectors",
+          desc_2:
+            "By default, the table name is <code>anythingllm_vectors</code>.",
+          desc_3:
+            "This table must not already exist on the database - it will be created automatically.",
+        },
+      },
+      chroma: {
+        description:
+          "Open source vector database you can host yourself or on the cloud.",
+        endpoint: "Chroma Endpoint",
+        apiHeader: "API Header",
+      },
+      chromacloud: {
+        description:
+          "Fully managed Chroma cloud service with enterprise features and support.",
+      },
+      pinecone: {
+        description:
+          "100% cloud-based vector database for enterprise use cases.",
+        apiKey: "Pinecone DB API Key",
+        indexName: "Pinecone Index Name",
+      },
+      zilliz: {
+        description:
+          "Cloud hosted vector database built for enterprise with SOC 2 compliance.",
+        clusterEndpoint: "Cluster Endpoint",
+        apiToken: "API Token",
+      },
+      qdrant: {
+        description: "Open source local and distributed cloud vector database.",
+        QDrantAPIEndpoint: "QDrant API Endpoint",
+      },
+      weaviate: {
+        description:
+          "Open source local and cloud hosted multi-modal vector database.",
+        endpoint: "Weaviate Endpoint",
+      },
+      milvus: {
+        description: "Open-source, highly scalable, and blazing fast.",
+        dbAddress: "Milvus DB Address",
+        username: "Milvus Username",
+        password: "Milvus Password",
+      },
+      astra: {
+        description: "Vector Search for Real-world GenAI.",
+        endpoint: "Astra DB Endpoint",
+        applicationToken: "Astra DB Application Token",
+      },
+      apiKey: "API Key",
     },
   },
 
