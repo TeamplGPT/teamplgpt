@@ -927,6 +927,8 @@ const TRANSLATIONS = {
       chromacloud: {
         description:
           "Fully managed Chroma cloud service with enterprise features and support.",
+        tenantId: "Tenant ID",
+        databaseName: "Database Name",
       },
       pinecone: {
         description:

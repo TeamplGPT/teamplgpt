@@ -1,10 +1,14 @@
+import { useTranslation } from "react-i18next";
+
 export default function ChromaCloudOptions({ settings }) {
+  const { t } = useTranslation();
+
   return (
     <div className="w-full flex flex-col gap-y-7">
       <div className="w-full flex items-center gap-[36px] mt-1.5">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
-            API Key
+            {t("vector.provider.apiKey")}
           </label>
           <input
             type="password"
@@ -18,9 +22,9 @@ export default function ChromaCloudOptions({ settings }) {
           />
         </div>
 
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
-            Tenant ID
+            {t("vector.provider.chromacloud.tenantId")}
           </label>
           <input
             name="ChromaCloudTenant"
@@ -32,10 +36,12 @@ export default function ChromaCloudOptions({ settings }) {
             required={true}
           />
         </div>
+      </div>
 
-        <div className="flex flex-col w-60">
+      <div className="w-full flex items-center gap-[36px] mt-1.5">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
-            Database Name
+            {t("vector.provider.chromacloud.databaseName")}
           </label>
           <input
             name="ChromaCloudDatabase"
