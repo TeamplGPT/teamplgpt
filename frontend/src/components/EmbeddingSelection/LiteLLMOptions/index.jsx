@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import System from "@/models/system";
 import { Warning } from "@phosphor-icons/react";
 import { Tooltip } from "react-tooltip";
+import { useTranslation } from "react-i18next";
 
 export default function LiteLLMOptions({ settings }) {
+  const { t } = useTranslation();
   const [basePathValue, setBasePathValue] = useState(settings?.LiteLLMBasePath);
   const [basePath, setBasePath] = useState(settings?.LiteLLMBasePath);
   const [apiKeyValue, setApiKeyValue] = useState(settings?.LiteLLMAPIKey);
@@ -12,9 +14,9 @@ export default function LiteLLMOptions({ settings }) {
   return (
     <div className="w-full flex flex-col gap-y-7">
       <div className="w-full flex items-center gap-[36px] mt-1.5">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
-            Base URL
+            {t("embedding.providers.base_url")}
           </label>
           <input
             type="url"
@@ -34,9 +36,11 @@ export default function LiteLLMOptions({ settings }) {
           basePath={basePath}
           apiKey={apiKey}
         />
-        <div className="flex flex-col w-60">
+      </div>
+      <div className="w-full flex items-center gap-[36px]">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
-            Max embedding chunk length
+            {t("embedding.providers.max_embedding_chunk_length")}
           </label>
           <input
             type="number"
@@ -50,12 +54,14 @@ export default function LiteLLMOptions({ settings }) {
             autoComplete="off"
           />
         </div>
-      </div>
-      <div className="w-full flex items-center gap-[36px]">
-        <div className="flex flex-col w-60">
+
+        <div className="flex flex-col w-72">
           <div className="flex flex-col gap-y-1 mb-4">
             <label className="text-white text-sm font-semibold flex items-center gap-x-2">
-              API Key <p className="!text-xs !italic !font-thin">optional</p>
+              {t("embedding.providers.api_key")}{" "}
+              <p className="!text-xs !italic !font-thin">
+                {t("embedding.providers.optional")}
+              </p>
             </label>
           </div>
           <input
@@ -100,7 +106,7 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
 
   if (loading || customModels.length == 0) {
     return (
-      <div className="flex flex-col w-60">
+      <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
           Embedding Model Selection
         </label>
@@ -120,7 +126,7 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
   }
 
   return (
-    <div className="flex flex-col w-60">
+    <div className="flex flex-col w-72">
       <div className="flex items-center">
         <label className="text-white text-sm font-semibold block mb-3">
           Embedding Model Selection

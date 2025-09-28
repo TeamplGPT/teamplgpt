@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { CaretDown, CaretUp } from "@phosphor-icons/react";
+import { useTranslation } from "react-i18next";
 
 export default function GenericOpenAiEmbeddingOptions({ settings }) {
   const [showAdvancedControls, setShowAdvancedControls] = useState(false);
+  const { t } = useTranslation();
+
   return (
     <div className="w-full flex flex-col gap-y-7">
       <div className="w-full flex items-center gap-[36px] mt-1.5 flex-wrap">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
-            Base URL
+            {t("embedding.providers.base_url")}
           </label>
           <input
             type="url"
@@ -21,9 +24,9 @@ export default function GenericOpenAiEmbeddingOptions({ settings }) {
             spellCheck={false}
           />
         </div>
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
-            Embedding Model
+            {t("embedding.providers.model_preference")}
           </label>
           <input
             type="text"
@@ -36,9 +39,11 @@ export default function GenericOpenAiEmbeddingOptions({ settings }) {
             spellCheck={false}
           />
         </div>
-        <div className="flex flex-col w-60">
+      </div>
+      <div className="w-full flex items-center gap-[36px]">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
-            Max embedding chunk length
+            {t("embedding.providers.max_embedding_chunk_length")}
           </label>
           <input
             type="number"
@@ -52,12 +57,13 @@ export default function GenericOpenAiEmbeddingOptions({ settings }) {
             autoComplete="off"
           />
         </div>
-      </div>
-      <div className="w-full flex items-center gap-[36px]">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <div className="flex flex-col gap-y-1 mb-4">
             <label className="text-white text-sm font-semibold flex items-center gap-x-2">
-              API Key <p className="!text-xs !italic !font-thin">optional</p>
+              {t("embedding.providers.api_key")}{" "}
+              <p className="!text-xs !italic !font-thin">
+                {t("embedding.providers.optional")}
+              </p>
             </label>
           </div>
           <input
@@ -81,7 +87,9 @@ export default function GenericOpenAiEmbeddingOptions({ settings }) {
           }}
           className="border-none text-theme-text-primary hover:text-theme-text-secondary flex items-center text-sm"
         >
-          {showAdvancedControls ? "Hide" : "Show"} advanced settings
+          {showAdvancedControls
+            ? t("embedding.providers.hide_advanced_settings")
+            : t("embedding.providers.show_advanced_settings")}
           {showAdvancedControls ? (
             <CaretUp size={14} className="ml-1" />
           ) : (
@@ -91,11 +99,13 @@ export default function GenericOpenAiEmbeddingOptions({ settings }) {
       </div>
       <div hidden={!showAdvancedControls}>
         <div className="w-full flex items-start gap-4">
-          <div className="flex flex-col w-60">
+          <div className="flex flex-col w-72">
             <div className="flex flex-col gap-y-1 mb-4">
               <label className="text-white text-sm font-semibold flex items-center gap-x-2">
-                Max concurrent Chunks
-                <p className="!text-xs !italic !font-thin">optional</p>
+                {t("embedding.providers.generic_openai.max_concurrent_chunks")}
+                <p className="!text-xs !italic !font-thin">
+                  {t("embedding.providers.optional")}
+                </p>
               </label>
             </div>
             <input
