@@ -1,10 +1,14 @@
+import { useTranslation } from "react-i18next";
+
 export default function CohereEmbeddingOptions({ settings }) {
+  const { t } = useTranslation();
+
   return (
     <div className="w-full flex flex-col gap-y-4">
       <div className="w-full flex items-center gap-[36px] mt-1.5">
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
-            API Key
+            {t("embedding.providers.api_key")}
           </label>
           <input
             type="password"
@@ -17,9 +21,9 @@ export default function CohereEmbeddingOptions({ settings }) {
             spellCheck={false}
           />
         </div>
-        <div className="flex flex-col w-60">
+        <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
-            Model Preference
+            {t("embedding.providers.model_preference")}
           </label>
           <select
             name="EmbeddingModelPref"

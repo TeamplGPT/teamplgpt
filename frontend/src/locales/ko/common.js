@@ -800,9 +800,100 @@ const TRANSLATIONS = {
     "desc-start":
       "임베딩 엔진을 지원하지 않는 LLM을 사용할 때 텍스트를 임베딩하는 데 다른 임베딩 엔진 제공자의 인증이 필요할 수 있습니다.",
     "desc-end":
-      "임베딩은 텍스트를 벡터로 변환하는 과정입니다. 파일과 프롬프트를 AnythingLLM이 처리할 수 있는 형식으로 변환하려면 이러한 인증이 필요합니다.",
+      "임베딩은 텍스트를 벡터로 변환하는 과정입니다. 파일과 프롬프트를 AnythingLLM이 처리할 수 있는 형식으로 변환하려면 인증이 필요합니다.",
+    messages: {
+      saveSuccess: "임베딩 설정이 성공적으로 저장되었습니다.",
+      saveError: "임베딩 설정 저장에 실패했습니다: {{error}}",
+    },
     provider: {
       title: "임베딩 제공자",
+      description:
+        "AnythingLLM의 기본 임베딩 엔진을 사용할 때는 설정이 필요하지 않습니다.",
+      search: "모든 임베딩 제공자 검색",
+    },
+    providers: {
+      native: {
+        description:
+          "AnythingLLM에 내장된 임베딩 제공자를 사용하세요. 별도의 설정이 필요 없습니다!",
+      },
+      openai: {
+        description: "대부분의 비상업적 용도에 적합한 표준 옵션입니다.",
+      },
+      azure: {
+        description:
+          "Azure 서비스에서 호스팅되는 OpenAI의 엔터프라이즈 옵션입니다.",
+        azure_service_endpoint: "Azure 서비스 엔드포인트",
+        embedding_deployment_name: "임베딩 배포 이름",
+      },
+      gemini: {
+        description: "Google AI의 강력한 임베딩 모델을 실행합니다.",
+      },
+      localai: {
+        description: "내 컴퓨터에서 임베딩 모델을 직접 실행할 수 있습니다.",
+        embedding_model_name: "임베딩 모델 이름",
+        local_ai_api_key: "Local AI API 키",
+        local_ai_base_url: "LocalAI 기본 URL",
+      },
+      ollama: {
+        description: "내 컴퓨터에서 임베딩 모델을 직접 실행할 수 있습니다.",
+        ollama_embedding_model: "Ollama 임베딩 모델",
+        enter_ollama_url_first: "Ollama URL을 먼저 입력하세요",
+        ollama_embedding_model_description:
+          "임베딩 모델을 선택하세요. 유효한 Ollama URL을 입력하면 모델을 불러옵니다.",
+        ollama_embedding_model_description_2:
+          "임베딩을 생성하기 위해 사용할 Ollama 모델을 선택하세요.",
+        ollama_base_url: "Ollama 기본 URL",
+        ollama_base_url_description: "Ollama가 실행되는 URL을 입력하세요.",
+      },
+      lmstudio: {
+        description:
+          "수천 개의 최신 LLM을 몇 번의 클릭만으로 탐색, 다운로드, 실행할 수 있습니다.",
+        lmstudio_embedding_model: "LM Studio 임베딩 모델",
+        lmstudio_embedding_model_description:
+          "임베딩에 사용할 LM Studio 모델을 선택하세요. 올바른 LM Studio URL을 입력하면 모델 목록을 자동으로 불러옵니다.",
+        lmstudio_embedding_model_description_2:
+          "임베딩 생성을 위해 사용할 LM Studio 모델을 선택하세요.",
+        enter_lmstudio_url_first: "LM Studio URL을 먼저 입력하세요",
+        lmstudio_base_url: "LM Studio 기본 URL",
+        lmstudio_base_url_description: "LM Studio가 실행되는 URL을 입력하세요.",
+      },
+      cohere: {
+        description: "Cohere의 강력한 임베딩 모델을 실행합니다.",
+      },
+      voyageai: {
+        description: "Voyage AI의 강력한 임베딩 모델을 실행합니다.",
+      },
+      litellm: {
+        description: "LiteLLM의 강력한 임베딩 모델을 실행합니다.",
+      },
+      mistral: {
+        description: "Mistral AI의 강력한 임베딩 모델을 실행합니다.",
+      },
+      generic_openai: {
+        description:
+          "OpenAI 호환 API 서비스라면 어디서든 임베딩 모델을 사용할 수 있습니다.",
+        embedding_model: "임베딩 모델",
+        max_concurrent_chunks: "동시 최대 청크",
+      },
+      endpoint_discovery: {
+        success: "엔드포인트가 자동으로 감지되었습니다.",
+        manual_required:
+          "엔드포인트를 자동으로 감지할 수 없습니다. 수동으로 입력하세요.",
+      },
+      api_key: "API 키",
+      base_url: "기본 URL",
+      embedding_model_selection: "임베딩 모델 선택",
+      model_preference: "모델 선택",
+      available_embedding_models: "사용 가능한 임베딩 모델",
+      show_advanced_settings: "고급 설정 보이기",
+      hide_advanced_settings: "고급 설정 숨기기",
+      your_loaded_models: "내가 로드한 모델",
+      auto_detect: "자동 감지",
+      optional: "선택 사항",
+      loading_models: "-- 사용 가능한 모델을 불러오는 중 --",
+      waiting_for_url: "-- URL 대기 중 --",
+      max_embedding_chunk_length: "임베딩 청크 최대 길이",
+      max_embedding_chunk_length_description: "임베딩 청크의 최대 길이입니다.",
     },
   },
   text: {
