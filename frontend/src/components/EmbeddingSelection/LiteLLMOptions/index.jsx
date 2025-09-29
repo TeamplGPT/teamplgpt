@@ -84,6 +84,7 @@ export default function LiteLLMOptions({ settings }) {
 function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
   const [customModels, setCustomModels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function findCustomModels() {
@@ -108,7 +109,7 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
     return (
       <div className="flex flex-col w-72">
         <label className="text-white text-sm font-semibold block mb-3">
-          Embedding Model Selection
+          {t("embedding.providers.embedding_model_selection")}
         </label>
         <select
           name="EmbeddingModelPref"
@@ -117,8 +118,8 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
         >
           <option disabled={true} selected={true}>
             {basePath?.includes("/v1")
-              ? "-- loading available models --"
-              : "-- waiting for URL --"}
+              ? t("embedding.providers.loading_models")
+              : t("embedding.providers.waiting_for_url")}
           </option>
         </select>
       </div>
@@ -129,7 +130,7 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
     <div className="flex flex-col w-72">
       <div className="flex items-center">
         <label className="text-white text-sm font-semibold block mb-3">
-          Embedding Model Selection
+          {t("embedding.providers.embedding_model_selection")}
         </label>
         <EmbeddingModelTooltip />
       </div>
@@ -139,7 +140,7 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
         className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
       >
         {customModels.length > 0 && (
-          <optgroup label="Your loaded models">
+          <optgroup label={t("embedding.providers.your_loaded_models")}>
             {customModels.map((model) => {
               return (
                 <option
@@ -159,6 +160,7 @@ function LiteLLMModelSelection({ settings, basePath = null, apiKey = null }) {
 }
 
 function EmbeddingModelTooltip() {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center justify-center -mt-3 ml-1">
       <Warning
@@ -174,17 +176,17 @@ function EmbeddingModelTooltip() {
         clickable={true}
       >
         <p className="text-sm">
-          Be sure to select a valid embedding model. Chat models are not
-          embedding models. See{" "}
+          {t("embedding.providers.litellm.modelSelection.warning")}{" "}
+          {t("embedding.providers.litellm.modelSelection.seeMore")}{" "}
           <a
             href="https://litellm.vercel.app/docs/embedding/supported_embedding"
             target="_blank"
             rel="noreferrer"
             className="underline"
           >
-            this page
+            {t("embedding.providers.litellm.modelSelection.thisPage")}
           </a>{" "}
-          for more information.
+          {t("embedding.providers.litellm.modelSelection.forMoreInfo")}
         </p>
       </Tooltip>
     </div>

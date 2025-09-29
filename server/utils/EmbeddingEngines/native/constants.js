@@ -12,8 +12,8 @@ const SUPPORTED_NATIVE_EMBEDDING_MODELS = {
       id: "Xenova/all-MiniLM-L6-v2",
       name: "all-MiniLM-L6-v2",
       description:
-        "A lightweight and fast model for embedding text. The default model for AnythingLLM.",
-      lang: "English",
+        "embedding.providers.native.model_preference.all-MiniLM-L6-v2",
+      lang: "embedding.providers.native.model_preference.english",
       size: "23MB",
       modelCard: "https://huggingface.co/Xenova/all-MiniLM-L6-v2",
     },
@@ -31,8 +31,8 @@ const SUPPORTED_NATIVE_EMBEDDING_MODELS = {
       id: "Xenova/nomic-embed-text-v1",
       name: "nomic-embed-text-v1",
       description:
-        "A high-performing open embedding model with a large token context window. Requires more processing power and memory.",
-      lang: "English",
+        "embedding.providers.native.model_preference.nomic-embed-text-v1",
+      lang: "embedding.providers.native.model_preference.english",
       size: "139MB",
       modelCard: "https://huggingface.co/Xenova/nomic-embed-text-v1",
     },
@@ -50,8 +50,8 @@ const SUPPORTED_NATIVE_EMBEDDING_MODELS = {
       id: "MintplexLabs/multilingual-e5-small",
       name: "multilingual-e5-small",
       description:
-        "A larger multilingual embedding model that supports 100+ languages. Requires more processing power and memory.",
-      lang: "100+ languages",
+        "embedding.providers.native.model_preference.multilingual-e5-small",
+      lang: "embedding.providers.native.model_preference.languages_100",
       size: "487MB",
       modelCard: "https://huggingface.co/intfloat/multilingual-e5-small",
     },

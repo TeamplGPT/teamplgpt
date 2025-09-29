@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import System from "@/models/system";
+import { useTranslation } from "react-i18next";
 
 export default function NativeEmbeddingOptions({ settings }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [availableModels, setAvailableModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState(
@@ -39,7 +41,7 @@ export default function NativeEmbeddingOptions({ settings }) {
       <div className="w-full flex flex-col mt-1.5">
         <div className="flex flex-col w-96">
           <label className="text-white text-sm font-semibold block mb-3">
-            Model Preference
+            {t("embedding.providers.model_preference")}
           </label>
           <select
             name="EmbeddingModelPref"
@@ -54,10 +56,12 @@ export default function NativeEmbeddingOptions({ settings }) {
                 disabled={true}
                 selected={true}
               >
-                --loading available models--
+                {t("embedding.providers.loading_models")}
               </option>
             ) : (
-              <optgroup label="Available embedding models">
+              <optgroup
+                label={t("embedding.providers.available_embedding_models")}
+              >
                 {availableModels.map((model) => {
                   return (
                     <option
@@ -76,13 +80,15 @@ export default function NativeEmbeddingOptions({ settings }) {
         {selectedModelInfo && (
           <div className="flex flex-col gap-y-2 mt-2">
             <p className="text-theme-text-secondary text-xs font-normal block">
-              {selectedModelInfo?.description}
+              {t(selectedModelInfo?.description)}
             </p>
             <p className="text-theme-text-secondary text-xs font-normal block">
-              Trained on: {selectedModelInfo?.lang}
+              {t("embedding.providers.native.model_preference.trained_on")}:{" "}
+              {t(selectedModelInfo?.lang)}
             </p>
             <p className="text-theme-text-secondary text-xs font-normal block">
-              Download Size: {selectedModelInfo?.size}
+              {t("embedding.providers.native.model_preference.download_size")}:{" "}
+              {selectedModelInfo?.size}
             </p>
             <Link
               to={selectedModelInfo?.modelCard}
@@ -90,7 +96,8 @@ export default function NativeEmbeddingOptions({ settings }) {
               rel="noopener noreferrer"
               className="text-theme-text-secondary text-xs font-normal block underline hover:text-theme-text-primary"
             >
-              View model card on Hugging Face &rarr;
+              {t("embedding.providers.native.model_preference.view_model_card")}{" "}
+              &rarr;
             </Link>
           </div>
         )}
