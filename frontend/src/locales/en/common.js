@@ -62,7 +62,6 @@ const TRANSLATIONS = {
     error: "error",
     success: "success",
     user: "User",
-    selection: "Model Selection",
     saving: "Saving...",
     save: "Save changes",
     previous: "Previous Page",
@@ -832,12 +831,25 @@ const TRANSLATIONS = {
     description:
       "These are the credentials and settings for your preferred transcription model provider. Its important these keys are current and correct or else media files and audio will not transcribe.",
     provider: "Transcription Provider",
+    providers: {
+      openai: {
+        description:
+          "Leverage the OpenAI Whisper-large model using your API key.",
+        whisper_model: "Whisper Model",
+      },
+      local: {
+        description: "Run a built-in whisper model on this instance privately.",
+      },
+    },
     "warn-start":
       "Using the local whisper model on machines with limited RAM or CPU can stall AnythingLLM when processing media files.",
     "warn-recommend":
       "We recommend at least 2GB of RAM and upload files <10Mb.",
     "warn-end":
       "The built-in model will automatically download on the first use.",
+    selection: "Model Selection",
+    search: "Search audio transcription providers",
+    api_key: "API Key",
   },
 
   embedding: {
