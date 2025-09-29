@@ -27,8 +27,10 @@ import ServerPanel from "./MCPServers/ServerPanel";
 import { Link } from "react-router-dom";
 import paths from "@/utils/paths";
 import AgentFlows from "@/models/agentFlows";
+import { useTranslation } from "react-i18next";
 
 export default function AdminAgents() {
+  const { t } = useTranslation();
   const formEl = useRef(null);
   const [hasChanges, setHasChanges] = useState(false);
   const [settings, setSettings] = useState({});
@@ -164,11 +166,13 @@ export default function AdminAgents() {
         _preferences.settings?.disabled_agent_skills ?? []
       );
       setImportedSkills(_preferences.settings?.imported_agent_skills ?? []);
-      showToast(`Agent preferences saved successfully.`, "success", {
+      showToast(t("agent.skill.agentPreferencesSavedSuccessfully"), "success", {
         clear: true,
       });
     } else {
-      showToast(`Agent preferences failed to save.`, "error", { clear: true });
+      showToast(t("agent.skill.agentPreferencesFailedToSave"), "error", {
+        clear: true,
+      });
     }
 
     setHasChanges(false);
@@ -271,7 +275,7 @@ export default function AdminAgents() {
           >
             <div className="text-theme-text-primary flex items-center gap-x-2">
               <Robot size={24} />
-              <p className="text-lg font-medium">Agent Skills</p>
+              <p className="text-lg font-medium">{t("agent.skill.title")}</p>
             </div>
             {/* Default skills */}
             <SkillList
@@ -292,7 +296,9 @@ export default function AdminAgents() {
 
             <div className="text-theme-text-primary flex items-center gap-x-2">
               <Plug size={24} />
-              <p className="text-lg font-medium">Custom Skills</p>
+              <p className="text-lg font-medium">
+                {t("agent.custom-skills.title")}
+              </p>
             </div>
             <ImportedSkillList
               skills={importedSkills}
@@ -302,7 +308,9 @@ export default function AdminAgents() {
 
             <div className="text-theme-text-primary flex items-center gap-x-2 mt-6">
               <FlowArrow size={24} />
-              <p className="text-lg font-medium">Agent Flows</p>
+              <p className="text-lg font-medium">
+                {t("agent.agent-flows.title")}
+              </p>
             </div>
             <AgentFlowsList
               flows={agentFlows}
@@ -347,7 +355,7 @@ export default function AdminAgents() {
                   >
                     <div className="flex items-center text-sky-400">
                       <CaretLeft size={24} />
-                      <div>Back</div>
+                      <div>{t("agent.skill.back")}</div>
                     </div>
                   </button>
                 </div>
@@ -410,7 +418,7 @@ export default function AdminAgents() {
                       <div className="flex flex-col items-center justify-center h-full text-theme-text-secondary">
                         <Robot size={40} />
                         <p className="font-medium">
-                          Select an Agent Skill, Agent Flow, or MCP Server
+                          {t("agent.skill.description")}
                         </p>
                       </div>
                     )}
@@ -460,7 +468,7 @@ export default function AdminAgents() {
           <div className="flex-none mb-4">
             <div className="text-theme-text-primary flex items-center gap-x-2">
               <Robot size={24} />
-              <p className="text-lg font-medium">Agent Skills</p>
+              <p className="text-lg font-medium">{t("agent.skill.title")}</p>
             </div>
           </div>
 
@@ -485,7 +493,9 @@ export default function AdminAgents() {
 
               <div className="text-theme-text-primary flex items-center gap-x-2 mt-4">
                 <Plug size={24} />
-                <p className="text-lg font-medium">Custom Skills</p>
+                <p className="text-lg font-medium">
+                  {t("agent.custom-skills.title")}
+                </p>
               </div>
               <ImportedSkillList
                 skills={importedSkills}
@@ -496,7 +506,9 @@ export default function AdminAgents() {
               <div className="text-theme-text-primary flex items-center justify-between gap-x-2 mt-4">
                 <div className="flex items-center gap-x-2">
                   <FlowArrow size={24} />
-                  <p className="text-lg font-medium">Agent Flows</p>
+                  <p className="text-lg font-medium">
+                    {t("agent.agent-flows.title")}
+                  </p>
                 </div>
                 {agentFlows.length === 0 ? (
                   <Link
@@ -504,7 +516,7 @@ export default function AdminAgents() {
                     className="text-cta-button flex items-center gap-x-1 hover:underline"
                   >
                     <Hammer size={16} />
-                    <p className="text-sm">Create Flow</p>
+                    <p className="text-sm">{t("agent.agent-flows.create")}</p>
                   </Link>
                 ) : (
                   <Link
@@ -512,7 +524,9 @@ export default function AdminAgents() {
                     className="text-theme-text-secondary hover:text-cta-button flex items-center gap-x-1"
                   >
                     <Hammer size={16} />
-                    <p className="text-sm">Open Builder</p>
+                    <p className="text-sm">
+                      {t("agent.agent-flows.openBuilder")}
+                    </p>
                   </Link>
                 )}
               </div>
@@ -600,9 +614,7 @@ export default function AdminAgents() {
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-theme-text-secondary">
                 <Robot size={40} />
-                <p className="font-medium">
-                  Select an Agent Skill, Agent Flow, or MCP Server
-                </p>
+                <p className="font-medium">{t("agent.skill.description")}</p>
               </div>
             )}
           </div>
@@ -641,6 +653,7 @@ function SkillList({
   handleClick = null,
   activeSkills = [],
 }) {
+  const { t } = useTranslation();
   if (skills.length === 0) return null;
 
   return (
@@ -666,13 +679,15 @@ function SkillList({
             }`}
             onClick={() => handleClick?.(skill)}
           >
-            <div className="text-sm font-light">{settings.title}</div>
+            <div className="text-sm font-light">{t(settings.title)}</div>
             <div className="flex items-center gap-x-2">
               {isDefault ? (
                 <DefaultBadge title={skill} />
               ) : (
                 <div className="text-sm text-theme-text-secondary font-medium">
-                  {activeSkills.includes(skill) ? "On" : "Off"}
+                  {activeSkills.includes(skill)
+                    ? t("agent.skill.On")
+                    : t("agent.skill.Off")}
                 </div>
               )}
               <CaretRight

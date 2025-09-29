@@ -365,6 +365,7 @@ const TRANSLATIONS = {
       success: "워크스페이스 벡터 데이터베이스가 재설정되었습니다!",
     },
   },
+
   agent: {
     "performance-warning":
       "도구 호출을 명시적으로 지원하지 않는 LLM의 성능은 모델의 기능과 정확도에 크게 좌우됩니다. 일부 기능은 제한되거나 작동하지 않을 수 있습니다.",
@@ -373,6 +374,21 @@ const TRANSLATIONS = {
       description:
         "이 워크스페이스의 @agent 에이전트에 사용할 특정 LLM 제공자 및 모델입니다.",
     },
+    settings: {
+      title: "에이전트 설정",
+      "edit-settings": "에이전트 설정 수정",
+      setupMessage:
+        "{{name}}을(를) 이 워크스페이스의 에이전트 LLM으로 사용하려면 먼저 설정해야 합니다.",
+      save: "{{name}} 에이전트 설정 저장",
+    },
+    default:
+      "별도로 지정하지 않는 한 에이전트는 워크스페이스 또는 시스템 LLM을 사용합니다.",
+    updatingAgent: "에이전트 업데이트 중...",
+    updateWorkspaceAgent: "워크스페이스 에이전트 업데이트",
+    "update-success": "워크스페이스 에이전트 업데이트 완료!",
+    configureAgentSkills: "에이전트 스킬 구성",
+    configureAgentSkillsDescription:
+      "특정 스킬을 활성화하거나 비활성화하여 기본 에이전트의 기능을 사용자 정의하고 향상시킬 수 있습니다. 이 설정은 모든 워크스페이스에 적용됩니다.",
     mode: {
       chat: {
         title: "워크스페이스 에이전트 채팅 모델",
@@ -385,41 +401,297 @@ const TRANSLATIONS = {
       wait: "-- 모델 기다리는 중 --",
     },
     skill: {
-      title: "기본 에이전트 스킬",
+      title: "에이전트 스킬",
       description:
-        "기본 에이전트의 능력을 사전 정의된 스킬을 사용하여 향상시킵니다. 이 설정은 모든 워크스페이스에 적용됩니다.",
-      rag: {
+        "에이전트 스킬, 에이전트 플로우, 또는 MCP 서버를 선택하세요.",
+      defaultskil:
+        "이 스킬은 기본적으로 활성화되어 있지만, 에이전트가 사용하지 않도록 비활성화할 수도 있습니다.",
+      agentPreferencesSavedSuccessfully:
+        "에이전트 설정이 성공적으로 저장되었습니다.",
+      agentPreferencesFailedToSave: "에이전트 설정 저장에 실패했습니다",
+      back: "뒤로가기",
+      default: "기본",
+      "rag-memory": {
         title: "RAG와 장기 메모리",
         description:
-          '에이전트가 제공된 문서를 활용하여 쿼리에 답변하거나 에이전트에게 "기억"할 내용을 요청하여 장기 메모리 검색을 허용합니다.',
+          "에이전트가 로컬 문서를 활용해 질문에 답변하거나, 특정 내용을 장기 기억으로 저장하도록 요청할 수 있습니다.",
       },
-      view: {
+      "document-summarizer": {
         title: "문서 보기 및 요약",
         description:
           "에이전트가 현재 임베딩된 워크스페이스의 문서 내용을 나열하고 요약할 수 있도록 합니다.",
       },
-      scrape: {
+      "web-scraping": {
         title: "웹사이트 스크래핑",
         description:
           "에이전트가 웹사이트를 방문하고 내용을 스크래핑할 수 있도록 합니다.",
       },
-      generate: {
+      "save-file-to-browser": {
+        title: "파일 생성 및 저장",
+        description:
+          "기본 에이전트가 파일을 생성하고 컴퓨터에 저장할 수 있도록 허용합니다.",
+      },
+      "create-chart": {
         title: "차트 생성",
         description:
           "기본 에이전트가 채팅에서 제공된 데이터를 이용하여 다양한 유형의 차트를 생성할 수 있도록 합니다.",
       },
-      save: {
-        title: "브라우저에서 파일 생성과 저장",
+      "web-browsing": {
+        title: "웹 검색",
+        title2: "실시간 웹 검색 및 탐색",
         description:
-          "기본 에이전트가 브라우저에서 파일을 생성하고 다운로드할 수 있도록 합니다.",
+          "에이전트가 웹 검색(SERP) 제공자와 연결하여 질문에 답변할 수 있도록 합니다. 이 설정이 완료되어야 에이전트 세션 중 웹 검색이 정상적으로 동작합니다.",
+        "search-providers": "사용 가능한 웹 검색 제공자 검색",
+        none: {
+          name: "선택해 주세요",
+          description: "제공자와 키가 설정될 때까지 웹 검색이 비활성화됩니다.",
+        },
+        "duckduckgo-engine": {
+          description:
+            "DuckDuckGo의 HTML 인터페이스를 이용한 무료이자 개인정보 보호 중심의 웹 검색입니다.",
+          description2:
+            "DuckDuckGo는 별도의 추가 설정 없이 바로 사용할 수 있습니다.",
+        },
+        "google-search-engine": {
+          description:
+            "커스텀 Google 검색 엔진을 통한 웹 검색입니다. 하루 100회까지 무료로 이용할 수 있습니다.",
+          description2:
+            "여기에서 Google 무료 검색 엔진 API 키를 발급받을 수 있습니다.",
+          "search-engine-id": "검색 엔진 ID",
+          "access-api-key": "프로그램 액세스 API 키",
+        },
+        searchapi: {
+          description:
+            "SearchApi는 여러 검색 엔진에서 구조화된 데이터를 제공합니다. 100회까지 무료로 사용할 수 있으며, 이후에는 유료로 전환됩니다.",
+          "searchapi-link":
+            "SearchApi에서 무료 API 키를 발급받을 수 있습니다. (클릭)",
+        },
+        "serper-dot-dev": {
+          description:
+            "Serper.dev 웹 검색입니다. 무료 계정으로 월 2,500회까지 사용 가능하며, 그 이후에는 유료로 전환됩니다.",
+          "serper-dev-link":
+            "Serper.dev에서 무료 API 키를 발급받을 수 있습니다. (클릭)",
+        },
+        "bing-search": {
+          description: "Bing Search API(유료 서비스)를 통한 웹 검색입니다.",
+          "bing-search-link":
+            "Azure 포털에서 Bing Web Search API 구독 키를 발급받을 수 있습니다. (클릭)",
+          description2: "Bing Web Search API 구독을 설정하려면:",
+          description3: "Azure 포털로 이동하세요: ",
+          description4:
+            "새 Azure 계정을 생성하거나 기존 계정으로 로그인하세요.",
+          description5:
+            '"리소스 만들기" 섹션으로 이동하여 "Grounding with Bing Search"를 검색하세요.',
+          description6:
+            '"Grounding with Bing Search" 리소스를 선택하고 새 구독을 생성하세요.',
+          description7: "필요에 맞는 가격 책정 계층을 선택하세요.",
+          description8:
+            "Grounding with Bing Search 구독에 대한 API 키를 발급받으세요.",
+        },
+        "serply-engine": {
+          description:
+            "Serply.io 웹 검색입니다. 무료 계정으로 월 100회까지 영구적으로 사용할 수 있습니다.",
+          "serply-link":
+            "Serply.io에서 무료 API 키를 발급받을 수 있습니다. (클릭)",
+        },
+        "searxng-engine": {
+          description:
+            "추적 없이 사용할 수 있는 무료 오픈소스 인터넷 메타 검색 엔진입니다.",
+          "searxng-url": "SearXNG API 기본 URL",
+        },
+        "tavily-search": {
+          description:
+            "Tavily Search API입니다. 월 1,000회까지 무료로 사용할 수 있는 요금제가 제공됩니다.",
+          "tavily-link":
+            "Tavily에서 무료 API 키를 발급받을 수 있습니다. (클릭)",
+        },
+        apikey: "API 키",
+        engine: "엔진",
+      },
+      "sql-agent": {
+        title: "SQL 커넥터",
+        title2: "SQL 에이전트",
+        description:
+          "에이전트가 다양한 SQL 데이터베이스 제공자에 연결하여 SQL을 활용해 질문에 답변할 수 있도록 합니다.",
+        connections: "데이터베이스 연결",
+        new: "새 SQL 연결",
+        new_description:
+          "아래에 데이터베이스 연결 정보를 추가하면 향후 SQL 에이전트 호출에서 사용할 수 있습니다.",
+        warning_message:
+          "<strong>경고:</strong> SQL 에이전트는 수정하지 않는 쿼리만 수행하도록 <i>지시</i>받았습니다. 하지만 이것이 환각(hallucination)으로 인한 데이터 삭제를 <strong>완전히 방지하지는 못합니다</strong>. <strong>읽기 전용</strong> 권한을 가진 사용자로만 연결하세요.",
+        select: "SQL 엔진 선택",
+        name: "연결 이름",
+        name_description: "이 SQL 연결을 식별할 수 있는 고유한 이름",
+        user: "데이터베이스 사용자",
+        password: "데이터베이스 사용자 비밀번호",
+        endpoint: "서버 엔드포인트",
+        endpoint_description: "데이터베이스의 호스트 또는 엔드포인트",
+        database: "데이터베이스",
+        database_description: "연결할 데이터베이스의 이름",
+        encryption: "암호화 활성화",
+        oracle_mode: "Oracle 연결 모드",
+        oracle_client_path: "Oracle Instant Client 경로",
+        schema: "스키마 (선택사항)",
+        "schema-placeholder": "public (지정하지 않으면 기본 스키마)",
+        fill: "모든 필드를 입력해주세요.",
+        save: "연결 저장",
+        validating: "검증 중...",
+        "failed-to-connect":
+          "데이터베이스 연결을 설정할 수 없습니다. 연결 정보를 확인해주세요.",
+        "failed-to-validate":
+          "연결 검증에 실패했습니다. 연결 정보를 확인해주세요.",
+        delete_confirmation:
+          "{{database_id}}를 사용 가능한 SQL 연결 목록에서 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+        cancel: "취소",
+      },
+      On: "켜짐",
+      Off: "꺼짐",
+    },
+    "custom-skills": {
+      title: "커스텀 스킬",
+      description:
+        "에이전트 스킬에 대해 더 알아보려면 AnythingLLM 에이전트 문서를 참고하세요.",
+      noSkills: "가져온 스킬이 없습니다",
+      learnAboutSkills:
+        "<docsLink>AnythingLLM 에이전트 문서</docsLink>에서 에이전트 스킬에 대해 알아보세요.",
+      On: "켜짐",
+      Off: "꺼짐",
+    },
+    "agent-flows": {
+      title: "에이전트 플로우",
+      learnMore: "에이전트 플로우에 대해 더 알아보려면 문서를 참고하세요.",
+      noFlows: "에이전트 플로우가 없습니다",
+      create: "플로우 생성",
+      openBuilder: "빌더 열기",
+      builder: "빌더",
+      untitledFlow: "무제 플로우",
+      newFlow: "새 플로우",
+      publish: "게시",
+      save: "저장",
+      viewDocumentation: "문서 보기",
+      "failed-load": "플로우 불러오기에 실패했습니다",
+      "failed-available": "사용 가능한 플로우 불러오기에 실패했습니다",
+      "name-description-required": "플로우의 이름과 설명을 모두 입력해주세요",
+      "saved-successfully": "에이전트 플로우가 성공적으로 저장되었습니다!",
+      "failed-to-save": "에이전트 플로우 저장에 실패했습니다.",
+      flowInformation: {
+        title: "플로우 정보",
+        description: "기본 플로우 정보",
+        name: "플로우 이름",
+        nameDescription:
+          "LLM이 쉽게 이해할 수 있도록 플로우에 명확한 이름을 지정하는 것이 중요합니다.",
+        namePlaceholder: "플로우 이름을 입력하세요",
+        descriptionLabel: "설명",
+        descriptionDescription:
+          "LLM이 쉽게 이해할 수 있도록 플로우에 설명을 제공하는 것도 마찬가지로 중요합니다. 플로우의 목적, 사용될 컨텍스트, 기타 관련 정보를 포함해야 합니다.",
+        descriptionPlaceholder: "플로우 설명을 입력하세요",
+      },
+      flowVariables: {
+        title: "플로우 변수",
+        description: "에이전트 변수 및 설정 구성",
+        variablesDefined: "{{count}}개의 변수가 정의됨",
+        variables: "변수",
+        name: "변수 이름",
+        initialValue: "초기 값",
+        deleteVariable: "변수 삭제",
+        addVariable: "변수 추가",
+      },
+      apiCall: {
+        title: "API 호출",
+        description: "HTTP 요청을 수행합니다",
+        noURL: "URL 없음",
+        selectInsert: "삽입할 변수 선택",
+        method: "메서드",
+        headers: "헤더",
+        addHeader: "헤더 추가",
+        headerName: "헤더 이름",
+        headerValue: "값",
+        removeHeader: "헤더 제거",
+        requestBody: "요청 본문",
+        rawText: "원본 텍스트",
+        rawRequest: "요청 본문...",
+        formData: "폼 데이터",
+        removeField: "필드 제거",
+        addField: "폼 필드 추가",
+        storeResponse: "응답 저장",
+      },
+      llm: {
+        title: "LLM 지시문",
+        description: "LLM 지시문을 사용해 데이터를 처리합니다",
+        noInstruction: "지시문 없음",
+        instruction: "지시문",
+        "enter-instructions": "LLM에 대한 지시문을 입력하세요...",
       },
       web: {
-        title: "실시간 웹 검색 및 탐색",
-        "desc-start":
-          "에이전트가 웹을 검색하여 질문에 답변할 수 있도록 허용합니다.",
-        "desc-end":
-          "에이전트 세션 중 웹 검색은 설정되지 않으면 작동하지 않습니다.",
+        title: "웹 스크래핑",
+        description: "웹페이지에서 콘텐츠를 스크래핑합니다",
+        noURL: "URL이 지정되지 않음",
+        "url-to-scrape": "스크래핑할 URL",
+        "capture-page": "페이지 콘텐츠 캡처 방식",
+        "text-content-only": "텍스트 콘텐츠만",
+        "raw-html": "원본 HTML",
+        "query-selector": "CSS 쿼리 선택자",
+        "query-selector-description":
+          "페이지 콘텐츠를 스크래핑하기 위한 유효한 CSS 선택자를 입력하세요.",
+        "content-summarization": "콘텐츠 요약",
+        "content-summarization-description":
+          "활성화하면 긴 웹페이지 콘텐츠가 자동으로 요약되어 토큰 사용량을 줄입니다.",
+        "content-summarization-description2":
+          "참고: 이는 데이터 품질에 영향을 줄 수 있으며 원본 콘텐츠의 특정 세부 정보가 제거될 수 있습니다.",
       },
+      complete: {
+        title: "플로우 완료",
+        description: "에이전트 플로우의 끝입니다",
+        summary: "플로우가 여기서 종료됩니다",
+      },
+      "direct-output": "직접 출력",
+      "direct-output-description": "이 블록의 출력은 직접 채팅에 반환됩니다.",
+      "direct-output-description2":
+        "이 설정을 사용하면 이후의 도구 호출이 더 이상 실행되지 않습니다.",
+      "coming-soon": "구성 옵션은 곧 제공될 예정입니다.",
+      resultVariable: "결과 변수",
+      selectVariable: "변수 선택 또는 생성",
+      addBlock: "블록 추가",
+      "move-block-up": "블록 위로 이동",
+      "move-block-down": "블록 아래로 이동",
+      "delete-block": "블록 삭제",
+    },
+    "mcp-servers": {
+      title: "MCP 서버",
+      refreshConfirm:
+        "정말 MCP 서버 목록을 새로고침하시겠습니까? 이 작업은 모든 MCP 서버를 재시작하고 도구를 다시 불러옵니다.",
+      failedToRefresh: "MCP 서버 새로고침에 실패했습니다.",
+      noServers: "등록된 MCP 서버가 없습니다",
+      loading: "불러오는 중...",
+      refresh: "새로고침",
+      loadingMcpServers: "설정 파일에서 MCP 서버를 불러오는 중...",
+      learnMore: "MCP 서버에 대해 더 알아보세요.",
+      On: "켜짐",
+      Stopped: "꺼짐",
+      deleteConfirm:
+        "정말로 이 MCP 서버를 삭제하시겠습니까? 설정 파일에서 제거되며, 다시 추가하려면 수동으로 등록해야 합니다.",
+      deletedSuccessfully: "MCP 서버가 성공적으로 삭제되었습니다.",
+      failedToDelete: "MCP 서버 삭제에 실패했습니다.",
+      stopConfirm:
+        "정말로 이 MCP 서버를 중지하시겠습니까? 서버를 다음에 시작할 때 자동으로 다시 시작됩니다.",
+      startConfirm:
+        "정말로 이 MCP 서버를 시작하시겠습니까? 서버를 다음에 시작할 때 자동으로 시작됩니다.",
+      toggleSuccess:
+        "MCP 서버 {{serverName}}이(가) 성공적으로 {{action}}되었습니다.",
+      started: "시작",
+      stopped: "중지",
+      failedToToggle: "MCP 서버 토글에 실패했습니다.",
+      stopMcpServer: "MCP 서버 중지",
+      startMcpServer: "MCP 서버 시작",
+      deleteMcpServer: "MCP 서버 삭제",
+      toolsAvailable: "{{count}}개의 도구 사용 가능",
+      startupCommand: "시작 명령",
+      command: "명령어",
+      arguments: "인수",
+      none: "없음",
+      notRunning:
+        "이 MCP 서버가 실행 중이 아닙니다. 중지되었거나 시작 시 오류가 발생했을 수 있습니다.",
+      toolCallArguments: "도구 호출 인수",
     },
   },
 

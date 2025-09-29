@@ -399,6 +399,21 @@ const TRANSLATIONS = {
       description:
         "The specific LLM provider & model that will be used for this workspace's @agent agent.",
     },
+    settings: {
+      title: "Agent Settings",
+      "edit-settings": "Edit Agent Settings",
+      setupMessage:
+        "To use {{name}} as this workspace's agent LLM you need to set it up first.",
+      save: "Save {{name}} Agent Settings",
+    },
+    default:
+      "Agents will use the workspace or system LLM unless otherwise specified.",
+    updatingAgent: "Updating agent...",
+    updateWorkspaceAgent: "Update workspace agent",
+    "update-success": "Workspace agent updated!",
+    configureAgentSkills: "Configure Agent Skills",
+    configureAgentSkillsDescription:
+      "Customize and enhance the default agent's capabilities by enabling or disabling specific skills. These settings will be applied across all workspaces.",
     mode: {
       chat: {
         title: "Workspace Agent Chat model",
@@ -410,43 +425,304 @@ const TRANSLATIONS = {
         "The specific LLM model that will be used for this workspace's @agent agent.",
       wait: "-- waiting for models --",
     },
-
     skill: {
-      title: "Default agent skills",
-      description:
-        "Improve the natural abilities of the default agent with these pre-built skills. This set up applies to all workspaces.",
-      rag: {
+      title: "Agent Skills",
+      description: "Select an Agent Skill, Agent Flow, or MCP Server",
+      defaultskil:
+        "By default, this skill is enabled, but you can disable it if you don't want it to be available to the agent.",
+      agentPreferencesSavedSuccessfully:
+        "Agent preferences saved successfully.",
+      agentPreferencesFailedToSave: "Agent preferences failed to save",
+      back: "Back",
+      default: "Default",
+      "rag-memory": {
         title: "RAG & long-term memory",
         description:
           'Allow the agent to leverage your local documents to answer a query or ask the agent to "remember" pieces of content for long-term memory retrieval.',
       },
-      view: {
+      "document-summarizer": {
         title: "View & summarize documents",
         description:
           "Allow the agent to list and summarize the content of workspace files currently embedded.",
       },
-      scrape: {
+      "web-scraping": {
         title: "Scrape websites",
         description:
           "Allow the agent to visit and scrape the content of websites.",
       },
-      generate: {
+      "save-file-to-browser": {
+        title: "Generate & save files",
+        description:
+          "Enable the default agent to generate and write to files that can be saved to your computer.",
+      },
+      "create-chart": {
         title: "Generate charts",
         description:
           "Enable the default agent to generate various types of charts from data provided or given in chat.",
       },
-      save: {
+      "web-browsing": {
+        title: "Web Search",
+        title2: "Live web search and browsing",
+        description:
+          "Enable your agent to search the web to answer your questions by connecting to a web-search (SERP) provider. Web search during agent sessions will not work until this is set up.",
+        "search-providers": "Search available web-search providers",
+        none: {
+          name: "Please make a selection",
+          description:
+            "Web search will be disabled until a provider and keys are provided.",
+        },
+        "duckduckgo-engine": {
+          description:
+            "Free and privacy-focused web search using DuckDuckGo's HTML interface.",
+          description2:
+            "DuckDuckGo is ready to use without any additional configuration.",
+        },
+        "google-search-engine": {
+          description:
+            "Web search powered by a custom Google Search Engine. Free for 100 queries per day.",
+          description2:
+            "You can get a free search engine & API key from Google here.",
+          "search-engine-id": "Search engine ID",
+          "access-api-key": "Programmatic Access API Key",
+        },
+        searchapi: {
+          description:
+            "SearchApi delivers structured data from multiple search engines. Free for 100 queries, but then paid.",
+          "searchapi-link":
+            "You can get a free API key from SearchApi. (Click)",
+        },
+        "serper-dot-dev": {
+          description:
+            "Serper.dev web-search. Free account with a 2,500 calls, but then paid.",
+          "serper-dev-link":
+            "You can get a free API key from Serper.dev. (Click)",
+        },
+        "bing-search": {
+          description:
+            "Web search powered by the Bing Search API (paid service).",
+          "bing-search-link":
+            "You can get a Bing Web Search API subscription key from the Azure portal. (Click)",
+          description2: "To set up a Bing Web Search API subscription:",
+          description3: "Go to the Azure portal: ",
+          description4:
+            "Create a new Azure account or sign in with an existing one.",
+          description5:
+            'Navigate to the "Create a resource" section and search for "Grounding with Bing Search".',
+          description6:
+            'Select the "Grounding with Bing Search" resource and create a new subscription.',
+          description7: "Choose the pricing tier that suits your needs.",
+          description8:
+            "Obtain the API key for your Grounding with Bing Search subscription.",
+        },
+        "serply-engine": {
+          description:
+            "Serply.io web-search. Free account with a 100 calls/month forever.",
+          "serply-link": "You can get a free API key from Serply.io. (Click)",
+        },
+        "searxng-engine": {
+          description:
+            "Free, open-source, internet meta-search engine with no tracking.",
+          "searxng-url": "SearXNG API Base URL",
+        },
+        "tavily-search": {
+          description:
+            "Tavily Search API. Offers a free tier with 1000 queries per month.",
+          "tavily-link": "You can get an API key from Tavily. (Click)",
+        },
+        apikey: "API Key",
+        engine: "Engine",
+      },
+      "sql-agent": {
+        title: "SQL Connector",
+        title2: "SQL Agent",
+        description:
+          "Enable your agent to be able to leverage SQL to answer you questions by connecting to various SQL database providers.",
+        connections: "Your database connections",
+        new: "New SQL connection",
+        new_description:
+          "Add the connection information for your database below and it will be available for future SQL agent calls.",
+        warning_message:
+          "<strong>WARNING:</strong> The SQL agent has been <i>instructed</i> to only perform non-modifying queries. This <strong>does not</strong> prevent a hallucination from still deleting data. Only connect with a user who has <strong>READ_ONLY</strong> permissions.",
+        select: "Select your SQL engine",
+        name: "Connection name",
+        name_description: "a unique name to identify this SQL connection",
+        user: "Database user",
+        password: "Database user password",
+        endpoint: "Server endpoint",
+        endpoint_description: "the hostname or endpoint for your database",
+        database: "Database",
+        database_description: "the name of the database to connect to",
+        encryption: "Enable Encryption",
+        oracle_mode: "Oracle Connection Mode",
+        oracle_client_path: "Oracle Instant Client Path",
+        schema: "Schema (optional)",
+        "schema-placeholder": "public (default schema if not specified)",
+        fill: "Please fill out all the fields above.",
+        save: "Save connection",
+        validating: "Validating...",
+        "failed-to-connect":
+          "Failed to establish database connection. Please check your connection details.",
+        "failed-to-validate":
+          "Failed to validate connection. Please check your connection details.",
+        delete_confirmation:
+          "Delete {{database_id}} from the list of available SQL connections? This cannot be undone.",
+        cancel: "Cancel",
+      },
+      On: "On",
+      Off: "Off",
+    },
+    "custom-skills": {
+      title: "Custom Skills",
+      description: "Learn about agent skills in the AnythingLLM Agent Docs.",
+      noSkills: "No imported skills found",
+      learnAboutSkills:
+        "Learn about agent skills in the <docsLink>AnythingLLM Agent Docs</docsLink>.",
+      On: "On",
+      Off: "Off",
+    },
+    "agent-flows": {
+      title: "Agent Flows",
+      learnMore: "Learn more about Agent Flows.",
+      noFlows: "No agent flows found",
+      create: "Create Flow",
+      openBuilder: "Open Builder",
+      builder: "Builder",
+      untitledFlow: "Untitled Flow",
+      newFlow: "New Flow",
+      publish: "Publish",
+      save: "Save",
+      viewDocumentation: "View documentation",
+      "failed-load": "Failed to load flow",
+      "failed-available": "Failed to load available flows",
+      "name-description-required":
+        "Please provide both a name and description for your flow",
+      "saved-successfully": "Agent flow saved successfully!",
+      "failed-to-save": "Failed to save agent flow.",
+      flowInformation: {
+        title: "Flow Information",
+        description: "Basic flow information",
+        name: "Flow Name",
+        nameDescription:
+          "It is important to give your flow a name that an LLM can easily understand.",
+        namePlaceholder: "Enter flow name",
+        descriptionLabel: "Description",
+        descriptionDescription:
+          "It is equally important to give your flow a description that an LLM can easily understand. Be sure to include the purpose of the flow, the context it will be used in, and any other relevant information.",
+        descriptionPlaceholder: "Enter flow description",
+      },
+      flowVariables: {
+        title: "Flow Variables",
+        description: "Configure agent variables and settings",
+        variablesDefined_one: "{{count}} variable defined",
+        variablesDefined_other: "{{count}} variables defined",
+        variables: "Variables",
+        name: "Variable Name",
+        initialValue: "Initial Value",
+        deleteVariable: "Delete Variable",
+        addVariable: "Add Variable",
+      },
+      apiCall: {
+        title: "API Call",
+        description: "Make an HTTP request",
+        noURL: "No URL",
+        selectInsert: "Select variable to insert",
+        method: "Method",
+        headers: "Headers",
+        addHeader: "Add header",
+        headerName: "Header name",
+        headerValue: "Value",
+        removeHeader: "Remove header",
+        requestBody: "Request Body",
+        rawText: "Raw Text",
+        rawRequest: "Raw request body...",
+        formData: "Form Data",
+        removeField: "Remove field",
+        addField: "Add Form Field",
+        storeResponse: "Store Response In",
+      },
+      llm: {
+        title: "LLM Instruction",
+        description: "Process data using LLM instructions",
+        noInstruction: "No instruction",
+        instruction: "Instruction",
+        "enter-instructions": "Enter instructions for the LLM...",
+      },
+      save_file: {
         title: "Generate & save files",
         description:
           "Enable the default agent to generate and write to files that can be saved to your computer.",
       },
       web: {
-        title: "Live web search and browsing",
-        "desc-start":
-          "Enable your agent to search the web to answer your questions by connecting to a web-search (SERP) provider.",
-        "desc-end":
-          "Web search during agent sessions will not work until this is set up.",
+        title: "Web Scraping",
+        description: "Scrape content from a webpage",
+        noURL: "No URL specified",
+        "url-to-scrape": "URL to Scrape",
+        "capture-page": "Capture Page Content As",
+        "text-content-only": "Text content only",
+        "raw-html": "Raw HTML",
+        "query-selector": "CSS Query Selector",
+        "query-selector-description":
+          "Enter a valid CSS selector to scrape the content of the page.",
+        "content-summarization": "Content Summarization",
+        "content-summarization-description":
+          "When enabled, long webpage content will be automatically summarized to reduce token usage.",
+        "content-summarization-description2":
+          "Note: This may affect data quality and remove specific details from the original content.",
       },
+      complete: {
+        title: "Flow Complete",
+        description: "End of agent flow",
+        summary: "Flow will end here",
+      },
+      "direct-output": "Direct Output",
+      "direct-output-description":
+        "The output of this block will be returned directly to the chat.",
+      "direct-output-description2":
+        "This will prevent any further tool calls from being executed.",
+      "coming-soon": "Configuration options coming soon...",
+      resultVariable: "Result Variable",
+      selectVariable: "Select or create variable",
+      addBlock: "Add Block",
+      "move-block-up": "Move block up",
+      "move-block-down": "Move block down",
+      "delete-block": "Delete block",
+    },
+    "mcp-servers": {
+      title: "MCP Servers",
+      refreshConfirm:
+        "Are you sure you want to refresh the list of MCP servers? This will restart all MCP servers and reload their tools.",
+      failedToRefresh: "Failed to refresh MCP servers.",
+      noServers: "No MCP servers found",
+      loading: "Loading...",
+      refresh: "Refresh",
+      loadingMcpServers: "Loading MCP Servers from configuration file...",
+      learnMore: "Learn more about MCP Servers.",
+      On: "On",
+      Stopped: "Stopped",
+      deleteConfirm:
+        "Are you sure you want to delete this MCP server? It will be removed from your config file and you will need to add it back manually.",
+      deletedSuccessfully: "MCP server deleted successfully.",
+      failedToDelete: "Failed to delete MCP server.",
+      stopConfirm:
+        "Are you sure you want to stop this MCP server? It will be started automatically when you next start the server.",
+      startConfirm:
+        "Are you sure you want to start this MCP server? It will be started automatically when you next start the server.",
+      toggleSuccess: "MCP server {{serverName}} {{action}} successfully.",
+      started: "started",
+      stopped: "stopped",
+      failedToToggle: "Failed to toggle MCP server.",
+      stopMcpServer: "Stop MCP Server",
+      startMcpServer: "Start MCP Server",
+      deleteMcpServer: "Delete MCP Server",
+      toolsAvailable_one: "{{count}} tool available",
+      toolsAvailable_other: "{{count}} tools available",
+      startupCommand: "Startup Command",
+      command: "Command",
+      arguments: "Arguments",
+      none: "None",
+      notRunning:
+        "This MCP server is not running - it may be stopped or experiencing an error on startup.",
+      toolCallArguments: "Tool call arguments",
     },
   },
 
