@@ -850,6 +850,10 @@ const TRANSLATIONS = {
       saveSuccess: "Embedding preferences saved successfully.",
       saveError: "Failed to save embedding settings: {{error}}",
     },
+    switchWarning: {
+      message:
+        "Switching the embedding model will reset all previously embedded documents in all workspaces.\n\nConfirming will clear all embeddings from your vector database and remove all documents from your workspaces. Your uploaded documents will not be deleted, they will be available for re-embedding.",
+    },
     provider: {
       title: "Embedding Provider",
       description:
@@ -860,6 +864,19 @@ const TRANSLATIONS = {
       native: {
         description:
           "Use the built-in embedding provider for AnythingLLM. Zero setup!",
+        model_preference: {
+          "all-MiniLM-L6-v2":
+            "A lightweight and fast model for embedding text. The default model for AnythingLLM.",
+          "nomic-embed-text-v1":
+            "A high-performing open embedding model with a large token context window. Requires more processing power and memory.",
+          "multilingual-e5-small":
+            "A larger multilingual embedding model that supports 100+ languages. Requires more processing power and memory.",
+          trained_on: "Trained on",
+          download_size: "Download Size",
+          english: "English",
+          languages_100: "100+ languages",
+          view_model_card: "View model card on Hugging Face",
+        },
       },
       openai: {
         description: "The standard option for most non-commercial use.",
@@ -911,6 +928,13 @@ const TRANSLATIONS = {
       },
       litellm: {
         description: "Run powerful embedding models from LiteLLM.",
+        modelSelection: {
+          warning:
+            "Be sure to select a valid embedding model. Chat models are not embedding models.",
+          seeMore: "See",
+          thisPage: "this page",
+          forMoreInfo: "for more information.",
+        },
       },
       mistral: {
         description: "Run powerful embedding models from Mistral AI.",
@@ -962,6 +986,76 @@ const TRANSLATIONS = {
       description:
         "This is the maximum overlap of characters that occurs during chunking between two adjacent text chunks.",
     },
+  },
+
+  "speech-text": {
+    provider: "Provider",
+    speech: {
+      title: "Speech-to-text Preference",
+      description:
+        "Here you can specify what kind of text-to-speech and speech-to-text providers you would want to use in your AnythingLLM experience. By default, we use the browser's built in support for these services, but you may want to use others.",
+      success: "Speech-to-text preferences saved successfully.",
+      error: "Failed to save preferences: {{error}}",
+      search: "Search speech to text providers",
+      providers: {
+        native: {
+          description: "Uses your browser's built in STT service if supported.",
+          description2: "There is no configuration needed for this provider.",
+        },
+      },
+    },
+    text: {
+      title: "Text-to-speech Preference",
+      description:
+        "Here you can specify what kind of text-to-speech providers you would want to use in your AnythingLLM experience. By default, we use the browser's built in support for these services, but you may want to use others.",
+      success: "Text-to-speech preferences saved successfully.",
+      error: "Failed to save preferences: {{error}}",
+      search: "Search text to speech providers",
+      providers: {
+        native: {
+          description: "Uses your browser's built in TTS service if supported.",
+          description2: "There is no configuration needed for this provider.",
+        },
+        openai: {
+          description: "Use OpenAI's text to speech voices.",
+        },
+        elevenlabs: {
+          description: "Use ElevenLabs's text to speech voices and technology.",
+          organization: "premade",
+        },
+        piper_local: {
+          description: "Run TTS models locally in your browser privately.",
+          description2:
+            "All PiperTTS models will run in your browser locally. This can be resource intensive on lower-end devices.",
+          description3:
+            "The '✔' indicates this model is already stored locally and does not need to be downloaded when run.",
+          info: "All voices flushed from browser storage",
+          flush_voice_cache: "Flush voice cache",
+          stop_demo: "Stop demo",
+          loading_voice: "Loading voice",
+          play_sample: "Play sample",
+        },
+        generic_openai: {
+          description:
+            "Connect to an OpenAI compatible TTS service running locally or remotely.",
+          description2:
+            "This should be the base URL of the OpenAI compatible TTS service you will generate TTS responses from.",
+          description3:
+            "Some TTS services require an API key to generate TTS responses - this is optional if your service does not require one.",
+          description4:
+            "Most TTS services will have several models available. This is the model parameter you will use to select the model you want to use. Note: This is not the same as the voice model.",
+          description5:
+            "Most TTS services will have several voice models available, this is the identifier for the voice model you want to use.",
+          tts_model_placeholder: "Your TTS model identifier",
+          voice_model_placeholder: "Your voice model identifier",
+          tts_model: "TTS Model",
+        },
+      },
+    },
+    api_key: "API Key",
+    voice_model: "Voice Model",
+    loading_models: "loading available models",
+    base_url: "Base URL",
   },
 
   // Vector Database

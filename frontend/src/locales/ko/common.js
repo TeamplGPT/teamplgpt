@@ -785,6 +785,7 @@ const TRANSLATIONS = {
       },
     },
   },
+
   transcription: {
     title: "텍스트 변환 모델 기본 설정",
     description:
@@ -795,6 +796,7 @@ const TRANSLATIONS = {
     "warn-recommend": "최소 2GB RAM과 10Mb 보다 작은 파일 업로드를 권장합니다.",
     "warn-end": "내장된 모델은 첫 번째 사용 시 자동으로 다운로드됩니다.",
   },
+
   embedding: {
     title: "임베딩 기본 설정",
     "desc-start":
@@ -804,6 +806,10 @@ const TRANSLATIONS = {
     messages: {
       saveSuccess: "임베딩 설정이 성공적으로 저장되었습니다.",
       saveError: "임베딩 설정 저장에 실패했습니다: {{error}}",
+    },
+    switchWarning: {
+      message:
+        "임베딩 모델을 변경하면 모든 워크스페이스에서 이전에 임베딩된 모든 문서가 초기화됩니다.\n\n확인하면 벡터 데이터베이스의 모든 임베딩이 삭제되고 워크스페이스의 모든 문서가 제거됩니다. 업로드된 문서는 삭제되지 않으며, 재임베딩이 가능합니다.",
     },
     provider: {
       title: "임베딩 제공자",
@@ -815,6 +821,19 @@ const TRANSLATIONS = {
       native: {
         description:
           "AnythingLLM에 내장된 임베딩 제공자를 사용하세요. 별도의 설정이 필요 없습니다!",
+        model_preference: {
+          "all-MiniLM-L6-v2":
+            "텍스트 임베딩을 위한 가볍고 빠른 모델입니다. AnythingLLM의 기본 모델입니다.",
+          "nomic-embed-text-v1":
+            "큰 토큰 컨텍스트 윈도우를 가진 고성능 오픈 임베딩 모델입니다. 더 많은 처리 능력과 메모리가 필요합니다.",
+          "multilingual-e5-small":
+            "100개 이상의 언어를 지원하는 대형 다국어 임베딩 모델입니다. 더 많은 처리 능력과 메모리가 필요합니다.",
+          trained_on: "학습 데이터",
+          download_size: "다운로드 크기",
+          english: "영어",
+          languages_100: "100개 이상의 언어",
+          view_model_card: "허깅페이스에서 모델 카드 보기",
+        },
       },
       openai: {
         description: "대부분의 비상업적 용도에 적합한 표준 옵션입니다.",
@@ -865,6 +884,13 @@ const TRANSLATIONS = {
       },
       litellm: {
         description: "LiteLLM의 강력한 임베딩 모델을 실행합니다.",
+        modelSelection: {
+          warning:
+            "유효한 임베딩 모델을 선택해야 합니다. 채팅 모델은 임베딩 모델이 아닙니다.",
+          seeMore: "자세한 정보는",
+          thisPage: "이 페이지",
+          forMoreInfo: "를 참조하세요.",
+        },
       },
       mistral: {
         description: "Mistral AI의 강력한 임베딩 모델을 실행합니다.",
@@ -896,6 +922,7 @@ const TRANSLATIONS = {
       max_embedding_chunk_length_description: "임베딩 청크의 최대 길이입니다.",
     },
   },
+
   text: {
     title: "텍스트 분할 및 청킹 기본 설정",
     "desc-start":
@@ -913,6 +940,81 @@ const TRANSLATIONS = {
         "청킹 동안 두 인접 텍스트 청크 간에 겹칠 수 있는 최대 문자 수입니다.",
     },
   },
+
+  "speech-text": {
+    provider: "제공자",
+    speech: {
+      title: "음성 인식(STT) 기본 설정",
+      description:
+        "AnythingLLM에서 사용할 음성 인식(STT) 및 음성 합성(TTS) 제공자를 선택할 수 있습니다. 기본적으로 브라우저에 내장된 서비스를 사용하지만, 필요에 따라 다른 제공자를 선택할 수도 있습니다.",
+      success: "음성 인식(STT) 기본 설정이 성공적으로 저장되었습니다.",
+      error: "설정 저장에 실패했습니다: {{error}}",
+      search: "음성 인식(STT) 제공자 검색",
+      providers: {
+        native: {
+          description:
+            "브라우저에 내장된 음성 인식(STT) 기능이 지원되는 경우 이를 사용합니다.",
+          description2: "이 제공자는 별도의 설정이 필요하지 않습니다.",
+        },
+      },
+    },
+    text: {
+      title: "음성 합성(TTS) 기본 설정",
+      description:
+        "AnythingLLM에서 사용할 음성 합성(TTS) 제공자를 선택할 수 있습니다. 기본적으로 브라우저에 내장된 서비스를 사용하지만, 필요에 따라 다른 제공자를 선택할 수도 있습니다.",
+      success: "음성 합성(TTS) 기본 설정이 성공적으로 저장되었습니다.",
+      error: "기본 설정 저장에 실패했습니다.",
+      search: "음성 합성(TTS) 제공자 검색",
+      providers: {
+        native: {
+          description:
+            "브라우저에 내장된 음성 합성(TTS) 기능이 지원되는 경우 이를 사용합니다.",
+          description2: "이 제공자는 별도의 설정이 필요하지 않습니다.",
+        },
+        openai: {
+          description: "OpenAI의 음성 합성(TTS) 음성을 사용합니다.",
+        },
+        elevenlabs: {
+          description: "ElevenLabs의 음성 합성(TTS) 음성과 기술을 사용합니다.",
+          organization: "기본 제공",
+        },
+        piper_local: {
+          description:
+            "브라우저에서 TTS 모델을 로컬로 실행하여 개인적으로 음성 합성을 처리합니다.",
+          description2:
+            "모든 PiperTTS 모델은 브라우저에서 로컬로 실행됩니다. 사양이 낮은 기기에서는 리소스 사용량이 많을 수 있습니다.",
+
+          description3:
+            "'✔' 표시는 이 모델이 이미 로컬에 저장되어 있어 실행 시 다운로드할 필요가 없음을 나타냅니다.",
+          info: "브라우저 저장소에서 모든 음성이 삭제되었습니다.",
+          flush_voice_cache: "음성 캐시 삭제",
+          stop_demo: "데모 중지",
+          loading_voice: "음성 로딩",
+          play_sample: "샘플 재생",
+        },
+        generic_openai: {
+          description:
+            "로컬 또는 원격에서 실행 중인 OpenAI 호환 TTS 서비스에 연결합니다.",
+          description2:
+            "여기에는 TTS 응답을 생성할 OpenAI 호환 TTS 서비스의 기본 URL을 입력해야 합니다.",
+          description3:
+            "일부 TTS 서비스는 음성 합성 응답을 생성하기 위해 API 키가 필요할 수 있습니다. 서비스에서 필요하지 않다면 입력하지 않아도 됩니다.",
+          description4:
+            "대부분의 음성 합성 서비스는 여러 모델을 지원합니다. 음성합성 모델 파라미터는 원하는 음성 합성 모델을 선택할 때 사용합니다. 참고: 이 값은 음성 모델과는 별개입니다.",
+          description5:
+            "대부분의 TTS 서비스는 여러 개의 음성 모델을 제공합니다. 여기에는 사용하려는 음성 모델의 식별자를 입력하세요.",
+          tts_model_placeholder: "음성 합성 모델 식별자",
+          voice_model_placeholder: "음성 모델 식별자",
+          tts_model: "음성 합성 모델(TTS)",
+        },
+      },
+    },
+    api_key: "API 키",
+    voice_model: "음성 모델(Voice)",
+    loading_models: "사용 가능한 모델을 불러오는 중",
+    base_url: "기본 URL",
+  },
+
   vector: {
     title: "벡터 데이터베이스",
     description:
