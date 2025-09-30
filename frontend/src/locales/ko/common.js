@@ -62,12 +62,20 @@ const TRANSLATIONS = {
     user: "사용자",
     saving: "저장 중...",
     save: "저장",
+    cancel: "취소",
+    close: "닫기",
+    unsavedChanges: "저장되지 않은 변경사항",
     previous: "이전",
     next: "다음",
     optional: "선택 사항",
     yes: "예",
     no: "아니오",
-    search: null,
+    "your-admin-password": "관리자 비밀번호",
+    search: "검색",
+    learn_more: "자세히 보기",
+    rows_per_page: "페이지당 행 수",
+    "hide-sidebar": "사이드바 숨기기",
+    "show-sidebar": "사이드바 보이기",
   },
   settings: {
     title: "인스턴스 설정",
@@ -455,27 +463,31 @@ const TRANSLATIONS = {
         "google-search-engine": {
           description:
             "커스텀 Google 검색 엔진을 통한 웹 검색입니다. 하루 100회까지 무료로 이용할 수 있습니다.",
-          description2:
-            "여기에서 Google 무료 검색 엔진 API 키를 발급받을 수 있습니다.",
+          "get-free-key-text": "무료 검색 엔진과 API 키를",
+          "get-free-key-link": "Google에서 (여기 클릭)",
+          "get-free-key-suffix": "발급받을 수 있습니다.",
           "search-engine-id": "검색 엔진 ID",
           "access-api-key": "프로그램 액세스 API 키",
         },
         searchapi: {
           description:
             "SearchApi는 여러 검색 엔진에서 구조화된 데이터를 제공합니다. 100회까지 무료로 사용할 수 있으며, 이후에는 유료로 전환됩니다.",
-          "searchapi-link":
-            "SearchApi에서 무료 API 키를 발급받을 수 있습니다. (클릭)",
+          "get-free-api-message": "무료 API 키를",
+          "get-free-api-link-text": "SearchApi에서 (클릭)",
+          "get-free-api-suffix": "발급받을 수 있습니다.",
         },
         "serper-dot-dev": {
           description:
             "Serper.dev 웹 검색입니다. 무료 계정으로 월 2,500회까지 사용 가능하며, 그 이후에는 유료로 전환됩니다.",
-          "serper-dev-link":
-            "Serper.dev에서 무료 API 키를 발급받을 수 있습니다. (클릭)",
+          "get-free-api-message": "무료 API 키를",
+          "get-free-api-link-text": "Serper.dev에서 (클릭)",
+          "get-free-api-suffix": "발급받을 수 있습니다.",
         },
         "bing-search": {
           description: "Bing Search API(유료 서비스)를 통한 웹 검색입니다.",
-          "bing-search-link":
-            "Azure 포털에서 Bing Web Search API 구독 키를 발급받을 수 있습니다. (클릭)",
+          "get-subscription-key-message": "Bing Web Search API 구독 키를",
+          "get-subscription-key-link-text": "Azure 포털에서",
+          "get-subscription-key-suffix": "발급받을 수 있습니다.",
           description2: "Bing Web Search API 구독을 설정하려면:",
           description3: "Azure 포털로 이동하세요: ",
           description4:

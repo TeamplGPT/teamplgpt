@@ -29,6 +29,7 @@ import {
   DuckDuckGoOptions,
   ExaSearchOptions,
 } from "./SearchProviderOptions";
+import { useTranslation } from "react-i18next";
 
 const SEARCH_PROVIDERS = [
   {
@@ -117,6 +118,7 @@ export default function AgentWebSearchSelection({
   enabled = false,
   setHasChanges,
 }) {
+  const { t } = useTranslation();
   const searchInputRef = useRef(null);
   const [filteredResults, setFilteredResults] = useState([]);
   const [selectedProvider, setSelectedProvider] = useState("none");
@@ -171,7 +173,7 @@ export default function AgentWebSearchSelection({
             htmlFor="name"
             className="text-theme-text-primary text-md font-bold"
           >
-            Live web search and browsing
+            {t("agent.skill.web-browsing.title2")}
           </label>
           <label className="border-none relative inline-flex items-center ml-auto cursor-pointer">
             <input
@@ -190,9 +192,7 @@ export default function AgentWebSearchSelection({
           className="w-full rounded-md"
         />
         <p className="text-theme-text-secondary text-opacity-60 text-xs font-medium py-1.5">
-          Enable your agent to search the web to answer your questions by
-          connecting to a web-search (SERP) provider. Web search during agent
-          sessions will not work until this is set up.
+          {t("agent.skill.web-browsing.description")}
         </p>
         <div hidden={!enabled}>
           <div className="relative">
@@ -220,7 +220,9 @@ export default function AgentWebSearchSelection({
                       type="text"
                       name="web-provider-search"
                       autoComplete="off"
-                      placeholder="Search available web-search providers"
+                      placeholder={t(
+                        "agent.skill.web-browsing.search-providers"
+                      )}
                       className="border-none -ml-4 my-2 bg-transparent z-20 pl-12 h-[38px] w-full px-4 py-1 text-sm outline-none text-theme-text-primary placeholder:text-theme-text-primary placeholder:font-medium"
                       onChange={(e) => setSearchQuery(e.target.value)}
                       ref={searchInputRef}
@@ -263,10 +265,10 @@ export default function AgentWebSearchSelection({
                   />
                   <div className="flex flex-col text-left">
                     <div className="text-sm font-semibold text-white">
-                      {selectedSearchProviderObject.name}
+                      {t(selectedSearchProviderObject.name)}
                     </div>
                     <div className="mt-1 text-xs text-description">
-                      {selectedSearchProviderObject.description}
+                      {t(selectedSearchProviderObject.description)}
                     </div>
                   </div>
                 </div>

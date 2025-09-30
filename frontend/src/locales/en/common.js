@@ -64,12 +64,20 @@ const TRANSLATIONS = {
     user: "User",
     saving: "Saving...",
     save: "Save changes",
+    cancel: "Cancel",
+    close: "Close",
+    unsavedChanges: "Unsaved Changes",
     previous: "Previous Page",
     next: "Next Page",
     optional: "Optional",
     yes: "Yes",
     no: "No",
+    "your-admin-password": "Your admin password",
     search: "Search",
+    learn_more: "Learn more",
+    rows_per_page: "Rows per page",
+    "hide-sidebar": "Hide Sidebar",
+    "show-sidebar": "Show Sidebar",
   },
 
   // Setting Sidebar menu items.
@@ -480,28 +488,33 @@ const TRANSLATIONS = {
         "google-search-engine": {
           description:
             "Web search powered by a custom Google Search Engine. Free for 100 queries per day.",
-          description2:
-            "You can get a free search engine & API key from Google here.",
+          "get-free-key-text": "You can get a free search engine & API key",
+          "get-free-key-link": "from Google (Click).",
+          "get-free-key-suffix": "",
           "search-engine-id": "Search engine ID",
           "access-api-key": "Programmatic Access API Key",
         },
         searchapi: {
           description:
             "SearchApi delivers structured data from multiple search engines. Free for 100 queries, but then paid.",
-          "searchapi-link":
-            "You can get a free API key from SearchApi. (Click)",
+          "get-free-api-message": "You can get a free API key",
+          "get-free-api-link-text": "from SearchApi (Click)",
+          "get-free-api-suffix": ".",
         },
         "serper-dot-dev": {
           description:
             "Serper.dev web-search. Free account with a 2,500 calls, but then paid.",
-          "serper-dev-link":
-            "You can get a free API key from Serper.dev. (Click)",
+          "get-free-api-message": "You can get a free API key",
+          "get-free-api-link-text": "from Serper.dev (Click)",
+          "get-free-api-suffix": ".",
         },
         "bing-search": {
           description:
             "Web search powered by the Bing Search API (paid service).",
-          "bing-search-link":
-            "You can get a Bing Web Search API subscription key from the Azure portal. (Click)",
+          "get-subscription-key-message":
+            "You can get a Bing Web Search API subscription key",
+          "get-subscription-key-link-text": "from the Azure portal",
+          "get-subscription-key-suffix": ".",
           description2: "To set up a Bing Web Search API subscription:",
           description3: "Go to the Azure portal: ",
           description4:
