@@ -590,7 +590,6 @@ const TRANSLATIONS = {
       untitledFlow: "Untitled Flow",
       newFlow: "New Flow",
       publish: "Publish",
-      save: "Save",
       viewDocumentation: "View documentation",
       "failed-load": "Failed to load flow",
       "failed-available": "Failed to load available flows",
@@ -598,6 +597,12 @@ const TRANSLATIONS = {
         "Please provide both a name and description for your flow",
       "saved-successfully": "Agent flow saved successfully!",
       "failed-to-save": "Failed to save agent flow.",
+      "delete-flow-confirm":
+        "Are you sure you want to delete this flow? This action cannot be undone.",
+      "flow-deleted-successfully": "Flow deleted successfully.",
+      "failed-to-delete-flow": "Failed to delete flow.",
+      editflow: "Edit Flow",
+      deleteflow: "Delete Flow",
       flowInformation: {
         title: "Flow Information",
         description: "Basic flow information",

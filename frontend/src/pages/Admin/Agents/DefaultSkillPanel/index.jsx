@@ -1,5 +1,6 @@
 import React from "react";
 import { DefaultBadge } from "../Badges/default";
+import { useTranslation } from "react-i18next";
 
 export default function DefaultSkillPanel({
   title,
@@ -10,6 +11,7 @@ export default function DefaultSkillPanel({
   toggleSkill,
   skill,
 }) {
+  const { t } = useTranslation();
   return (
     <div className="p-2">
       <div className="flex flex-col gap-y-[18px] max-w-[500px]">
@@ -25,7 +27,7 @@ export default function DefaultSkillPanel({
               htmlFor="name"
               className="text-theme-text-primary text-md font-bold"
             >
-              {title}
+              {t(title)}
             </label>
             <DefaultBadge title={title} />
           </div>
@@ -44,11 +46,10 @@ export default function DefaultSkillPanel({
         </div>
         <img src={image} alt={title} className="w-full rounded-md" />
         <p className="text-theme-text-secondary text-opacity-60 text-xs font-medium py-1.5">
-          {description}
+          {t(description)}
           <br />
           <br />
-          By default, this skill is enabled, but you can disable it if you don't
-          want it to be available to the agent.
+          {t("agent.skill.defaultskil")}
         </p>
       </div>
     </div>

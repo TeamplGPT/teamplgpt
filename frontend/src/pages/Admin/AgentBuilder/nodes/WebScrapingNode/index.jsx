@@ -1,16 +1,18 @@
 import { Info } from "@phosphor-icons/react";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export default function WebScrapingNode({
   config,
   onConfigChange,
   renderVariableSelect,
 }) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-theme-text-primary mb-2">
-          URL to Scrape
+          {t("agent.agent-flows.web.url-to-scrape")}
         </label>
         <input
           type="url"
@@ -28,7 +30,7 @@ export default function WebScrapingNode({
 
       <div>
         <label className="block text-sm font-medium text-theme-text-primary mb-2">
-          Capture Page Content As
+          {t("agent.agent-flows.web.capture-page")}
         </label>
         <select
           value={config.captureAs}
@@ -38,9 +40,15 @@ export default function WebScrapingNode({
           className="w-full border-none bg-theme-settings-input-bg text-theme-text-primary text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none p-2.5"
         >
           {[
-            { label: "Text content only", value: "text" },
-            { label: "Raw HTML", value: "html" },
-            { label: "CSS Query Selector", value: "querySelector" },
+            {
+              label: t("agent.agent-flows.web.text-content-only"),
+              value: "text",
+            },
+            { label: t("agent.agent-flows.web.raw-html"), value: "html" },
+            {
+              label: t("agent.agent-flows.web.query-selector"),
+              value: "querySelector",
+            },
           ].map((captureAs) => (
             <option
               key={captureAs.value}
@@ -56,10 +64,10 @@ export default function WebScrapingNode({
       {config.captureAs === "querySelector" && (
         <div>
           <label className="block text-sm font-medium text-theme-text-primary mb-2">
-            Query Selector
+            {t("agent.agent-flows.web.query-selector")}
           </label>
           <p className="text-xs text-theme-text-secondary mb-2">
-            Enter a valid CSS selector to scrape the content of the page.
+            {t("agent.agent-flows.web.query-selector-description")}
           </p>
           <input
             value={config.querySelector}
@@ -75,7 +83,7 @@ export default function WebScrapingNode({
       <div className="flex justify-between items-center">
         <div className="flex flex-row items-center gap-x-1 mb-2">
           <label className="block text-sm font-medium text-theme-text-primary">
-            Content Summarization
+            {t("agent.agent-flows.web.content-summarization")}
           </label>
           <Info
             size={16}
@@ -103,12 +111,12 @@ export default function WebScrapingNode({
       </div>
       <div>
         <label className="block text-sm font-medium text-theme-text-primary mb-2">
-          Result Variable
+          {t("agent.agent-flows.resultVariable")}
         </label>
         {renderVariableSelect(
           config.resultVariable,
           (value) => onConfigChange({ ...config, resultVariable: value }),
-          "Select or create variable",
+          t("agent.agent-flows.selectVariable"),
           true
         )}
       </div>

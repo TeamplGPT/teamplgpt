@@ -1,11 +1,13 @@
 import React from "react";
 import { Plus, X } from "@phosphor-icons/react";
+import { useTranslation } from "react-i18next";
 
 export default function StartNode({
   config,
   onConfigChange,
   onDeleteVariable,
 }) {
+  const { t } = useTranslation();
   const handleDeleteVariable = (index, variableName) => {
     // First clean up references, then delete the variable
     onDeleteVariable(variableName);
@@ -15,12 +17,14 @@ export default function StartNode({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-medium text-theme-text-primary">Variables</h3>
+      <h3 className="text-sm font-medium text-theme-text-primary">
+        {t("agent.agent-flows.flowVariables.variables")}
+      </h3>
       {config.variables.map((variable, index) => (
         <div key={index} className="flex gap-2">
           <input
             type="text"
-            placeholder="Variable name"
+            placeholder={t("agent.agent-flows.flowVariables.name")}
             value={variable.name}
             onChange={(e) => {
               const newVars = [...config.variables];
@@ -33,7 +37,7 @@ export default function StartNode({
           />
           <input
             type="text"
-            placeholder="Initial value"
+            placeholder={t("agent.agent-flows.flowVariables.initialValue")}
             value={variable.value}
             onChange={(e) => {
               const newVars = [...config.variables];
@@ -48,7 +52,7 @@ export default function StartNode({
             <button
               onClick={() => handleDeleteVariable(index, variable.name)}
               className="p-2.5 rounded-lg border-none bg-theme-settings-input-bg text-theme-text-primary hover:text-red-500 hover:border-red-500/20 hover:bg-red-500/10 transition-colors duration-300"
-              title="Delete variable"
+              title={t("agent.agent-flows.flowVariables.deleteVariable")}
             >
               <X className="w-4 h-4" />
             </button>
@@ -60,7 +64,7 @@ export default function StartNode({
                 onConfigChange({ variables: newVars });
               }}
               className="p-2.5 rounded-lg border-none bg-theme-settings-input-bg text-theme-text-primary hover:bg-theme-action-menu-item-hover transition-colors duration-300"
-              title="Add variable"
+              title={t("agent.agent-flows.flowVariables.addVariable")}
             >
               <Plus className="w-4 h-4" />
             </button>

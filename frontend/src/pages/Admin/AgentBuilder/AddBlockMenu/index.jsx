@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { Plus, CaretDown } from "@phosphor-icons/react";
 import { BLOCK_TYPES, BLOCK_INFO } from "../BlockList";
+import { useTranslation } from "react-i18next";
 
 /**
  * Check if the last configurable block has direct output disabled or undefined
@@ -23,6 +24,7 @@ export default function AddBlockMenu({
   setShowBlockMenu,
   addBlock,
 }) {
+  const { t } = useTranslation();
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -46,7 +48,7 @@ export default function AddBlockMenu({
         className="transition-all duration-300 w-full p-2.5 bg-theme-action-menu-bg hover:bg-theme-action-menu-item-hover border border-white/10 rounded-lg text-white flex items-center justify-center gap-2 text-sm font-medium"
       >
         <Plus className="w-4 h-4" />
-        Add Block
+        {t("agent.agent-flows.addBlock")}
         <CaretDown
           className={`w-3.5 h-3.5 transition-transform duration-300 ${showBlockMenu ? "rotate-180" : ""}`}
         />
@@ -70,9 +72,9 @@ export default function AddBlockMenu({
                     <div className="w-fit h-fit text-white">{info.icon}</div>
                   </div>
                   <div className="text-left flex-1">
-                    <div className="text-sm font-medium">{info.label}</div>
+                    <div className="text-sm font-medium">{t(info.label)}</div>
                     <div className="text-xs text-white/60">
-                      {info.description}
+                      {t(info.description)}
                     </div>
                   </div>
                 </button>

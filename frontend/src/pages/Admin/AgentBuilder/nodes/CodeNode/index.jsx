@@ -1,10 +1,12 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export default function CodeNode({
   config,
   onConfigChange,
   renderVariableSelect,
 }) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
       <div>
@@ -43,12 +45,12 @@ export default function CodeNode({
       </div>
       <div>
         <label className="block text-sm font-medium text-white mb-2">
-          Store Result In
+          {t("agent.agent-flows.apiCall.storeResponse")}
         </label>
         {renderVariableSelect(
           config.resultVariable,
           (value) => onConfigChange({ resultVariable: value }),
-          "Select or create variable"
+          t("agent.agent-flows.selectVariable")
         )}
       </div>
     </div>

@@ -4,12 +4,14 @@ import { BookOpenText, ArrowClockwise } from "@phosphor-icons/react";
 import MCPLogo from "@/media/agents/mcp-logo.svg";
 import MCPServers from "@/models/mcpServers";
 import showToast from "@/utils/toast";
+import { useTranslation } from "react-i18next";
 
 export function MCPServerHeader({
   setMcpServers,
   setSelectedMcpServer,
   children,
 }) {
+  const { t } = useTranslation();
   const [loadingMcpServers, setLoadingMcpServers] = useState(false);
   useEffect(() => {
     async function fetchMCPServers() {
@@ -23,11 +25,7 @@ export function MCPServerHeader({
 
   // Refresh the list of MCP servers
   const refreshMCPServers = () => {
-    if (
-      window.confirm(
-        "Are you sure you want to refresh the list of MCP servers? This will restart all MCP servers and reload their tools."
-      )
-    ) {
+    if (window.confirm(t("agent.mcp-servers.refreshConfirm"))) {
       setLoadingMcpServers(true);
       MCPServers.forceReload()
         .then(({ servers = [] }) => {
@@ -36,7 +34,9 @@ export function MCPServerHeader({
         })
         .catch((err) => {
           console.error(err);
-          showToast(`Failed to refresh MCP servers.`, "error", { clear: true });
+          showToast(t("agent.mcp-servers.failedToRefresh"), "error", {
+            clear: true,
+          });
         })
         .finally(() => {
           setLoadingMcpServers(false);
@@ -49,7 +49,7 @@ export function MCPServerHeader({
       <div className="text-theme-text-primary flex items-center justify-between gap-x-2 mt-4">
         <div className="flex items-center gap-x-2">
           <img src={MCPLogo} className="w-6 h-6 light:invert" alt="MCP Logo" />
-          <p className="text-lg font-medium">MCP Servers</p>
+          <p className="text-lg font-medium">{t("agent.mcp-servers.title")}</p>
         </div>
         <div className="flex items-center gap-x-3">
           <a
@@ -71,7 +71,9 @@ export function MCPServerHeader({
               className={loadingMcpServers ? "animate-spin" : ""}
             />
             <p className="text-sm">
-              {loadingMcpServers ? "Loading..." : "Refresh"}
+              {loadingMcpServers
+                ? t("agent.mcp-servers.loading")
+                : t("agent.mcp-servers.refresh")}
             </p>
           </button>
         </div>
@@ -87,17 +89,18 @@ export function MCPServersList({
   selectedServer,
   handleClick,
 }) {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <div className="text-theme-text-secondary text-center text-xs flex flex-col gap-y-2">
-        <p>Loading MCP Servers from configuration file...</p>
+        <p>{t("agent.mcp-servers.loadingMcpServers")}</p>
         <a
           href="https://docs.anythingllm.com/mcp-compatibility/overview"
           target="_blank"
           rel="noopener noreferrer"
           className="text-theme-text-secondary underline hover:text-cta-button"
         >
-          Learn more about MCP Servers.
+          {t("agent.mcp-servers.learnMore")}
         </a>
       </div>
     );
@@ -106,14 +109,14 @@ export function MCPServersList({
   if (servers.length === 0) {
     return (
       <div className="text-theme-text-secondary text-center text-xs flex flex-col gap-y-2">
-        <p>No MCP servers found</p>
+        <p>{t("agent.mcp-servers.noServers")}</p>
         <a
           href="https://docs.anythingllm.com/mcp-compatibility/overview"
           target="_blank"
           rel="noopener noreferrer"
           className="text-theme-text-secondary underline hover:text-cta-button"
         >
-          Learn more about MCP Servers.
+          {t("agent.mcp-servers.learnMore")}
         </a>
       </div>
     );
@@ -144,7 +147,9 @@ export function MCPServersList({
             <div
               className={`text-sm text-theme-text-secondary font-medium ${server.running ? "text-green-500" : "text-red-500"}`}
             >
-              {server.running ? "On" : "Stopped"}
+              {server.running
+                ? t("agent.mcp-servers.On")
+                : t("agent.mcp-servers.Stopped")}
             </div>
           </div>
         </div>

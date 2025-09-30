@@ -1,22 +1,27 @@
 import React from "react";
 import { CaretRight } from "@phosphor-icons/react";
+import { useTranslation } from "react-i18next";
 
 export default function AgentFlowsList({
   flows = [],
   selectedFlow,
   handleClick,
+  activeFlowIds = [],
 }) {
+  const { t } = useTranslation();
+  const isFlowActive = (flow) => activeFlowIds.includes(flow.uuid);
+
   if (flows.length === 0) {
     return (
       <div className="text-theme-text-secondary text-center text-xs flex flex-col gap-y-2">
-        <p>No agent flows found</p>
+        <p>{t("agent.agent-flows.noFlows")}</p>
         <a
           href="https://docs.anythingllm.com/agent-flows/getting-started"
           target="_blank"
           rel="noreferrer"
           className="text-theme-text-secondary underline hover:text-cta-button"
         >
-          Learn more about Agent Flows.
+          {t("agent.agent-flows.learnMore")}
         </a>
       </div>
     );
@@ -43,7 +48,7 @@ export default function AgentFlowsList({
           <div className="text-sm font-light">{flow.name}</div>
           <div className="flex items-center gap-x-2">
             <div className="text-sm text-theme-text-secondary font-medium">
-              {flow.active ? "On" : "Off"}
+              {isFlowActive(flow) ? t("agent.skill.On") : t("agent.skill.Off")}
             </div>
             <CaretRight
               size={14}

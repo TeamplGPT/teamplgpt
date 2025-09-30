@@ -4,25 +4,22 @@ import showToast from "@/utils/toast";
 import { FlowArrow, Gear } from "@phosphor-icons/react";
 import { useNavigate } from "react-router-dom";
 import paths from "@/utils/paths";
+import { useTranslation } from "react-i18next";
 
 function ManageFlowMenu({ flow, onDelete }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   async function deleteFlow() {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this flow? This action cannot be undone."
-      )
-    )
-      return;
+    if (!window.confirm(t("agent.agent-flows.delete-flow-confirm"))) return;
     const { success, error } = await AgentFlows.deleteFlow(flow.uuid);
     if (success) {
-      showToast("Flow deleted successfully.", "success");
+      showToast(t("agent.agent-flows.flow-deleted-successfully"), "success");
       onDelete(flow.uuid);
     } else {
-      showToast(error || "Failed to delete flow.", "error");
+      showToast(error || t("agent.agent-flows.failed-to-delete-flow"), "error");
     }
   }
 
@@ -55,14 +52,14 @@ function ManageFlowMenu({ flow, onDelete }) {
             onClick={() => navigate(paths.agents.editAgent(flow.uuid))}
             className="border-none flex items-center rounded-lg gap-x-2 hover:bg-theme-action-menu-item-hover py-1.5 px-2 transition-colors duration-200 w-full text-left"
           >
-            <span className="text-sm">Edit Flow</span>
+            <span className="text-sm">{t("agent.agent-flows.editflow")}</span>
           </button>
           <button
             type="button"
             onClick={deleteFlow}
             className="border-none flex items-center rounded-lg gap-x-2 hover:bg-theme-action-menu-item-hover py-1.5 px-2 transition-colors duration-200 w-full text-left"
           >
-            <span className="text-sm">Delete Flow</span>
+            <span className="text-sm">{t("agent.agent-flows.deleteflow")}</span>
           </button>
         </div>
       )}

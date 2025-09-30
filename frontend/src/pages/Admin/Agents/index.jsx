@@ -316,6 +316,7 @@ export default function AdminAgents() {
               flows={agentFlows}
               selectedFlow={selectedFlow}
               handleClick={handleFlowClick}
+              activeFlowIds={activeFlowIds}
             />
             <input
               type="hidden"
@@ -534,6 +535,7 @@ export default function AdminAgents() {
                 flows={agentFlows}
                 selectedFlow={selectedFlow}
                 handleClick={handleFlowClick}
+                activeFlowIds={activeFlowIds}
               />
 
               <MCPServerHeader

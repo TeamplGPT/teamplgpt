@@ -1,26 +1,31 @@
 import { CaretRight } from "@phosphor-icons/react";
 import { sentenceCase } from "text-case";
+import { useTranslation, Trans } from "react-i18next";
 
 export default function ImportedSkillList({
   skills = [],
   selectedSkill = null,
   handleClick = null,
 }) {
+  const { t } = useTranslation();
   if (skills.length === 0)
     return (
       <div className="text-theme-text-secondary text-center text-xs flex flex-col gap-y-2">
-        <p>No imported skills found</p>
+        <p>{t("agent.custom-skills.noSkills")}</p>
         <p>
-          Learn about agent skills in the{" "}
-          <a
-            href="https://docs.anythingllm.com/agent/custom/developer-guide"
-            target="_blank"
-            rel="noreferrer"
-            className="text-theme-text-secondary underline hover:text-cta-button"
-          >
-            AnythingLLM Agent Docs
-          </a>
-          .
+          <Trans
+            i18nKey="agent.custom-skills.learnAboutSkills"
+            components={{
+              docsLink: (
+                <a
+                  href="https://docs.anythingllm.com/agent/custom/developer-guide"
+                  target="_blank"
+                  className="text-theme-text-secondary underline hover:text-cta-button"
+                  rel="noreferrer"
+                />
+              ),
+            }}
+          />
         </p>
       </div>
     );
@@ -46,7 +51,7 @@ export default function ImportedSkillList({
           <div className="text-sm font-light">{sentenceCase(config.name)}</div>
           <div className="flex items-center gap-x-2">
             <div className="text-sm text-theme-text-secondary font-medium">
-              {config.active ? "On" : "Off"}
+              {config.active ? t("agent.skill.On") : t("agent.skill.Off")}
             </div>
             <CaretRight
               size={14}
