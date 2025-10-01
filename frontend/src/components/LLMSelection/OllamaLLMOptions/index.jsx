@@ -199,7 +199,7 @@ export default function OllamaLLMOptions({ settings }) {
                   rel="noreferrer"
                 >
                   {" "}
-                  {t("llm.providers.ollama.learn_more")} &rarr;
+                  {t("common.learn_more")} &rarr;
                 </a>
               </p>
             </div>
