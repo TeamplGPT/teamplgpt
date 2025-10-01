@@ -171,6 +171,8 @@ export default function CommunityHubAuthentication() {
                   <a
                     href={paths.communityHub.profile()}
                     className="underline text-primary-button"
+                    target="_blank"
+                    rel="noreferrer"
                   >
                     {t("community_hub.account.profile-page-link")}
                   </a>

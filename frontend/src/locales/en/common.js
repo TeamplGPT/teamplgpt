@@ -2149,6 +2149,12 @@ const TRANSLATIONS = {
         warning_message:
           "If you are pulling in a private item, make sure it is shared with a team you belong to, and you have added a Connection Key.",
         key_link: "Connection Key.",
+        "import-item-warning":
+          "If you are pulling in a private item, make sure it is",
+        "shared-with-team": "shared with a team",
+        "you-belong-to": "you belong to, and you have added a",
+        "connection-key-link": "Connection Key",
+        "private-item-suffix": ".",
         item_id_label: "Community Hub Item Import ID",
         button: "Continue with import",
         error: "Please enter an item ID",

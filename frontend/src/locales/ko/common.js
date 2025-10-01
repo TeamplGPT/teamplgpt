@@ -2059,9 +2059,12 @@ const TRANSLATIONS = {
           "이 아이템들은 AnythingLLM 팀과 커뮤니티가 직접 만든 것으로, AnythingLLM을 시작하거나 내 필요에 맞게 확장하는 데 매우 유용합니다.",
         description_3:
           "커뮤니티 허브에는 비공개 아이템과 공개 아이템이 모두 있습니다. 비공개 아이템은 본인만 볼 수 있고, 공개 아이템은 모든 사용자가 볼 수 있습니다.",
-        warning_message:
-          "비공개 아이템을 가져오려면 해당 아이템이 내가 속한 팀과 공유되어 있고, 연결 키를 추가했는지 확인하세요.",
-        key_link: "연결 키.",
+        "import-item-warning":
+          "비공개 아이템을 가져오려면 해당 아이템이 내가 속한 ",
+        "shared-with-team": "팀과 공유",
+        "you-belong-to": "되어 있고, ",
+        "connection-key-link": "커뮤니티 허브 API 키",
+        "private-item-suffix": "를 추가했는지 확인하세요.",
         item_id_label: "커뮤니티 허브 아이템 가져오기 ID",
         button: "가져오기 계속하기",
         error: "아이템 ID를 입력해 주세요",
