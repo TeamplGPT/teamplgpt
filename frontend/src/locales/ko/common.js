@@ -1992,6 +1992,174 @@ const TRANSLATIONS = {
     },
   },
   community_hub: {
+    trending: {
+      description: "AnythingLLM 커뮤니티와 공유하고 협업하세요.",
+      "recently-added": "AnythingLLM 커뮤니티 허브에 최근 추가된 아이템",
+      "explore-latest":
+        "AnythingLLM 커뮤니티 허브의 최신 추가 아이템을 탐색해보세요",
+      "agent-skills": "에이전트 스킬",
+      "system-prompts": "시스템 프롬프트",
+      "slash-commands": "슬래시 커맨드",
+      "agent-flows": "에이전트 플로우",
+      "explore-more": "더 보기",
+      import: "가져오기",
+      prompt: "프롬프트",
+      verified: "인증됨",
+      unverified: "인증되지 않음",
+      skill: "스킬",
+      command: "커맨드",
+      steps: "단계",
+      visibility: {
+        tooltip: "이 아이템은 {{visibility}} 입니다",
+        public: "공개",
+        private: "비공개",
+      },
+      "files-found_one": "{{count}}개 파일 발견됨",
+      "files-found_other": "{{count}}개 파일 발견됨",
+    },
+    account: {
+      title: "AnythingLLM 커뮤니티 허브 계정",
+      description:
+        "AnythingLLM 커뮤니티 허브 계정을 연결하면 비공개 아이템에 접근하고 자신만의 아이템을 커뮤니티 허브에 업로드할 수 있습니다.",
+      "why-connect": "AnythingLLM 커뮤니티 허브 계정을 연결하는 이유는?",
+      "why-connect-description-1":
+        "AnythingLLM 커뮤니티 허브 계정을 연결하면 커뮤니티 허브에서 비공개 아이템을 가져오고 자신만의 아이템을 업로드할 수 있습니다.",
+      "why-connect-description-2":
+        "AnythingLLM 커뮤니티 허브의 공개 아이템을 가져오는 데는 계정 연결이 필요하지 않습니다.",
+      "fail-save": "API 키 저장 실패",
+      "success-save": "API 키 저장 성공",
+      api_key: "AnythingLLM 허브 API 키",
+      "api-key-placeholder": "AnythingLLM 허브 API 키를 입력하세요",
+      "api-key-instruction": "API 키를",
+      "profile-page-link": "AnythingLLM 커뮤니티 허브 프로필 페이지",
+      "api-key-instruction-suffix": "에서 발급받을 수 있습니다.",
+      disconnect: "연결 해제",
+      "fail-disconnect": "허브 연결 해제 실패",
+      "success-disconnect": "AnythingLLM 커뮤니티 허브 연결이 해제되었습니다",
+      created: "내가 만든 아이템",
+      created_description:
+        "AnythingLLM 커뮤니티 허브에서 공개적으로 생성하고 공유한 아이템들입니다.",
+      private_items: "내 비공개 아이템이 보이지 않는 이유는?",
+      noprivate: "아직 생성한 아이템이 없습니다.",
+      "items-by-team": "팀별 아이템",
+      "items-by-team-description":
+        "소속된 팀과 공유하는 공개 및 비공개 아이템들입니다.",
+      "no-items": "아직 팀과 공유한 아이템이 없습니다.",
+    },
+    import: {
+      title: "커뮤니티 아이템 가져오기",
+      description:
+        "AnythingLLM 커뮤니티 허브에서 프롬프트, 스킬, 커맨드 등 커뮤니티가 만든 아이템을 가져와 내 인스턴스를 더욱 풍부하게 만들어보세요.",
+      paste: {
+        menu: "1. 아이템 ID 붙여넣기",
+        title: "커뮤니티 허브에서 아이템 가져오기",
+        description:
+          "커뮤니티 허브는 에이전트 스킬, 시스템 프롬프트, 슬래시 커맨드 등 다양한 아이템을 찾고, 공유하고, 가져올 수 있는 공간입니다!",
+        description_2:
+          "이 아이템들은 AnythingLLM 팀과 커뮤니티가 직접 만든 것으로, AnythingLLM을 시작하거나 내 필요에 맞게 확장하는 데 매우 유용합니다.",
+        description_3:
+          "커뮤니티 허브에는 비공개 아이템과 공개 아이템이 모두 있습니다. 비공개 아이템은 본인만 볼 수 있고, 공개 아이템은 모든 사용자가 볼 수 있습니다.",
+        warning_message:
+          "비공개 아이템을 가져오려면 해당 아이템이 내가 속한 팀과 공유되어 있고, 연결 키를 추가했는지 확인하세요.",
+        key_link: "연결 키.",
+        item_id_label: "커뮤니티 허브 아이템 가져오기 ID",
+        button: "가져오기 계속하기",
+        error: "아이템 ID를 입력해 주세요",
+      },
+      review: {
+        menu: "2. 아이템 검토",
+        title: "아이템 검토",
+        pulling: "커뮤니티 허브에서 아이템 정보를 불러오는 중...",
+        error:
+          "아이템을 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+        try_again: "다른 아이템 시도하기",
+        agent_skill: {
+          title: "신뢰할 수 있는 에이전트 스킬만 가져오세요",
+          description:
+            "에이전트 스킬은 AnythingLLM 인스턴스에서 코드를 실행할 수 있으므로, 반드시 신뢰할 수 있는 출처의 스킬만 가져오세요. 가져오기 전에 코드를 직접 검토하는 것이 좋습니다. 스킬의 동작이 확실하지 않다면 가져오지 마세요!",
+          review_title: "에이전트 스킬 검토",
+          creator: "제작자",
+          verified: "검증된 코드",
+          unverified: "이 스킬은 검증되지 않았습니다.",
+          description_2:
+            "<1>@agent</1> 스킬을 통해 AnythingLLM 워크스페이스에 새로운 기능을 추가할 수 있습니다. 호출 시 특정 작업을 자동으로 수행하는 에이전트 스킬을 활용해보세요.",
+          importing: "가져오는 중...",
+          import: "에이전트 스킬 가져오기",
+          success: "에이전트 스킬이 성공적으로 가져와졌습니다!",
+          error: {
+            fallback: "에이전트 스킬 가져오기에 실패했습니다. {{error}}",
+            community_hub_bundle_downloads_not_enabled:
+              "에이전트 스킬 가져오기에 실패했습니다. 커뮤니티 허브 번들 다운로드가 활성화되지 않았습니다. 시스템 관리자가 이 인스턴스에서 이러한 유형의 아이템을 다운로드할 수 있도록 수동으로 이 기능을 활성화해야 합니다. https://docs.anythingllm.com/configuration#anythingllm-hub-agent-skills 를 참조하세요.",
+            community_hub_bundle_downloads_limited:
+              "에이전트 스킬 가져오기에 실패했습니다. 커뮤니티 허브 번들 다운로드는 검증된 공개 아이템 또는 비공개 팀 아이템으로만 제한됩니다. 이 설정을 검토하거나 수정하려면 시스템 관리자에게 문의하세요. https://docs.anythingllm.com/configuration#anythingllm-hub-agent-skills 를 참조하세요.",
+          },
+        },
+        system_prompt: {
+          title: "시스템 프롬프트 검토",
+          description:
+            "시스템 프롬프트는 AI 에이전트의 동작을 안내하는 역할을 하며, 모든 기존 워크스페이스에 적용할 수 있습니다.",
+          provided_system_prompt: "제공된 시스템 프롬프트",
+          creator: "제작자",
+          apply_to_workspace: "적용할 워크스페이스",
+          available_workspaces: "사용 가능한 워크스페이스",
+          apply_button: "시스템 프롬프트를 워크스페이스에 적용",
+          applying: "시스템 프롬프트를 워크스페이스에 적용하는 중...",
+          success: "시스템 프롬프트가 워크스페이스에 적용되었습니다.",
+          errors: {
+            ITEM_REQUIRED:
+              "시스템 프롬프트를 적용할 수 없습니다. 아이템 정보가 필요합니다.",
+            WORKSPACE_SLUG_REQUIRED:
+              "시스템 프롬프트를 적용할 수 없습니다. 워크스페이스 식별자가 필요합니다.",
+            WORKSPACE_NOT_FOUND:
+              "시스템 프롬프트를 적용할 수 없습니다. 해당 워크스페이스를 찾을 수 없습니다.",
+            UNSUPPORTED_ITEM_TYPE:
+              "시스템 프롬프트를 적용할 수 없습니다. 지원하지 않는 아이템 유형입니다.",
+            UNKNOWN: "시스템 프롬프트 적용 중 오류가 발생했습니다. {{error}}",
+          },
+        },
+        slash_command: {
+          title: "슬래시 커맨드 검토",
+          description:
+            "슬래시 커맨드는 AnythingLLM 워크스페이스에서 채팅할 때 프롬프트에 정보를 미리 입력하는 데 사용됩니다.",
+          description_2:
+            "이 슬래시 커맨드는 채팅 중에 <code>{{command}}</code>와 같이 입력하면 다른 명령어처럼 바로 사용할 수 있습니다.",
+          creator: "제작자",
+          importing: "슬래시 커맨드 가져오는 중...",
+          import: "슬래시 커맨드 가져오기",
+          success: "슬래시 커맨드 {{command}}을(를) 성공적으로 가져왔습니다!",
+        },
+        agent_flow: {
+          title: "에이전트 플로우 가져오기",
+          description:
+            "에이전트 플로우를 사용하면 에이전트가 실행할 수 있는 재사용 가능한 작업 시퀀스를 만들 수 있습니다.",
+          flow_details: "플로우 세부 정보",
+          description_label: "설명",
+          steps: "단계",
+          creator: "제작자",
+          importing: "가져오는 중...",
+          import: "에이전트 플로우 가져오기",
+          success: "에이전트 플로우를 성공적으로 가져왔습니다!",
+          error: {
+            UNSUPPORTED_BLOCKS:
+              "이 플로우에는 지원되지 않는 블록이 포함되어 있습니다. AnythingLLM 버전에서 지원되지 않거나 이 플랫폼에서 사용할 수 없는 기능일 수 있습니다.",
+            REQUIRED_FIELDS_MISSING: "이름과 설정이 필요합니다.",
+            SAVE_FAILED: "플로우 저장에 실패했습니다.",
+            SERVER_ERROR: "서버 오류가 발생했습니다.",
+            UNKNOWN: "에이전트 플로우 가져오기에 실패했습니다. {{error}}",
+          },
+        },
+      },
+      complete: {
+        menu: "3. 완료",
+        title: "커뮤니티 허브 아이템 가져오기 완료",
+        success:
+          '"{{name}}" {{type}}을(를) 성공적으로 가져왔습니다! 이제 AnythingLLM 인스턴스에서 사용할 수 있습니다.',
+        view_in_agent_skills: '"{{name}}" 아이템을 에이전트 스킬에서 보기',
+        changes_not_reflected:
+          "이 {{type}}에 대한 변경 사항은 커뮤니티 허브에 반영되지 않습니다. 이제 자유롭게 수정할 수 있습니다.",
+        import_another: "다른 아이템 가져오기",
+      },
+    },
     publish: {
       system_prompt: {
         success_title: "성공!",

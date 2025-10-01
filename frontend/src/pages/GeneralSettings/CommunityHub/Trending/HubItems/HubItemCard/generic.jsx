@@ -2,8 +2,10 @@ import paths from "@/utils/paths";
 import { Eye, LockSimple } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 import { Tooltip } from "react-tooltip";
+import { useTranslation } from "react-i18next";
 
 export default function GenericHubCard({ item }) {
+  const { t } = useTranslation();
   return (
     <div
       key={item.id}
@@ -16,7 +18,7 @@ export default function GenericHubCard({ item }) {
           className="text-primary-button hover:text-primary-button/80 text-xs"
           to={paths.communityHub.importItem(item.importId)}
         >
-          Import →
+          {t("community_hub.trending.import")} →
         </Link>
       </div>
     </div>
@@ -24,13 +26,18 @@ export default function GenericHubCard({ item }) {
 }
 
 export function VisibilityIcon({ visibility = "public" }) {
+  const { t } = useTranslation();
   const Icon = visibility === "private" ? LockSimple : Eye;
+
+  const tooltipContent = t("community_hub.trending.visibility.tooltip", {
+    visibility: t(`community_hub.trending.visibility.${visibility}`),
+  });
 
   return (
     <>
       <div
         data-tooltip-id="visibility-icon"
-        data-tooltip-content={`This item is ${visibility === "private" ? "private" : "public"}`}
+        data-tooltip-content={tooltipContent}
       >
         <Icon className="w-4 h-4 text-white/60" />
       </div>

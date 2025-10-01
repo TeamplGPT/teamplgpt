@@ -2,8 +2,10 @@ import truncate from "truncate";
 import { Link } from "react-router-dom";
 import paths from "@/utils/paths";
 import { VisibilityIcon } from "./generic";
+import { useTranslation } from "react-i18next";
 
 export default function SlashCommandHubCard({ item }) {
+  const { t } = useTranslation();
   return (
     <>
       <Link
@@ -18,14 +20,14 @@ export default function SlashCommandHubCard({ item }) {
         <div className="flex flex-col gap-2">
           <p className="text-white/60 text-xs mt-1">{item.description}</p>
           <label className="text-white/60 text-xs font-semibold mt-4">
-            Command
+            {t("community_hub.trending.command")}
           </label>
           <p className="text-white/60 text-xs bg-zinc-900 light:bg-slate-200 px-2 py-1 rounded-md font-mono border border-slate-800 light:border-slate-300">
             {item.command}
           </p>
 
           <label className="text-white/60 text-xs font-semibold mt-4">
-            Prompt
+            {t("community_hub.trending.prompt")}
           </label>
           <p className="text-white/60 text-xs bg-zinc-900 light:bg-slate-200 px-2 py-1 rounded-md font-mono border border-slate-800 light:border-slate-300">
             {truncate(item.prompt, 90)}
@@ -36,7 +38,7 @@ export default function SlashCommandHubCard({ item }) {
             to={paths.communityHub.importItem(item.importId)}
             className="text-primary-button hover:text-primary-button/80 text-sm font-medium px-3 py-1.5 rounded-md bg-black/30 light:bg-slate-200 group-hover:bg-black/50 light:group-hover:bg-slate-300 transition-all"
           >
-            Import →
+            {t("community_hub.trending.import")} →
           </Link>
         </div>
       </Link>

@@ -2079,6 +2079,173 @@ const TRANSLATIONS = {
     },
   },
   community_hub: {
+    trending: {
+      description: "Share and collaborate with the AnythingLLM community.",
+      "recently-added": "Recently Added on AnythingLLM Community Hub",
+      "explore-latest":
+        "Explore the latest additions to the AnythingLLM Community Hub",
+      "agent-skills": "Agent Skills",
+      "system-prompts": "System Prompts",
+      "slash-commands": "Slash Commands",
+      "agent-flows": "Agent Flows",
+      "explore-more": "Explore More",
+      import: "Import",
+      prompt: "Prompt",
+      verified: "Verified",
+      unverified: "Unverified",
+      skill: "Skill",
+      command: "Command",
+      steps: "Steps",
+      visibility: {
+        tooltip: "This item is {{visibility}}",
+        public: "Public",
+        private: "Private",
+      },
+      "files-found_one": "{{count}} file found",
+      "files-found_other": "{{count}} files found",
+    },
+    account: {
+      title: "Your AnythingLLM Community Hub Account",
+      description:
+        "Connecting your AnythingLLM Community Hub account allows you to access your private AnythingLLM Community Hub items as well as upload your own items to the AnythingLLM Community Hub.",
+      "why-connect": "Why connect my AnythingLLM Community Hub account?",
+      "why-connect-description-1":
+        "Connecting your AnythingLLM Community Hub account allows you to pull in your private items from the AnythingLLM Community Hub as well as upload your own items to the AnythingLLM Community Hub.",
+      "why-connect-description-2":
+        "You do not need to connect your AnythingLLM Community Hub account to pull in public items from the AnythingLLM Community Hub.",
+      "fail-save": "Failed to save API key",
+      "success-save": "API key saved successfully",
+      api_key: "AnythingLLM Hub API Key",
+      "api-key-placeholder": "Enter your AnythingLLM Hub API key",
+      "api-key-instruction": "You can get your API key from your",
+      "profile-page-link": "AnythingLLM Community Hub profile page",
+      "api-key-instruction-suffix": ".",
+      disconnect: "Disconnect",
+      "fail-disconnect": "Failed to disconnect from hub",
+      "success-disconnect": "Disconnected from AnythingLLM Community Hub",
+      created: "Created by me",
+      created_description:
+        "Items you have created and shared publicly on the AnythingLLM Community Hub.",
+      private_items: "Why can't I see my private items?",
+      noprivate: "You haven't created any items yet.",
+      "items-by-team": "Items by team",
+      "items-by-team-description":
+        "Public and private items shared with teams you belong to.",
+      "no-items": "No items shared with this team yet.",
+    },
+    import: {
+      title: "Import a Community Item",
+      description:
+        "Import items from the AnythingLLM Community Hub to enhance your instance with community-created prompts, skills, and commands.",
+      paste: {
+        menu: "1. Paste in Item ID",
+        title: "Import an item from the community hub",
+        description:
+          "The community hub is a place where you can find, share, and import agent-skills, system prompts, slash commands, and more!",
+        description_2:
+          "These items are created by the AnythingLLM team and community, and are a great way to get started with AnythingLLM as well as extend AnythingLLM in a way that is customized to your needs.",
+        description_3:
+          "There are both private and public items in the community hub. Private items are only visible to you, while public items are visible to everyone.",
+        warning_message:
+          "If you are pulling in a private item, make sure it is shared with a team you belong to, and you have added a Connection Key.",
+        key_link: "Connection Key.",
+        item_id_label: "Community Hub Item Import ID",
+        button: "Continue with import",
+        error: "Please enter an item ID",
+      },
+      review: {
+        menu: "2. Review item",
+        title: "Review item",
+        pulling: "Pulling item details from community hub...",
+        error:
+          "An error occurred while fetching the item. Please try again later.",
+        try_again: "Try another item",
+        agent_skill: {
+          title: "Only import agent skills you trust",
+          description:
+            "Agent skills can execute code on your AnythingLLM instance, so only import agent skills from sources you trust. You should also review the code before importing. If you are unsure about what a skill does - don't import it!",
+          review_title: "Review Agent Skill",
+          creator: "Created by",
+          verified: "Verified code",
+          unverified: "This skill is not verified.",
+          description_2:
+            "Agent skills unlock new capabilities for your AnythingLLM workspace via <1>@agent</1> skills that can do specific tasks when invoked.",
+          importing: "Importing...",
+          import: "Import agent skill",
+          success: "Agent skill imported successfully!",
+          error: {
+            fallback: "Failed to import agent skill. {{error}}",
+            hub_bundle_downloads_not_enabled:
+              "Failed to import agent skill. Community Hub bundle downloads are not enabled. The system administrator must enable this feature manually to allow this instance to download these types of items. See https://docs.anythingllm.com/configuration#anythingllm-hub-agent-skills",
+            hub_bundle_downloads_limited:
+              "Failed to import agent skill. Community hub bundle downloads are limited to verified public items or private team items only. Please contact the system administrator to review or modify this setting. See https://docs.anythingllm.com/configuration#anythingllm-hub-agent-skills",
+          },
+        },
+        system_prompt: {
+          title: "Review System Prompt",
+          description:
+            "System prompts are used to guide the behavior of the AI agents and can be applied to any existing workspace.",
+          provided_system_prompt: "Provided system prompt",
+          creator: "Created by",
+          apply_to_workspace: "Apply to workspace",
+          available_workspaces: "Available workspaces",
+          apply_button: "Apply system prompt to workspace",
+          applying: "Applying system prompt to workspace...",
+          success: "System prompt applied to workspace.",
+          errors: {
+            ITEM_REQUIRED: "Failed to apply system prompt. Item is required.",
+            WORKSPACE_SLUG_REQUIRED:
+              "Failed to apply system prompt. Workspace slug is required.",
+            WORKSPACE_NOT_FOUND:
+              "Failed to apply system prompt. Workspace not found.",
+            UNSUPPORTED_ITEM_TYPE:
+              "Failed to apply system prompt. Unsupported item type. Nothing to apply.",
+            UNKNOWN: "Failed to apply system prompt. {{error}}",
+          },
+        },
+        slash_command: {
+          title: "Review Slash Command",
+          description:
+            "Slash commands are used to prefill information into a prompt while chatting with a AnythingLLM workspace.",
+          description_2:
+            "The slash command will be available during chatting by simply invoking it with <code>{{command}}</code> like you would any other command.",
+          creator: "Created by",
+          importing: "Importing...",
+          import: "Import slash command",
+          success: "Slash command {{command}} imported successfully!",
+        },
+        agent_flow: {
+          title: "Import Agent Flow",
+          description:
+            "Agent flows allow you to create reusable sequences of actions that can be triggered by your agent.",
+          flow_details: "Flow Details",
+          description_label: "Description",
+          steps: "Steps",
+          creator: "Created by",
+          importing: "Importing...",
+          import: "Import agent flow",
+          success: "Agent flow imported successfully!",
+          errors: {
+            UNSUPPORTED_BLOCKS:
+              "This flow includes unsupported blocks. They may not be supported by your version of AnythingLLM or are not available on this platform.",
+            REQUIRED_FIELDS_MISSING: "Name and config are required.",
+            SAVE_FAILED: "Failed to save flow.",
+            SERVER_ERROR: "A server error occurred.",
+            UNKNOWN: "Failed to import agent flow. {{error}}",
+          },
+        },
+      },
+      complete: {
+        menu: "3. Completed",
+        title: "Community Hub Item Imported",
+        success:
+          'The "{{name}}" {{type}} has been imported successfully! It is now available in your AnythingLLM instance.',
+        view_in_agent_skills: 'View "{{name}}" in Agent Skills',
+        changes_not_reflected:
+          "Any changes you make to this {{type}} will not be reflected in the community hub. You can now modify as needed.",
+        import_another: "Import another item",
+      },
+    },
     publish: {
       system_prompt: {
         success_title: "Success!",

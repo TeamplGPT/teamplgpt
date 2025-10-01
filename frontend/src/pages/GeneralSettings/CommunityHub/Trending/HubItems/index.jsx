@@ -5,6 +5,7 @@ import HubItemCard from "./HubItemCard";
 import * as Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { readableType, typeToPath } from "../../utils";
+import { useTranslation } from "react-i18next";
 
 const DEFAULT_EXPLORE_ITEMS = {
   agentSkills: { items: [], hasMore: false, totalCount: 0 },
@@ -35,15 +36,16 @@ function useCommunityHubExploreItems() {
 }
 
 export default function HubItems() {
+  const { t } = useTranslation();
   const { loading, exploreItems } = useCommunityHubExploreItems();
   return (
     <div className="w-full flex flex-col gap-y-1 pb-6 pt-6">
       <div className="flex flex-col gap-y-2 mb-4">
         <p className="text-base font-semibold text-theme-text-primary">
-          Recently Added on AnythingLLM Community Hub
+          {t("community_hub.trending.recently-added")}
         </p>
         <p className="text-xs text-theme-text-secondary">
-          Explore the latest additions to the AnythingLLM Community Hub
+          {t("community_hub.trending.explore-latest")}
         </p>
       </div>
       <HubCategory loading={loading} exploreItems={exploreItems} />
@@ -52,6 +54,7 @@ export default function HubItems() {
 }
 
 function HubCategory({ loading, exploreItems }) {
+  const { t } = useTranslation();
   if (loading) return <HubItemCardSkeleton />;
   return (
     <div className="flex flex-col gap-4">
@@ -62,7 +65,7 @@ function HubCategory({ loading, exploreItems }) {
           <div key={type} className="rounded-lg w-full">
             <div className="flex justify-between items-center">
               <h3 className="text-theme-text-primary capitalize font-medium mb-3">
-                {readableType(type)}
+                {t(readableType(type))}
               </h3>
               {exploreItems[type].hasMore && (
                 <a
@@ -71,7 +74,7 @@ function HubCategory({ loading, exploreItems }) {
                   rel="noopener noreferrer"
                   className="text-primary-button hover:text-primary-button/80 text-sm"
                 >
-                  Explore More →
+                  {t("community_hub.trending.explore-more")} →
                 </a>
               )}
             </div>
