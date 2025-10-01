@@ -33,81 +33,74 @@ import { useTranslation } from "react-i18next";
 
 const SEARCH_PROVIDERS = [
   {
-    name: "Please make a selection",
+    name: "agent.skill.web-browsing.none.name",
     value: "none",
     logo: AnythingLLMIcon,
     options: () => <React.Fragment />,
-    description:
-      "Web search will be disabled until a provider and keys are provided.",
+    description: "agent.skill.web-browsing.none.description",
   },
   {
     name: "DuckDuckGo",
     value: "duckduckgo-engine",
     logo: DuckDuckGoIcon,
     options: () => <DuckDuckGoOptions />,
-    description: "Free and privacy-focused web search using DuckDuckGo.",
+    description: "agent.skill.web-browsing.duckduckgo-engine.description",
   },
   {
     name: "Google Search Engine",
     value: "google-search-engine",
     logo: GoogleSearchIcon,
     options: (settings) => <GoogleSearchOptions settings={settings} />,
-    description:
-      "Web search powered by a custom Google Search Engine. Free for 100 queries per day.",
+    description: "agent.skill.web-browsing.google-search-engine.description",
   },
   {
     name: "SearchApi",
     value: "searchapi",
     logo: SearchApiIcon,
     options: (settings) => <SearchApiOptions settings={settings} />,
-    description:
-      "SearchApi delivers structured data from multiple search engines. Free for 100 queries, but then paid. ",
+    description: "agent.skill.web-browsing.searchapi.description",
   },
   {
     name: "Serper.dev",
     value: "serper-dot-dev",
     logo: SerperDotDevIcon,
     options: (settings) => <SerperDotDevOptions settings={settings} />,
-    description:
-      "Serper.dev web-search. Free account with a 2,500 calls, but then paid.",
+    description: "agent.skill.web-browsing.serper-dot-dev.description",
   },
   {
     name: "Bing Search",
     value: "bing-search",
     logo: BingSearchIcon,
     options: (settings) => <BingSearchOptions settings={settings} />,
-    description: "Web search powered by the Bing Search API (paid service).",
+    description: "agent.skill.web-browsing.bing-search.description",
   },
   {
     name: "Serply.io",
     value: "serply-engine",
     logo: SerplySearchIcon,
     options: (settings) => <SerplySearchOptions settings={settings} />,
-    description:
-      "Serply.io web-search. Free account with a 100 calls/month forever.",
+    description: "agent.skill.web-browsing.serply-engine.description",
   },
   {
     name: "SearXNG",
     value: "searxng-engine",
     logo: SearXNGSearchIcon,
     options: (settings) => <SearXNGOptions settings={settings} />,
-    description:
-      "Free, open-source, internet meta-search engine with no tracking.",
+    description: "agent.skill.web-browsing.searxng-engine.description",
   },
   {
     name: "Tavily Search",
     value: "tavily-search",
     logo: TavilySearchIcon,
     options: (settings) => <TavilySearchOptions settings={settings} />,
-    description:
-      "Tavily Search API. Offers a free tier with 1000 queries per month.",
+    description: "agent.skill.web-browsing.tavily-search.description",
   },
   {
     name: "Exa Search",
     value: "exa-search",
     logo: ExaIcon,
     options: (settings) => <ExaSearchOptions settings={settings} />,
-    description: "AI-powered search engine optimized for LLM use cases.",
+    description: "agent.skill.web-browsing.exa-search.description",
   },
 ];
 

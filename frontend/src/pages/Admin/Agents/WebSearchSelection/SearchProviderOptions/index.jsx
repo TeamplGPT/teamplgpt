@@ -237,15 +237,16 @@ export function SerplySearchOptions({ settings }) {
   return (
     <>
       <p className="text-sm text-white/60 my-2">
-        You can get a free API key{" "}
+        {t("agent.skill.web-browsing.serply-engine.get-free-api-message")}{" "}
         <a
           href="https://serply.io"
           target="_blank"
           rel="noreferrer"
           className="text-blue-300 underline"
         >
-          from Serply.io.
+          {t("agent.skill.web-browsing.serply-engine.get-free-api-link-text")}
         </a>
+        {t("agent.skill.web-browsing.serply-engine.get-free-api-suffix")}
       </p>
       <div className="flex gap-x-4">
         <div className="flex flex-col w-72">
@@ -292,23 +293,25 @@ export function SearXNGOptions({ settings }) {
 }
 
 export function TavilySearchOptions({ settings }) {
+  const { t } = useTranslation();
   return (
     <>
       <p className="text-sm text-white/60 my-2">
-        You can get an API key{" "}
+        {t("agent.skill.web-browsing.tavily-search.get-free-api-message")}{" "}
         <a
           href="https://tavily.com/"
           target="_blank"
           rel="noreferrer"
           className="text-blue-300 underline"
         >
-          from Tavily.
+          {t("agent.skill.web-browsing.tavily-search.get-free-api-link-text")}
         </a>
+        {t("agent.skill.web-browsing.tavily-search.get-free-api-suffix")}
       </p>
       <div className="flex gap-x-4">
         <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
-            API Key
+            {t("agent.skill.web-browsing.apikey")}
           </label>
           <input
             type="password"
@@ -327,33 +330,36 @@ export function TavilySearchOptions({ settings }) {
 }
 
 export function DuckDuckGoOptions() {
+  const { t } = useTranslation();
   return (
     <>
       <p className="text-sm text-white/60 my-2">
-        DuckDuckGo is ready to use without any additional configuration.
+        {t("agent.skill.web-browsing.duckduckgo-engine.description2")}
       </p>
     </>
   );
 }
 
 export function ExaSearchOptions({ settings }) {
+  const { t } = useTranslation();
   return (
     <>
       <p className="text-sm text-white/60 my-2">
-        You can get an API key{" "}
+        {t("agent.skill.web-browsing.exa-search.get-free-api-message")}{" "}
         <a
           href="https://exa.ai"
           target="_blank"
           rel="noreferrer"
           className="text-blue-300 underline"
         >
-          from Exa.
+          {t("agent.skill.web-browsing.exa-search.get-free-api-link-text")}
         </a>
+        {t("agent.skill.web-browsing.exa-search.get-free-api-suffix")}
       </p>
       <div className="flex gap-x-4">
         <div className="flex flex-col w-72">
           <label className="text-white text-sm font-semibold block mb-3">
-            API Key
+            {t("agent.skill.web-browsing.apikey")}
           </label>
           <input
             type="password"

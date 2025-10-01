@@ -530,7 +530,9 @@ const TRANSLATIONS = {
         "serply-engine": {
           description:
             "Serply.io web-search. Free account with a 100 calls/month forever.",
-          "serply-link": "You can get a free API key from Serply.io. (Click)",
+          "get-free-api-message": "You can get a free API key",
+          "get-free-api-link-text": "from Serply.io (Click)",
+          "get-free-api-suffix": ".",
         },
         "searxng-engine": {
           description:
@@ -540,7 +542,15 @@ const TRANSLATIONS = {
         "tavily-search": {
           description:
             "Tavily Search API. Offers a free tier with 1000 queries per month.",
-          "tavily-link": "You can get an API key from Tavily. (Click)",
+          "get-free-api-message": "You can get an API key",
+          "get-free-api-link-text": "from Tavily (Click)",
+          "get-free-api-suffix": ".",
+        },
+        "exa-search": {
+          description: "AI-powered search engine optimized for LLM use cases.",
+          "get-free-api-message": "You can get an API key",
+          "get-free-api-link-text": "from Exa (Click)",
+          "get-free-api-suffix": ".",
         },
         apikey: "API Key",
         engine: "Engine",

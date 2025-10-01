@@ -503,8 +503,9 @@ const TRANSLATIONS = {
         "serply-engine": {
           description:
             "Serply.io 웹 검색입니다. 무료 계정으로 월 100회까지 영구적으로 사용할 수 있습니다.",
-          "serply-link":
-            "Serply.io에서 무료 API 키를 발급받을 수 있습니다. (클릭)",
+          "get-free-api-message": "무료 API 키를",
+          "get-free-api-link-text": "Serply.io에서 (클릭) ",
+          "get-free-api-suffix": "발급받을 수 있습니다.",
         },
         "searxng-engine": {
           description:
@@ -514,8 +515,15 @@ const TRANSLATIONS = {
         "tavily-search": {
           description:
             "Tavily Search API입니다. 월 1,000회까지 무료로 사용할 수 있는 요금제가 제공됩니다.",
-          "tavily-link":
-            "Tavily에서 무료 API 키를 발급받을 수 있습니다. (클릭)",
+          "get-free-api-message": "API 키를",
+          "get-free-api-link-text": "Tavily에서 (클릭)",
+          "get-free-api-suffix": "발급받을 수 있습니다.",
+        },
+        "exa-search": {
+          description: "LLM 활용 사례에 최적화된 AI 기반 검색 엔진입니다.",
+          "get-free-api-message": "API 키를",
+          "get-free-api-link-text": "Exa에서 (클릭)",
+          "get-free-api-suffix": "발급받을 수 있습니다.",
         },
         apikey: "API 키",
         engine: "엔진",
