@@ -1,8 +1,15 @@
-const { WorkspaceLlmMessageLogs } = require("../../models/workspaceLlmMessageLogs");
+const {
+  WorkspaceLlmMessageLogs,
+} = require("../../models/workspaceLlmMessageLogs");
 const { WorkspaceChats } = require("../../models/workspaceChats");
 const prisma = require("../../utils/prisma");
 
-describe("WorkspaceLlmMessageLogs Integration Tests (SQLite)", () => {
+const hasPostgres =
+  typeof process.env.DATABASE_URL === "string" &&
+  /^(postgresql|postgres):\/\//.test(process.env.DATABASE_URL);
+const describeIf = hasPostgres ? describe : describe.skip;
+
+describeIf("WorkspaceLlmMessageLogs Integration Tests (SQLite)", () => {
   let testWorkspace;
   let testUser;
   let testChat;
@@ -128,7 +135,9 @@ describe("WorkspaceLlmMessageLogs Integration Tests (SQLite)", () => {
       });
 
       // Retrieve the log
-      const retrievedLog = await WorkspaceLlmMessageLogs.getByChatId(testChat.id);
+      const retrievedLog = await WorkspaceLlmMessageLogs.getByChatId(
+        testChat.id
+      );
 
       expect(retrievedLog).toBeDefined();
       expect(retrievedLog.id).toBe(createdLog.id);
@@ -164,11 +173,9 @@ describe("WorkspaceLlmMessageLogs Integration Tests (SQLite)", () => {
     });
 
     it("should retrieve logs ordered by createdAt", async () => {
-      const logs = await WorkspaceLlmMessageLogs.where(
-        {},
-        null,
-        { createdAt: "desc" }
-      );
+      const logs = await WorkspaceLlmMessageLogs.where({}, null, {
+        createdAt: "desc",
+      });
       expect(logs.length).toBeGreaterThan(0);
       expect(logs[0]).toHaveProperty("createdAt");
     });
