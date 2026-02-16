@@ -8,6 +8,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.js'],
     css: true,
+    exclude: ['**/node_modules/**', '**/e2e/**'],
   },
   resolve: {
     alias: {
