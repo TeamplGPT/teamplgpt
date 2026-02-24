@@ -56,6 +56,7 @@ const Workspace = {
     "queryRefusalResponse",
     "vectorSearchMode",
     "adjacentChunks",
+    "reactMaxIterations",
   ],
 
   validations: {
@@ -137,6 +138,14 @@ const Workspace = {
       if (chunks < 0) return 0;
       if (chunks > 5) return 5;
       return chunks;
+    },
+    reactMaxIterations: (value) => {
+      if (value === null || value === undefined) return 5;
+      const iterations = parseInt(value);
+      if (isNullOrNaN(iterations)) return 5;
+      if (iterations < 1) return 1;
+      if (iterations > 25) return 25;
+      return iterations;
     },
   },
 

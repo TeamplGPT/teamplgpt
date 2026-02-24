@@ -283,6 +283,11 @@ const TRANSLATIONS = {
         "desc-start": "단계별로 추론하며",
         search: "반복적으로 문서를 검색",
         "desc-end": "하여 근거 있는 답변을 제공합니다.",
+        maxIterations: {
+          title: "최대 반복 횟수",
+          description:
+            "최종 답변을 제공하기 전에 LLM이 문서를 검색하고 추론할 수 있는 최대 횟수입니다. (최소: 1, 최대: 25)",
+        },
       },
     },
     history: {

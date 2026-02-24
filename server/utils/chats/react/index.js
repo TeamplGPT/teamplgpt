@@ -7,7 +7,6 @@ const { writeResponseChunk } = require("../../helpers/chat/responses");
 const { chatPrompt, recentChatHistory, sourceIdentifier } = require("../index");
 const { parseReactOutput } = require("./outputParser");
 
-const MAX_ITERATIONS = 5;
 // Maximum characters per search observation to prevent LLM context window overflow.
 // Tune based on model context limits.
 const OBSERVATION_MAX_CHARS = 2000;
@@ -150,8 +149,9 @@ async function streamReactChat(
     // Keep pinned docs in final citations even if a search returns 0.
     allSources = [...pinnedSources];
 
+    const maxIterations = workspace?.reactMaxIterations ?? 5;
     let llmCallCount = 0;
-    for (let i = 0; i < MAX_ITERATIONS; i++) {
+    for (let i = 0; i < maxIterations; i++) {
       if (response.writableEnded) break;
 
       // Non-streaming LLM call for intermediate steps

@@ -2,6 +2,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 export default function ChatModeSelection({ workspace, setHasChanges }) {
   const [chatMode, setChatMode] = useState(workspace?.chatMode || "chat");
+  const [reactMaxIterations, setReactMaxIterations] = useState(
+    workspace?.reactMaxIterations ?? 5
+  );
   const { t } = useTranslation();
   return (
     <div>
@@ -72,6 +75,33 @@ export default function ChatModeSelection({ workspace, setHasChanges }) {
             </>
           )}
         </p>
+
+        {chatMode === "react" && (
+          <div className="mt-4">
+            <input
+              type="hidden"
+              name="reactMaxIterations"
+              value={reactMaxIterations}
+            />
+            <label className="block input-label mb-1">
+              {t("chat.mode.react.maxIterations.title")}
+            </label>
+            <p className="text-xs text-white/60 mb-2">
+              {t("chat.mode.react.maxIterations.description")}
+            </p>
+            <input
+              type="number"
+              min={1}
+              max={25}
+              value={reactMaxIterations}
+              onChange={(e) => {
+                setReactMaxIterations(Number(e.target.value));
+                setHasChanges(true);
+              }}
+              className="border-none bg-theme-settings-input-bg text-white placeholder:text-theme-settings-input-placeholder text-sm rounded-lg focus:outline-primary-button active:outline-primary-button outline-none block w-[100px] p-2.5"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
