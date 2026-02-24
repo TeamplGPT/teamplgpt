@@ -307,6 +307,11 @@ const TRANSLATIONS = {
         "desc-start": "will reason step-by-step and",
         search: "iteratively search documents",
         "desc-end": "to provide well-reasoned answers.",
+        maxIterations: {
+          title: "Max Iterations",
+          description:
+            "The maximum number of times the LLM can search documents and reason before providing a final answer. (Min: 1, Max: 25)",
+        },
       },
     },
     history: {

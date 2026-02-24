@@ -143,6 +143,7 @@ model workspaces {
   queryRefusalResponse         String?
   vectorSearchMode             String?                        @default("default")
   adjacentChunks               Int?                           @default(0)
+  reactMaxIterations           Int?                           @default(5)
   workspace_users              workspace_users[]
   documents                    workspace_documents[]
   workspace_suggested_messages workspace_suggested_messages[]

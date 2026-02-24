@@ -12,6 +12,9 @@ export function castToType(key, value) {
     topN: {
       cast: (value) => Number(value),
     },
+    reactMaxIterations: {
+      cast: (value) => Number(value),
+    },
   };
 
   if (!definitions.hasOwnProperty(key)) return value;
