@@ -109,10 +109,12 @@ async function streamReactChat(
   const basePrompt = await chatPrompt(workspace, user);
   const systemPrompt = buildReactSystemPrompt(basePrompt);
 
-  // Build initial messages array with system prompt, chat history, and user message
+  // Build initial messages array with system prompt, chat history, and user message.
+  // Strip attachments from chat history — ReAct mode does not pass attachments to the LLM,
+  // and including the attachments field causes a 400 error from the OpenAI Responses API.
   const messages = [
     { role: "system", content: systemPrompt },
-    ...chatHistory,
+    ...chatHistory.map(({ role, content }) => ({ role, content })),
     { role: "user", content: message },
   ];
 
