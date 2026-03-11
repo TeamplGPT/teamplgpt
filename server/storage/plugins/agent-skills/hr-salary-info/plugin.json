@@ -1,0 +1,59 @@
+{
+  "active": true,
+  "name": "HR 급여정보 조회",
+  "schema": "skill-1.0.0",
+  "version": "1.0.0",
+  "hubId": "hr-salary-info",
+  "author": "teamplgpt",
+  "description": "사원번호로 급여 산출일자 정보(시급, 일급, 수당, 지급액 등 17개 필드)를 조회합니다. 기간 지정 가능합니다. 응답 데이터를 받으면 반드시 사용자가 보기 편하도록 마크다운 표(Markdown Table) 형식으로 정리해서 보여주세요.",
+  "entrypoint": {
+    "file": "handler.js",
+    "params": {
+      "emp_no": {
+        "description": "조회할 직원의 사원번호 (필수). 예: '12345'",
+        "type": "string"
+      },
+      "sta_ymd": {
+        "description": "조회 시작일 (선택, YYYYMMDD 형식). 예: '20260101'. 지정하지 않으면 전체 기간 조회.",
+        "type": "string"
+      },
+      "end_ymd": {
+        "description": "조회 종료일 (선택, YYYYMMDD 형식). 예: '20260131'. 시작일과 함께 사용.",
+        "type": "string"
+      },
+      "site_id": {
+        "description": "사이트 ID (선택). 멀티사이트 환경에서 특정 사이트를 지정할 때 사용.",
+        "type": "string"
+      }
+    }
+  },
+  "setup_args": {
+    "HR_API_BASE_URL": {
+      "type": "string",
+      "required": true,
+      "input": {
+        "type": "text",
+        "default": "http://host.docker.internal:8000",
+        "placeholder": "http://host.docker.internal:8000",
+        "hint": "HR REST API 서버 주소. Docker: host.docker.internal, Local: localhost"
+      },
+      "value": "http://localhost:8000"
+    }
+  },
+  "examples": [
+    {
+      "prompt": "사원번호 12345의 급여 정보 조회해줘",
+      "call": "{\"emp_no\": \"12345\"}"
+    },
+    {
+      "prompt": "직원 00100의 2026년 1월 급여 알려줘",
+      "call": "{\"emp_no\": \"00100\", \"sta_ymd\": \"20260101\", \"end_ymd\": \"20260131\"}"
+    },
+    {
+      "prompt": "사번 A0001 3월 급여내역",
+      "call": "{\"emp_no\": \"A0001\", \"sta_ymd\": \"20260301\", \"end_ymd\": \"20260331\"}"
+    }
+  ],
+  "imported": true,
+  "license": "MIT"
+}

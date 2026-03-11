@@ -1,0 +1,59 @@
+{
+  "active": true,
+  "name": "HR 휴가/휴직 정보 조회",
+  "schema": "skill-1.0.0",
+  "version": "1.0.0",
+  "hubId": "hr-leave-info",
+  "author": "teamplgpt",
+  "description": "사원번호로 휴가/휴직 정보(근태종류, 기간, 사유, 상태 등 15개 필드)를 조회합니다. 휴가코드나 기준일로 필터링 가능합니다. 응답 데이터(JSON)를 받으면 반드시 사용자가 보기 편하도록 마크다운 표(Markdown Table) 형식으로 정리하여 답변하세요.",
+  "entrypoint": {
+    "file": "handler.js",
+    "params": {
+      "emp_no": {
+        "description": "조회할 직원의 사원번호 (필수). 예: '12345'",
+        "type": "string"
+      },
+      "leav_cd": {
+        "description": "휴가 코드 (선택). 특정 휴가 유형만 조회할 때 사용. 예: 연차, 병가 등의 코드.",
+        "type": "string"
+      },
+      "base_ymd": {
+        "description": "기준일 (선택, YYYYMMDD 형식). 해당 날짜 기준의 휴가정보를 조회. 예: '20260309'",
+        "type": "string"
+      },
+      "site_id": {
+        "description": "사이트 ID (선택). 멀티사이트 환경에서 특정 사이트를 지정할 때 사용.",
+        "type": "string"
+      }
+    }
+  },
+  "setup_args": {
+    "HR_API_BASE_URL": {
+      "type": "string",
+      "required": true,
+      "input": {
+        "type": "text",
+        "default": "http://host.docker.internal:8000",
+        "placeholder": "http://host.docker.internal:8000",
+        "hint": "HR REST API 서버 주소. Docker: host.docker.internal, Local: localhost"
+      },
+      "value": "http://localhost:8000"
+    }
+  },
+  "examples": [
+    {
+      "prompt": "사원번호 12345의 휴가 정보 알려줘",
+      "call": "{\"emp_no\": \"12345\"}"
+    },
+    {
+      "prompt": "직원 00100의 오늘 기준 휴가 현황",
+      "call": "{\"emp_no\": \"00100\", \"base_ymd\": \"20260309\"}"
+    },
+    {
+      "prompt": "사번 A0001 연차 사용내역 조회",
+      "call": "{\"emp_no\": \"A0001\"}"
+    }
+  ],
+  "imported": true,
+  "license": "MIT"
+}

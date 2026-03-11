@@ -18,6 +18,8 @@ CLAUDE*.md
 .cursorrules
 
 .analysis
+.bkit
+docs/
 
 # Test results
 test-results/
