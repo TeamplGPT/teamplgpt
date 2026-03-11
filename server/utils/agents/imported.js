@@ -193,6 +193,7 @@ class ImportedPlugin {
             $schema: "http://json-schema.org/draft-07/schema#",
             type: "object",
             properties: this.config.entrypoint.params ?? {},
+            required: this.config.entrypoint.required ?? [],
             additionalProperties: false,
           },
           ...customFunctions,

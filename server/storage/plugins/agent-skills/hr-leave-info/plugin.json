@@ -25,7 +25,8 @@
         "description": "사이트 ID (선택). 멀티사이트 환경에서 특정 사이트를 지정할 때 사용.",
         "type": "string"
       }
-    }
+    },
+    "required": ["emp_no"]
   },
   "setup_args": {
     "HR_API_BASE_URL": {

@@ -1,0 +1,61 @@
+{
+  "active": true,
+  "name": "HR 연말정산 조회",
+  "schema": "skill-1.0.0",
+  "version": "1.0.0",
+  "hubId": "hr-year-end-tax",
+  "author": "teamplgpt",
+  "description": "직원 연말정산 정보를 조회합니다. query_type으로 조회 종류를 선택합니다: credit_card(신용카드), donation(기부금), education(교육비), family(부양가족), insurance(보장성보험), medical(의료비), previous_employer(종전근무지), result(연말정산결과), savings(연금저축), summary(공제요약). 결과는 Markdown 표 형식으로 반환됩니다.",
+  "entrypoint": {
+    "file": "handler.js",
+    "params": {
+      "emp_no": {
+        "description": "사원번호 (필수). 예: '12345'",
+        "type": "string"
+      },
+      "query_type": {
+        "description": "조회 종류 (필수).",
+        "type": "string",
+        "enum": ["credit_card", "donation", "education", "family", "insurance", "medical", "previous_employer", "result", "savings", "summary"]
+      },
+      "cal_yy": {
+        "description": "정산 연도 (선택, YYYY). 지정하지 않으면 최근 연도. 예: '2025'",
+        "type": "string"
+      }
+    },
+    "required": ["emp_no", "query_type"]
+  },
+  "setup_args": {
+    "HR_API_BASE_URL": {
+      "type": "string",
+      "required": true,
+      "input": {
+        "type": "text",
+        "default": "http://host.docker.internal:8000",
+        "placeholder": "http://host.docker.internal:8000",
+        "hint": "HR REST API 서버 주소."
+      },
+      "value": "http://localhost:8000"
+    }
+  },
+  "examples": [
+    {
+      "prompt": "작년 연말정산 결과 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"result\", \"cal_yy\": \"2025\"}"
+    },
+    {
+      "prompt": "연말정산 공제 요약 보여줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"summary\"}"
+    },
+    {
+      "prompt": "부양가족 공제 대상 조회해줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"family\"}"
+    },
+    {
+      "prompt": "작년 의료비 공제 내역 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"medical\", \"cal_yy\": \"2025\"}"
+    }
+  ],
+  "imported": true,
+  "license": "MIT"
+}

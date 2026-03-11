@@ -159,15 +159,17 @@ class AnthropicProvider extends Provider {
   // so that the call can run correctly.
   #formatFunctions(functions = []) {
     return functions.map((func) => {
-      const { name, description, parameters, required } = func;
-      const { type, properties } = parameters;
+      const { name, description, parameters } = func;
+      const { type, properties, required } = parameters;
       return {
         name,
         description,
         input_schema: {
           type,
           properties,
-          required,
+          ...(Array.isArray(required) && required.length > 0
+            ? { required }
+            : {}),
         },
       };
     });
