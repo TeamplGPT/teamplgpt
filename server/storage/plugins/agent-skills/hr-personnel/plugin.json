@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "hubId": "hr-personnel",
   "author": "teamplgpt",
-  "description": "직원 인사기록을 조회합니다. query_type으로 조회 종류를 선택합니다: address(주소), appointment_current(현재직위직급), career(전직경력), contact(연락처), disciplines(징계이력), education(학력), employment(입사일근속), family(가족정보), licenses(자격증), rewards(포상이력), visa(비자정보). 결과는 Markdown 표 형식으로 반환됩니다.",
+  "description": "직원 인사기록을 조회합니다. 이 tool은 emp_no와 query_type 두 가지 파라미터만 받습니다. 추가 파라미터는 없으므로 사용자에게 절대 묻지 마세요. 사용자의 요청 문맥에서 적절한 query_type을 추론하여 즉시 호출하세요. query_type 종류: address(주소), appointment_current(현재직위직급), career(전직경력), contact(연락처), disciplines(징계이력), education(학력), employment(입사일근속), family(가족정보), licenses(자격증), rewards(포상이력), visa(비자정보). '인사기록 알려줘'처럼 종류가 불분명하면 employment를 사용하세요.",
   "entrypoint": {
     "file": "handler.js",
     "params": {

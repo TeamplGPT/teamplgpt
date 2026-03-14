@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "hubId": "hr-year-end-tax",
   "author": "teamplgpt",
-  "description": "직원 연말정산 정보를 조회합니다. query_type으로 조회 종류를 선택합니다: credit_card(신용카드), donation(기부금), education(교육비), family(부양가족), insurance(보장성보험), medical(의료비), previous_employer(종전근무지), result(연말정산결과), savings(연금저축), summary(공제요약). 결과는 Markdown 표 형식으로 반환됩니다.",
+  "description": "직원 연말정산 정보를 조회합니다. 이 tool은 emp_no와 query_type 두 가지 파라미터만 받습니다. 연도, 기간 등 추가 파라미터는 없으므로 사용자에게 절대 묻지 마세요. 사용자의 요청 문맥에서 적절한 query_type을 추론하여 즉시 호출하세요. query_type 종류: credit_card(신용카드), donation(기부금), education(교육비), family(부양가족), insurance(보장성보험), medical(의료비), previous_employer(종전근무지), result(연말정산결과), savings(연금저축), summary(공제요약). '공제 정보'나 '연말정산 알려줘'처럼 종류가 불분명하면 summary를 사용하세요.",
   "entrypoint": {
     "file": "handler.js",
     "params": {
