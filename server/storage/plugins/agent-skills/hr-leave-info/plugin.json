@@ -12,18 +12,6 @@
       "emp_no": {
         "description": "조회할 직원의 사원번호 (필수). 예: '12345'",
         "type": "string"
-      },
-      "leav_cd": {
-        "description": "휴가 코드 (선택). 특정 휴가 유형만 조회할 때 사용. 예: 연차, 병가 등의 코드.",
-        "type": "string"
-      },
-      "base_ymd": {
-        "description": "기준일 (선택, YYYYMMDD 형식). 해당 날짜 기준의 휴가정보를 조회. 예: '20260309'",
-        "type": "string"
-      },
-      "site_id": {
-        "description": "사이트 ID (선택). 멀티사이트 환경에서 특정 사이트를 지정할 때 사용.",
-        "type": "string"
       }
     },
     "required": ["emp_no"]
@@ -47,8 +35,8 @@
       "call": "{\"emp_no\": \"12345\"}"
     },
     {
-      "prompt": "직원 00100의 오늘 기준 휴가 현황",
-      "call": "{\"emp_no\": \"00100\", \"base_ymd\": \"20260309\"}"
+      "prompt": "직원 00100의 휴가 현황",
+      "call": "{\"emp_no\": \"00100\"}"
     },
     {
       "prompt": "사번 A0001 연차 사용내역 조회",

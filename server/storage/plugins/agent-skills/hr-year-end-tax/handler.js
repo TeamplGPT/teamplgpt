@@ -29,7 +29,7 @@ const QUERY_LABELS = {
 };
 
 module.exports.runtime = {
-  handler: async function ({ emp_no, query_type, cal_yy }) {
+  handler: async function ({ emp_no, query_type }) {
     try {
       if (!emp_no || emp_no.trim() === "") {
         return "> ⚠️ 사원번호(emp_no)가 필요합니다.";
@@ -41,7 +41,6 @@ module.exports.runtime = {
 
       const baseUrl = this.runtimeArgs["HR_API_BASE_URL"] || "http://host.docker.internal:8000";
       const params = new URLSearchParams({ emp_no: emp_no.trim() });
-      if (cal_yy) params.append("cal_yy", cal_yy.trim());
 
       const endpoint = ENDPOINT_MAP[query_type];
       const url = `${baseUrl}${endpoint}?${params.toString()}`;
@@ -67,7 +66,7 @@ module.exports.runtime = {
       }
 
       this.introspect(`${label} 조회 완료.`);
-      return formatYearEndTax(records, label, emp_no, cal_yy);
+      return formatYearEndTax(records, label, emp_no);
     } catch (e) {
       this.logger("Error in hr-year-end-tax", e.message);
       if (e.name === "TimeoutError") return "> ⚠️ HR API 서버 응답 시간이 초과되었습니다.";
@@ -76,10 +75,9 @@ module.exports.runtime = {
   },
 };
 
-function formatYearEndTax(data, label, staffId, calYy) {
+function formatYearEndTax(data, label, staffId) {
   const records = Array.isArray(data) ? data : [data];
-  const yearStr = calYy ? ` (${calYy}년)` : "";
-  let md = `## HR 연말정산 - ${label}${yearStr} (사번: ${staffId})\n\n`;
+  let md = `## HR 연말정산 - ${label} (사번: ${staffId})\n\n`;
 
   if (records.length === 0) return md + "> 조회된 데이터가 없습니다.";
 

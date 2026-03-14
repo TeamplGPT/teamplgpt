@@ -12,10 +12,6 @@
       "emp_no": {
         "description": "조회할 직원의 사원번호 (필수). 예: '12345', '00100'",
         "type": "string"
-      },
-      "site_id": {
-        "description": "사이트 ID (선택). 멀티사이트 환경에서 특정 사이트를 지정할 때 사용. 보통 생략 가능.",
-        "type": "string"
       }
     },
     "required": ["emp_no"]

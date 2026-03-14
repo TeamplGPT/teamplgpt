@@ -17,26 +17,6 @@
         "description": "조회 종류 (필수).",
         "type": "string",
         "enum": ["account", "annual_total", "base_amount", "bonus", "compare", "deductions", "leave_pay_rate", "pay_step", "payslip", "retroactive"]
-      },
-      "year_month": {
-        "description": "조회 연월 (선택, YYYYMM). payslip, deductions, retroactive 조회 시 사용. 예: '202603'",
-        "type": "string"
-      },
-      "year": {
-        "description": "조회 연도 (선택, YYYY). annual_total, bonus 조회 시 사용. 예: '2026'",
-        "type": "string"
-      },
-      "current_month": {
-        "description": "비교 기준월 (선택, YYYYMM). compare 조회 시 사용.",
-        "type": "string"
-      },
-      "previous_month": {
-        "description": "비교 이전월 (선택, YYYYMM). compare 조회 시 사용.",
-        "type": "string"
-      },
-      "limit": {
-        "description": "최대 조회 건수 (선택, 정수). retroactive 조회 시 사용.",
-        "type": "string"
       }
     },
     "required": ["emp_no", "query_type"]
@@ -56,24 +36,24 @@
   },
   "examples": [
     {
-      "prompt": "이번 달 급여명세서 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"payslip\", \"year_month\": \"202603\"}"
+      "prompt": "급여명세서 조회해줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"payslip\"}"
     },
     {
-      "prompt": "올해 연간 급여 총액 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_total\", \"year\": \"2026\"}"
+      "prompt": "연간 급여 총액 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_total\"}"
     },
     {
       "prompt": "내 기본급 얼마야?",
       "call": "{\"emp_no\": \"12345\", \"query_type\": \"base_amount\"}"
     },
     {
-      "prompt": "이번달 공제 항목 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"deductions\", \"year_month\": \"202603\"}"
+      "prompt": "공제 항목 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"deductions\"}"
     },
     {
-      "prompt": "2월 3월 급여 비교해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"compare\", \"current_month\": \"202603\", \"previous_month\": \"202602\"}"
+      "prompt": "급여 비교해줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"compare\"}"
     }
   ],
   "imported": true,

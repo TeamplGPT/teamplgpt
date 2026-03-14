@@ -3,7 +3,7 @@ const { parseErrorMessage } = require("../_shared/parseErrorMessage");
 const { unwrapResponse } = require("../_shared/unwrapResponse");
 
 module.exports.runtime = {
-  handler: async function ({ emp_no, site_id }) {
+  handler: async function ({ emp_no }) {
     try {
       if (!emp_no || emp_no.trim() === "") {
         return "> ⚠️ 사원번호(emp_no)가 필요합니다. 사원번호를 알려주세요.";
@@ -11,7 +11,6 @@ module.exports.runtime = {
 
       const baseUrl = this.runtimeArgs["HR_API_BASE_URL"] || "http://host.docker.internal:8000";
       const params = new URLSearchParams({ emp_no: emp_no.trim() });
-      if (site_id && site_id.trim() !== "") params.append("site_id", site_id.trim());
 
       const url = `${baseUrl}/api/v1/employee/basic?${params.toString()}`;
       this.introspect(`사원번호 ${emp_no}의 기본정보를 조회하고 있습니다...`);

@@ -12,18 +12,6 @@
       "emp_no": {
         "description": "조회할 직원의 사원번호 (필수). 예: '12345'",
         "type": "string"
-      },
-      "sta_ymd": {
-        "description": "조회 시작일 (선택, YYYYMMDD 형식). 예: '20260101'. 지정하지 않으면 전체 기간 조회.",
-        "type": "string"
-      },
-      "end_ymd": {
-        "description": "조회 종료일 (선택, YYYYMMDD 형식). 예: '20260131'. 시작일과 함께 사용.",
-        "type": "string"
-      },
-      "site_id": {
-        "description": "사이트 ID (선택). 멀티사이트 환경에서 특정 사이트를 지정할 때 사용.",
-        "type": "string"
       }
     },
     "required": ["emp_no"]
@@ -47,12 +35,12 @@
       "call": "{\"emp_no\": \"12345\"}"
     },
     {
-      "prompt": "직원 00100의 2026년 1월 급여 알려줘",
-      "call": "{\"emp_no\": \"00100\", \"sta_ymd\": \"20260101\", \"end_ymd\": \"20260131\"}"
+      "prompt": "직원 00100의 급여 알려줘",
+      "call": "{\"emp_no\": \"00100\"}"
     },
     {
-      "prompt": "사번 A0001 3월 급여내역",
-      "call": "{\"emp_no\": \"A0001\", \"sta_ymd\": \"20260301\", \"end_ymd\": \"20260331\"}"
+      "prompt": "사번 A0001 급여내역",
+      "call": "{\"emp_no\": \"A0001\"}"
     }
   ],
   "imported": true,

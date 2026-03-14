@@ -29,7 +29,7 @@ const QUERY_LABELS = {
 };
 
 module.exports.runtime = {
-  handler: async function ({ emp_no, query_type, year_month, year, current_month, previous_month, limit }) {
+  handler: async function ({ emp_no, query_type }) {
     try {
       if (!emp_no || emp_no.trim() === "") {
         return "> ⚠️ 사원번호(emp_no)가 필요합니다.";
@@ -41,11 +41,6 @@ module.exports.runtime = {
 
       const baseUrl = this.runtimeArgs["HR_API_BASE_URL"] || "http://host.docker.internal:8000";
       const params = new URLSearchParams({ emp_no: emp_no.trim() });
-      if (year_month) params.append("year_month", year_month.trim());
-      if (year) params.append("year", year.trim());
-      if (current_month) params.append("current_month", current_month.trim());
-      if (previous_month) params.append("previous_month", previous_month.trim());
-      if (limit) params.append("limit", limit.trim());
 
       const endpoint = ENDPOINT_MAP[query_type];
       const url = `${baseUrl}${endpoint}?${params.toString()}`;

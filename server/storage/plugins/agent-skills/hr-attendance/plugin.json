@@ -17,30 +17,6 @@
         "description": "조회 종류 (필수).",
         "type": "string",
         "enum": ["annual_leave_balance", "annual_leave_plan", "business_trips", "leave_requests", "overtime", "substitute_leave", "timesheet", "timesheet_requests", "work_plan_weekly", "work_type"]
-      },
-      "year_month": {
-        "description": "조회 연월 (선택, YYYYMM). timesheet, overtime 조회 시 사용. 예: '202603'",
-        "type": "string"
-      },
-      "year": {
-        "description": "조회 연도 (선택, YYYY). annual_leave_balance 조회 시 사용. 예: '2026'",
-        "type": "string"
-      },
-      "base_date": {
-        "description": "기준일 (선택, YYYYMMDD). work_plan_weekly 조회 시 사용. 예: '20260311'",
-        "type": "string"
-      },
-      "status": {
-        "description": "승인 상태 (선택). leave_requests 조회 시 사용. 예: '30'(결재완료)",
-        "type": "string"
-      },
-      "months": {
-        "description": "조회 개월수 (선택, 정수). leave_requests 조회 시 사용. 예: 3",
-        "type": "string"
-      },
-      "limit": {
-        "description": "최대 조회 건수 (선택, 정수). business_trips, substitute_leave, timesheet_requests 조회 시 사용.",
-        "type": "string"
       }
     },
     "required": ["emp_no", "query_type"]
@@ -64,20 +40,20 @@
       "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_leave_balance\"}"
     },
     {
-      "prompt": "3월 출퇴근 기록 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet\", \"year_month\": \"202603\"}"
+      "prompt": "출퇴근 기록 조회해줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet\"}"
     },
     {
-      "prompt": "이번 달 연장근무 내역 보여줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"overtime\", \"year_month\": \"202603\"}"
+      "prompt": "연장근무 내역 보여줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"overtime\"}"
     },
     {
       "prompt": "오늘 근무 유형 뭐야",
       "call": "{\"emp_no\": \"12345\", \"query_type\": \"work_type\"}"
     },
     {
-      "prompt": "최근 휴가 신청 목록 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"leave_requests\", \"months\": \"3\"}"
+      "prompt": "휴가 신청 목록 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"leave_requests\"}"
     }
   ],
   "imported": true,
