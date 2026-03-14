@@ -3,6 +3,7 @@ const { APIError } = require("./error.js");
 const Providers = require("./providers/index.js");
 const { Telemetry } = require("../../../models/telemetry.js");
 const { v4 } = require("uuid");
+const { truncateToolResult } = require("./utils/truncate.js");
 
 /**
  * AIbitat is a class that manages the conversation between agents.
@@ -692,7 +693,8 @@ ${this.getHistory({ to: route.to })
         `[debug]: ${fn.caller} is attempting to call \`${name}\` tool ${JSON.stringify(args, null, 2)}`
       );
 
-      const result = await fn.handler(args);
+      const rawResult = await fn.handler(args);
+      const result = truncateToolResult(rawResult);
       Telemetry.sendTelemetry("agent_tool_call", { tool: name }, null, true);
 
       /**
@@ -718,8 +720,7 @@ ${this.getHistory({ to: route.to })
         return result;
       }
 
-      return await this.handleAsyncExecution(
-        provider,
+      const updatedMessages = this.#guardContextWindow(
         [
           ...messages,
           {
@@ -729,6 +730,12 @@ ${this.getHistory({ to: route.to })
             originalFunctionCall: completionStream.functionCall,
           },
         ],
+        provider
+      );
+
+      return await this.handleAsyncExecution(
+        provider,
+        updatedMessages,
         functions,
         byAgent
       );
@@ -795,7 +802,8 @@ ${this.getHistory({ to: route.to })
         `[debug]: ${fn.caller} is attempting to call \`${name}\` tool`
       );
 
-      const result = await fn.handler(args);
+      const rawResult = await fn.handler(args);
+      const result = truncateToolResult(rawResult);
       Telemetry.sendTelemetry("agent_tool_call", { tool: name }, null, true);
 
       // If the tool call has direct output enabled, return the result directly to the chat
@@ -812,8 +820,7 @@ ${this.getHistory({ to: route.to })
         return result;
       }
 
-      return await this.handleExecution(
-        provider,
+      const updatedMessages = this.#guardContextWindow(
         [
           ...messages,
           {
@@ -823,12 +830,83 @@ ${this.getHistory({ to: route.to })
             originalFunctionCall: completion.functionCall,
           },
         ],
+        provider
+      );
+
+      return await this.handleExecution(
+        provider,
+        updatedMessages,
         functions,
         byAgent
       );
     }
 
     return completion?.textResponse;
+  }
+
+  /**
+   * Guard against context window overflow by pruning old function results
+   * when the accumulated messages exceed a threshold ratio of the model's context limit.
+   *
+   * @param {Array} messages - The message array to check.
+   * @param {object} provider - The provider instance (has .model property).
+   * @param {number} thresholdRatio - Ratio of context limit to trigger pruning (default 0.8).
+   * @param {number} targetRatio - Target ratio after pruning (default 0.7).
+   * @returns {Array} The original or pruned message array.
+   */
+  #guardContextWindow(
+    messages,
+    provider,
+    thresholdRatio = 0.8,
+    targetRatio = 0.7
+  ) {
+    try {
+      const { TokenManager } = require("../../helpers/tiktoken");
+      const AiProvider = require("./providers/ai-provider");
+
+      const model = provider?.model || this.defaultProvider?.model || "gpt-3.5-turbo";
+      const providerName = this.defaultProvider?.provider || "openai";
+      const tokenManager = new TokenManager(model);
+      const totalTokens = tokenManager.statsFrom(messages);
+      const contextLimit = AiProvider.contextLimit(providerName, model);
+      const threshold = Math.floor(contextLimit * thresholdRatio);
+
+      if (totalTokens <= threshold) return messages;
+
+      // Token count exceeds threshold — prune old function results
+      this.handlerProps?.log?.(
+        `[ContextGuard] Token count (${totalTokens}) exceeds ${Math.round(thresholdRatio * 100)}% of context limit (${contextLimit}). Pruning old tool results.`
+      );
+
+      const target = Math.floor(contextLimit * targetRatio);
+      const pruned = [...messages];
+      let currentTokens = totalTokens;
+
+      // Prune oldest function-role messages first
+      for (let i = 0; i < pruned.length && currentTokens > target; i++) {
+        if (pruned[i].role === "function" && pruned[i].content) {
+          const oldContentTokens = tokenManager.countFromString(
+            pruned[i].content
+          );
+          const replacement = `[Previous tool result for "${pruned[i].name || "unknown"}" omitted to fit context window]`;
+          const newContentTokens = tokenManager.countFromString(replacement);
+          pruned[i] = { ...pruned[i], content: replacement };
+          currentTokens -= oldContentTokens - newContentTokens;
+
+          this.handlerProps?.log?.(
+            `[ContextGuard] Pruned result of "${pruned[i].name || "unknown"}" (saved ~${oldContentTokens - newContentTokens} tokens)`
+          );
+        }
+      }
+
+      return pruned;
+    } catch (error) {
+      // If token counting fails, return original messages (safe fallback)
+      this.handlerProps?.log?.(
+        `[ContextGuard] Token counting failed: ${error.message}. Proceeding without guard.`
+      );
+      return messages;
+    }
   }
 
   /**

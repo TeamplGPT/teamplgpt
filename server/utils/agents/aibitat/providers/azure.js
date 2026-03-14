@@ -1,7 +1,7 @@
 const { OpenAI } = require("openai");
 const { AzureOpenAiLLM } = require("../../../AiProviders/azureOpenAi");
 const Provider = require("./ai-provider.js");
-const { RetryError } = require("../error.js");
+const { RetryError, ContextWindowError } = require("../error.js");
 
 /**
  * The agent provider for the Azure OpenAI API.
@@ -85,6 +85,17 @@ class AzureOpenAiProvider extends Provider {
       // If invalid Auth error we need to abort because no amount of waiting
       // will make auth better.
       if (error instanceof OpenAI.AuthenticationError) throw error;
+
+      // Context window exceeded — fail immediately, do not retry
+      if (
+        error instanceof OpenAI.APIError &&
+        typeof error.message === "string" &&
+        (error.message.includes("context window") ||
+         error.message.includes("context_length_exceeded") ||
+         error.message.includes("maximum context length"))
+      ) {
+        throw new ContextWindowError(error.message);
+      }
 
       if (
         error instanceof OpenAI.RateLimitError ||
