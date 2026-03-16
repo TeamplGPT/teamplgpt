@@ -1,0 +1,61 @@
+{
+  "active": true,
+  "name": "HR 급여 조회",
+  "schema": "skill-1.0.0",
+  "version": "1.0.0",
+  "hubId": "hr-salary",
+  "author": "teamplgpt",
+  "description": "직원 급여 정보를 조회합니다. 이 tool은 emp_no와 query_type 두 가지 파라미터만 받습니다. 연도, 월, 기간 등 추가 파라미터는 없으므로 사용자에게 절대 묻지 마세요. 사용자의 요청 문맥에서 적절한 query_type을 추론하여 즉시 호출하세요. query_type 종류: account(이체계좌), annual_total(연간총액), base_amount(기본급연봉), bonus(성과급상여), compare(월별비교), deductions(공제항목), leave_pay_rate(휴직급여율), pay_step(호봉), payslip(급여명세서), retroactive(소급급여). '급여 알려줘'처럼 종류가 불분명하면 payslip을 사용하세요.",
+  "entrypoint": {
+    "file": "handler.js",
+    "params": {
+      "emp_no": {
+        "description": "사원번호 (필수). 예: '12345'",
+        "type": "string"
+      },
+      "query_type": {
+        "description": "조회 종류 (필수).",
+        "type": "string",
+        "enum": ["account", "annual_total", "base_amount", "bonus", "compare", "deductions", "leave_pay_rate", "pay_step", "payslip", "retroactive"]
+      }
+    },
+    "required": ["emp_no", "query_type"]
+  },
+  "setup_args": {
+    "HR_API_BASE_URL": {
+      "type": "string",
+      "required": true,
+      "input": {
+        "type": "text",
+        "default": "http://host.docker.internal:8000",
+        "placeholder": "http://host.docker.internal:8000",
+        "hint": "HR REST API 서버 주소."
+      },
+      "value": "http://localhost:8000"
+    }
+  },
+  "examples": [
+    {
+      "prompt": "급여명세서 조회해줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"payslip\"}"
+    },
+    {
+      "prompt": "연간 급여 총액 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_total\"}"
+    },
+    {
+      "prompt": "내 기본급 얼마야?",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"base_amount\"}"
+    },
+    {
+      "prompt": "공제 항목 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"deductions\"}"
+    },
+    {
+      "prompt": "급여 비교해줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"compare\"}"
+    }
+  ],
+  "imported": true,
+  "license": "MIT"
+}

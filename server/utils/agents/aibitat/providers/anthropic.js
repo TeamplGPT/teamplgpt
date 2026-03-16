@@ -1,5 +1,5 @@
 const Anthropic = require("@anthropic-ai/sdk");
-const { RetryError } = require("../error.js");
+const { RetryError, ContextWindowError } = require("../error.js");
 const Provider = require("./ai-provider.js");
 const { v4 } = require("uuid");
 const { safeJsonParse } = require("../../../http");
@@ -159,15 +159,17 @@ class AnthropicProvider extends Provider {
   // so that the call can run correctly.
   #formatFunctions(functions = []) {
     return functions.map((func) => {
-      const { name, description, parameters, required } = func;
-      const { type, properties } = parameters;
+      const { name, description, parameters } = func;
+      const { type, properties, required } = parameters;
       return {
         name,
         description,
         input_schema: {
           type,
           properties,
-          required,
+          ...(Array.isArray(required) && required.length > 0
+            ? { required }
+            : {}),
         },
       };
     });
@@ -291,6 +293,17 @@ class AnthropicProvider extends Provider {
       // will make auth better.
       if (error instanceof Anthropic.AuthenticationError) throw error;
 
+      // Context window exceeded — fail immediately, do not retry
+      if (
+        error instanceof Anthropic.APIError &&
+        typeof error.message === "string" &&
+        (error.message.includes("context window") ||
+         error.message.includes("too many tokens") ||
+         error.message.includes("prompt is too long"))
+      ) {
+        throw new ContextWindowError(error.message);
+      }
+
       if (
         error instanceof Anthropic.RateLimitError ||
         error instanceof Anthropic.InternalServerError ||
@@ -388,6 +401,17 @@ class AnthropicProvider extends Provider {
       // If invalid Auth error we need to abort because no amount of waiting
       // will make auth better.
       if (error instanceof Anthropic.AuthenticationError) throw error;
+
+      // Context window exceeded — fail immediately, do not retry
+      if (
+        error instanceof Anthropic.APIError &&
+        typeof error.message === "string" &&
+        (error.message.includes("context window") ||
+         error.message.includes("too many tokens") ||
+         error.message.includes("prompt is too long"))
+      ) {
+        throw new ContextWindowError(error.message);
+      }
 
       if (
         error instanceof Anthropic.RateLimitError ||

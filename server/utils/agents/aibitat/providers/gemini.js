@@ -1,6 +1,6 @@
 const OpenAI = require("openai");
 const Provider = require("./ai-provider.js");
-const { RetryError } = require("../error.js");
+const { RetryError, ContextWindowError } = require("../error.js");
 const { safeJsonParse } = require("../../../http");
 const { v4 } = require("uuid");
 
@@ -220,6 +220,18 @@ class GeminiProvider extends Provider {
       };
     } catch (error) {
       if (error instanceof OpenAI.AuthenticationError) throw error;
+
+      // Context window exceeded — fail immediately, do not retry
+      if (
+        error instanceof OpenAI.APIError &&
+        typeof error.message === "string" &&
+        (error.message.includes("context window") ||
+         error.message.includes("exceeds the maximum") ||
+         error.message.includes("too many tokens"))
+      ) {
+        throw new ContextWindowError(error.message);
+      }
+
       if (
         error instanceof OpenAI.RateLimitError ||
         error instanceof OpenAI.InternalServerError ||
@@ -278,6 +290,17 @@ class GeminiProvider extends Provider {
       // If invalid Auth error we need to abort because no amount of waiting
       // will make auth better.
       if (error instanceof OpenAI.AuthenticationError) throw error;
+
+      // Context window exceeded — fail immediately, do not retry
+      if (
+        error instanceof OpenAI.APIError &&
+        typeof error.message === "string" &&
+        (error.message.includes("context window") ||
+         error.message.includes("exceeds the maximum") ||
+         error.message.includes("too many tokens"))
+      ) {
+        throw new ContextWindowError(error.message);
+      }
 
       if (
         error instanceof OpenAI.RateLimitError ||
