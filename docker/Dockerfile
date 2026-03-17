@@ -168,6 +168,9 @@ FROM backend-build AS production-build
 WORKDIR /app
 COPY --chown=anythingllm:anythingllm --from=frontend-build /app/frontend/dist /app/server/public
 
+# Backup agent-skills for entrypoint initialization (bind mount overwrites /app/server/storage)
+RUN cp -r /app/server/storage/plugins /app/server/storage-defaults-plugins 2>/dev/null || true
+
 # Setup the environment
 ENV NODE_ENV=production
 ENV ANYTHING_LLM_RUNTIME=docker

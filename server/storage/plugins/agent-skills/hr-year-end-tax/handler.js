@@ -39,7 +39,7 @@ module.exports.runtime = {
         return `> ⚠️ query_type이 올바르지 않습니다. 가능한 값: ${types}`;
       }
 
-      const baseUrl = this.runtimeArgs["HR_API_BASE_URL"] || "http://host.docker.internal:8000";
+      const baseUrl = this.runtimeArgs["HR_API_BASE_URL"] || "http://kiwibox-hr-api:8000";
       const params = new URLSearchParams({ emp_no: emp_no.trim() });
 
       const endpoint = ENDPOINT_MAP[query_type];
