@@ -28,8 +28,21 @@ const QUERY_LABELS = {
   summary:           "연말정산 공제 요약",
 };
 
+const PARAMS_MAP = {
+  credit_card:       ["cal_yy"],
+  donation:          ["cal_yy"],
+  education:         ["cal_yy"],
+  family:            ["cal_yy"],
+  insurance:         ["cal_yy"],
+  medical:           ["cal_yy"],
+  previous_employer: ["cal_yy"],
+  result:            ["cal_yy"],
+  savings:           ["cal_yy"],
+  summary:           ["cal_yy"],
+};
+
 module.exports.runtime = {
-  handler: async function ({ emp_no, query_type }) {
+  handler: async function ({ emp_no, query_type, cal_yy }) {
     try {
       if (!emp_no || emp_no.trim() === "") {
         return "> ⚠️ 사원번호(emp_no)가 필요합니다.";
@@ -41,6 +54,13 @@ module.exports.runtime = {
 
       const baseUrl = this.runtimeArgs["HR_API_BASE_URL"] || "http://kiwibox-hr-api:8000";
       const params = new URLSearchParams({ emp_no: emp_no.trim() });
+      const allOptional = { cal_yy };
+      const validKeys = PARAMS_MAP[query_type] || [];
+      for (const key of validKeys) {
+        if (allOptional[key] !== undefined && allOptional[key] !== null && String(allOptional[key]).trim() !== "") {
+          params.append(key, String(allOptional[key]).trim());
+        }
+      }
 
       const endpoint = ENDPOINT_MAP[query_type];
       const url = `${baseUrl}${endpoint}?${params.toString()}`;

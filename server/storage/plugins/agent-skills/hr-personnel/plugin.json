@@ -16,10 +16,25 @@
       "query_type": {
         "description": "조회 종류 (필수).",
         "type": "string",
-        "enum": ["address", "appointment_current", "career", "contact", "disciplines", "education", "employment", "family", "licenses", "rewards", "visa"]
+        "enum": [
+          "address",
+          "appointment_current",
+          "career",
+          "contact",
+          "disciplines",
+          "education",
+          "employment",
+          "family",
+          "licenses",
+          "rewards",
+          "visa"
+        ]
       }
     },
-    "required": ["emp_no", "query_type"]
+    "required": [
+      "emp_no",
+      "query_type"
+    ]
   },
   "setup_args": {
     "HR_API_BASE_URL": {
@@ -31,7 +46,7 @@
         "placeholder": "http://kiwibox-hr-api:8000",
         "hint": "HR REST API 서버 주소 (Docker 네트워크 내 서비스명 사용)."
       },
-      "value": "http://kiwibox-hr-api:8000"
+      "value": "http://localhost:8000"
     }
   },
   "examples": [

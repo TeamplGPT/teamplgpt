@@ -28,8 +28,21 @@ const QUERY_LABELS = {
   work_type:            "오늘의 근무유형",
 };
 
+const PARAMS_MAP = {
+  annual_leave_balance: ["year"],
+  annual_leave_plan:    [],
+  business_trips:       ["limit"],
+  leave_requests:       ["months", "status"],
+  overtime:             ["year_month"],
+  substitute_leave:     ["limit"],
+  timesheet:            ["year_month"],
+  timesheet_requests:   ["limit"],
+  work_plan_weekly:     ["base_date"],
+  work_type:            [],
+};
+
 module.exports.runtime = {
-  handler: async function ({ emp_no, query_type }) {
+  handler: async function ({ emp_no, query_type, year, year_month, months, status, base_date, limit }) {
     try {
       if (!emp_no || emp_no.trim() === "") {
         return "> ⚠️ 사원번호(emp_no)가 필요합니다.";
@@ -41,6 +54,13 @@ module.exports.runtime = {
 
       const baseUrl = this.runtimeArgs["HR_API_BASE_URL"] || "http://kiwibox-hr-api:8000";
       const params = new URLSearchParams({ emp_no: emp_no.trim() });
+      const allOptional = { year, year_month, months, status, base_date, limit };
+      const validKeys = PARAMS_MAP[query_type] || [];
+      for (const key of validKeys) {
+        if (allOptional[key] !== undefined && allOptional[key] !== null && String(allOptional[key]).trim() !== "") {
+          params.append(key, String(allOptional[key]).trim());
+        }
+      }
 
       const endpoint = ENDPOINT_MAP[query_type];
       const url = `${baseUrl}${endpoint}?${params.toString()}`;

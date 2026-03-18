@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "hubId": "hr-attendance",
   "author": "teamplgpt",
-  "description": "직원 근태 정보를 조회합니다. 이 tool은 emp_no와 query_type 두 가지 파라미터만 받습니다. 연도, 월, 기간 등 추가 파라미터는 없으므로 사용자에게 절대 묻지 마세요. 사용자의 요청 문맥에서 적절한 query_type을 추론하여 즉시 호출하세요. query_type 종류: annual_leave_balance(연차잔여), annual_leave_plan(연차계획), business_trips(출장내역), leave_requests(휴가신청), overtime(연장근무), substitute_leave(대체휴무), timesheet(출퇴근기록), timesheet_requests(출퇴근변경신청), work_plan_weekly(주간근무계획), work_type(오늘근무유형). '근태 알려줘'처럼 종류가 불분명하면 annual_leave_balance를 사용하세요.",
+  "description": "직원 근태 정보를 조회합니다. emp_no와 query_type은 필수이며, query_type에 따라 선택적 파라미터를 추가할 수 있습니다. 사용자가 특정 기간을 언급하면 해당 파라미터를 포함하고, 언급하지 않으면 생략하세요(서버 기본값 적용). query_type 종류: annual_leave_balance(연차잔여, year 가능), timesheet(출퇴근기록, year_month 가능), leave_requests(휴가신청, months/status 가능), work_plan_weekly(주간근무계획, base_date 가능), overtime(연장근무, year_month 가능), timesheet_requests(출퇴근변경신청, limit 가능), substitute_leave(대체휴무, limit 가능), business_trips(출장내역, limit 가능), annual_leave_plan(연차계획), work_type(오늘근무유형). '근태 알려줘'처럼 종류가 불분명하면 annual_leave_balance를 사용하세요.",
   "entrypoint": {
     "file": "handler.js",
     "params": {
@@ -16,10 +16,48 @@
       "query_type": {
         "description": "조회 종류 (필수).",
         "type": "string",
-        "enum": ["annual_leave_balance", "annual_leave_plan", "business_trips", "leave_requests", "overtime", "substitute_leave", "timesheet", "timesheet_requests", "work_plan_weekly", "work_type"]
+        "enum": [
+          "annual_leave_balance",
+          "annual_leave_plan",
+          "business_trips",
+          "leave_requests",
+          "overtime",
+          "substitute_leave",
+          "timesheet",
+          "timesheet_requests",
+          "work_plan_weekly",
+          "work_type"
+        ]
+      },
+      "year": {
+        "description": "조회 연도 (선택). YYYY 형식. annual_leave_balance에서 사용. 예: '2025'. 미지정 시 현재 연도.",
+        "type": "string"
+      },
+      "year_month": {
+        "description": "조회 연월 (선택). YYYYMM 형식. timesheet, overtime에서 사용. 예: '202503'. 미지정 시 현재 월.",
+        "type": "string"
+      },
+      "months": {
+        "description": "조회 개월 수 (선택). leave_requests에서 사용. 미지정 시 기본값 6.",
+        "type": "number"
+      },
+      "status": {
+        "description": "승인상태 필터 (선택). leave_requests에서 사용. 10=임시저장, 20=결재요청, 30=결재완료, 40=반려. 미지정 시 전체 조회.",
+        "type": "string"
+      },
+      "base_date": {
+        "description": "기준일 (선택). YYYYMMDD 형식. work_plan_weekly에서 사용. 예: '20250319'. 미지정 시 오늘 기준.",
+        "type": "string"
+      },
+      "limit": {
+        "description": "조회 건수 (선택). timesheet_requests, substitute_leave, business_trips에서 사용. 미지정 시 기본값 10.",
+        "type": "number"
       }
     },
-    "required": ["emp_no", "query_type"]
+    "required": [
+      "emp_no",
+      "query_type"
+    ]
   },
   "setup_args": {
     "HR_API_BASE_URL": {
@@ -31,7 +69,7 @@
         "placeholder": "http://kiwibox-hr-api:8000",
         "hint": "HR REST API 서버 주소 (Docker 네트워크 내 서비스명 사용)."
       },
-      "value": "http://kiwibox-hr-api:8000"
+      "value": "http://localhost:8000"
     }
   },
   "examples": [
@@ -54,6 +92,18 @@
     {
       "prompt": "휴가 신청 목록 알려줘",
       "call": "{\"emp_no\": \"12345\", \"query_type\": \"leave_requests\"}"
+    },
+    {
+      "prompt": "2024년 연차 잔여일 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_leave_balance\", \"year\": \"2024\"}"
+    },
+    {
+      "prompt": "2025년 1월 출퇴근 기록 조회해줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet\", \"year_month\": \"202501\"}"
+    },
+    {
+      "prompt": "승인된 휴가 신청 목록",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"leave_requests\", \"status\": \"30\"}"
     }
   ],
   "imported": true,
