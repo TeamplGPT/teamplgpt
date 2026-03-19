@@ -697,6 +697,13 @@ ${this.getHistory({ to: route.to })
       const result = truncateToolResult(rawResult);
       Telemetry.sendTelemetry("agent_tool_call", { tool: name }, null, true);
 
+      // Log the tool call result for debugging purposes
+      const _resultStr = typeof result === "string" ? result : JSON.stringify(result);
+      const _preview = _resultStr.length > 500 ? _resultStr.substring(0, 500) + "\n... [truncated]" : _resultStr;
+      this.handlerProps?.log?.(
+        `[debug]: \`${name}\` tool call result (length: ${_resultStr.length})\n${_preview}`
+      );
+
       /**
        * If the tool call has direct output enabled, return the result directly to the chat
        * without any further processing and no further tool calls will be run.
@@ -805,6 +812,13 @@ ${this.getHistory({ to: route.to })
       const rawResult = await fn.handler(args);
       const result = truncateToolResult(rawResult);
       Telemetry.sendTelemetry("agent_tool_call", { tool: name }, null, true);
+
+      // Log the tool call result for debugging purposes
+      const _resultStr = typeof result === "string" ? result : JSON.stringify(result);
+      const _preview = _resultStr.length > 500 ? _resultStr.substring(0, 500) + "\n... [truncated]" : _resultStr;
+      this.handlerProps?.log?.(
+        `[debug]: \`${name}\` tool call result (length: ${_resultStr.length})\n${_preview}`
+      );
 
       // If the tool call has direct output enabled, return the result directly to the chat
       // without any further processing and no further tool calls will be run.

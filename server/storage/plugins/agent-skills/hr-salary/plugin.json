@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "hubId": "hr-salary",
   "author": "teamplgpt",
-  "description": "직원 급여 정보를 조회합니다. 이 tool은 emp_no와 query_type 두 가지 파라미터만 받습니다. 연도, 월, 기간 등 추가 파라미터는 없으므로 사용자에게 절대 묻지 마세요. 사용자의 요청 문맥에서 적절한 query_type을 추론하여 즉시 호출하세요. query_type 종류: account(이체계좌), annual_total(연간총액), base_amount(기본급연봉), bonus(성과급상여), compare(월별비교), deductions(공제항목), leave_pay_rate(휴직급여율), pay_step(호봉), payslip(급여명세서), retroactive(소급급여). '급여 알려줘'처럼 종류가 불분명하면 payslip을 사용하세요.",
+  "description": "직원 급여 정보를 조회합니다. emp_no와 query_type은 필수이며, query_type에 따라 선택적 파라미터를 추가할 수 있습니다. 사용자가 특정 기간을 언급하면 해당 파라미터를 포함하고, 언급하지 않으면 생략하세요(서버 기본값 적용). query_type 종류: payslip(급여명세서, year_month 가능), deductions(공제항목, year_month 가능), compare(월별비교, current_month/previous_month 가능), retroactive(소급급여, year_month/limit 가능), annual_total(연간총액, year 가능), bonus(성과급상여, year 가능), account(이체계좌), base_amount(기본급연봉), leave_pay_rate(휴직급여율), pay_step(호봉). '급여 알려줘'처럼 종류가 불분명하면 payslip을 사용하세요.",
   "entrypoint": {
     "file": "handler.js",
     "params": {
@@ -16,10 +16,44 @@
       "query_type": {
         "description": "조회 종류 (필수).",
         "type": "string",
-        "enum": ["account", "annual_total", "base_amount", "bonus", "compare", "deductions", "leave_pay_rate", "pay_step", "payslip", "retroactive"]
+        "enum": [
+          "account",
+          "annual_total",
+          "base_amount",
+          "bonus",
+          "compare",
+          "deductions",
+          "leave_pay_rate",
+          "pay_step",
+          "payslip",
+          "retroactive"
+        ]
+      },
+      "year": {
+        "description": "조회 연도 (선택). YYYY 형식. annual_total, bonus에서 사용. 예: '2025'. 미지정 시 현재 연도.",
+        "type": "string"
+      },
+      "year_month": {
+        "description": "조회 연월 (선택). YYYYMM 형식. payslip, deductions, retroactive에서 사용. 예: '202503'. 미지정 시 현재 월.",
+        "type": "string"
+      },
+      "current_month": {
+        "description": "비교 기준 월 (선택). YYYYMM 형식. compare에서 사용. 예: '202503'. 미지정 시 현재 월.",
+        "type": "string"
+      },
+      "previous_month": {
+        "description": "비교 대상 월 (선택). YYYYMM 형식. compare에서 사용. 예: '202502'. 미지정 시 전월.",
+        "type": "string"
+      },
+      "limit": {
+        "description": "조회 건수 (선택). retroactive에서 사용. 미지정 시 기본값 20.",
+        "type": "number"
       }
     },
-    "required": ["emp_no", "query_type"]
+    "required": [
+      "emp_no",
+      "query_type"
+    ]
   },
   "setup_args": {
     "HR_API_BASE_URL": {
@@ -54,6 +88,18 @@
     {
       "prompt": "급여 비교해줘",
       "call": "{\"emp_no\": \"12345\", \"query_type\": \"compare\"}"
+    },
+    {
+      "prompt": "2025년 1월 급여명세서 조회해줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"payslip\", \"year_month\": \"202501\"}"
+    },
+    {
+      "prompt": "2024년 연간 급여 총액 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_total\", \"year\": \"2024\"}"
+    },
+    {
+      "prompt": "1월과 2월 급여 비교해줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"compare\", \"current_month\": \"202502\", \"previous_month\": \"202501\"}"
     }
   ],
   "imported": true,

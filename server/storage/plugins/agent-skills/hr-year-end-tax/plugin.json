@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "hubId": "hr-year-end-tax",
   "author": "teamplgpt",
-  "description": "직원 연말정산 정보를 조회합니다. 이 tool은 emp_no와 query_type 두 가지 파라미터만 받습니다. 연도, 기간 등 추가 파라미터는 없으므로 사용자에게 절대 묻지 마세요. 사용자의 요청 문맥에서 적절한 query_type을 추론하여 즉시 호출하세요. query_type 종류: credit_card(신용카드), donation(기부금), education(교육비), family(부양가족), insurance(보장성보험), medical(의료비), previous_employer(종전근무지), result(연말정산결과), savings(연금저축), summary(공제요약). '공제 정보'나 '연말정산 알려줘'처럼 종류가 불분명하면 summary를 사용하세요.",
+  "description": "직원 연말정산 정보를 조회합니다. emp_no와 query_type은 필수이며, 모든 query_type에서 cal_yy(귀속연도)를 선택적으로 지정할 수 있습니다. 사용자가 특정 연도를 언급하면 cal_yy를 포함하고, 언급하지 않으면 생략하세요(서버 기본값 적용). query_type 종류: credit_card(신용카드), donation(기부금), education(교육비), family(부양가족), insurance(보장성보험), medical(의료비), previous_employer(종전근무지), result(연말정산결과), savings(연금저축), summary(공제요약). '공제 정보'나 '연말정산 알려줘'처럼 종류가 불분명하면 summary를 사용하세요.",
   "entrypoint": {
     "file": "handler.js",
     "params": {
@@ -16,10 +16,28 @@
       "query_type": {
         "description": "조회 종류 (필수).",
         "type": "string",
-        "enum": ["credit_card", "donation", "education", "family", "insurance", "medical", "previous_employer", "result", "savings", "summary"]
+        "enum": [
+          "credit_card",
+          "donation",
+          "education",
+          "family",
+          "insurance",
+          "medical",
+          "previous_employer",
+          "result",
+          "savings",
+          "summary"
+        ]
+      },
+      "cal_yy": {
+        "description": "귀속연도 (선택). YYYY 형식. 모든 query_type에서 사용 가능. 예: '2025'. 미지정 시 최근 연도 조회.",
+        "type": "string"
       }
     },
-    "required": ["emp_no", "query_type"]
+    "required": [
+      "emp_no",
+      "query_type"
+    ]
   },
   "setup_args": {
     "HR_API_BASE_URL": {
@@ -50,6 +68,14 @@
     {
       "prompt": "의료비 공제 내역 알려줘",
       "call": "{\"emp_no\": \"12345\", \"query_type\": \"medical\"}"
+    },
+    {
+      "prompt": "2024년 연말정산 결과 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"result\", \"cal_yy\": \"2024\"}"
+    },
+    {
+      "prompt": "2023년 의료비 공제 내역 조회해줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"medical\", \"cal_yy\": \"2023\"}"
     }
   ],
   "imported": true,
