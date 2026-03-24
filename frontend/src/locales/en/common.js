@@ -272,6 +272,17 @@ const TRANSLATIONS = {
       "confirm-end":
         "workspace. This will remove all vector embeddings in your vector database.\n\nThe original source files will remain untouched. This action is irreversible.",
     },
+    shared: {
+      title: "Shared Workspace",
+      toggle: "Set this workspace as shared",
+      warning: "Documents in this workspace will be searchable from all workspaces. Only admins can manage documents.",
+      alreadyExists: "A shared workspace already exists.",
+      deleteWarning: "This workspace's embeddings are used by all workspaces. Are you sure you want to delete?",
+      convertOnWarning: "This workspace's documents will be searchable from all workspaces. Existing non-admin members will be removed. Continue?",
+      convertOffWarning: "Other workspaces will no longer have access to shared data. Continue?",
+      sourcePrefix: "Shared",
+      badge: "Shared Workspace",
+    },
   },
 
   // Chat Settings

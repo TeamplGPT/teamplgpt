@@ -11,6 +11,10 @@ export default function DeleteWorkspace({ workspace }) {
   const { t } = useTranslation();
 
   const deleteWorkspace = async () => {
+    if (workspace?.isShared) {
+      if (!window.confirm(t("general.shared.deleteWarning"))) return false;
+    }
+
     if (
       !window.confirm(
         `${t("general.delete.confirm-start")} ${workspace.name} ${t(

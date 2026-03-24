@@ -49,8 +49,10 @@ function workspaceEndpoints(app) {
     async (request, response) => {
       try {
         const user = await userFromSession(request, response);
-        const { name = null, onboardingComplete = false } = reqBody(request);
-        const { workspace, message } = await Workspace.new(name, user?.id);
+        const { name = null, onboardingComplete = false, isShared } = reqBody(request);
+        const additionalFields = {};
+        if (isShared !== undefined) additionalFields.isShared = isShared;
+        const { workspace, message } = await Workspace.new(name, user?.id, additionalFields);
         await Telemetry.sendTelemetry(
           "workspace_created",
           {
@@ -102,7 +104,8 @@ function workspaceEndpoints(app) {
         await Workspace.trackChange(currWorkspace, data, user);
         const { workspace, message } = await Workspace.update(
           currWorkspace.id,
-          data
+          data,
+          user
         );
         response.status(200).json({ workspace, message });
       } catch (e) {
@@ -344,6 +347,20 @@ function workspaceEndpoints(app) {
           : await Workspace.where();
 
         response.status(200).json({ workspaces });
+      } catch (e) {
+        console.error(e.message, e);
+        response.sendStatus(500).end();
+      }
+    }
+  );
+
+  app.get(
+    "/workspace/shared",
+    [validatedRequest, flexUserRoleValid([ROLES.admin])],
+    async (request, response) => {
+      try {
+        const shared = await Workspace.getShared();
+        response.status(200).json({ workspace: shared });
       } catch (e) {
         console.error(e.message, e);
         response.sendStatus(500).end();

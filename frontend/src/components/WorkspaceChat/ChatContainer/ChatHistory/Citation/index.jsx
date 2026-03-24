@@ -27,15 +27,24 @@ import useTextSize from "@/hooks/useTextSize";
 function combineLikeSources(sources) {
   const combined = {};
   sources.forEach((source) => {
-    const { id, title, text, chunkSource = "", score = null } = source;
+    const {
+      id,
+      title,
+      text,
+      chunkSource = "",
+      score = null,
+      fromShared = false,
+    } = source;
     if (combined.hasOwnProperty(title)) {
       combined[title].chunks.push({ id, text, chunkSource, score });
       combined[title].references += 1;
+      if (fromShared) combined[title].fromShared = true;
     } else {
       combined[title] = {
         title,
         chunks: [{ id, text, chunkSource, score }],
         references: 1,
+        fromShared,
       };
     }
   });
@@ -92,9 +101,13 @@ export default function Citations({ sources = [] }) {
 
 const Citation = memo(({ source, onClick, textSizeClass }) => {
   const { title, references = 1 } = source;
+  const { t } = useTranslation();
   if (!title) return null;
   const chunkSourceInfo = parseChunkSource(source);
-  const truncatedTitle = chunkSourceInfo?.text ?? middleTruncate(title, 25);
+  const displayTitle = source?.fromShared
+    ? `[${t("general.shared.sourcePrefix")}] ${title}`
+    : title;
+  const truncatedTitle = chunkSourceInfo?.text ?? middleTruncate(displayTitle, 25);
   const CitationIcon = ICONS.hasOwnProperty(chunkSourceInfo?.icon)
     ? ICONS[chunkSourceInfo.icon]
     : ICONS.file;

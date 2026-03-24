@@ -4,6 +4,8 @@ const { WorkspaceChats } = require("../../models/workspaceChats");
 const { getVectorDbClass, getLLMProvider } = require("../helpers");
 const { writeResponseChunk } = require("../helpers/chat/responses");
 const { chatPrompt, sourceIdentifier } = require("./index");
+const { performMergedSearch } = require("../vectorSearch/mergeSharedResults");
+const { Workspace } = require("../../models/workspace");
 
 const { PassThrough } = require("stream");
 
@@ -27,7 +29,10 @@ async function chatSync({
 
   // User is trying to query-mode chat a workspace that has no data in it - so
   // we should exit early as no information can be found under these conditions.
-  if ((!hasVectorizedSpace || embeddingsCount === 0) && chatMode === "query") {
+  // Skip early exit if a shared workspace exists (merged search may still find results).
+  const sharedWorkspace = await Workspace.getShared();
+  const hasSharedFallback = sharedWorkspace && sharedWorkspace.id !== workspace.id;
+  if ((!hasVectorizedSpace || embeddingsCount === 0) && chatMode === "query" && !hasSharedFallback) {
     const textResponse =
       workspace?.queryRefusalResponse ??
       "There is no relevant information in this workspace to answer your query.";
@@ -84,8 +89,8 @@ async function chatSync({
 
   const vectorSearchResults =
     embeddingsCount !== 0
-      ? await VectorDb.performSimilaritySearch({
-          namespace: workspace.slug,
+      ? await performMergedSearch({
+          workspace,
           input: String(prompt),
           LLMConnector,
           similarityThreshold: workspace?.similarityThreshold,
@@ -250,7 +255,10 @@ async function streamChat({
 
   // User is trying to query-mode chat a workspace that has no data in it - so
   // we should exit early as no information can be found under these conditions.
-  if ((!hasVectorizedSpace || embeddingsCount === 0) && chatMode === "query") {
+  // Skip early exit if a shared workspace exists (merged search may still find results).
+  const sharedWs = await Workspace.getShared();
+  const hasSharedFallback2 = sharedWs && sharedWs.id !== workspace.id;
+  if ((!hasVectorizedSpace || embeddingsCount === 0) && chatMode === "query" && !hasSharedFallback2) {
     const textResponse =
       workspace?.queryRefusalResponse ??
       "There is no relevant information in this workspace to answer your query.";
@@ -311,8 +319,8 @@ async function streamChat({
 
   const vectorSearchResults =
     embeddingsCount !== 0
-      ? await VectorDb.performSimilaritySearch({
-          namespace: workspace.slug,
+      ? await performMergedSearch({
+          workspace,
           input: String(prompt),
           LLMConnector,
           similarityThreshold: workspace?.similarityThreshold,

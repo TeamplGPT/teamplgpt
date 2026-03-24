@@ -3,6 +3,7 @@ import { castToType } from "@/utils/types";
 import showToast from "@/utils/toast";
 import { useEffect, useRef, useState } from "react";
 import WorkspaceName from "./WorkspaceName";
+import SharedWorkspaceToggle from "./SharedWorkspaceToggle";
 import SuggestedChatMessages from "./SuggestedChatMessages";
 import DeleteWorkspace from "./DeleteWorkspace";
 import WorkspacePfp from "./WorkspacePfp";
@@ -60,6 +61,10 @@ export default function GeneralInfo({ slug }) {
         )}
         <WorkspaceName
           key={workspace.slug}
+          workspace={workspace}
+          setHasChanges={setHasChanges}
+        />
+        <SharedWorkspaceToggle
           workspace={workspace}
           setHasChanges={setHasChanges}
         />

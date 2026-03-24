@@ -57,6 +57,7 @@ const Workspace = {
     "vectorSearchMode",
     "adjacentChunks",
     "reactMaxIterations",
+    "isShared",
   ],
 
   validations: {
@@ -146,6 +147,10 @@ const Workspace = {
       if (iterations < 1) return 1;
       if (iterations > 25) return 25;
       return iterations;
+    },
+    isShared: (value) => {
+      if (value === true || value === "true") return true;
+      return false;
     },
   },
 
@@ -245,7 +250,7 @@ const Workspace = {
    * @param {Object} updates - The data to update.
    * @returns {Promise<{workspace: Object | null, message: string | null}>} A promise that resolves to an object containing the updated workspace and an error message if applicable.
    */
-  update: async function (id = null, updates = {}) {
+  update: async function (id = null, updates = {}, user = null) {
     if (!id) throw new Error("No workspace id provided for update");
 
     const validatedUpdates = this.validateFields(updates);
@@ -260,7 +265,32 @@ const Workspace = {
       validatedUpdates.chatModel = null;
     }
 
-    return this._update(id, validatedUpdates);
+    // Shared workspace validation
+    if (validatedUpdates.hasOwnProperty("isShared")) {
+      if (user && user.role !== "admin") {
+        return { workspace: { id }, message: "Only admin can change shared workspace setting." };
+      }
+      if (validatedUpdates.isShared === true) {
+        const existing = await this.getShared();
+        if (existing && existing.id !== id) {
+          return { workspace: { id }, message: "A shared workspace already exists." };
+        }
+        if (!validatedUpdates.openAiPrompt) {
+          validatedUpdates.openAiPrompt = "이 워크스페이스는 공용 지식 베이스입니다. 여기에 업로드된 문서는 모든 워크스페이스에서 검색 컨텍스트로 활용됩니다.";
+        }
+      }
+    }
+
+    const result = await this._update(id, validatedUpdates);
+
+    if (validatedUpdates.hasOwnProperty("isShared")) {
+      this._invalidateSharedCache();
+      if (validatedUpdates.isShared === true) {
+        await this._removeNonAdminMembers(id);
+      }
+    }
+
+    return result;
   },
 
   /**
@@ -281,6 +311,25 @@ const Workspace = {
     } catch (error) {
       console.error(error.message);
       return { workspace: null, message: error.message };
+    }
+  },
+
+  _removeNonAdminMembers: async function (workspaceId) {
+    try {
+      const members = await prisma.workspace_users.findMany({
+        where: { workspace_id: workspaceId },
+        include: { users: { select: { id: true, role: true } } },
+      });
+      const nonAdminIds = members
+        .filter((m) => m.users.role !== "admin")
+        .map((m) => m.id);
+      if (nonAdminIds.length > 0) {
+        await prisma.workspace_users.deleteMany({
+          where: { id: { in: nonAdminIds } },
+        });
+      }
+    } catch (error) {
+      console.error("Failed to remove non-admin members:", error.message);
     }
   },
 
@@ -354,6 +403,34 @@ const Workspace = {
 
     if (!provider || !model) return null;
     return LLMProvider?.promptWindowLimit?.(model) || null;
+  },
+
+  // Cache for shared workspace lookup (invalidated on isShared change)
+  _sharedCache: { value: undefined, timestamp: 0 },
+  _SHARED_CACHE_TTL: 30_000,
+
+  _invalidateSharedCache: function () {
+    this._sharedCache = { value: undefined, timestamp: 0 };
+  },
+
+  getShared: async function () {
+    const now = Date.now();
+    if (
+      this._sharedCache.value !== undefined &&
+      now - this._sharedCache.timestamp < this._SHARED_CACHE_TTL
+    ) {
+      return this._sharedCache.value;
+    }
+    try {
+      const result = await prisma.workspaces.findFirst({
+        where: { isShared: true },
+      });
+      this._sharedCache = { value: result, timestamp: now };
+      return result;
+    } catch (error) {
+      console.error(error.message);
+      return null;
+    }
   },
 
   get: async function (clause = {}) {

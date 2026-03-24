@@ -213,6 +213,14 @@ const Workspace = {
 
     return workspaces;
   },
+  getShared: async function () {
+    return await fetch(`${API_BASE}/workspace/shared`, {
+      headers: baseHeaders(),
+    })
+      .then((res) => res.json())
+      .then((res) => res.workspace)
+      .catch(() => null);
+  },
   bySlug: async function (slug = "") {
     const workspace = await fetch(`${API_BASE}/workspace/${slug}`, {
       headers: baseHeaders(),

@@ -6,6 +6,8 @@ const { fillSourceWindow } = require("../../helpers/chat");
 const { writeResponseChunk } = require("../../helpers/chat/responses");
 const { chatPrompt, recentChatHistory, sourceIdentifier } = require("../index");
 const { parseReactOutput } = require("./outputParser");
+const { performMergedSearch } = require("../../vectorSearch/mergeSharedResults");
+const { Workspace } = require("../../../models/workspace");
 
 // Maximum characters per search observation to prevent LLM context window overflow.
 // Tune based on model context limits.
@@ -221,7 +223,10 @@ async function streamReactChat(
         // Perform similarity search
         let observation = "";
         let currentSearchSourceCount = 0;
-        if (!hasVectorizedSpace || embeddingsCount === 0) {
+        // Skip local-only fallback if shared workspace exists (merged search may find results)
+        const sharedWorkspace = await Workspace.getShared();
+        const hasSharedFallback = sharedWorkspace && sharedWorkspace.id !== workspace.id;
+        if ((!hasVectorizedSpace || embeddingsCount === 0) && !hasSharedFallback) {
           const filledSources = fillSourceWindow({
             nDocs: workspace?.topN || 4,
             searchResults: [],
@@ -245,8 +250,8 @@ async function streamReactChat(
               .join("\n\n");
           }
         } else {
-          const searchResults = await VectorDb.performSimilaritySearch({
-            namespace: workspace.slug,
+          const searchResults = await performMergedSearch({
+            workspace,
             input: searchQuery,
             LLMConnector,
             similarityThreshold: workspace?.similarityThreshold,

@@ -28,7 +28,19 @@ export default function ActiveWorkspaces() {
     async function getWorkspaces() {
       const workspaces = await Workspace.all();
       setLoading(false);
-      setWorkspaces(Workspace.orderWorkspaces(workspaces));
+      const orderedWorkspaces = Workspace.orderWorkspaces(workspaces);
+      // Filter shared workspace for non-admin users, pin to top for admin
+      let displayWorkspaces = orderedWorkspaces;
+      if (user?.role === "admin") {
+        const sharedIdx = displayWorkspaces.findIndex((w) => w.isShared);
+        if (sharedIdx > 0) {
+          const [shared] = displayWorkspaces.splice(sharedIdx, 1);
+          displayWorkspaces.unshift(shared);
+        }
+      } else {
+        displayWorkspaces = orderedWorkspaces.filter((w) => !w.isShared);
+      }
+      setWorkspaces(displayWorkspaces);
     }
     getWorkspaces();
   }, []);
@@ -137,6 +149,7 @@ export default function ActiveWorkspaces() {
                                   w-full group-hover:w-[130px] group-hover:font-bold group-hover:duration-200
                                 `}
                                 >
+                                  {workspace.isShared && <span className="mr-1 flex-shrink-0">🌐</span>}
                                   {workspace.name}
                                 </p>
                               </div>

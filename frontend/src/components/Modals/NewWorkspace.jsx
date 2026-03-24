@@ -4,12 +4,15 @@ import Workspace from "@/models/workspace";
 import paths from "@/utils/paths";
 import { useTranslation } from "react-i18next";
 import ModalWrapper from "@/components/ModalWrapper";
+import useUser from "@/hooks/useUser";
 
 const noop = () => false;
 export default function NewWorkspaceModal({ hideModal = noop }) {
   const formEl = useRef(null);
   const [error, setError] = useState(null);
+  const [isShared, setIsShared] = useState(false);
   const { t } = useTranslation();
+  const { user } = useUser();
   const handleCreate = async (e) => {
     setError(null);
     e.preventDefault();
@@ -65,6 +68,20 @@ export default function NewWorkspaceModal({ hideModal = noop }) {
                     autoFocus={true}
                   />
                 </div>
+                {user?.role === "admin" && (
+                  <div className="mt-4">
+                    <label className="flex items-center gap-x-2 text-white text-sm">
+                      <input type="hidden" name="isShared" value={isShared ? "true" : "false"} />
+                      <input
+                        type="checkbox"
+                        checked={isShared}
+                        onChange={(e) => setIsShared(e.target.checked)}
+                        className="form-checkbox"
+                      />
+                      <span>{t("general.shared.toggle")}</span>
+                    </label>
+                  </div>
+                )}
                 {error && (
                   <p className="text-red-400 text-sm">Error: {error}</p>
                 )}

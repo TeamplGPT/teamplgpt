@@ -7,6 +7,8 @@ const {
   writeResponseChunk,
 } = require("../helpers/chat/responses");
 const { DocumentManager } = require("../DocumentManager");
+const { performMergedSearch } = require("../vectorSearch/mergeSharedResults");
+const { Workspace } = require("../../models/workspace");
 
 async function streamChatWithForEmbed(
   response,
@@ -40,7 +42,10 @@ async function streamChatWithForEmbed(
 
   // User is trying to query-mode chat a workspace that has no data in it - so
   // we should exit early as no information can be found under these conditions.
-  if ((!hasVectorizedSpace || embeddingsCount === 0) && chatMode === "query") {
+  // Skip early exit if a shared workspace exists (merged search may still find results).
+  const sharedWorkspace = await Workspace.getShared();
+  const hasSharedFallback = sharedWorkspace && sharedWorkspace.id !== embed.workspace.id;
+  if ((!hasVectorizedSpace || embeddingsCount === 0) && chatMode === "query" && !hasSharedFallback) {
     writeResponseChunk(response, {
       id: uuid,
       type: "textResponse",
@@ -86,8 +91,8 @@ async function streamChatWithForEmbed(
 
   const vectorSearchResults =
     embeddingsCount !== 0
-      ? await VectorDb.performSimilaritySearch({
-          namespace: embed.workspace.slug,
+      ? await performMergedSearch({
+          workspace: embed.workspace,
           input: message,
           LLMConnector,
           similarityThreshold: embed.workspace?.similarityThreshold,
