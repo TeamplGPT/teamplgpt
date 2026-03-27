@@ -6,6 +6,21 @@ const { v4 } = require("uuid");
 const { truncateToolResult } = require("./utils/truncate.js");
 
 /**
+ * Extract text from a multimodal content array.
+ * Returns the original string if content is already a string.
+ * @param {Array|string} content - Content that may be a multimodal array or plain string
+ * @returns {string}
+ */
+function extractTextFromContent(content) {
+  if (typeof content === "string") return content;
+  if (!Array.isArray(content)) return String(content);
+  return content
+    .filter((item) => item.type === "input_text" || item.type === "text")
+    .map((item) => item.text)
+    .join(" ");
+}
+
+/**
  * AIbitat is a class that manages the conversation between agents.
  * It is designed to solve a task with LLM.
  *
@@ -496,7 +511,7 @@ ${availableNodes
 Read the following conversation.
 
 CHAT HISTORY
-${history.map((c) => `@${c.from}: ${c.content}`).join("\n")}
+${history.map((c) => `@${c.from}: ${extractTextFromContent(c.content)}`).join("\n")}
 
 Then select the next role from that is going to speak next.
 Only return the role.
@@ -552,7 +567,7 @@ Do not add introduction or conclusion to your reply because this will be a conti
 
 CHAT HISTORY
 ${this.getHistory({ to: route.to })
-  .map((c) => `@${c.from}: ${c.content}`)
+  .map((c) => `@${c.from}: ${extractTextFromContent(c.content)}`)
   .join("\n")}
 
 @${route.from}:`,
@@ -899,8 +914,11 @@ ${this.getHistory({ to: route.to })
       // Prune oldest function-role messages first
       for (let i = 0; i < pruned.length && currentTokens > target; i++) {
         if (pruned[i].role === "function" && pruned[i].content) {
+          const contentStr = typeof pruned[i].content === "string"
+            ? pruned[i].content
+            : JSON.stringify(pruned[i].content);
           const oldContentTokens = tokenManager.countFromString(
-            pruned[i].content
+            contentStr
           );
           const replacement = `[Previous tool result for "${pruned[i].name || "unknown"}" omitted to fit context window]`;
           const newContentTokens = tokenManager.countFromString(replacement);
@@ -931,7 +949,7 @@ ${this.getHistory({ to: route.to })
    * @param feedback The feedback to the interruption if any.
    * @returns
    */
-  async continue(feedback) {
+  async continue(feedbackOrObject) {
     const lastChat = this._chats.at(-1);
     if (!lastChat || lastChat.state !== "interrupt") {
       throw new Error("No chat to continue");
@@ -946,11 +964,29 @@ ${this.getHistory({ to: route.to })
       throw new Error("Maximum rounds reached");
     }
 
+    // Backward compatible: string or { feedback, attachments } object
+    const { feedback, attachments = [] } =
+      typeof feedbackOrObject === "string"
+        ? { feedback: feedbackOrObject, attachments: [] }
+        : feedbackOrObject || {};
+
     if (feedback) {
+      // Build multimodal content when attachments are present
+      const content =
+        attachments.length > 0
+          ? [
+              { type: "input_text", text: feedback },
+              ...attachments.map((att) => ({
+                type: "input_image",
+                image_url: att.contentString,
+              })),
+            ]
+          : feedback;
+
       const message = {
         from,
         to,
-        content: feedback,
+        content,
       };
 
       // register the message in the chat history
@@ -1103,3 +1139,4 @@ ${this.getHistory({ to: route.to })
 }
 
 module.exports = AIbitat;
+module.exports.extractTextFromContent = extractTextFromContent;

@@ -69,6 +69,16 @@ class OpenAIProvider extends Provider {
         return;
       }
 
+      // If content is already a multimodal array (e.g. input_text + input_image),
+      // pass it through as-is. Otherwise, wrap the string in the standard format.
+      if (Array.isArray(message.content)) {
+        formattedMessages.push({
+          role: message.role,
+          content: message.content,
+        });
+        return;
+      }
+
       formattedMessages.push({
         role: message.role,
         content: [

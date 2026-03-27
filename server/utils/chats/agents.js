@@ -4,6 +4,35 @@ const {
 } = require("../../models/workspaceAgentInvocation");
 const { writeResponseChunk } = require("../helpers/chat/responses");
 
+// In-memory cache for agent attachments.
+// Bridges the HTTP → WebSocket gap: attachments are cached here after grepAgents()
+// and consumed by AgentHandler once the WebSocket connection is established.
+const agentAttachmentCache = new Map();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Cache attachments for an agent invocation (in-memory, one-time consumption).
+ * @param {string} uuid - The invocation UUID
+ * @param {Array<{name: string, mime: string, contentString: string}>} attachments
+ */
+function cacheAgentAttachments(uuid, attachments) {
+  if (!attachments?.length) return;
+  agentAttachmentCache.set(uuid, attachments);
+  setTimeout(() => agentAttachmentCache.delete(uuid), CACHE_TTL_MS);
+}
+
+/**
+ * Retrieve and delete cached attachments for an agent invocation.
+ * Returns empty array if not found (cache miss, TTL expired, or already consumed).
+ * @param {string} uuid - The invocation UUID
+ * @returns {Array<{name: string, mime: string, contentString: string}>}
+ */
+function consumeAgentAttachments(uuid) {
+  const attachments = agentAttachmentCache.get(uuid) || [];
+  agentAttachmentCache.delete(uuid);
+  return attachments;
+}
+
 async function grepAgents({
   uuid,
   response,
@@ -11,6 +40,7 @@ async function grepAgents({
   workspace,
   user = null,
   thread = null,
+  attachments = [],
 }) {
   const agentHandles = WorkspaceAgentInvocation.parseAgents(message);
   if (agentHandles.length > 0) {
@@ -37,6 +67,14 @@ async function grepAgents({
         error: null,
       });
       return;
+    }
+
+    // Cache attachments so AgentHandler can retrieve them after WebSocket handshake
+    cacheAgentAttachments(newInvocation.uuid, attachments);
+    if (attachments.length > 0) {
+      console.log(
+        `\x1b[36m[Agent Multimodal]\x1b[0m Cached ${attachments.length} attachment(s) for invocation ${newInvocation.uuid}`
+      );
     }
 
     writeResponseChunk(response, {
@@ -70,4 +108,4 @@ async function grepAgents({
   return false;
 }
 
-module.exports = { grepAgents };
+module.exports = { grepAgents, consumeAgentAttachments };

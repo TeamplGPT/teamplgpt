@@ -10,6 +10,7 @@ const { USER_AGENT, WORKSPACE_AGENT } = require("./defaults");
 const ImportedPlugin = require("./imported");
 const { AgentFlows } = require("../agentFlows");
 const MCPCompatibilityLayer = require("../MCP");
+const { consumeAgentAttachments } = require("../chats/agents");
 
 class AgentHandler {
   #invocationUUID;
@@ -553,6 +554,15 @@ class AgentHandler {
   async init() {
     await this.#validInvocation();
     this.#providerSetupAndCheck();
+
+    // Retrieve cached attachments from the HTTP→WebSocket bridge (one-time consumption)
+    this.attachments = consumeAgentAttachments(this.#invocationUUID);
+    if (this.attachments.length > 0) {
+      this.log(
+        `Retrieved ${this.attachments.length} cached attachment(s) for multimodal agent chat`
+      );
+    }
+
     return this;
   }
 
@@ -594,11 +604,31 @@ class AgentHandler {
     await this.#attachPlugins(args);
   }
 
+  /**
+   * Build multimodal content array when attachments exist,
+   * or return plain text prompt when no attachments.
+   * Uses the same input_text/input_image format as ReAct mode's buildUserContent().
+   * @returns {string|Array<{type: string, text?: string, image_url?: string}>}
+   */
+  #buildMultimodalContent() {
+    if (!this.attachments?.length) {
+      return this.invocation.prompt;
+    }
+
+    return [
+      { type: "input_text", text: this.invocation.prompt },
+      ...this.attachments.map((att) => ({
+        type: "input_image",
+        image_url: att.contentString,
+      })),
+    ];
+  }
+
   startAgentCluster() {
     return this.aibitat.start({
       from: USER_AGENT.name,
       to: this.channel ?? WORKSPACE_AGENT.name,
-      content: this.invocation.prompt,
+      content: this.#buildMultimodalContent(),
     });
   }
 }

@@ -486,6 +486,111 @@ describe("streamReactChat", () => {
     expect(statusMessages.some((msg) => msg.includes("maximum"))).toBe(true);
   });
 
+  // ─── Multimodal (image-in-react) tests ───
+
+  it("이미지 첨부 시 초기 user 메시지가 멀티모달 content 배열로 구성된다", async () => {
+    const attachments = [
+      {
+        name: "screenshot.png",
+        mime: "image/png",
+        contentString: "data:image/png;base64,iVBORw0KGgo",
+      },
+    ];
+
+    await streamReactChat(
+      mockResponse,
+      mockWorkspace,
+      "이 이미지에서 글자를 추출해줘",
+      { id: 7 },
+      { id: 11 },
+      attachments
+    );
+
+    // messages 배열은 ReAct 루프에서 in-place 변경되므로
+    // 초기 user 메시지는 index 1 (0=system, 1=user, chatHistory는 빈 배열)
+    const messagesRef =
+      mockLLMConnector.getChatCompletion.mock.calls[0][0];
+    const userMsg = messagesRef[1];
+
+    expect(userMsg.role).toBe("user");
+    expect(Array.isArray(userMsg.content)).toBe(true);
+    expect(userMsg.content).toEqual([
+      { type: "input_text", text: "이 이미지에서 글자를 추출해줘" },
+      {
+        type: "input_image",
+        image_url: "data:image/png;base64,iVBORw0KGgo",
+      },
+    ]);
+
+    // DB에도 attachments 저장 확인
+    const createArg = WorkspaceChats.new.mock.calls[0][0];
+    expect(createArg.response.attachments).toEqual(attachments);
+  });
+
+  it("이미지 없을 때 user 메시지가 기존과 동일하게 문자열이다", async () => {
+    await streamReactChat(
+      mockResponse,
+      mockWorkspace,
+      "텍스트만 질문",
+      { id: 7 },
+      null,
+      []
+    );
+
+    const messagesRef =
+      mockLLMConnector.getChatCompletion.mock.calls[0][0];
+    const userMsg = messagesRef[1]; // 0=system, 1=user
+
+    expect(userMsg.role).toBe("user");
+    expect(typeof userMsg.content).toBe("string");
+    expect(userMsg.content).toBe("텍스트만 질문");
+  });
+
+  it("복수 이미지 첨부 시 모든 이미지가 content 배열에 포함된다", async () => {
+    const attachments = [
+      {
+        name: "img1.png",
+        mime: "image/png",
+        contentString: "data:image/png;base64,AAA",
+      },
+      {
+        name: "img2.jpg",
+        mime: "image/jpeg",
+        contentString: "data:image/jpeg;base64,BBB",
+      },
+    ];
+
+    await streamReactChat(
+      mockResponse,
+      mockWorkspace,
+      "두 이미지 비교",
+      null,
+      null,
+      attachments
+    );
+
+    const messagesRef =
+      mockLLMConnector.getChatCompletion.mock.calls[0][0];
+    const userMsg = messagesRef[1]; // 0=system, 1=user
+
+    expect(Array.isArray(userMsg.content)).toBe(true);
+    expect(userMsg.content).toHaveLength(3); // 1 text + 2 images
+    expect(userMsg.content[0]).toEqual({
+      type: "input_text",
+      text: "두 이미지 비교",
+    });
+    expect(userMsg.content[1]).toEqual({
+      type: "input_image",
+      image_url: "data:image/png;base64,AAA",
+    });
+    expect(userMsg.content[2]).toEqual({
+      type: "input_image",
+      image_url: "data:image/jpeg;base64,BBB",
+    });
+  });
+
+  // ─── End multimodal tests ───
+
   it("LLM이 빈 응답을 반환하면 abort 청크를 전송한다", async () => {
     mockLLMConnector.getChatCompletion
       .mockReset()

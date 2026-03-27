@@ -96,13 +96,15 @@ const websocket = {
         });
 
         aibitat.onInterrupt(async (node) => {
-          const feedback = await socket.askForFeedback(socket, node);
-          if (WEBSOCKET_BAIL_COMMANDS.includes(feedback)) {
+          const result = await socket.askForFeedback(socket, node);
+          const feedbackText =
+            typeof result === "string" ? result : result.feedback;
+          if (WEBSOCKET_BAIL_COMMANDS.includes(feedbackText)) {
             socket.close();
             return;
           }
 
-          await aibitat.continue(feedback);
+          await aibitat.continue(result);
         });
 
         /**
@@ -123,7 +125,10 @@ const websocket = {
                 if (data.type !== "awaitingFeedback") return;
                 delete socket.handleFeedback;
                 clearTimeout(socketTimeout);
-                resolve(data.feedback);
+                resolve({
+                  feedback: data.feedback,
+                  attachments: data.attachments ?? [],
+                });
                 return;
               };
 

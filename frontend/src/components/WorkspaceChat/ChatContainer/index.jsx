@@ -62,18 +62,20 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!message || message === "") return false;
+    const currentAttachments = parseAttachments();
     const prevChatHistory = [
       ...chatHistory,
       {
         content: message,
         role: "user",
-        attachments: parseAttachments(),
+        attachments: currentAttachments,
       },
       {
         content: "",
         role: "assistant",
         pending: true,
         userMessage: message,
+        attachments: currentAttachments,
         animate: true,
       },
     ];
@@ -189,11 +191,13 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
       // Override hook for new messages to now go to agents until the connection closes
       if (!!websocket) {
         if (!promptMessage || !promptMessage?.userMessage) return false;
+        const wsAttachments = promptMessage?.attachments ?? parseAttachments();
         window.dispatchEvent(new CustomEvent(CLEAR_ATTACHMENTS_EVENT));
         websocket.send(
           JSON.stringify({
             type: "awaitingFeedback",
             feedback: promptMessage?.userMessage,
+            attachments: wsAttachments,
           })
         );
         return;

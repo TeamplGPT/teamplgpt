@@ -3,6 +3,22 @@ const { safeJsonParse } = require("../../http");
 const { TokenManager } = require("../tiktoken");
 const { convertToPromptHistory } = require("./responses");
 
+/**
+ * Checks if a message contains multimodal (image) content.
+ * Used to skip cannonball compression on messages with images.
+ * @param {{role:string, content:string|object[]}} message
+ * @returns {boolean}
+ */
+function hasMultimodalContent(message) {
+  if (!Array.isArray(message?.content)) return false;
+  return message.content.some(
+    (item) =>
+      item.type === "input_image" ||
+      item.type === "image_url" ||
+      item.type === "image"
+  );
+}
+
 /*
 What is the message Array compressor?
 TLDR: So anyway, i started blasting (your prompts & stuff)
@@ -67,7 +83,7 @@ async function messageArrayCompressor(llm, messages = [], rawHistory = []) {
 
   const system = messages.shift();
   const user = messages.pop();
-  const userPromptSize = tokenManager.countFromString(user.content);
+  const userPromptSize = tokenManager.contentTokenCount(user.content);
 
   // 히스토리만 압축하는 모드인 경우
   if (compressOnlyHistory) {
@@ -116,7 +132,8 @@ async function messageArrayCompressor(llm, messages = [], rawHistory = []) {
         // be 50% of the history. We cannonball whichever is the problem.
         // The math isnt perfect for tokens, so we have to add a fudge factor for safety.
         const maxTargetSize = Math.floor(llm.limits.history / 2.2);
-        if (userTokens > maxTargetSize) {
+        // Skip cannonball for multimodal history messages to preserve images
+        if (userTokens > maxTargetSize && !hasMultimodalContent(user)) {
           user.content = cannonball({
             input: user.content,
             targetTokenSize: maxTargetSize,
@@ -124,7 +141,7 @@ async function messageArrayCompressor(llm, messages = [], rawHistory = []) {
           });
         }
 
-        if (assistantTokens > maxTargetSize) {
+        if (assistantTokens > maxTargetSize && !hasMultimodalContent(assistant)) {
           assistant.content = cannonball({
             input: assistant.content,
             targetTokenSize: maxTargetSize,
@@ -142,7 +159,7 @@ async function messageArrayCompressor(llm, messages = [], rawHistory = []) {
 
     console.log(
       `[COMPRESS_ONLY_HISTORY] Compressed history only. ` +
-      `System: ${tokenManager.countFromString(system.content)} tokens, ` +
+      `System: ${tokenManager.contentTokenCount(system.content)} tokens, ` +
       `History: ${tokenManager.statsFrom(compressedHistory)} tokens, ` +
       `User: ${userPromptSize} tokens`
     );
@@ -156,6 +173,35 @@ async function messageArrayCompressor(llm, messages = [], rawHistory = []) {
   // cannonball the prompt through to ensure the reply has at least 20% of
   // the token supply to reply with.
   if (userPromptSize > llm.limits.user) {
+    // Multimodal messages: cannonball text only, preserve image items
+    if (hasMultimodalContent(user)) {
+      const textItems = user.content.filter(
+        (item) => item.type === "input_text" || item.type === "text"
+      );
+      const imageItems = user.content.filter(
+        (item) => item.type !== "input_text" && item.type !== "text"
+      );
+      const textContent = textItems.map((item) => item.text).join("\n");
+      const compressedText = cannonball({
+        input: textContent,
+        targetTokenSize:
+          llm.promptWindowLimit() * 0.8 - imageItems.length * 1000,
+        tiktokenInstance: tokenManager,
+      });
+      return [
+        {
+          role: "user",
+          content: [
+            {
+              type: textItems[0]?.type || "input_text",
+              text: compressedText,
+            },
+            ...imageItems,
+          ],
+        },
+      ];
+    }
+
     return [
       {
         role: "user",
@@ -248,7 +294,8 @@ async function messageArrayCompressor(llm, messages = [], rawHistory = []) {
       // be 50% of the history. We cannonball whichever is the problem.
       // The math isnt perfect for tokens, so we have to add a fudge factor for safety.
       const maxTargetSize = Math.floor(llm.limits.history / 2.2);
-      if (userTokens > maxTargetSize) {
+      // Skip cannonball for multimodal history messages to preserve images
+      if (userTokens > maxTargetSize && !hasMultimodalContent(user)) {
         user.content = cannonball({
           input: user.content,
           targetTokenSize: maxTargetSize,
@@ -256,7 +303,7 @@ async function messageArrayCompressor(llm, messages = [], rawHistory = []) {
         });
       }
 
-      if (assistantTokens > maxTargetSize) {
+      if (assistantTokens > maxTargetSize && !hasMultimodalContent(assistant)) {
         assistant.content = cannonball({
           input: assistant.content,
           targetTokenSize: maxTargetSize,

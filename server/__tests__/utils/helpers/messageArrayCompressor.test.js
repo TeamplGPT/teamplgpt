@@ -5,14 +5,48 @@ const { messageArrayCompressor } = require("../../../utils/helpers/chat");
 jest.mock("../../../utils/helpers/tiktoken", () => ({
   TokenManager: jest.fn().mockImplementation(() => ({
     countFromString: jest.fn((text) => {
+      // Defensive: handle array input (multimodal content)
+      if (Array.isArray(text)) {
+        return text.reduce((sum, item) => {
+          if (item.type === "input_text" || item.type === "text") {
+            return sum + (item.text || "").split(/\s+/).length;
+          }
+          if (item.type === "input_image" || item.type === "image_url" || item.type === "image") {
+            return sum + 1000;
+          }
+          return sum;
+        }, 0);
+      }
       // 간단한 토큰 카운트 모의: 공백으로 분리된 단어 수로 근사
       return text.split(/\s+/).length;
+    }),
+    contentTokenCount: jest.fn((content) => {
+      if (typeof content === "string") return content.split(/\s+/).length;
+      if (Array.isArray(content)) {
+        return content.reduce((sum, item) => {
+          if (item.type === "input_text" || item.type === "text") {
+            return sum + (item.text || "").split(/\s+/).length;
+          }
+          if (item.type === "input_image" || item.type === "image_url" || item.type === "image") {
+            return sum + 1000;
+          }
+          return sum;
+        }, 0);
+      }
+      return String(content).split(/\s+/).length;
     }),
     statsFrom: jest.fn((messages) => {
       if (Array.isArray(messages)) {
         return messages.reduce((total, msg) => {
           if (typeof msg === "string") {
             return total + msg.split(/\s+/).length;
+          }
+          if (Array.isArray(msg.content)) {
+            return total + msg.content.reduce((s, item) => {
+              if (item.type === "input_text" || item.type === "text") return s + (item.text || "").split(/\s+/).length;
+              if (item.type === "input_image" || item.type === "image_url") return s + 1000;
+              return s;
+            }, 0);
           }
           return total + (msg.content ? msg.content.split(/\s+/).length : 0);
         }, 0);

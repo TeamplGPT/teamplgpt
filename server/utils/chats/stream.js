@@ -49,6 +49,7 @@ async function streamChatWithWorkspace(
     user,
     workspace,
     thread,
+    attachments,
   });
   if (isAgentChat) return;
 
@@ -248,6 +249,14 @@ async function streamChatWithWorkspace(
 
   // Compress & Assemble message to ensure prompt passes token limit with room for response
   // and build system messages based on inputs and history.
+  const debugMultimodal = process.env.DEBUG_MULTIMODAL === "true";
+  if (debugMultimodal && attachments?.length > 0) {
+    console.log(
+      `\x1b[36m[Multimodal]\x1b[0m Sending ${attachments.length} attachment(s) to LLM. ` +
+        `Types: ${attachments.map((a) => a.mime).join(", ")}`
+    );
+  }
+
   const systemPrompt = await chatPrompt(workspace, user);
   const messages = await LLMConnector.compressMessages(
     {
@@ -259,6 +268,29 @@ async function streamChatWithWorkspace(
     },
     rawHistory
   );
+
+  // Verify image data survived compression
+  if (attachments?.length > 0) {
+    const userMsg = messages[messages.length - 1];
+    const hasImages =
+      Array.isArray(userMsg?.content) &&
+      userMsg.content.some(
+        (c) => c.type === "input_image" || c.type === "image_url"
+      );
+    if (debugMultimodal) {
+      console.log(
+        `\x1b[36m[Multimodal]\x1b[0m Post-compression: ` +
+          `images preserved = ${hasImages}, ` +
+          `total messages = ${messages.length}`
+      );
+    }
+    // WARNING always logged regardless of DEBUG_MULTIMODAL
+    if (!hasImages) {
+      console.warn(
+        `\x1b[33m[Multimodal WARNING]\x1b[0m Image data was lost during compression!`
+      );
+    }
+  }
 
   // Collect LLM log data for later storage
   const llmLogData = {

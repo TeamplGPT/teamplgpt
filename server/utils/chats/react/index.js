@@ -19,7 +19,17 @@ const OBSERVATION_MAX_CHARS = 2000;
  * @param {string} basePrompt - The workspace's base system prompt. If empty, the ReAct instructions are still appended.
  * @returns {string} The combined system prompt containing basePrompt followed by tool definitions and ReAct format instructions.
  */
-function buildReactSystemPrompt(basePrompt) {
+function buildReactSystemPrompt(basePrompt, { hasImages = false } = {}) {
+  const imageInstructions = hasImages
+    ? `
+
+When the user provides an image along with their message:
+- First, analyze the image content in your Thought (describe what you see)
+- If the user asks to extract text (OCR), read the text from the image and include it in your Final Answer
+- You may search documents for additional context if needed, but you can also provide a Final Answer directly based on the image alone
+- Do NOT ignore the image — it is the primary input for this request`
+    : "";
+
   return `${basePrompt}
 
 You have access to the following tool to help answer the user's question:
@@ -44,7 +54,7 @@ Important rules:
 - You may search multiple times if needed to gather sufficient information
 - When you have enough information, provide a Final Answer
 - If no relevant documents are found, provide a Final Answer based on your general knowledge and note that no relevant documents were found
-- Keep your search queries focused and specific`;
+- Keep your search queries focused and specific${imageInstructions}`;
 }
 
 /**
@@ -67,6 +77,31 @@ function sendStatusMessage(response, uuid, text) {
 }
 
 /**
+ * Builds the user message content for ReAct mode.
+ * When attachments are present, returns a multimodal content array
+ * compatible with OpenAI Responses API input format.
+ * When no attachments, returns the plain text message (existing behavior).
+ *
+ * @param {string} message - User's text message
+ * @param {Object[]} attachments - Attachment objects with { name, mime, contentString }
+ * @returns {string|Object[]} Plain text string or multimodal content array
+ */
+function buildUserContent(message, attachments = []) {
+  if (!attachments.length) {
+    return message;
+  }
+
+  const content = [{ type: "input_text", text: message }];
+  for (const attachment of attachments) {
+    content.push({
+      type: "input_image",
+      image_url: attachment.contentString,
+    });
+  }
+  return content;
+}
+
+/**
  * Main ReAct chat handler for streaming responses.
  * Implements a Thought → Action → Observation loop using non-streaming LLM calls,
  * then sends the complete final answer as a single SSE chunk (non-streaming;
@@ -77,8 +112,9 @@ function sendStatusMessage(response, uuid, text) {
  * @param {string} message - User's message
  * @param {Object|null} user - User model object
  * @param {Object|null} thread - Thread model object
- * @param {Object[]} attachments - Attachments array. Stored in the chat record for retrieval
- *   but NOT passed to the LLM or used during document search.
+ * @param {Object[]} attachments - Attachments array (images). Included in the initial
+ *   user message as multimodal content (input_image). Stored in DB for chat history.
+ *   Not included in subsequent ReAct loop messages (Observation, etc.).
  */
 async function streamReactChat(
   response,
@@ -109,15 +145,26 @@ async function streamReactChat(
   });
 
   const basePrompt = await chatPrompt(workspace, user);
-  const systemPrompt = buildReactSystemPrompt(basePrompt);
+  const hasAttachments = attachments.length > 0;
+  const systemPrompt = buildReactSystemPrompt(basePrompt, {
+    hasImages: hasAttachments,
+  });
 
   // Build initial messages array with system prompt, chat history, and user message.
-  // Strip attachments from chat history — ReAct mode does not pass attachments to the LLM,
-  // and including the attachments field causes a 400 error from the OpenAI Responses API.
+  // Strip attachments from chat history — only the current user message includes images.
+  // Including the raw `attachments` field (not content array) causes a 400 error from
+  // the OpenAI Responses API, so images are converted to input_image content format.
+  if (hasAttachments) {
+    console.log(
+      `\x1b[36m[ReAct Multimodal]\x1b[0m Including ${attachments.length} image(s) ` +
+        `in initial user message. Types: ${attachments.map((a) => a.mime).join(", ")}`
+    );
+  }
+
   const messages = [
     { role: "system", content: systemPrompt },
     ...chatHistory.map(({ role, content }) => ({ role, content })),
-    { role: "user", content: message },
+    { role: "user", content: buildUserContent(message, attachments) },
   ];
 
   const reactTrace = [];

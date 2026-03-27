@@ -65,7 +65,7 @@
         "placeholder": "http://kiwibox-hr-api:8000",
         "hint": "HR REST API 서버 주소 (Docker 네트워크 내 서비스명 사용)."
       },
-      "value": "http://kiwibox-hr-api:8000"
+      "value": "http://localhost:8000"
     }
   },
   "examples": [

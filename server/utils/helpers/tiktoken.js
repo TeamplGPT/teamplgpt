@@ -68,17 +68,54 @@ class TokenManager {
 
   /**
    * Counts the number of tokens in a string.
-   * @param {string} input
+   * Includes defensive handling for multimodal array content.
+   * @param {string|object[]} input
    * @returns {number}
    */
   countFromString(input = "") {
+    // Defensive: if an array (multimodal content) is passed, delegate to contentTokenCount
+    if (Array.isArray(input)) return this.contentTokenCount(input);
     const tokens = this.tokensFromString(input);
     return tokens.length;
   }
 
   /**
-   * Estimates the number of tokens in a string or array of strings.
-   * @param {string | string[]} input
+   * Counts tokens from message content, handling both string and
+   * multimodal array formats (e.g., [{type:"input_text", text:...}, {type:"input_image",...}]).
+   * Images are estimated at a fixed token cost since base64 data
+   * should not be tokenized directly.
+   * @param {string|object[]} content
+   * @returns {number}
+   */
+  contentTokenCount(content) {
+    // String content → existing logic
+    if (typeof content === "string") return this.countFromString(content);
+
+    // Multimodal array content → count text tokens + fixed estimate per image
+    if (Array.isArray(content)) {
+      const IMAGE_TOKEN_ESTIMATE = 1000; // Conservative estimate for high-detail images
+      let tokens = 0;
+      for (const item of content) {
+        if (item.type === "input_text" || item.type === "text") {
+          tokens += this.countFromString(item.text || "");
+        } else if (
+          item.type === "input_image" ||
+          item.type === "image_url" ||
+          item.type === "image"
+        ) {
+          tokens += IMAGE_TOKEN_ESTIMATE;
+        }
+      }
+      return tokens;
+    }
+
+    // Fallback: convert to string
+    return this.countFromString(String(content));
+  }
+
+  /**
+   * Estimates the number of tokens in a string or array of messages.
+   * @param {string | object[]} input
    * @returns {number}
    */
   statsFrom(input) {
@@ -91,7 +128,7 @@ class TokenManager {
     if (Array.isArray(input)) {
       const perMessageFactorTokens = input.length * 3;
       const tokensFromContent = input.reduce(
-        (a, b) => a + this.countFromString(b.content),
+        (a, b) => a + this.contentTokenCount(b.content),
         0
       );
       const diffCoefficient = 5;
