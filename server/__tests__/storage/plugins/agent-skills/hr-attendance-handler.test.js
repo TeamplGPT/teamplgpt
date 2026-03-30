@@ -247,6 +247,71 @@ describe("hr-attendance handler", () => {
     });
   });
 
+  describe("날짜 파라미터 해석 (resolveDateParam 연동)", () => {
+    it("한국어 상대 표현 '지난달'을 YYYYMM으로 변환해야 한다", async () => {
+      const mod = loadHandler();
+      const ctx = createMockContext();
+      mockFetchSuccess([{ date: "20250219", in: "09:00", out: "18:00" }]);
+
+      await mod.runtime.handler.call(ctx, {
+        emp_no: "10001",
+        query_type: "timesheet",
+        year_month: "지난달",
+      });
+
+      const calledUrl = global.fetch.mock.calls[0][0];
+      const lastMonth = new Date();
+      lastMonth.setMonth(lastMonth.getMonth() - 1);
+      const expected = `${lastMonth.getFullYear()}${String(lastMonth.getMonth() + 1).padStart(2, "0")}`;
+      expect(calledUrl).toContain(`year_month=${expected}`);
+    });
+
+    it("한국어 상대 표현 '어제'를 YYYYMMDD로 변환해야 한다", async () => {
+      const mod = loadHandler();
+      const ctx = createMockContext();
+      mockFetchSuccess([{ day: "월", type: "근무" }]);
+
+      await mod.runtime.handler.call(ctx, {
+        emp_no: "10001",
+        query_type: "work_plan_weekly",
+        base_date: "어제",
+      });
+
+      const calledUrl = global.fetch.mock.calls[0][0];
+      expect(calledUrl).toMatch(/base_date=\d{8}/);
+    });
+
+    it("비표준 포맷 '2025-03'은 sugar-date가 '202503'으로 해석해야 한다", async () => {
+      const mod = loadHandler();
+      const ctx = createMockContext();
+      mockFetchSuccess([{ date: "20250319" }]);
+
+      await mod.runtime.handler.call(ctx, {
+        emp_no: "10001",
+        query_type: "timesheet",
+        year_month: "2025-03",
+      });
+
+      const calledUrl = global.fetch.mock.calls[0][0];
+      expect(calledUrl).toContain("year_month=202503");
+    });
+
+    it("해석 불가 문자열은 제거되어야 한다", async () => {
+      const mod = loadHandler();
+      const ctx = createMockContext();
+      mockFetchSuccess({ total: 15, used: 5, remaining: 10 });
+
+      await mod.runtime.handler.call(ctx, {
+        emp_no: "10001",
+        query_type: "annual_leave_balance",
+        year: "abc날짜아님",
+      });
+
+      const calledUrl = global.fetch.mock.calls[0][0];
+      expect(calledUrl).not.toContain("year=");
+    });
+  });
+
   describe("하위 호환성", () => {
     it("선택 파라미터 없이 기존 방식으로 호출해도 정상 동작해야 한다", async () => {
       const mod = loadHandler();

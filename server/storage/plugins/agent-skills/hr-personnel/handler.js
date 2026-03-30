@@ -77,23 +77,17 @@ module.exports.runtime = {
 };
 
 function formatPersonnel(data, label, staffId) {
-  const records = Array.isArray(data) ? data : [data];
+  const { normalizeData, renderTable, renderSummary } = require("../_shared/formatTable");
+  const { rows, summary } = normalizeData(data);
+
   let md = `## HR 인사기록 - ${label} (사번: ${staffId})\n\n`;
 
-  if (records.length === 0) return md + "> 조회된 데이터가 없습니다.";
+  if (rows.length === 0) return md + "> 조회된 데이터가 없습니다.";
 
-  const keys = Object.keys(records[0]).filter(k => !["code", "message"].includes(k));
-  md += `| ${keys.join(" | ")} |\n`;
-  md += `| ${keys.map(() => "------").join(" | ")} |\n`;
-
-  for (const rec of records) {
-    const row = keys.map(k => {
-      const v = rec[k];
-      return (v === null || v === undefined) ? "-" : String(v);
-    });
-    md += `| ${row.join(" | ")} |\n`;
+  md += renderTable(rows);
+  md += `\n> 총 **${rows.length}건** 조회됨`;
+  if (summary) {
+    md += `\n${renderSummary(summary)}`;
   }
-
-  md += `\n> 총 **${records.length}건** 조회됨`;
   return md;
 }

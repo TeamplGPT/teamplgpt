@@ -173,6 +173,74 @@ describe("hr-salary handler", () => {
     });
   });
 
+  describe("날짜 파라미터 해석 (resolveDateParam 연동)", () => {
+    it("한국어 상대 표현 '지난달'을 YYYYMM으로 변환해야 한다", async () => {
+      const mod = loadHandler();
+      const ctx = createMockContext();
+      mockFetchSuccess([{ item: "기본급", amount: 3000000 }]);
+
+      await mod.runtime.handler.call(ctx, {
+        emp_no: "10001",
+        query_type: "payslip",
+        year_month: "지난달",
+      });
+
+      const calledUrl = global.fetch.mock.calls[0][0];
+      const lastMonth = new Date();
+      lastMonth.setMonth(lastMonth.getMonth() - 1);
+      const expected = `${lastMonth.getFullYear()}${String(lastMonth.getMonth() + 1).padStart(2, "0")}`;
+      expect(calledUrl).toContain(`year_month=${expected}`);
+    });
+
+    it("한국어 상대 표현 '작년'을 YYYY로 변환해야 한다", async () => {
+      const mod = loadHandler();
+      const ctx = createMockContext();
+      mockFetchSuccess({ total: 45000000 });
+
+      await mod.runtime.handler.call(ctx, {
+        emp_no: "10001",
+        query_type: "annual_total",
+        year: "작년",
+      });
+
+      const calledUrl = global.fetch.mock.calls[0][0];
+      const expected = String(new Date().getFullYear() - 1);
+      expect(calledUrl).toContain(`year=${expected}`);
+    });
+
+    it("compare의 상대 표현 '이번달'/'지난달'을 변환해야 한다", async () => {
+      const mod = loadHandler();
+      const ctx = createMockContext();
+      mockFetchSuccess([{ item: "기본급", current: 3000000, previous: 2900000 }]);
+
+      await mod.runtime.handler.call(ctx, {
+        emp_no: "10001",
+        query_type: "compare",
+        current_month: "이번달",
+        previous_month: "지난달",
+      });
+
+      const calledUrl = global.fetch.mock.calls[0][0];
+      expect(calledUrl).toMatch(/current_month=\d{6}/);
+      expect(calledUrl).toMatch(/previous_month=\d{6}/);
+    });
+
+    it("비표준 포맷 '2025-03'은 sugar-date가 '202503'으로 해석해야 한다", async () => {
+      const mod = loadHandler();
+      const ctx = createMockContext();
+      mockFetchSuccess([{ item: "기본급", amount: 3000000 }]);
+
+      await mod.runtime.handler.call(ctx, {
+        emp_no: "10001",
+        query_type: "payslip",
+        year_month: "2025-03",
+      });
+
+      const calledUrl = global.fetch.mock.calls[0][0];
+      expect(calledUrl).toContain("year_month=202503");
+    });
+  });
+
   describe("하위 호환성", () => {
     it("선택 파라미터 없이 호출해도 정상 동작해야 한다", async () => {
       const mod = loadHandler();

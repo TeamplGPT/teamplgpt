@@ -1,6 +1,7 @@
 // hr-salary/handler.js
 const { parseErrorMessage } = require("../_shared/parseErrorMessage");
 const { unwrapResponse } = require("../_shared/unwrapResponse");
+const { resolveDateParam } = require("../_shared/dateResolver");
 
 const ENDPOINT_MAP = {
   account:        "/api/v1/salary/account",
@@ -41,6 +42,13 @@ const PARAMS_MAP = {
   pay_step:       [],
 };
 
+const DATE_FORMAT_MAP = {
+  year: "year",
+  year_month: "year_month",
+  current_month: "year_month",
+  previous_month: "year_month",
+};
+
 module.exports.runtime = {
   handler: async function ({ emp_no, query_type, year, year_month, current_month, previous_month, limit }) {
     try {
@@ -57,8 +65,12 @@ module.exports.runtime = {
       const allOptional = { year, year_month, current_month, previous_month, limit };
       const validKeys = PARAMS_MAP[query_type] || [];
       for (const key of validKeys) {
-        if (allOptional[key] !== undefined && allOptional[key] !== null && String(allOptional[key]).trim() !== "") {
-          params.append(key, String(allOptional[key]).trim());
+        let val = allOptional[key];
+        if (DATE_FORMAT_MAP[key]) {
+          val = resolveDateParam(val, DATE_FORMAT_MAP[key]);
+        }
+        if (val !== undefined && val !== null && String(val).trim() !== "") {
+          params.append(key, String(val).trim());
         }
       }
 
@@ -96,25 +108,17 @@ module.exports.runtime = {
 };
 
 function formatSalary(data, label, staffId) {
-  const records = Array.isArray(data) ? data : [data];
+  const { normalizeData, renderTable, renderSummary } = require("../_shared/formatTable");
+  const { rows, summary } = normalizeData(data);
+
   let md = `## HR 급여 - ${label} (사번: ${staffId})\n\n`;
 
-  if (records.length === 0) return md + "> 조회된 데이터가 없습니다.";
+  if (rows.length === 0) return md + "> 조회된 데이터가 없습니다.";
 
-  const keys = Object.keys(records[0]).filter(k => !["code", "message"].includes(k));
-  md += `| ${keys.join(" | ")} |\n`;
-  md += `| ${keys.map(() => "------").join(" | ")} |\n`;
-
-  for (const rec of records) {
-    const row = keys.map(k => {
-      const v = rec[k];
-      if (v === null || v === undefined) return "-";
-      if (typeof v === "number") return `**${v.toLocaleString("ko-KR")}**`;
-      return String(v);
-    });
-    md += `| ${row.join(" | ")} |\n`;
+  md += renderTable(rows, { boldNumbers: true });
+  md += `\n> 총 **${rows.length}건** 조회됨`;
+  if (summary) {
+    md += `\n${renderSummary(summary)}`;
   }
-
-  md += `\n> 총 **${records.length}건** 조회됨`;
   return md;
 }

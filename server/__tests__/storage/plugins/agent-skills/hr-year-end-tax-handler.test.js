@@ -111,6 +111,54 @@ describe("hr-year-end-tax handler", () => {
     });
   });
 
+  describe("날짜 파라미터 해석 (resolveDateParam 연동)", () => {
+    it("한국어 상대 표현 '작년'을 YYYY로 변환해야 한다", async () => {
+      const mod = loadHandler();
+      const ctx = createMockContext();
+      mockFetchSuccess([{ item: "test", amount: 100000 }]);
+
+      await mod.runtime.handler.call(ctx, {
+        emp_no: "10001",
+        query_type: "result",
+        cal_yy: "작년",
+      });
+
+      const calledUrl = global.fetch.mock.calls[0][0];
+      const expected = String(new Date().getFullYear() - 1);
+      expect(calledUrl).toContain(`cal_yy=${expected}`);
+    });
+
+    it("해석 불가 문자열은 제거되어야 한다", async () => {
+      const mod = loadHandler();
+      const ctx = createMockContext();
+      mockFetchSuccess([{ item: "test" }]);
+
+      await mod.runtime.handler.call(ctx, {
+        emp_no: "10001",
+        query_type: "summary",
+        cal_yy: "abc날짜아님",
+      });
+
+      const calledUrl = global.fetch.mock.calls[0][0];
+      expect(calledUrl).not.toContain("cal_yy");
+    });
+
+    it("정확한 YYYY 형식은 그대로 전달해야 한다", async () => {
+      const mod = loadHandler();
+      const ctx = createMockContext();
+      mockFetchSuccess([{ item: "test", amount: 100000 }]);
+
+      await mod.runtime.handler.call(ctx, {
+        emp_no: "10001",
+        query_type: "credit_card",
+        cal_yy: "2024",
+      });
+
+      const calledUrl = global.fetch.mock.calls[0][0];
+      expect(calledUrl).toContain("cal_yy=2024");
+    });
+  });
+
   describe("필수 파라미터 유효성 검증", () => {
     it("emp_no가 없으면 에러를 반환해야 한다", async () => {
       const mod = loadHandler();
