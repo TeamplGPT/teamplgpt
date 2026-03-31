@@ -401,6 +401,170 @@ const PGVector = {
     return result;
   },
 
+  /**
+   * Performs a keyword search using tsvector full-text search and pg_trgm trigram similarity.
+   * Combines ts_rank (weight 0.4) and trigram similarity (weight 0.6) for scoring.
+   * @param {Object} params
+   * @param {pgsql.Client} params.client
+   * @param {string} params.namespace
+   * @param {string} params.queryText - Raw user query text
+   * @param {number} params.topN
+   * @param {string[]} params.filterIdentifiers
+   * @returns {Promise<{contextTexts: string[], sourceDocuments: Object[], scores: number[]}>}
+   */
+  keywordSearchResponse: async function ({
+    client,
+    namespace,
+    queryText,
+    topN = 20,
+    filterIdentifiers = [],
+  }) {
+    const result = {
+      contextTexts: [],
+      sourceDocuments: [],
+      scores: [],
+    };
+
+    const response = await client.query(
+      `SELECT
+         metadata,
+         (
+           COALESCE(ts_rank(text_search, plainto_tsquery('simple', $1)), 0) * 0.4
+           + COALESCE(similarity(metadata->>'text', $1), 0) * 0.6
+         ) AS _keyword_score
+       FROM "${PGVector.tableName()}"
+       WHERE namespace = $2
+         AND (
+           text_search @@ plainto_tsquery('simple', $1)
+           OR similarity(metadata->>'text', $1) > 0.1
+         )
+       ORDER BY _keyword_score DESC
+       LIMIT $3`,
+      [queryText, namespace, topN]
+    );
+
+    response.rows.forEach((item) => {
+      if (item._keyword_score <= 0) return;
+      if (filterIdentifiers.includes(sourceIdentifier(item.metadata))) return;
+
+      result.contextTexts.push(item.metadata.text);
+      result.sourceDocuments.push({
+        ...item.metadata,
+        keywordScore: item._keyword_score,
+      });
+      result.scores.push(item._keyword_score);
+    });
+
+    return result;
+  },
+
+  /**
+   * Reciprocal Rank Fusion to combine vector and keyword search results.
+   * RRF score = sum(1 / (k + rank_i)) for each ranking list where the doc appears.
+   * @param {Object} vectorResults - Results from vector similarity search
+   * @param {Object} keywordResults - Results from keyword search
+   * @param {number} topN - Number of final results to return
+   * @param {number} k - RRF constant (default 60, from Cormack et al. 2009)
+   * @returns {Object} Fused results with combined scores
+   */
+  rrfFusion: function (vectorResults, keywordResults, topN = 4, k = 60) {
+    const scoreMap = new Map();
+
+    const docKey = (metadata) =>
+      `${metadata.docId || ""}-${metadata.chunkIndex ?? ""}-${(metadata.text || "").slice(0, 50)}`;
+
+    // Score vector results by rank
+    vectorResults.sourceDocuments.forEach((doc, rank) => {
+      const key = docKey(doc);
+      const entry = scoreMap.get(key) || {
+        metadata: doc,
+        contextText: vectorResults.contextTexts[rank],
+        rrfScore: 0,
+      };
+      entry.rrfScore += 1 / (k + rank + 1);
+      entry.metadata.vectorScore = doc.score;
+      scoreMap.set(key, entry);
+    });
+
+    // Score keyword results by rank
+    keywordResults.sourceDocuments.forEach((doc, rank) => {
+      const key = docKey(doc);
+      const entry = scoreMap.get(key) || {
+        metadata: doc,
+        contextText: keywordResults.contextTexts[rank],
+        rrfScore: 0,
+      };
+      entry.rrfScore += 1 / (k + rank + 1);
+      entry.metadata.keywordScore = doc.keywordScore;
+      scoreMap.set(key, entry);
+    });
+
+    // Sort by RRF score descending, take topN
+    const sorted = Array.from(scoreMap.values())
+      .sort((a, b) => b.rrfScore - a.rrfScore)
+      .slice(0, topN);
+
+    return {
+      contextTexts: sorted.map((e) => e.contextText),
+      sourceDocuments: sorted.map((e) => ({
+        ...e.metadata,
+        score: e.rrfScore,
+      })),
+      scores: sorted.map((e) => e.rrfScore),
+    };
+  },
+
+  /**
+   * Performs a hybrid search combining vector similarity and keyword search,
+   * then fuses results using Reciprocal Rank Fusion (RRF).
+   * @param {Object} params
+   * @param {pgsql.Client} params.client
+   * @param {string} params.namespace
+   * @param {string} params.queryText - Raw user query text
+   * @param {number[]} params.queryVector - Embedded query vector
+   * @param {number} params.similarityThreshold
+   * @param {number} params.topN
+   * @param {string[]} params.filterIdentifiers
+   * @returns {Promise<{contextTexts: string[], sourceDocuments: Object[], scores: number[]}>}
+   */
+  hybridSearchResponse: async function ({
+    client,
+    namespace,
+    queryText,
+    queryVector,
+    similarityThreshold = 0.25,
+    topN = 4,
+    filterIdentifiers = [],
+  }) {
+    // Fetch more candidates from each source for better RRF fusion
+    const candidateCount = topN * 3;
+
+    // Run vector and keyword searches in parallel
+    const [vectorResults, keywordResults] = await Promise.all([
+      this.similarityResponse({
+        client,
+        namespace,
+        queryVector,
+        similarityThreshold,
+        topN: candidateCount,
+        filterIdentifiers,
+      }),
+      this.keywordSearchResponse({
+        client,
+        namespace,
+        queryText,
+        topN: candidateCount,
+        filterIdentifiers,
+      }),
+    ]);
+
+    this.log(
+      `Hybrid search: ${vectorResults.sourceDocuments.length} vector + ${keywordResults.sourceDocuments.length} keyword candidates`
+    );
+
+    return this.rrfFusion(vectorResults, keywordResults, topN);
+  },
+
   normalizeVector: function (vector) {
     const magnitude = Math.sqrt(
       vector.reduce((sum, val) => sum + val * val, 0)
@@ -447,9 +611,10 @@ const PGVector = {
         for (const submission of batch) {
           const embedding = `[${submission.vector.map(Number).join(",")}]`; // stringify the vector for pgvector
           const sanitizedMetadata = this.sanitizeForJsonb(submission.metadata);
+          const textContent = sanitizedMetadata?.text || "";
           await connection.query(
-            `INSERT INTO "${PGVector.tableName()}" (id, namespace, embedding, metadata) VALUES ($1, $2, $3, $4)`,
-            [submission.id, namespace, embedding, sanitizedMetadata]
+            `INSERT INTO "${PGVector.tableName()}" (id, namespace, embedding, metadata, text_search) VALUES ($1, $2, $3, $4, to_tsvector('simple', $5))`,
+            [submission.id, namespace, embedding, sanitizedMetadata, textContent]
           );
         }
         processedCount += batch.length;
@@ -807,6 +972,7 @@ const PGVector = {
     topN = 4,
     filterIdentifiers = [],
     adjacentChunks = 0,
+    hybridSearch = false,
   }) {
     let connection = null;
     if (!namespace || !input || !LLMConnector)
@@ -827,14 +993,28 @@ const PGVector = {
       }
 
       const queryVector = await LLMConnector.embedTextInput(input);
-      const result = await this.similarityResponse({
-        client: connection,
-        namespace,
-        queryVector,
-        similarityThreshold,
-        topN,
-        filterIdentifiers,
-      });
+
+      let result;
+      if (hybridSearch) {
+        result = await this.hybridSearchResponse({
+          client: connection,
+          namespace,
+          queryText: input,
+          queryVector,
+          similarityThreshold,
+          topN,
+          filterIdentifiers,
+        });
+      } else {
+        result = await this.similarityResponse({
+          client: connection,
+          namespace,
+          queryVector,
+          similarityThreshold,
+          topN,
+          filterIdentifiers,
+        });
+      }
 
       let { contextTexts, sourceDocuments } = result;
 

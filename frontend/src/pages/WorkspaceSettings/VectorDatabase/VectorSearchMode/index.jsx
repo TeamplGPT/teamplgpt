@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-// We dont support all vectorDBs yet for reranking due to complexities of how each provider
-// returns information. We need to normalize the response data so Reranker can be used for each provider.
-const supportedVectorDBs = ["lancedb"];
+// Supported vector DBs for advanced search modes
+// lancedb: supports reranking, pgvector: supports hybrid search
+const supportedVectorDBs = ["lancedb", "pgvector"];
 const hint = {
   default: {
     title: "Default",
@@ -14,6 +14,11 @@ const hint = {
     description:
       "LLM responses may take longer to generate, but your responses will be more accurate and relevant.",
   },
+  hybrid: {
+    title: "Hybrid (Vector + Keyword)",
+    description:
+      "Combines semantic vector search with keyword matching (BM25) using Reciprocal Rank Fusion. Best for Korean text and exact term matching.",
+  },
 };
 
 export default function VectorSearchMode({ workspace, setHasChanges }) {
@@ -22,6 +27,9 @@ export default function VectorSearchMode({ workspace, setHasChanges }) {
   );
   if (!workspace?.vectorDB || !supportedVectorDBs.includes(workspace?.vectorDB))
     return null;
+
+  const isPgvector = workspace?.vectorDB === "pgvector";
+  const isLancedb = workspace?.vectorDB === "lancedb";
 
   return (
     <div>
@@ -41,7 +49,12 @@ export default function VectorSearchMode({ workspace, setHasChanges }) {
         required={true}
       >
         <option value="default">Default</option>
-        <option value="rerank">Accuracy Optimized</option>
+        {isLancedb && (
+          <option value="rerank">Accuracy Optimized</option>
+        )}
+        {isPgvector && (
+          <option value="hybrid">Hybrid (Vector + Keyword)</option>
+        )}
       </select>
       <p className="text-white text-opacity-60 text-xs font-medium py-1.5">
         {hint[selection]?.description}

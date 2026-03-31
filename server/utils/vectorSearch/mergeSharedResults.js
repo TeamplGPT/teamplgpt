@@ -9,6 +9,7 @@ async function performMergedSearch({
   filterIdentifiers = [],
   rerank = false,
   adjacentChunks = 0,
+  hybridSearch = false,
 }) {
   const { getVectorDbClass } = require("../helpers");
   const VectorDb = getVectorDbClass();
@@ -23,6 +24,7 @@ async function performMergedSearch({
       filterIdentifiers,
       rerank,
       adjacentChunks,
+      hybridSearch,
     });
 
   const sharedWorkspace = await Workspace.getShared();
@@ -49,6 +51,7 @@ async function performMergedSearch({
     filterIdentifiers: [],
     rerank, // Use calling workspace's vectorSearchMode
     adjacentChunks: sharedWorkspace.adjacentChunks ?? 0,
+    hybridSearch, // Use calling workspace's vectorSearchMode
   }).catch((error) => {
     console.warn(
       "[Shared Workspace] Shared search failed:",
