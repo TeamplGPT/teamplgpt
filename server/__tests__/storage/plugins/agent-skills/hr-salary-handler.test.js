@@ -187,6 +187,7 @@ describe("hr-salary handler", () => {
 
       const calledUrl = global.fetch.mock.calls[0][0];
       const lastMonth = new Date();
+      lastMonth.setDate(1); // 월말 롤오버 방지 (e.g. 3/31 → setMonth → 2/31 → 3/3)
       lastMonth.setMonth(lastMonth.getMonth() - 1);
       const expected = `${lastMonth.getFullYear()}${String(lastMonth.getMonth() + 1).padStart(2, "0")}`;
       expect(calledUrl).toContain(`year_month=${expected}`);

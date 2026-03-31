@@ -104,8 +104,8 @@ describe("plugin.json 스키마 검증", () => {
       expect(plugin.entrypoint.params).toHaveProperty("cal_yy");
     });
 
-    it("cal_yy description에 '모든 query_type'이 명시되어 있어야 한다", () => {
-      expect(plugin.entrypoint.params.cal_yy.description).toMatch(/모든|전체/);
+    it("cal_yy description에 선택적 사용 안내가 명시되어 있어야 한다", () => {
+      expect(plugin.entrypoint.params.cal_yy.description).toMatch(/선택|YYYY/);
     });
 
     it("description에 '두 가지 파라미터만' 문구가 없어야 한다", () => {
