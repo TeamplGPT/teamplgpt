@@ -1,4 +1,5 @@
 const { Workspace } = require("../../models/workspace");
+const { rewriteQuery } = require("../queryRewriter");
 
 async function performMergedSearch({
   workspace,
@@ -9,14 +10,24 @@ async function performMergedSearch({
   filterIdentifiers = [],
   rerank = false,
   adjacentChunks = 0,
+  chatHistory = [],
 }) {
   const { getVectorDbClass } = require("../helpers");
   const VectorDb = getVectorDbClass();
 
+  // Query Rewriting: transform input before vector search
+  const { rewrittenQuery } = await rewriteQuery({
+    input,
+    workspace,
+    chatHistory,
+    LLMConnector,
+  });
+  const searchInput = rewrittenQuery || input;
+
   const localSearch = () =>
     VectorDb.performSimilaritySearch({
       namespace: workspace.slug,
-      input,
+      input: searchInput,
       LLMConnector,
       similarityThreshold,
       topN,
@@ -42,7 +53,7 @@ async function performMergedSearch({
   const localPromise = localSearch();
   const sharedPromise = VectorDb.performSimilaritySearch({
     namespace: sharedWorkspace.slug,
-    input,
+    input: searchInput,
     LLMConnector,
     similarityThreshold: sharedWorkspace.similarityThreshold ?? 0.25,
     topN: sharedWorkspace.topN ?? 4,

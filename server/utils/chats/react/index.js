@@ -306,6 +306,7 @@ async function streamReactChat(
             filterIdentifiers: pinnedDocIdentifiers,
             rerank: workspace?.vectorSearchMode === "rerank",
             adjacentChunks: workspace?.adjacentChunks ?? 0,
+            chatHistory: rawHistory,
           });
 
           if (searchResults.message) {

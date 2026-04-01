@@ -58,6 +58,7 @@ const Workspace = {
     "adjacentChunks",
     "reactMaxIterations",
     "isShared",
+    "queryRewriteMode",
   ],
 
   validations: {
@@ -151,6 +152,15 @@ const Workspace = {
     isShared: (value) => {
       if (value === true || value === "true") return true;
       return false;
+    },
+    queryRewriteMode: (value) => {
+      if (
+        !value ||
+        typeof value !== "string" ||
+        !["off", "rule", "llm"].includes(value)
+      )
+        return "off";
+      return value;
     },
   },
 
