@@ -428,6 +428,21 @@ async function chatSync({
     user,
   });
 
+  // Save LLM message log
+  try {
+    await WorkspaceChats.createLlmMessageLog(chat.id, {
+      systemPrompt:
+        messages.find((m) => m.role === "system")?.content || null,
+      userPrompt: message,
+      contextTexts,
+      chatHistory: rawHistory,
+      compressedMessages: messages,
+      llmResponse: textResponse,
+    });
+  } catch (error) {
+    console.error("[LLM Log] Failed to save log:", error.message);
+  }
+
   return {
     id: uuid,
     type: "textResponse",
@@ -798,6 +813,21 @@ async function streamChat({
       apiSessionId: sessionId,
       user,
     });
+
+    // Save LLM message log
+    try {
+      await WorkspaceChats.createLlmMessageLog(chat.id, {
+        systemPrompt:
+          messages.find((m) => m.role === "system")?.content || null,
+        userPrompt: message,
+        contextTexts,
+        chatHistory: rawHistory,
+        compressedMessages: messages,
+        llmResponse: completeText,
+      });
+    } catch (error) {
+      console.error("[LLM Log] Failed to save log:", error.message);
+    }
 
     writeResponseChunk(response, {
       uuid,

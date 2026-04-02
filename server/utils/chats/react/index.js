@@ -506,6 +506,20 @@ async function streamReactChat(
         user,
       });
 
+      // Save LLM message log
+      try {
+        await WorkspaceChats.createLlmMessageLog(chat.id, {
+          systemPrompt,
+          userPrompt: message,
+          contextTexts: pinnedContextTexts,
+          chatHistory: rawHistory,
+          compressedMessages: messages,
+          llmResponse: finalAnswer,
+        });
+      } catch (logError) {
+        console.error("[LLM Log] Failed to save log:", logError.message);
+      }
+
       if (!response.writableEnded) {
         writeResponseChunk(response, {
           uuid,
