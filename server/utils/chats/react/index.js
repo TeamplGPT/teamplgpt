@@ -306,6 +306,7 @@ async function streamReactChat(
             filterIdentifiers: pinnedDocIdentifiers,
             rerank: workspace?.vectorSearchMode === "rerank",
             adjacentChunks: workspace?.adjacentChunks ?? 0,
+            chatHistory: rawHistory,
           });
 
           if (searchResults.message) {
@@ -504,6 +505,20 @@ async function streamReactChat(
         threadId: thread?.id || null,
         user,
       });
+
+      // Save LLM message log
+      try {
+        await WorkspaceChats.createLlmMessageLog(chat.id, {
+          systemPrompt,
+          userPrompt: message,
+          contextTexts: pinnedContextTexts,
+          chatHistory: rawHistory,
+          compressedMessages: messages,
+          llmResponse: finalAnswer,
+        });
+      } catch (logError) {
+        console.error("[LLM Log] Failed to save log:", logError.message);
+      }
 
       if (!response.writableEnded) {
         writeResponseChunk(response, {

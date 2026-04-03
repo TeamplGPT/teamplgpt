@@ -77,6 +77,9 @@ describe("streamReactChat", () => {
     recentChatHistory.mockResolvedValue({ rawHistory: [], chatHistory: [] });
     chatPrompt.mockResolvedValue("You are a helpful assistant.");
     WorkspaceChats.new.mockResolvedValue({ chat: { id: 999 }, message: null });
+    WorkspaceChats.createLlmMessageLog = jest
+      .fn()
+      .mockResolvedValue({ log: { id: 1 }, message: null });
   });
 
   it("persists reactTrace when the react loop performs search then finalizes", async () => {
@@ -604,5 +607,82 @@ describe("streamReactChat", () => {
       ([, payload]) => payload.type === "abort"
     );
     expect(abortCall).toBeDefined();
+  });
+
+  // ─── LLM Message Log tests ───
+
+  it("정상 응답 시 createLlmMessageLog를 호출하여 LLM 로그를 저장한다", async () => {
+    await streamReactChat(
+      mockResponse,
+      mockWorkspace,
+      "LLM 로그 테스트",
+      { id: 7 },
+      { id: 11 },
+      []
+    );
+
+    expect(WorkspaceChats.createLlmMessageLog).toHaveBeenCalledTimes(1);
+    expect(WorkspaceChats.createLlmMessageLog).toHaveBeenCalledWith(
+      999, // chat.id from mock
+      expect.objectContaining({
+        systemPrompt: expect.any(String),
+        userPrompt: "LLM 로그 테스트",
+        compressedMessages: expect.any(Array),
+        llmResponse: expect.stringContaining("ReAct는 모델이"),
+      })
+    );
+  });
+
+  it("createLlmMessageLog에 chatHistory(rawHistory)를 전달한다", async () => {
+    const rawHistoryData = [
+      { response: JSON.stringify({ sources: [] }) },
+    ];
+    recentChatHistory.mockResolvedValue({
+      rawHistory: rawHistoryData,
+      chatHistory: [],
+    });
+
+    await streamReactChat(mockResponse, mockWorkspace, "히스토리 로그 테스트");
+
+    const logCall = WorkspaceChats.createLlmMessageLog.mock.calls[0];
+    expect(logCall[1].chatHistory).toEqual(rawHistoryData);
+  });
+
+  it("createLlmMessageLog에 pinnedContextTexts를 contextTexts로 전달한다", async () => {
+    mockPinnedDocs.mockResolvedValue([
+      {
+        id: "pin-1",
+        title: "Pinned",
+        pageContent: "핀된 문서 내용",
+      },
+    ]);
+
+    await streamReactChat(mockResponse, mockWorkspace, "핀 컨텍스트 로그 테스트");
+
+    const logCall = WorkspaceChats.createLlmMessageLog.mock.calls[0];
+    expect(logCall[1].contextTexts).toEqual(["핀된 문서 내용"]);
+  });
+
+  it("createLlmMessageLog 실패 시에도 채팅 흐름이 정상 완료된다", async () => {
+    WorkspaceChats.createLlmMessageLog = jest
+      .fn()
+      .mockRejectedValue(new Error("DB log error"));
+
+    await streamReactChat(mockResponse, mockWorkspace, "로그 실패 테스트");
+
+    // 채팅 자체는 정상 저장
+    expect(WorkspaceChats.new).toHaveBeenCalledTimes(1);
+
+    // finalizeResponseStream이 전송되어야 함
+    const finalizeCall = writeResponseChunk.mock.calls.find(
+      ([, payload]) => payload.type === "finalizeResponseStream"
+    );
+    expect(finalizeCall).toBeDefined();
+
+    // abort가 전송되면 안 됨
+    const abortCall = writeResponseChunk.mock.calls.find(
+      ([, payload]) => payload.type === "abort"
+    );
+    expect(abortCall).toBeUndefined();
   });
 });

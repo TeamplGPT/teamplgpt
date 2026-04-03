@@ -308,6 +308,7 @@ async function chatSync({
           filterIdentifiers: pinnedDocIdentifiers,
           rerank: workspace?.vectorSearchMode === "rerank",
           adjacentChunks: workspace?.adjacentChunks ?? 0,
+          chatHistory: rawHistory,
         })
       : {
           contextTexts: [],
@@ -426,6 +427,21 @@ async function chatSync({
     apiSessionId: sessionId,
     user,
   });
+
+  // Save LLM message log
+  try {
+    await WorkspaceChats.createLlmMessageLog(chat.id, {
+      systemPrompt:
+        messages.find((m) => m.role === "system")?.content || null,
+      userPrompt: message,
+      contextTexts,
+      chatHistory: rawHistory,
+      compressedMessages: messages,
+      llmResponse: textResponse,
+    });
+  } catch (error) {
+    console.error("[LLM Log] Failed to save log:", error.message);
+  }
 
   return {
     id: uuid,
@@ -664,6 +680,7 @@ async function streamChat({
           filterIdentifiers: pinnedDocIdentifiers,
           rerank: workspace?.vectorSearchMode === "rerank",
           adjacentChunks: workspace?.adjacentChunks ?? 0,
+          chatHistory: rawHistory,
         })
       : {
           contextTexts: [],
@@ -796,6 +813,21 @@ async function streamChat({
       apiSessionId: sessionId,
       user,
     });
+
+    // Save LLM message log
+    try {
+      await WorkspaceChats.createLlmMessageLog(chat.id, {
+        systemPrompt:
+          messages.find((m) => m.role === "system")?.content || null,
+        userPrompt: message,
+        contextTexts,
+        chatHistory: rawHistory,
+        compressedMessages: messages,
+        llmResponse: completeText,
+      });
+    } catch (error) {
+      console.error("[LLM Log] Failed to save log:", error.message);
+    }
 
     writeResponseChunk(response, {
       uuid,

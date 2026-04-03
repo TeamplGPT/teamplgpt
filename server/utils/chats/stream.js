@@ -178,6 +178,7 @@ async function streamChatWithWorkspace(
           filterIdentifiers: pinnedDocIdentifiers,
           rerank: workspace?.vectorSearchMode === "rerank",
           adjacentChunks: workspace?.adjacentChunks ?? 0,
+          chatHistory: rawHistory,
         })
       : {
           contextTexts: [],
