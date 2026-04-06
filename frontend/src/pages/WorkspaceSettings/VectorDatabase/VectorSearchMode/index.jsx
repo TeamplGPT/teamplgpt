@@ -1,27 +1,12 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 // Supported vector DBs for advanced search modes
 // lancedb: supports reranking, pgvector: supports hybrid search
 const supportedVectorDBs = ["lancedb", "pgvector"];
-const hint = {
-  default: {
-    title: "Default",
-    description:
-      "This is the fastest performance, but may not return the most relevant results leading to model hallucinations.",
-  },
-  rerank: {
-    title: "Accuracy Optimized",
-    description:
-      "LLM responses may take longer to generate, but your responses will be more accurate and relevant.",
-  },
-  hybrid: {
-    title: "Hybrid (Vector + Keyword)",
-    description:
-      "Combines semantic vector search with keyword matching (BM25) using Reciprocal Rank Fusion. Best for Korean text and exact term matching.",
-  },
-};
 
 export default function VectorSearchMode({ workspace, setHasChanges }) {
+  const { t } = useTranslation();
   const [selection, setSelection] = useState(
     workspace?.vectorSearchMode ?? "default"
   );
@@ -35,7 +20,7 @@ export default function VectorSearchMode({ workspace, setHasChanges }) {
     <div>
       <div className="flex flex-col">
         <label htmlFor="name" className="block input-label">
-          Search Preference
+          {t("vector-workspace.searchMode.title")}
         </label>
       </div>
       <select
@@ -48,16 +33,22 @@ export default function VectorSearchMode({ workspace, setHasChanges }) {
         }}
         required={true}
       >
-        <option value="default">Default</option>
+        <option value="default">
+          {t("vector-workspace.searchMode.default.title")}
+        </option>
         {isLancedb && (
-          <option value="rerank">Accuracy Optimized</option>
+          <option value="rerank">
+            {t("vector-workspace.searchMode.rerank.title")}
+          </option>
         )}
         {isPgvector && (
-          <option value="hybrid">Hybrid (Vector + Keyword)</option>
+          <option value="hybrid">
+            {t("vector-workspace.searchMode.hybrid.title")}
+          </option>
         )}
       </select>
       <p className="text-white text-opacity-60 text-xs font-medium py-1.5">
-        {hint[selection]?.description}
+        {t(`vector-workspace.searchMode.${selection}.description`)}
       </p>
     </div>
   );
