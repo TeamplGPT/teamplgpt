@@ -141,6 +141,7 @@ describe("resolveDateParam", () => {
       const result = resolveDateParam("지난달", "year_month");
       expect(result).toMatch(/^\d{6}$/);
       const lastMonth = new Date();
+      lastMonth.setDate(1); // 월말 롤오버 방지 (e.g. 3/31 → setMonth → 2/31 → 3/3)
       lastMonth.setMonth(lastMonth.getMonth() - 1);
       const expected = `${lastMonth.getFullYear()}${String(lastMonth.getMonth() + 1).padStart(2, "0")}`;
       expect(result).toBe(expected);
@@ -150,6 +151,7 @@ describe("resolveDateParam", () => {
       const result = resolveDateParam("다음달", "year_month");
       expect(result).toMatch(/^\d{6}$/);
       const nextMonth = new Date();
+      nextMonth.setDate(1); // 월말 롤오버 방지
       nextMonth.setMonth(nextMonth.getMonth() + 1);
       const expected = `${nextMonth.getFullYear()}${String(nextMonth.getMonth() + 1).padStart(2, "0")}`;
       expect(result).toBe(expected);
