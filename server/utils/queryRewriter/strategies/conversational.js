@@ -43,13 +43,15 @@ async function llmRewrite(input, chatHistory, LLMConnector) {
 
   const messages = [
     { role: "system", content: REWRITE_SYSTEM_PROMPT },
-    ...recentHistory.map((h) => ({
-      role: h.role === "user" ? "user" : "assistant",
-      content:
-        typeof h.content === "string"
-          ? h.content.slice(0, 300) // Truncate long messages
-          : JSON.stringify(h.content).slice(0, 300),
-    })),
+    ...recentHistory
+      .filter((h) => h.content != null)
+      .map((h) => ({
+        role: h.role === "user" ? "user" : "assistant",
+        content:
+          typeof h.content === "string"
+            ? h.content.slice(0, 300) // Truncate long messages
+            : (JSON.stringify(h.content) ?? "").slice(0, 300),
+      })),
     {
       role: "user",
       content: `원본 질문: "${input}"\n\n위 질문을 벡터 검색에 최적화된 쿼리로 재작성하세요. 쿼리만 출력하세요.`,
