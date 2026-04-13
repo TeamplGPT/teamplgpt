@@ -14,6 +14,7 @@ const {
   recentChatHistory,
   sourceIdentifier,
 } = require("./index");
+const { ChatTraceLogger } = require("./traceLogger");
 
 const VALID_CHAT_MODE = ["chat", "query", "react"];
 
@@ -27,6 +28,7 @@ async function streamChatWithWorkspace(
   attachments = []
 ) {
   const uuid = uuidv4();
+  const logger = new ChatTraceLogger(uuid, { chatMode });
   const updatedMessage = await grepCommand(message, user);
 
   if (Object.keys(VALID_COMMANDS).includes(updatedMessage)) {
@@ -83,6 +85,10 @@ async function streamChatWithWorkspace(
   const sharedWorkspace = await Workspace.getShared();
   const hasSharedFallback = sharedWorkspace && sharedWorkspace.id !== workspace.id;
   if ((!hasVectorizedSpace || embeddingsCount === 0) && chatMode === "query" && !hasSharedFallback) {
+    logger.traceStart({ query: updatedMessage, workspace, chatHistoryCount: 0, pinnedDocsCount: 0, parsedFilesCount: 0 });
+    logger.searchSkipped("no embeddings");
+    logger.traceEnd({ reason: "query_no_embeddings" });
+    logger.traceSummary();
     const textResponse =
       workspace?.queryRefusalResponse ??
       "There is no relevant information in this workspace to answer your query.";
@@ -167,6 +173,15 @@ async function streamChatWithWorkspace(
     });
   });
 
+  logger.traceStart({
+    query: updatedMessage,
+    workspace,
+    chatHistoryCount: chatHistory.length,
+    pinnedDocsCount: pinnedDocIdentifiers.length,
+    parsedFilesCount: parsedFiles.length,
+  });
+
+  const searchStartMs = Date.now();
   const vectorSearchResults =
     embeddingsCount !== 0
       ? await performMergedSearch({
@@ -186,9 +201,19 @@ async function streamChatWithWorkspace(
           sources: [],
           message: null,
         };
+  const searchDurationMs = Date.now() - searchStartMs;
 
   // Failed similarity search if it was run at all and failed.
   if (!!vectorSearchResults.message) {
+    logger.search({
+      query: updatedMessage,
+      mode: workspace?.vectorSearchMode || "default",
+      resultCount: 0,
+      durationMs: searchDurationMs,
+      error: vectorSearchResults.message,
+    });
+    logger.traceEnd({ reason: "search_error" });
+    logger.traceSummary();
     writeResponseChunk(response, {
       id: uuid,
       type: "abort",
@@ -198,6 +223,18 @@ async function streamChatWithWorkspace(
       error: vectorSearchResults.message,
     });
     return;
+  }
+
+  if (embeddingsCount === 0) {
+    logger.searchSkipped("no embeddings");
+  } else {
+    logger.search({
+      query: updatedMessage,
+      mode: workspace?.vectorSearchMode || "default",
+      resultCount: vectorSearchResults.sources.length,
+      durationMs: searchDurationMs,
+      hasShared: !!sharedWorkspace && sharedWorkspace.id !== workspace.id,
+    });
   }
 
   const { fillSourceWindow } = require("../helpers/chat");
@@ -218,9 +255,19 @@ async function streamChatWithWorkspace(
   contextTexts = [...contextTexts, ...filledSources.contextTexts];
   sources = [...sources, ...vectorSearchResults.sources];
 
+  const backfillCount = filledSources.contextTexts.length;
+  logger.context({
+    pinnedCount: pinnedDocIdentifiers.length,
+    searchCount: vectorSearchResults.sources.length,
+    backfillCount,
+    totalCount: contextTexts.length,
+  });
+
   // If in query mode and no context chunks are found from search, backfill, or pins -  do not
   // let the LLM try to hallucinate a response or use general knowledge and exit early
   if (chatMode === "query" && contextTexts.length === 0) {
+    logger.traceEnd({ reason: "query_no_context" });
+    logger.traceSummary();
     const textResponse =
       workspace?.queryRefusalResponse ??
       "There is no relevant information in this workspace to answer your query.";
@@ -270,6 +317,7 @@ async function streamChatWithWorkspace(
     },
     rawHistory
   );
+  logger.compress(messages.length);
 
   // Verify image data survived compression
   if (attachments?.length > 0) {
@@ -309,11 +357,13 @@ async function streamChatWithWorkspace(
     console.log(
       `\x1b[31m[STREAMING DISABLED]\x1b[0m Streaming is not available for ${LLMConnector.constructor.name}. Will use regular chat method.`
     );
+    logger.llmStart({ messageCount: messages.length, streaming: false });
     const { textResponse, metrics: performanceMetrics } =
       await LLMConnector.getChatCompletion(messages, {
         temperature: workspace?.openAiTemp ?? LLMConnector.defaultTemp,
         user: user,
       });
+    logger.llmEnd({ responseLength: textResponse?.length || 0, isEmpty: !textResponse });
 
     completeText = textResponse;
     metrics = performanceMetrics;
@@ -327,6 +377,7 @@ async function streamChatWithWorkspace(
       metrics,
     });
   } else {
+    logger.llmStart({ messageCount: messages.length, streaming: true });
     const stream = await LLMConnector.streamGetChatCompletion(messages, {
       temperature: workspace?.openAiTemp ?? LLMConnector.defaultTemp,
       user: user,
@@ -335,10 +386,13 @@ async function streamChatWithWorkspace(
       uuid,
       sources,
     });
+    logger.llmEnd({ responseLength: completeText?.length || 0, isEmpty: !completeText });
     metrics = stream.metrics;
   }
 
   if (completeText?.length > 0) {
+    logger.traceEnd({ reason: "success", answerLength: completeText.length, sourceCount: sources.length });
+    logger.traceSummary();
     const { chat } = await WorkspaceChats.new({
       workspaceId: workspace.id,
       prompt: message,
@@ -375,6 +429,8 @@ async function streamChatWithWorkspace(
     return;
   }
 
+  logger.traceEnd({ reason: "empty_llm_response" });
+  logger.traceSummary();
   writeResponseChunk(response, {
     uuid,
     type: "finalizeResponseStream",

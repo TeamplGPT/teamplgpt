@@ -8,6 +8,7 @@ const { chatPrompt, recentChatHistory, sourceIdentifier } = require("../index");
 const { parseReactOutput } = require("./outputParser");
 const { performMergedSearch } = require("../../vectorSearch/mergeSharedResults");
 const { Workspace } = require("../../../models/workspace");
+const { ChatTraceLogger } = require("../traceLogger");
 
 // Maximum characters per search observation to prevent LLM context window overflow.
 // Tune based on model context limits.
@@ -125,6 +126,7 @@ async function streamReactChat(
   attachments = []
 ) {
   const uuid = uuidv4();
+  const logger = new ChatTraceLogger(uuid, { chatMode: "react" });
 
   const LLMConnector = getLLMProvider({
     provider: workspace?.chatProvider,
@@ -202,19 +204,40 @@ async function streamReactChat(
 
     const maxIterations = workspace?.reactMaxIterations ?? 5;
     let llmCallCount = 0;
+
+    logger.traceStart({
+      query: message,
+      workspace,
+      chatHistoryCount: chatHistory.length,
+      pinnedDocsCount: pinnedDocIdentifiers.length,
+      maxIterations,
+    });
+
     for (let i = 0; i < maxIterations; i++) {
       if (response.writableEnded) break;
+      logger.iterationStart(i + 1, maxIterations);
 
       // Non-streaming LLM call for intermediate steps
       llmCallCount++;
+      logger.llmStart({ messageCount: messages.length });
       const { textResponse } = await LLMConnector.getChatCompletion(messages, {
         temperature: workspace?.openAiTemp ?? LLMConnector.defaultTemp,
+      });
+      const llmDur = logger.llmEnd({
+        responseLength: textResponse?.length || 0,
+        isEmpty: !textResponse,
       });
 
       // Check if client disconnected during the async LLM call to avoid wasted work
       if (response.writableEnded) return;
 
       if (!textResponse) {
+        logger.traceEnd({
+          reason: "empty_llm_response",
+          iterations: i + 1,
+          maxIterations,
+        });
+        logger.traceSummary();
         if (!response.writableEnded) {
           writeResponseChunk(response, {
             uuid,
@@ -229,7 +252,8 @@ async function streamReactChat(
       }
 
       const parsed = parseReactOutput(textResponse);
-      reactTrace.push({ iteration: i + 1, llmOutput: textResponse, parsed });
+      logger.parseResult(parsed);
+      reactTrace.push({ iteration: i + 1, llmOutput: textResponse, parsed, llmDurationMs: llmDur });
 
       if (parsed.type === "final_answer") {
         finalAnswer = parsed.answer;
@@ -270,6 +294,7 @@ async function streamReactChat(
         // Perform similarity search
         let observation = "";
         let currentSearchSourceCount = 0;
+        const searchStartMs = Date.now();
         // Skip local-only fallback if shared workspace exists (merged search may find results)
         const sharedWorkspace = await Workspace.getShared();
         const hasSharedFallback = sharedWorkspace && sharedWorkspace.id !== workspace.id;
@@ -368,11 +393,21 @@ async function streamReactChat(
         }
 
         // Truncate observation to prevent context overflow
-        if (observation.length > OBSERVATION_MAX_CHARS) {
+        const wasTruncated = observation.length > OBSERVATION_MAX_CHARS;
+        if (wasTruncated) {
           observation =
             observation.substring(0, OBSERVATION_MAX_CHARS) +
             "\n...(truncated)";
         }
+        const searchDurationMs = Date.now() - searchStartMs;
+
+        logger.search({
+          query: searchQuery,
+          mode: workspace?.vectorSearchMode || "default",
+          resultCount: currentSearchSourceCount,
+          durationMs: searchDurationMs,
+        });
+        logger.observation(observation.length, wasTruncated);
 
         sendStatusMessage(
           response,
@@ -384,6 +419,7 @@ async function streamReactChat(
           iteration: i + 1,
           searchQuery,
           observationLength: observation.length,
+          searchDurationMs,
         });
 
         // Append assistant response and observation to messages for next iteration
@@ -421,10 +457,12 @@ async function streamReactChat(
           "You have reached the maximum number of search iterations. Based on all the information gathered so far, please provide your Final Answer now.",
       });
       llmCallCount++;
+      logger.llmStart({ messageCount: messages.length });
       const { textResponse: summaryResponse } =
         await LLMConnector.getChatCompletion(messages, {
           temperature: workspace?.openAiTemp ?? LLMConnector.defaultTemp,
         });
+      logger.llmEnd({ responseLength: summaryResponse?.length || 0, isEmpty: !summaryResponse });
 
       if (!summaryResponse) {
         console.error(
@@ -449,6 +487,12 @@ async function streamReactChat(
       console.error("[ReAct Chat] finalAnswer is empty, cannot stream", {
         workspaceId: workspace.id,
       });
+      logger.traceEnd({
+        reason: "empty_llm_response",
+        iterations: logger.iterationCount,
+        maxIterations,
+      });
+      logger.traceSummary();
       if (!response.writableEnded) {
         writeResponseChunk(response, {
           uuid,
@@ -463,6 +507,18 @@ async function streamReactChat(
     }
 
     const uniqueSources = deduplicateSources(allSources);
+
+    const endReason = finalAnswer !== null
+      ? (logger.iterationCount < maxIterations ? "final_answer" : "max_iterations_summary")
+      : "max_iterations_summary";
+    logger.traceEnd({
+      reason: endReason,
+      answerLength: finalAnswer?.length || 0,
+      sourceCount: uniqueSources.length,
+      iterations: logger.iterationCount,
+      maxIterations,
+    });
+    logger.traceSummary();
 
     // LLM 호출 횟수를 statusResponse로 전송
     sendStatusMessage(
@@ -544,6 +600,12 @@ async function streamReactChat(
       workspaceId: workspace.id,
       stack: error.stack,
     });
+    logger.traceEnd({
+      reason: "error",
+      iterations: logger.iterationCount,
+      maxIterations: workspace?.reactMaxIterations ?? 5,
+    });
+    logger.traceSummary();
     if (!response.writableEnded) {
       writeResponseChunk(response, {
         uuid,
