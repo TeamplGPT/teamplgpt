@@ -12,17 +12,16 @@ async function performMergedSearch({
   adjacentChunks = 0,
   chatHistory = [],
   hybridSearch = false,
+  skipRewrite = false,
 }) {
   const { getVectorDbClass } = require("../helpers");
   const VectorDb = getVectorDbClass();
 
   // Query Rewriting: transform input before vector search
-  const { rewrittenQuery } = await rewriteQuery({
-    input,
-    workspace,
-    chatHistory,
-    LLMConnector,
-  });
+  // Skipped in ReAct mode where the LLM already generates optimized search queries
+  const { rewrittenQuery } = skipRewrite
+    ? { rewrittenQuery: input }
+    : await rewriteQuery({ input, workspace, chatHistory, LLMConnector });
   const searchInput = rewrittenQuery || input;
 
   const localSearch = () =>

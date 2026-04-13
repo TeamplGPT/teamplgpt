@@ -342,4 +342,83 @@ describe("performMergedSearch", () => {
       expect(result.contextTexts[1]).toBe("local context A");
     });
   });
+
+  describe("skipRewrite 파라미터", () => {
+    beforeEach(() => {
+      mockGetShared.mockResolvedValue(null);
+    });
+
+    it("skipRewrite=true: 원본 쿼리가 그대로 VectorDb에 전달된다", async () => {
+      const expected = {
+        contextTexts: ["text1"],
+        sources: [{ title: "doc1", score: 0.8 }],
+        message: false,
+      };
+      mockPerformSimilaritySearch.mockResolvedValue(expected);
+
+      const result = await performMergedSearch({
+        ...defaultParams,
+        input: "홍길동 급여 지급 내역",
+        skipRewrite: true,
+      });
+
+      expect(result).toEqual(expected);
+      const searchCall = mockPerformSimilaritySearch.mock.calls[0][0];
+      expect(searchCall.input).toBe("홍길동 급여 지급 내역");
+    });
+
+    it("skipRewrite 미지정(기본값 false): 기존 동작과 동일하다", async () => {
+      const expected = {
+        contextTexts: ["text1"],
+        sources: [{ title: "doc1", score: 0.8 }],
+        message: false,
+      };
+      mockPerformSimilaritySearch.mockResolvedValue(expected);
+
+      const result = await performMergedSearch({
+        ...defaultParams,
+        input: "테스트 쿼리",
+      });
+
+      expect(result).toEqual(expected);
+      expect(mockPerformSimilaritySearch).toHaveBeenCalledTimes(1);
+    });
+
+    it("skipRewrite=true + 공용 WS: 양쪽 검색 모두 원본 쿼리를 사용한다", async () => {
+      const sharedWorkspace = {
+        id: 2,
+        slug: "shared-ws",
+        similarityThreshold: 0.25,
+        topN: 4,
+        adjacentChunks: 0,
+      };
+      mockGetShared.mockResolvedValue(sharedWorkspace);
+      mockHasNamespace.mockResolvedValue(true);
+
+      const localResult = {
+        contextTexts: ["local"],
+        sources: [{ title: "local-doc", score: 0.9, chunkSource: "l://1" }],
+        message: false,
+      };
+      const sharedResult = {
+        contextTexts: ["shared"],
+        sources: [{ title: "shared-doc", score: 0.7, chunkSource: "s://1" }],
+        message: false,
+      };
+      mockPerformSimilaritySearch
+        .mockResolvedValueOnce(localResult)
+        .mockResolvedValueOnce(sharedResult);
+
+      await performMergedSearch({
+        ...defaultParams,
+        input: "원본 검색어",
+        skipRewrite: true,
+      });
+
+      const localCall = mockPerformSimilaritySearch.mock.calls[0][0];
+      const sharedCall = mockPerformSimilaritySearch.mock.calls[1][0];
+      expect(localCall.input).toBe("원본 검색어");
+      expect(sharedCall.input).toBe("원본 검색어");
+    });
+  });
 });

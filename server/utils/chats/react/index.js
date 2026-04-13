@@ -308,6 +308,7 @@ async function streamReactChat(
             hybridSearch: workspace?.vectorSearchMode === "hybrid",
             adjacentChunks: workspace?.adjacentChunks ?? 0,
             chatHistory: rawHistory,
+            skipRewrite: true,
           });
 
           if (searchResults.message) {
