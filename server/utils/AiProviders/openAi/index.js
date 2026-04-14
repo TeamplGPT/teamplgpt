@@ -53,6 +53,14 @@ class OpenAiLLM {
     return "streamGetChatCompletion" in this;
   }
 
+  supportsToolCalling() {
+    return true;
+  }
+
+  toolCallingFormat() {
+    return "openai-responses";
+  }
+
   static promptWindowLimit(modelName) {
     return MODEL_MAP.get("openai", modelName) ?? 4_096;
   }
@@ -143,7 +151,7 @@ class OpenAiLLM {
     return temperature;
   }
 
-  async getChatCompletion(messages = null, { temperature = 0.7 }) {
+  async getChatCompletion(messages = null, { temperature = 0.7, tools = null }) {
     if (!(await this.isValidChatCompletionModel(this.model)))
       throw new Error(
         `OpenAI chat: ${this.model} is not valid for chat completion!`
@@ -156,32 +164,51 @@ class OpenAiLLM {
           input: messages,
           store: false,
           temperature: this.#temperature(this.model, temperature),
+          ...(tools?.length > 0 ? { tools } : {}),
         })
         .catch((e) => {
           throw new Error(e.message);
         })
     );
 
+    const usage = result.output.usage || {};
+    const metrics = {
+      prompt_tokens: usage.input_tokens || 0,
+      completion_tokens: usage.output_tokens || 0,
+      total_tokens: usage.total_tokens || 0,
+      outputTps: usage.output_tokens
+        ? usage.output_tokens / result.duration
+        : 0,
+      duration: result.duration,
+      model: this.model,
+      timestamp: new Date(),
+    };
+
+    // Check for tool calls in output
+    const functionCalls = (result.output?.output || []).filter(
+      (item) => item.type === "function_call"
+    );
+    if (functionCalls.length > 0) {
+      return {
+        textResponse: result.output.output_text || "",
+        toolCalls: functionCalls.map((item) => ({
+          name: item.name,
+          call_id: item.call_id,
+          arguments: item.arguments,
+        })),
+        metrics,
+      };
+    }
+
     if (!result.output.hasOwnProperty("output_text")) return null;
 
-    const usage = result.output.usage || {};
     return {
       textResponse: result.output.output_text,
-      metrics: {
-        prompt_tokens: usage.input_tokens || 0,
-        completion_tokens: usage.output_tokens || 0,
-        total_tokens: usage.total_tokens || 0,
-        outputTps: usage.output_tokens
-          ? usage.output_tokens / result.duration
-          : 0,
-        duration: result.duration,
-        model: this.model,
-        timestamp: new Date(),
-      },
+      metrics,
     };
   }
 
-  async streamGetChatCompletion(messages = null, { temperature = 0.7 }) {
+  async streamGetChatCompletion(messages = null, { temperature = 0.7, tools = null }) {
     if (!(await this.isValidChatCompletionModel(this.model)))
       throw new Error(
         `OpenAI chat: ${this.model} is not valid for chat completion!`
@@ -194,6 +221,7 @@ class OpenAiLLM {
         input: messages,
         store: false,
         temperature: this.#temperature(this.model, temperature),
+        ...(tools?.length > 0 ? { tools } : {}),
       }),
       messages,
       runPromptTokenCalculation: false,
@@ -213,6 +241,7 @@ class OpenAiLLM {
 
     return new Promise(async (resolve) => {
       let fullText = "";
+      const pendingToolCalls = [];
 
       const handleAbort = () => {
         stream?.endMeasurement(usage);
@@ -237,6 +266,15 @@ class OpenAiLLM {
                 error: false,
               });
             }
+          } else if (
+            chunk.type === "response.output_item.done" &&
+            chunk.item?.type === "function_call"
+          ) {
+            pendingToolCalls.push({
+              name: chunk.item.name,
+              call_id: chunk.item.call_id,
+              arguments: chunk.item.arguments,
+            });
           } else if (chunk.type === "response.completed") {
             const { response: res } = chunk;
             if (res.hasOwnProperty("usage") && !!res.usage) {
@@ -247,6 +285,14 @@ class OpenAiLLM {
                 completion_tokens: res.usage?.output_tokens || 0,
                 total_tokens: res.usage?.total_tokens || 0,
               };
+            }
+
+            // Tool calls detected — return for tool execution without closing stream
+            if (pendingToolCalls.length > 0) {
+              response.removeListener("close", handleAbort);
+              stream?.endMeasurement(usage);
+              resolve({ text: fullText, toolCalls: pendingToolCalls });
+              break;
             }
 
             writeResponseChunk(response, {

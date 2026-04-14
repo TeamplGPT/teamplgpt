@@ -15,6 +15,9 @@ const {
   sourceIdentifier,
 } = require("./index");
 const { ChatTraceLogger } = require("./traceLogger");
+const { ChatToolsManager } = require("./toolCalling/manager");
+const { ToolExecutor } = require("./toolCalling/executor");
+const { appendToolResult } = require("./toolCalling/appendToolResult");
 
 const VALID_CHAT_MODE = ["chat", "query", "react"];
 
@@ -351,43 +354,105 @@ async function streamChatWithWorkspace(
     compressedMessages: messages,
   };
 
-  // If streaming is not explicitly enabled for connector
-  // we do regular waiting of a response and send a single chunk.
-  if (LLMConnector.streamingEnabled() !== true) {
-    console.log(
-      `\x1b[31m[STREAMING DISABLED]\x1b[0m Streaming is not available for ${LLMConnector.constructor.name}. Will use regular chat method.`
-    );
-    logger.llmStart({ messageCount: messages.length, streaming: false });
-    const { textResponse, metrics: performanceMetrics } =
-      await LLMConnector.getChatCompletion(messages, {
+  // Tool calling setup — get tool definitions if provider supports it
+  const MAX_TOOL_ROUNDS = 5;
+  const tools =
+    typeof LLMConnector.supportsToolCalling === "function" &&
+    LLMConnector.supportsToolCalling()
+      ? ChatToolsManager.getToolDefinitions(LLMConnector.toolCallingFormat())
+      : null;
+
+  let currentMessages = [...messages];
+
+  // Tool calling loop — LLM may request tool execution, then we re-call with results
+  for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
+    if (LLMConnector.streamingEnabled() !== true) {
+      // Non-streaming path
+      if (round === 0) {
+        console.log(
+          `\x1b[31m[STREAMING DISABLED]\x1b[0m Streaming is not available for ${LLMConnector.constructor.name}. Will use regular chat method.`
+        );
+      }
+      logger.llmStart({ messageCount: currentMessages.length, streaming: false });
+      const result = await LLMConnector.getChatCompletion(currentMessages, {
         temperature: workspace?.openAiTemp ?? LLMConnector.defaultTemp,
         user: user,
+        tools,
       });
-    logger.llmEnd({ responseLength: textResponse?.length || 0, isEmpty: !textResponse });
+      logger.llmEnd({
+        responseLength: result?.textResponse?.length || 0,
+        isEmpty: !result?.textResponse,
+      });
 
-    completeText = textResponse;
-    metrics = performanceMetrics;
-    writeResponseChunk(response, {
-      uuid,
-      sources,
-      type: "textResponseChunk",
-      textResponse: completeText,
-      close: true,
-      error: false,
-      metrics,
-    });
-  } else {
-    logger.llmStart({ messageCount: messages.length, streaming: true });
-    const stream = await LLMConnector.streamGetChatCompletion(messages, {
-      temperature: workspace?.openAiTemp ?? LLMConnector.defaultTemp,
-      user: user,
-    });
-    completeText = await LLMConnector.handleStream(response, stream, {
-      uuid,
-      sources,
-    });
-    logger.llmEnd({ responseLength: completeText?.length || 0, isEmpty: !completeText });
-    metrics = stream.metrics;
+      if (result?.toolCalls?.length > 0 && round < MAX_TOOL_ROUNDS) {
+        for (const tc of result.toolCalls) {
+          logger.toolCall({ name: tc.name, arguments: tc.arguments, round });
+          const tcStart = Date.now();
+          const toolResult = await ToolExecutor.execute(tc);
+          logger.toolCallEnd({ name: tc.name, durationMs: Date.now() - tcStart, isError: toolResult.startsWith("Error") });
+          currentMessages = appendToolResult(currentMessages, tc, toolResult, LLMConnector.toolCallingFormat());
+        }
+        metrics = result.metrics || {};
+        continue;
+      }
+
+      completeText = result?.textResponse;
+      metrics = result?.metrics || {};
+      writeResponseChunk(response, {
+        uuid,
+        sources,
+        type: "textResponseChunk",
+        textResponse: completeText,
+        close: true,
+        error: false,
+        metrics,
+      });
+      break;
+    } else {
+      // Streaming path
+      logger.llmStart({ messageCount: currentMessages.length, streaming: true });
+      const stream = await LLMConnector.streamGetChatCompletion(currentMessages, {
+        temperature: workspace?.openAiTemp ?? LLMConnector.defaultTemp,
+        user: user,
+        tools,
+      });
+      const streamResult = await LLMConnector.handleStream(response, stream, {
+        uuid,
+        sources,
+      });
+
+      // handleStream returns string (text-only) or { text, toolCalls } (tool calling)
+      if (typeof streamResult === "object" && streamResult?.toolCalls?.length > 0 && round < MAX_TOOL_ROUNDS) {
+        logger.llmEnd({ responseLength: streamResult.text?.length || 0, isEmpty: !streamResult.text });
+        for (const tc of streamResult.toolCalls) {
+          logger.toolCall({ name: tc.name, arguments: tc.arguments, round });
+          const tcStart = Date.now();
+          const toolResult = await ToolExecutor.execute(tc);
+          logger.toolCallEnd({ name: tc.name, durationMs: Date.now() - tcStart, isError: toolResult.startsWith("Error") });
+          currentMessages = appendToolResult(currentMessages, tc, toolResult, LLMConnector.toolCallingFormat());
+        }
+        metrics = stream.metrics || {};
+        continue;
+      }
+
+      // If tool calls present but max rounds reached, write the close chunk that handleStream skipped
+      if (typeof streamResult === "object" && streamResult?.toolCalls?.length > 0) {
+        console.warn(`[ToolCalling] Max rounds (${MAX_TOOL_ROUNDS}) reached, using partial response`);
+        writeResponseChunk(response, {
+          uuid,
+          sources,
+          type: "textResponseChunk",
+          textResponse: "",
+          close: true,
+          error: false,
+        });
+      }
+
+      completeText = typeof streamResult === "string" ? streamResult : streamResult?.text;
+      logger.llmEnd({ responseLength: completeText?.length || 0, isEmpty: !completeText });
+      metrics = stream.metrics || {};
+      break;
+    }
   }
 
   if (completeText?.length > 0) {
