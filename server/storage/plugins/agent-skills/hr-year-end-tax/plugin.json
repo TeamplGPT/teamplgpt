@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "hubId": "hr-year-end-tax",
   "author": "teamplgpt",
-  "description": "직원 연말정산 정보를 조회합니다. emp_no와 query_type은 필수이며, 모든 query_type에서 cal_yy(귀속연도)를 선택적으로 지정할 수 있습니다. 사용자가 특정 연도를 언급하면 cal_yy를 포함하고, 언급하지 않으면 생략하세요(서버 기본값 적용). query_type 종류: credit_card(신용카드), donation(기부금), education(교육비), family(부양가족), insurance(보장성보험), medical(의료비), previous_employer(종전근무지), result(연말정산결과), savings(연금저축), summary(공제요약). '공제 정보'나 '연말정산 알려줘'처럼 종류가 불분명하면 summary를 사용하세요. [중요-날짜규칙] (1) 연도 파라미터를 직접 변환하지 마세요. 서버가 자동 변환합니다. (2) 사용자가 말한 연도를 숫자(2025) 또는 한국어(작년, 올해 등) 그대로 전달하세요. (3) 연도를 되묻지 마세요.",
+  "description": "직원 연말정산(소득공제, 세액공제, 부양가족, 의료비 등)을 조회합니다. cal_yy(귀속연도)를 선택적으로 지정할 수 있으며, 연도를 언급하지 않으면 생략하세요(서버 기본값 적용). query_type 종류: credit_card(신용카드), donation(기부금), education(교육비), family(부양가족), insurance(보장성보험), medical(의료비), previous_employer(종전근무지), result(연말정산결과), savings(연금저축), summary(공제요약). 종류가 불분명하면 summary를 사용하세요.",
   "entrypoint": {
     "file": "handler.js",
     "params": {
@@ -14,7 +14,7 @@
         "type": "string"
       },
       "query_type": {
-        "description": "조회 종류 (필수).",
+        "description": "조회 종류 (필수). credit_card=신용카드, donation=기부금, education=교육비, family=부양가족, insurance=보장성보험, medical=의료비, previous_employer=종전근무지, result=연말정산결과, savings=연금저축, summary=공제요약.",
         "type": "string",
         "enum": [
           "credit_card",
