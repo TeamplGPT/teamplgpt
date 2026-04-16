@@ -47,6 +47,14 @@ class AnthropicLLM {
     return "streamGetChatCompletion" in this;
   }
 
+  supportsToolCalling() {
+    return true;
+  }
+
+  toolCallingFormat() {
+    return "anthropic";
+  }
+
   static promptWindowLimit(modelName) {
     return MODEL_MAP.get("anthropic", modelName) ?? 100_000;
   }
@@ -147,7 +155,7 @@ class AnthropicLLM {
     ];
   }
 
-  async getChatCompletion(messages = null, { temperature = 0.7 }) {
+  async getChatCompletion(messages = null, { temperature = 0.7, tools = null }) {
     try {
       const systemContent = messages[0].content;
       const result = await LLMPerformanceMonitor.measureAsyncFunction(
@@ -157,23 +165,42 @@ class AnthropicLLM {
           system: this.#buildSystemPrompt(systemContent),
           messages: messages.slice(1), // Pop off the system message
           temperature: Number(temperature ?? this.defaultTemp),
+          ...(tools?.length > 0 ? { tools } : {}),
         })
       );
 
       const promptTokens = result.output.usage.input_tokens;
       const completionTokens = result.output.usage.output_tokens;
+      const metrics = {
+        prompt_tokens: promptTokens,
+        completion_tokens: completionTokens,
+        total_tokens: promptTokens + completionTokens,
+        outputTps: completionTokens / result.duration,
+        duration: result.duration,
+        model: this.model,
+        timestamp: new Date(),
+      };
+
+      // Check for tool use in response
+      const toolUseBlocks = (result.output.content || []).filter(
+        (block) => block.type === "tool_use"
+      );
+      if (toolUseBlocks.length > 0) {
+        const textBlock = result.output.content.find((b) => b.type === "text");
+        return {
+          textResponse: textBlock?.text || "",
+          toolCalls: toolUseBlocks.map((block) => ({
+            id: block.id,
+            name: block.name,
+            arguments: block.input,
+          })),
+          metrics,
+        };
+      }
 
       return {
         textResponse: result.output.content[0].text,
-        metrics: {
-          prompt_tokens: promptTokens,
-          completion_tokens: completionTokens,
-          total_tokens: promptTokens + completionTokens,
-          outputTps: completionTokens / result.duration,
-          duration: result.duration,
-          model: this.model,
-          timestamp: new Date(),
-        },
+        metrics,
       };
     } catch (error) {
       console.log(error);
@@ -181,7 +208,7 @@ class AnthropicLLM {
     }
   }
 
-  async streamGetChatCompletion(messages = null, { temperature = 0.7 }) {
+  async streamGetChatCompletion(messages = null, { temperature = 0.7, tools = null }) {
     const systemContent = messages[0].content;
     const measuredStreamRequest = await LLMPerformanceMonitor.measureStream({
       func: this.anthropic.messages.stream({
@@ -190,6 +217,7 @@ class AnthropicLLM {
         system: this.#buildSystemPrompt(systemContent),
         messages: messages.slice(1), // Pop off the system message
         temperature: Number(temperature ?? this.defaultTemp),
+        ...(tools?.length > 0 ? { tools } : {}),
       }),
       messages,
       runPromptTokenCalculation: false,
@@ -214,6 +242,8 @@ class AnthropicLLM {
         prompt_tokens: 0,
         completion_tokens: 0,
       };
+      const pendingToolCalls = [];
+      let currentToolUse = null;
 
       // Establish listener to early-abort a streaming response
       // in case things go sideways or the user does not like the response.
@@ -271,6 +301,49 @@ class AnthropicLLM {
             close: false,
             error: false,
           });
+        }
+
+        // Tool use: content_block_start with tool_use type
+        if (
+          data.type === "content_block_start" &&
+          data.content_block?.type === "tool_use"
+        ) {
+          currentToolUse = {
+            id: data.content_block.id,
+            name: data.content_block.name,
+            argumentsJson: "",
+          };
+        }
+
+        // Tool use: accumulate input JSON delta
+        if (
+          data.type === "content_block_delta" &&
+          data.delta?.type === "input_json_delta" &&
+          currentToolUse
+        ) {
+          currentToolUse.argumentsJson += data.delta.partial_json;
+        }
+
+        // Tool use: content_block_stop finalizes the current block
+        if (data.type === "content_block_stop" && currentToolUse) {
+          let parsedArgs = {};
+          try {
+            parsedArgs = JSON.parse(currentToolUse.argumentsJson);
+          } catch { /* use empty object */ }
+          pendingToolCalls.push({
+            id: currentToolUse.id,
+            name: currentToolUse.name,
+            arguments: parsedArgs,
+          });
+          currentToolUse = null;
+        }
+
+        // Tool use stop_reason — return for tool execution
+        if (data.type === "message_delta" && data.delta?.stop_reason === "tool_use") {
+          response.removeListener("close", handleAbort);
+          stream?.endMeasurement(usage);
+          resolve({ text: fullText, toolCalls: pendingToolCalls });
+          return;
         }
 
         if (

@@ -27,6 +27,7 @@ class ChatTraceLogger {
     // 누적 통계
     this.llmCallCount = 0;
     this.searchCount = 0;
+    this.toolCallCount = 0;
     this.totalLlmMs = 0;
     this.totalSearchMs = 0;
     this.iterationCount = 0;
@@ -184,6 +185,37 @@ class ChatTraceLogger {
   }
 
   /**
+   * [TOOL_CALL] — tool calling 이벤트 기록
+   * @param {object} params
+   * @param {string} params.name - tool(plugin) 이름
+   * @param {object|string} params.arguments - tool 호출 인자
+   * @param {number} params.round - tool calling 라운드 번호
+   */
+  toolCall({ name, arguments: args, round }) {
+    this.toolCallCount++;
+    const argsStr =
+      typeof args === "string" ? args : JSON.stringify(args || {});
+    this._log(
+      `[TOOL_CALL] #${this.toolCallCount} round=${round} | tool=${name} | args=${this._truncate(argsStr, 120)}`
+    );
+  }
+
+  /**
+   * [TOOL_RESULT] — tool 실행 결과 기록
+   * @param {object} params
+   * @param {string} params.name - tool 이름
+   * @param {number} params.durationMs - 실행 소요시간
+   * @param {boolean} [params.isError=false] - 에러 여부
+   */
+  toolCallEnd({ name, durationMs = 0, isError = false }) {
+    if (isError) {
+      this._error(`[TOOL_RESULT] tool=${name} ERROR (${durationMs}ms)`);
+    } else {
+      this._log(`[TOOL_RESULT] tool=${name} OK (${durationMs}ms)`);
+    }
+  }
+
+  /**
    * ═══ TRACE_END ═══
    * @param {object} params
    * @param {string} params.reason - 종료 사유
@@ -250,6 +282,9 @@ class ChatTraceLogger {
     }
     if (this.searchCount > 0) {
       parts.push(`${this.searchCount} search(${this.totalSearchMs}ms)`);
+    }
+    if (this.toolCallCount > 0) {
+      parts.push(`${this.toolCallCount} tools`);
     }
     if (
       this.endReason === "query_no_context" ||

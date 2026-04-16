@@ -113,7 +113,7 @@ describe("plugin.json 스키마 검증", () => {
     });
   });
 
-  describe("hr-personnel (변경 없음 확인)", () => {
+  describe("hr-personnel", () => {
     const plugin = loadPluginJson("hr-personnel");
 
     it("required에 emp_no와 query_type만 있어야 한다", () => {
@@ -125,8 +125,54 @@ describe("plugin.json 스키마 검증", () => {
       expect(paramKeys).toEqual(["emp_no", "query_type"]);
     });
 
-    it("description에 '두 가지 파라미터만' 문구가 있어야 한다", () => {
-      expect(plugin.description).toContain("두 가지 파라미터만");
+    it("description에 행동 지시문이 없어야 한다", () => {
+      expect(plugin.description).not.toContain("절대 묻지");
+      expect(plugin.description).not.toContain("즉시 호출");
+      expect(plugin.description).not.toContain("두 가지 파라미터만");
+    });
+  });
+
+  describe("전체 plugin description 품질", () => {
+    const SKILLS = ["hr-attendance", "hr-salary", "hr-year-end-tax", "hr-personnel"];
+
+    describe("description에 행동 지시문/날짜규칙 블록이 없어야 한다", () => {
+      for (const skill of SKILLS) {
+        it(`${skill}: description에 중요-날짜규칙 블록이 없어야 한다`, () => {
+          const plugin = loadPluginJson(skill);
+          expect(plugin.description).not.toContain("[중요-날짜규칙]");
+          expect(plugin.description).not.toContain("YYYYMM");
+          expect(plugin.description).not.toContain("되묻지 마세요");
+        });
+      }
+    });
+
+    describe("query_type description에 enum 매핑이 포함되어야 한다", () => {
+      for (const skill of SKILLS) {
+        it(`${skill}: query_type description에 첫 번째 enum 값이 포함되어야 한다`, () => {
+          const plugin = loadPluginJson(skill);
+          const firstEnum = plugin.entrypoint.params.query_type.enum[0];
+          expect(plugin.entrypoint.params.query_type.description).toContain(firstEnum);
+        });
+      }
+    });
+
+    describe("examples에 YYYYMM 형식이 없어야 한다", () => {
+      const YYYYMM_PATTERN = /^\d{6}$/;
+      const DATE_PARAMS = ["year_month", "current_month", "previous_month", "base_date", "cal_yy"];
+
+      for (const skill of SKILLS) {
+        it(`${skill}: examples의 날짜 파라미터에 YYYYMM 패턴이 없어야 한다`, () => {
+          const plugin = loadPluginJson(skill);
+          for (const ex of plugin.examples || []) {
+            const call = JSON.parse(ex.call);
+            for (const param of DATE_PARAMS) {
+              if (call[param]) {
+                expect(call[param]).not.toMatch(YYYYMM_PATTERN);
+              }
+            }
+          }
+        });
+      }
     });
   });
 });

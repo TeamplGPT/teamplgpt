@@ -160,6 +160,14 @@ class OpenRouterLLM {
     return "streamGetChatCompletion" in this;
   }
 
+  supportsToolCalling() {
+    return true;
+  }
+
+  toolCallingFormat() {
+    return "chat-completions";
+  }
+
   static promptWindowLimit(modelName) {
     const cacheModelPath = path.resolve(cacheFolder, "models.json");
     const availableModels = fs.existsSync(cacheModelPath)
@@ -238,7 +246,7 @@ class OpenRouterLLM {
     ];
   }
 
-  async getChatCompletion(messages = null, { temperature = 0.7, user = null }) {
+  async getChatCompletion(messages = null, { temperature = 0.7, user = null, tools = null }) {
     if (!(await this.isValidChatCompletionModel(this.model)))
       throw new Error(
         `OpenRouter chat: ${this.model} is not valid for chat completion!`
@@ -254,6 +262,7 @@ class OpenRouterLLM {
           // before the token text.
           include_reasoning: true,
           user: user?.id ? `user_${user.id}` : "",
+          ...(tools?.length > 0 ? { tools } : {}),
         })
         .catch((e) => {
           throw new Error(e.message);
@@ -268,23 +277,39 @@ class OpenRouterLLM {
         `Invalid response body returned from OpenRouter: ${result.output?.error?.message || "Unknown error"} ${result.output?.error?.code || "Unknown code"}`
       );
 
+    const metrics = {
+      prompt_tokens: result.output.usage.prompt_tokens || 0,
+      completion_tokens: result.output.usage.completion_tokens || 0,
+      total_tokens: result.output.usage.total_tokens || 0,
+      outputTps: result.output.usage.completion_tokens / result.duration,
+      duration: result.duration,
+      model: this.model,
+      timestamp: new Date(),
+    };
+
+    // Check for tool calls
+    const choice = result.output.choices[0];
+    if (choice.message?.tool_calls?.length > 0) {
+      return {
+        textResponse: this.#parseReasoningFromResponse(choice),
+        toolCalls: choice.message.tool_calls.map((tc) => ({
+          id: tc.id,
+          name: tc.function.name,
+          arguments: tc.function.arguments,
+        })),
+        metrics,
+      };
+    }
+
     return {
-      textResponse: this.#parseReasoningFromResponse(result.output.choices[0]),
-      metrics: {
-        prompt_tokens: result.output.usage.prompt_tokens || 0,
-        completion_tokens: result.output.usage.completion_tokens || 0,
-        total_tokens: result.output.usage.total_tokens || 0,
-        outputTps: result.output.usage.completion_tokens / result.duration,
-        duration: result.duration,
-        model: this.model,
-        timestamp: new Date(),
-      },
+      textResponse: this.#parseReasoningFromResponse(choice),
+      metrics,
     };
   }
 
   async streamGetChatCompletion(
     messages = null,
-    { temperature = 0.7, user = null }
+    { temperature = 0.7, user = null, tools = null }
   ) {
     if (!(await this.isValidChatCompletionModel(this.model)))
       throw new Error(
@@ -301,6 +326,7 @@ class OpenRouterLLM {
         // before the token text.
         include_reasoning: true,
         user: user?.id ? `user_${user.id}` : "",
+        ...(tools?.length > 0 ? { tools } : {}),
       }),
       messages,
       // We have to manually count the tokens
@@ -333,6 +359,7 @@ class OpenRouterLLM {
       let lastChunkTime = null; // null when first token is still not received.
       let pplxCitations = []; // Array of inline citations for Perplexity models (if applicable)
       let isPerplexity = this.isPerplexityModel;
+      const pendingToolCalls = {}; // keyed by index
 
       // Establish listener to early-abort a streaming response
       // in case things go sideways or the user does not like the response.
@@ -462,7 +489,37 @@ class OpenRouterLLM {
             });
           }
 
+          // Accumulate tool call deltas from streaming chunks
+          const deltaToolCalls = message?.delta?.tool_calls;
+          if (Array.isArray(deltaToolCalls)) {
+            for (const tc of deltaToolCalls) {
+              const idx = tc.index;
+              if (!pendingToolCalls[idx]) {
+                pendingToolCalls[idx] = {
+                  id: tc.id || "",
+                  name: tc.function?.name || "",
+                  arguments: "",
+                };
+              }
+              if (tc.id) pendingToolCalls[idx].id = tc.id;
+              if (tc.function?.name) pendingToolCalls[idx].name = tc.function.name;
+              if (tc.function?.arguments) pendingToolCalls[idx].arguments += tc.function.arguments;
+            }
+          }
+
           if (message.finish_reason !== null) {
+            // Tool calls detected — return for tool execution
+            const toolCallList = Object.values(pendingToolCalls);
+            if (message.finish_reason === "tool_calls" || toolCallList.length > 0) {
+              response.removeListener("close", handleAbort);
+              clearInterval(timeoutCheck);
+              stream?.endMeasurement({
+                completion_tokens: LLMPerformanceMonitor.countTokens(fullText),
+              });
+              resolve({ text: fullText, toolCalls: toolCallList });
+              break;
+            }
+
             writeResponseChunk(response, {
               uuid,
               sources,

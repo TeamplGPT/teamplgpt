@@ -254,6 +254,21 @@ describe("HR API 통합테스트", () => {
       expect(result).not.toContain("오류가 발생했습니다");
     });
 
+    it("work_plan_weekly에 base_date 자연어를 전달할 수 있어야 한다", async () => {
+      if (skipIfNoApi()) return;
+      const mod = loadHandler("hr-attendance");
+      const ctx = createContext();
+
+      const result = await mod.runtime.handler.call(ctx, {
+        emp_no: TEST_EMP_NO,
+        query_type: "work_plan_weekly",
+        base_date: "어제",
+      });
+
+      expect(result).not.toContain("HR API 호출 실패");
+      expect(result).not.toContain("오류가 발생했습니다");
+    });
+
     it("work_type에 무효 파라미터를 전달해도 에러가 발생하지 않아야 한다", async () => {
       if (skipIfNoApi()) return;
       const mod = loadHandler("hr-attendance");
