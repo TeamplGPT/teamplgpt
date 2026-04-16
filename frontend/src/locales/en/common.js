@@ -414,11 +414,6 @@ const TRANSLATIONS = {
         description:
           "LLM responses may take longer to generate, but your responses will be more accurate and relevant.",
       },
-      hybrid: {
-        title: "Hybrid (Vector + Keyword)",
-        description:
-          "Combines semantic vector search with keyword matching (BM25) using Reciprocal Rank Fusion. Best for Korean text and exact term matching.",
-      },
     },
   },
 
