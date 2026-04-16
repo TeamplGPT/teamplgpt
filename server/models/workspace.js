@@ -128,7 +128,7 @@ const Workspace = {
       if (
         !value ||
         typeof value !== "string" ||
-        !["default", "rerank", "hybrid"].includes(value)
+        !["default", "rerank"].includes(value)
       )
         return "default";
       return value;
