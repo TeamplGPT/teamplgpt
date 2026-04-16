@@ -7,6 +7,11 @@
  * 환경변수: CHAT_TRACE_LOG (기본 "true", "false"로 비활성화)
  */
 
+const {
+  shouldUseHybridSearch,
+  shouldUseRerank,
+} = require("../vectorSearch/searchModeHelpers");
+
 const ENABLED = process.env.CHAT_TRACE_LOG !== "false";
 
 class ChatTraceLogger {
@@ -68,7 +73,11 @@ class ChatTraceLogger {
     maxIterations,
   }) {
     const w = workspace;
-    const vsMode = w?.vectorSearchMode || "default";
+    const vsMode = shouldUseHybridSearch(w)
+      ? "hybrid"
+      : shouldUseRerank(w)
+        ? "rerank"
+        : "default";
     const qrMode =
       this.chatMode === "react"
         ? "skipped"
