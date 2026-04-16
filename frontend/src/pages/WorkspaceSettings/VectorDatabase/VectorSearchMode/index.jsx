@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-// Supported vector DBs for advanced search modes
-// lancedb: supports reranking, pgvector: supports hybrid search
-const supportedVectorDBs = ["lancedb", "pgvector"];
+// We dont support all vectorDBs yet for reranking due to complexities of how each provider
+// returns information. We need to normalize the response data so Reranker can be used for each provider.
+const supportedVectorDBs = ["lancedb"];
 
 export default function VectorSearchMode({ workspace, setHasChanges }) {
   const { t } = useTranslation();
@@ -12,9 +12,6 @@ export default function VectorSearchMode({ workspace, setHasChanges }) {
   );
   if (!workspace?.vectorDB || !supportedVectorDBs.includes(workspace?.vectorDB))
     return null;
-
-  const isPgvector = workspace?.vectorDB === "pgvector";
-  const isLancedb = workspace?.vectorDB === "lancedb";
 
   return (
     <div>
@@ -36,16 +33,9 @@ export default function VectorSearchMode({ workspace, setHasChanges }) {
         <option value="default">
           {t("vector-workspace.searchMode.default.title")}
         </option>
-        {isLancedb && (
-          <option value="rerank">
-            {t("vector-workspace.searchMode.rerank.title")}
-          </option>
-        )}
-        {isPgvector && (
-          <option value="hybrid">
-            {t("vector-workspace.searchMode.hybrid.title")}
-          </option>
-        )}
+        <option value="rerank">
+          {t("vector-workspace.searchMode.rerank.title")}
+        </option>
       </select>
       <p className="text-white text-opacity-60 text-xs font-medium py-1.5">
         {t(`vector-workspace.searchMode.${selection}.description`)}
