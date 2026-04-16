@@ -120,6 +120,10 @@
     {
       "prompt": "지난달 출퇴근 기록",
       "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet\", \"year_month\": \"지난달\"}"
+    },
+    {
+      "prompt": "어제 근무계획 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"work_plan_weekly\", \"base_date\": \"어제\"}"
     }
   ],
   "imported": true,
