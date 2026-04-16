@@ -8,6 +8,10 @@ const {
 } = require("../helpers/chat/responses");
 const { DocumentManager } = require("../DocumentManager");
 const { performMergedSearch } = require("../vectorSearch/mergeSharedResults");
+const {
+  shouldUseHybridSearch,
+  shouldUseRerank,
+} = require("../vectorSearch/searchModeHelpers");
 const { Workspace } = require("../../models/workspace");
 
 async function streamChatWithForEmbed(
@@ -98,8 +102,8 @@ async function streamChatWithForEmbed(
           similarityThreshold: embed.workspace?.similarityThreshold,
           topN: embed.workspace?.topN,
           filterIdentifiers: pinnedDocIdentifiers,
-          rerank: embed.workspace?.vectorSearchMode === "rerank",
-          hybridSearch: embed.workspace?.vectorSearchMode === "hybrid",
+          rerank: shouldUseRerank(embed.workspace),
+          hybridSearch: shouldUseHybridSearch(embed.workspace),
           adjacentChunks: embed.workspace?.adjacentChunks ?? 0,
         })
       : {

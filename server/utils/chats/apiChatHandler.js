@@ -4,6 +4,10 @@ const { WorkspaceChats } = require("../../models/workspaceChats");
 const { getVectorDbClass, getLLMProvider } = require("../helpers");
 const { writeResponseChunk } = require("../helpers/chat/responses");
 const { performMergedSearch } = require("../vectorSearch/mergeSharedResults");
+const {
+  shouldUseHybridSearch,
+  shouldUseRerank,
+} = require("../vectorSearch/searchModeHelpers");
 const { Workspace } = require("../../models/workspace");
 const {
   chatPrompt,
@@ -321,8 +325,8 @@ async function chatSync({
           similarityThreshold: workspace?.similarityThreshold,
           topN: workspace?.topN,
           filterIdentifiers: pinnedDocIdentifiers,
-          rerank: workspace?.vectorSearchMode === "rerank",
-          hybridSearch: workspace?.vectorSearchMode === "hybrid",
+          rerank: shouldUseRerank(workspace),
+          hybridSearch: shouldUseHybridSearch(workspace),
           adjacentChunks: workspace?.adjacentChunks ?? 0,
           chatHistory: rawHistory,
         })
@@ -747,8 +751,8 @@ async function streamChat({
           similarityThreshold: workspace?.similarityThreshold,
           topN: workspace?.topN,
           filterIdentifiers: pinnedDocIdentifiers,
-          rerank: workspace?.vectorSearchMode === "rerank",
-          hybridSearch: workspace?.vectorSearchMode === "hybrid",
+          rerank: shouldUseRerank(workspace),
+          hybridSearch: shouldUseHybridSearch(workspace),
           adjacentChunks: workspace?.adjacentChunks ?? 0,
           chatHistory: rawHistory,
         })
