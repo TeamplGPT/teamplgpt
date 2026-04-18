@@ -55,6 +55,28 @@
       },
       "repeat": 1,
       "pre_reset": true
+    },
+    {
+      "id": "E6",
+      "label": "다음주 업무계획 (상대 표현)",
+      "message": "@agent 사번 20070133 직원의 다음주 업무계획 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/attendance/work-plan/weekly\\?.*base_date=\\d{8}"
+      },
+      "repeat": 1,
+      "pre_reset": true
+    },
+    {
+      "id": "E7",
+      "label": "이번주 스케줄 (키워드 힌트)",
+      "message": "@agent 사번 20070133 직원의 이번주 스케줄 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/attendance/work-plan/weekly\\?.*base_date=\\d{8}"
+      },
+      "repeat": 1,
+      "pre_reset": true
     }
   ]
 }
