@@ -7,6 +7,7 @@ storage/assets/*
 storage/documents/*
 storage/comkey/*
 storage/tmp/*
+scripts/e2e-hr-skill/runs/
 storage/vector-cache/*.json
 storage/exports
 storage/imports

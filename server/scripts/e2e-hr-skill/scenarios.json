@@ -1,0 +1,60 @@
+{
+  "$comment": "HR skill E2E scenarios. Schema: see ../../docs/02-design/features/hr-e2e-automation-script.design.md §3",
+  "scenarios": [
+    {
+      "id": "E1",
+      "label": "연도 명시 급여",
+      "message": "@agent 사번 20070133 직원의 2025년 3월 정기급여명세서를 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/salary/payslip\\?.*year_month=202503"
+      },
+      "repeat": 1,
+      "pre_reset": true
+    },
+    {
+      "id": "E2",
+      "label": "상대 표현 출퇴근",
+      "message": "@agent 사번 20070133 직원의 지난달 출퇴근 기록 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/attendance/timesheet\\?.*year_month=\\d{6}"
+      },
+      "repeat": 1,
+      "pre_reset": true
+    },
+    {
+      "id": "E3",
+      "label": "연도 미명시 출퇴근 (결정론성)",
+      "message": "@agent 사번 20070133 직원의 3월 출퇴근 기록 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/attendance/timesheet\\?.*year_month=\\d{4}03"
+      },
+      "repeat": 5,
+      "pre_reset": true
+    },
+    {
+      "id": "E4",
+      "label": "과거 연도 공제",
+      "message": "@agent 사번 20070133 직원의 2024년 12월 급여 공제항목 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/salary/deductions\\?.*year_month=202412"
+      },
+      "repeat": 1,
+      "pre_reset": true
+    },
+    {
+      "id": "E5",
+      "label": "주간 업무계획 (query_type 인식)",
+      "message": "@agent 사번 20070133 직원의 이번주 업무계획 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": null
+      },
+      "repeat": 1,
+      "pre_reset": true
+    }
+  ]
+}
