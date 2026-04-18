@@ -77,6 +77,72 @@
       },
       "repeat": 1,
       "pre_reset": true
+    },
+    {
+      "id": "E8",
+      "label": "급여 월급 자연어",
+      "message": "@agent 사번 20070133 직원의 이번달 월급 얼마야",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/salary/payslip(\\?.*)?$"
+      },
+      "repeat": 1,
+      "pre_reset": true
+    },
+    {
+      "id": "E9",
+      "label": "급여 보너스 내역",
+      "message": "@agent 사번 20070133 직원의 보너스 내역 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/salary/bonus(\\?.*)?$"
+      },
+      "repeat": 1,
+      "pre_reset": true
+    },
+    {
+      "id": "E10",
+      "label": "인사 현재직위",
+      "message": "@agent 사번 20070133 직원의 현재 직위 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/appointment/current(\\?.*)?$"
+      },
+      "repeat": 1,
+      "pre_reset": true
+    },
+    {
+      "id": "E11",
+      "label": "인사 자격증",
+      "message": "@agent 사번 20070133 직원의 보유 자격증 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/licenses(\\?.*)?$"
+      },
+      "repeat": 1,
+      "pre_reset": true
+    },
+    {
+      "id": "E12",
+      "label": "연말정산 의료비",
+      "message": "@agent 사번 20070133 직원의 의료비 공제 내역 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/year-end-tax/medical(\\?.*)?$"
+      },
+      "repeat": 1,
+      "pre_reset": true
+    },
+    {
+      "id": "E13",
+      "label": "경계 부양가족공제 (personnel.family 아님)",
+      "message": "@agent 사번 20070133 직원의 부양가족 공제 대상 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/year-end-tax/family(\\?.*)?$"
+      },
+      "repeat": 1,
+      "pre_reset": true
     }
   ]
 }

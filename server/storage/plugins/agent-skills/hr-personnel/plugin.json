@@ -2,10 +2,10 @@
   "active": true,
   "name": "HR 인사기록 조회",
   "schema": "skill-1.0.0",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "hubId": "hr-personnel",
   "author": "teamplgpt",
-  "description": "직원 인사기록(인적사항, 경력, 학력, 자격증 등)을 조회합니다. query_type 종류: address(주소), appointment_current(현재직위직급), career(전직경력), contact(연락처), disciplines(징계이력), education(학력), employment(입사일근속), family(가족정보), licenses(자격증), rewards(포상이력), visa(비자정보). 종류가 불분명하면 employment를 사용하세요.",
+  "description": "직원 인사기록(인적사항/현재직위직급/전직경력/연락처/주소/학력/자격증/가족정보/포상/징계/비자 등)을 조회합니다. 사용자가 직위/직급/발령/경력/이전직장/연락처/전화/주소/거주지/학력/학교/자격증/면허/가족/배우자/자녀/포상/상/징계/비자 등 인사기록 관련 항목을 물으면 이 skill을 사용하세요. query_type 종류: address(주소), appointment_current(현재직위직급), career(전직경력), contact(연락처), disciplines(징계이력), education(학력), employment(입사일근속), family(가족정보-인사기록), licenses(자격증), rewards(포상이력), visa(비자정보). 종류가 불분명하면 employment를 사용하세요.",
   "entrypoint": {
     "file": "handler.js",
     "params": {
@@ -14,7 +14,7 @@
         "type": "string"
       },
       "query_type": {
-        "description": "조회 종류 (필수). address=주소, appointment_current=현재직위직급, career=전직경력, contact=연락처, disciplines=징계이력, education=학력, employment=입사일근속, family=가족정보, licenses=자격증, rewards=포상이력, visa=비자정보.",
+        "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표에 있는 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 해당 query_type으로 매핑하세요. 매핑표: address=주소(주소/거주지/자택), appointment_current=현재직위직급(직위/직급/발령/현재직책), career=전직경력(경력/전직/이전직장/전직장-인사기록용이며 연말정산 종전근무지는 hr-year-end-tax.previous_employer 사용), contact=연락처(연락처/전화/휴대폰/이메일), disciplines=징계이력(징계/징계이력/처분), education=학력(학력/학교/졸업), employment=입사일근속(입사일/근속/재직기간), family=가족정보(가족/가족관계/배우자/자녀-인사기록용이며 연말정산 부양가족 공제는 hr-year-end-tax.family 사용), licenses=자격증(자격증/면허/자격), rewards=포상이력(포상/수상/표창), visa=비자정보(비자/체류/외국인).",
         "type": "string",
         "enum": [
           "address",
@@ -65,6 +65,18 @@
     {
       "prompt": "보유 자격증 알려줘",
       "call": "{\"emp_no\": \"12345\", \"query_type\": \"licenses\"}"
+    },
+    {
+      "prompt": "현재 직위 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"appointment_current\"}"
+    },
+    {
+      "prompt": "보유 자격증 조회해줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"licenses\"}"
+    },
+    {
+      "prompt": "가족관계 인사기록 보여줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"family\"}"
     }
   ],
   "imported": true,
