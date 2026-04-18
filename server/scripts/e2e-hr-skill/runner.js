@@ -34,6 +34,32 @@ const SCENARIOS_PATH = path.resolve(
 );
 const PG_CONTAINER = process.env.E2E_PG_CONTAINER || "anythingllm-postgres";
 
+// ─── Tier selection (hr-skill-synonym-coverage-matrix) ───────────────────────
+const VALID_TIERS = ["primary", "full"];
+
+function parseTierArg() {
+  const argv = process.argv.slice(2);
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a.startsWith("--tier=")) return a.slice("--tier=".length);
+    if (a === "--tier" && argv[i + 1]) return argv[i + 1];
+  }
+  return null;
+}
+
+function resolveTier() {
+  const tier = parseTierArg() || process.env.E2E_TIER || "primary";
+  if (!VALID_TIERS.includes(tier)) {
+    fatal(`Invalid tier "${tier}". Must be one of: ${VALID_TIERS.join(", ")}`);
+  }
+  return tier;
+}
+
+function applyTierFilter(scenarios, tier) {
+  if (tier === "full") return scenarios.slice();
+  return scenarios.filter((s) => !s.tier || s.tier === "primary");
+}
+
 const COLOR = {
   reset: "\x1b[0m",
   green: "\x1b[32m",
@@ -440,9 +466,11 @@ function gitHead() {
 // ─── main ────────────────────────────────────────────────────────────────────
 
 async function main() {
-  const scenarios = loadScenarios();
+  const rawScenarios = loadScenarios();
+  const tier = resolveTier();
+  const scenarios = applyTierFilter(rawScenarios, tier);
   info(
-    `loaded ${scenarios.length} scenarios (${scenarios.reduce(
+    `tier="${tier}", ${scenarios.length}/${rawScenarios.length} scenarios after filter (${scenarios.reduce(
       (n, s) => n + s.repeat,
       0
     )} total runs)`
@@ -463,6 +491,8 @@ async function main() {
     startedAt: new Date().toISOString(),
     finishedAt: null,
     durationMs: null,
+    appliedTier: tier,
+    totalAvailable: rawScenarios.length,
     scenariosCount: scenarios.length,
     totalRuns: scenarios.reduce((n, s) => n + s.repeat, 0),
     serverUrl: SERVER_URL,
