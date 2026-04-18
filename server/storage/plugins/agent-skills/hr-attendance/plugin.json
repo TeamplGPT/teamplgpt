@@ -2,7 +2,7 @@
   "active": true,
   "name": "HR 근태 조회",
   "schema": "skill-1.0.0",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "hubId": "hr-attendance",
   "author": "teamplgpt",
   "description": "직원 근태(연차, 출퇴근, 휴가, 연장근무, 출장, 주간근무계획/스케줄/일정, 재택 등)를 조회합니다. 사용자가 근무계획/스케줄/일정/연차/출퇴근/휴가/연장/야근/출장/재택 등을 물으면 이 skill을 사용하세요. query_type에 따라 선택적 기간 파라미터를 추가할 수 있으며, 언급하지 않으면 생략하세요(서버 기본값 적용). query_type 종류: annual_leave_balance(연차잔여), timesheet(출퇴근기록), leave_requests(휴가신청), work_plan_weekly(주간근무계획/업무계획/스케줄/일정), overtime(연장근무/야근/OT), timesheet_requests(출퇴근변경신청), substitute_leave(대체휴무), business_trips(출장), annual_leave_plan(연차계획/휴가계획), work_type(오늘근무유형/재택). 종류가 불분명하면 annual_leave_balance를 사용하세요.",
@@ -30,7 +30,7 @@
         ]
       },
       "year": {
-        "description": "조회 연도 (선택). YYYY 형식 또는 자연어(작년, 올해 등). annual_leave_balance에서 사용. 사용자가 연도를 명시한 경우에만 전달하세요. 언급하지 않으면 생략(서버가 현재 연도로 처리). 연도를 되묻지 마세요.",
+        "description": "조회 연도 (선택). [CRITICAL] 절대로 사용자에게 연도를 되묻지 마세요. 연도 없이도 즉시 tool-call을 실행하세요. 연도를 추론해 추가하지도 마세요. 전달 규칙: 사용자가 연도를 명시한 경우에만 'YYYY'(예: '2024') 또는 자연어('작년', '올해') 로 전달하세요. 연도 미명시 시 year 파라미터를 생략하세요—서버가 현재 연도를 자동으로 적용합니다. [재강조] 연도가 사용자 발화에 없으면 되묻지 말고 year를 생략하고 즉시 tool-call하세요. annual_leave_balance에서 사용.",
         "type": "string"
       },
       "year_month": {
