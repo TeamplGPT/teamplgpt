@@ -1,0 +1,482 @@
+{
+  "meta": {
+    "feature": "embed-tool-calling-e2e-runner",
+    "startedAt": "2026-04-20T11:04:26.867Z",
+    "finishedAt": "2026-04-20T11:11:13.119Z",
+    "durationMs": 405403,
+    "scenariosCount": 22,
+    "totalRuns": 22,
+    "serverUrl": "http://localhost:3001",
+    "mockPort": 8001,
+    "primaryWorkspaceId": 1,
+    "testWorkspaceId": 3,
+    "testWorkspaceSlug": "e2e-embed-ws-60bee5fe",
+    "gitHead": "4725a210"
+  },
+  "runs": [
+    {
+      "scenario": "EC-ALLOW-01",
+      "axis": "ALLOW",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 지난달 출퇴근 기록 조회해줘",
+      "elapsedMs": 17974,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 73,
+      "pass": false,
+      "reason": "[ALLOW] expected tool_call but LLM did not invoke any tool"
+    },
+    {
+      "scenario": "EC-ALLOW-02",
+      "axis": "ALLOW",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 이번주 업무계획 알려줘",
+      "elapsedMs": 12849,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 67,
+      "pass": false,
+      "reason": "[ALLOW] expected tool_call but LLM did not invoke any tool"
+    },
+    {
+      "scenario": "EC-ALLOW-03",
+      "axis": "ALLOW",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 연차 잔여일 알려줘",
+      "elapsedMs": 14139,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 74,
+      "pass": false,
+      "reason": "[ALLOW] expected tool_call but LLM did not invoke any tool"
+    },
+    {
+      "scenario": "EC-ALLOW-04",
+      "axis": "ALLOW",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 2025년 3월 급여명세서 조회해줘",
+      "elapsedMs": 44336,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 93,
+      "pass": false,
+      "reason": "[ALLOW] expected tool_call but LLM did not invoke any tool"
+    },
+    {
+      "scenario": "EC-ALLOW-05",
+      "axis": "ALLOW",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 2024년 12월 급여 공제항목 알려줘",
+      "elapsedMs": 15402,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 112,
+      "pass": false,
+      "reason": "[ALLOW] expected tool_call but LLM did not invoke any tool"
+    },
+    {
+      "scenario": "EC-ALLOW-06",
+      "axis": "ALLOW",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 보너스 내역 알려줘",
+      "elapsedMs": 10818,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 67,
+      "pass": false,
+      "reason": "[ALLOW] expected tool_call but LLM did not invoke any tool"
+    },
+    {
+      "scenario": "EC-ALLOW-07",
+      "axis": "ALLOW",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 현재 직위 알려줘",
+      "elapsedMs": 6374,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 70,
+      "pass": false,
+      "reason": "[ALLOW] expected tool_call but LLM did not invoke any tool"
+    },
+    {
+      "scenario": "EC-ALLOW-08",
+      "axis": "ALLOW",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 보유 자격증 조회해줘",
+      "elapsedMs": 10527,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 62,
+      "pass": false,
+      "reason": "[ALLOW] expected tool_call but LLM did not invoke any tool"
+    },
+    {
+      "scenario": "EC-ALLOW-09",
+      "axis": "ALLOW",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 의료비 공제 내역 알려줘",
+      "elapsedMs": 14815,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 112,
+      "pass": false,
+      "reason": "[ALLOW] expected tool_call but LLM did not invoke any tool"
+    },
+    {
+      "scenario": "EC-ALLOW-10",
+      "axis": "ALLOW",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 부양가족 공제 대상 조회해줘",
+      "elapsedMs": 21020,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 162,
+      "pass": false,
+      "reason": "[ALLOW] expected tool_call but LLM did not invoke any tool"
+    },
+    {
+      "scenario": "EC-DENY-01",
+      "axis": "DENY",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-deny",
+      "message": "사번 20070133 직원의 지난달 출퇴근 기록 조회해줘",
+      "elapsedMs": 14900,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 77,
+      "pass": true,
+      "reason": null
+    },
+    {
+      "scenario": "EC-DENY-02",
+      "axis": "DENY",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-deny",
+      "message": "사번 20070133 직원의 2025년 3월 급여명세서 조회해줘",
+      "elapsedMs": 9877,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 52,
+      "pass": true,
+      "reason": null
+    },
+    {
+      "scenario": "EC-DENY-03",
+      "axis": "DENY",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-deny",
+      "message": "사번 20070133 직원의 현재 직위 알려줘",
+      "elapsedMs": 13146,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 22,
+      "pass": true,
+      "reason": null
+    },
+    {
+      "scenario": "EC-DENY-04",
+      "axis": "DENY",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-deny",
+      "message": "사번 20070133 직원의 의료비 공제 내역 알려줘",
+      "elapsedMs": 12495,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 38,
+      "pass": true,
+      "reason": null
+    },
+    {
+      "scenario": "EC-DENY-05",
+      "axis": "DENY",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-deny",
+      "message": "안녕하세요, 회사 복지 제도를 설명해주세요.",
+      "elapsedMs": 13401,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 844,
+      "pass": true,
+      "reason": null
+    },
+    {
+      "scenario": "EC-FILTER-01",
+      "axis": "FILTER",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-filter-attendance",
+      "message": "사번 20070133 직원의 이번달 출퇴근 알려줘",
+      "elapsedMs": 13982,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 88,
+      "pass": false,
+      "reason": "[FILTER] expected tool_call but LLM did not invoke any tool"
+    },
+    {
+      "scenario": "EC-FILTER-02",
+      "axis": "FILTER",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-filter-attendance",
+      "message": "사번 20070133 직원의 2024년 연차 잔여일 알려줘",
+      "elapsedMs": 18470,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 73,
+      "pass": false,
+      "reason": "[FILTER] expected tool_call but LLM did not invoke any tool"
+    },
+    {
+      "scenario": "EC-FILTER-03",
+      "axis": "FILTER",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-filter-attendance",
+      "message": "사번 20070133 직원의 이번달 급여명세서 보여줘",
+      "elapsedMs": 20311,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 445,
+      "pass": true,
+      "reason": null
+    },
+    {
+      "scenario": "EC-FILTER-04",
+      "axis": "FILTER",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-filter-attendance",
+      "message": "사번 20070133 직원의 현재 직위 알려줘",
+      "elapsedMs": 17278,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 156,
+      "pass": true,
+      "reason": null
+    },
+    {
+      "scenario": "EC-FILTER-05",
+      "axis": "FILTER",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-filter-attendance",
+      "message": "사번 20070133 직원의 의료비 공제 내역 알려줘",
+      "elapsedMs": 24261,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 394,
+      "pass": true,
+      "reason": null
+    },
+    {
+      "scenario": "EC-FILTER-06",
+      "axis": "FILTER",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-filter-salary-personnel",
+      "message": "사번 20070133 직원의 2025년 3월 급여명세서 조회해줘",
+      "elapsedMs": 28300,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 157,
+      "pass": false,
+      "reason": "[FILTER] expected tool_call but LLM did not invoke any tool"
+    },
+    {
+      "scenario": "EC-FILTER-07",
+      "axis": "FILTER",
+      "iteration": 1,
+      "embedConfig": "e2e-embed-filter-salary-personnel",
+      "message": "사번 20070133 직원의 보유 자격증 조회해줘",
+      "elapsedMs": 19185,
+      "toolCall": null,
+      "finalText": null,
+      "mockUrl": null,
+      "eventCount": 74,
+      "pass": false,
+      "reason": "[FILTER] expected tool_call but LLM did not invoke any tool"
+    }
+  ],
+  "summary": {
+    "perScenario": {
+      "EC-ALLOW-01": {
+        "axis": "ALLOW",
+        "total": 1,
+        "pass": 0,
+        "toolCallRate": "0/1"
+      },
+      "EC-ALLOW-02": {
+        "axis": "ALLOW",
+        "total": 1,
+        "pass": 0,
+        "toolCallRate": "0/1"
+      },
+      "EC-ALLOW-03": {
+        "axis": "ALLOW",
+        "total": 1,
+        "pass": 0,
+        "toolCallRate": "0/1"
+      },
+      "EC-ALLOW-04": {
+        "axis": "ALLOW",
+        "total": 1,
+        "pass": 0,
+        "toolCallRate": "0/1"
+      },
+      "EC-ALLOW-05": {
+        "axis": "ALLOW",
+        "total": 1,
+        "pass": 0,
+        "toolCallRate": "0/1"
+      },
+      "EC-ALLOW-06": {
+        "axis": "ALLOW",
+        "total": 1,
+        "pass": 0,
+        "toolCallRate": "0/1"
+      },
+      "EC-ALLOW-07": {
+        "axis": "ALLOW",
+        "total": 1,
+        "pass": 0,
+        "toolCallRate": "0/1"
+      },
+      "EC-ALLOW-08": {
+        "axis": "ALLOW",
+        "total": 1,
+        "pass": 0,
+        "toolCallRate": "0/1"
+      },
+      "EC-ALLOW-09": {
+        "axis": "ALLOW",
+        "total": 1,
+        "pass": 0,
+        "toolCallRate": "0/1"
+      },
+      "EC-ALLOW-10": {
+        "axis": "ALLOW",
+        "total": 1,
+        "pass": 0,
+        "toolCallRate": "0/1"
+      },
+      "EC-DENY-01": {
+        "axis": "DENY",
+        "total": 1,
+        "pass": 1,
+        "toolCallRate": "0/1"
+      },
+      "EC-DENY-02": {
+        "axis": "DENY",
+        "total": 1,
+        "pass": 1,
+        "toolCallRate": "0/1"
+      },
+      "EC-DENY-03": {
+        "axis": "DENY",
+        "total": 1,
+        "pass": 1,
+        "toolCallRate": "0/1"
+      },
+      "EC-DENY-04": {
+        "axis": "DENY",
+        "total": 1,
+        "pass": 1,
+        "toolCallRate": "0/1"
+      },
+      "EC-DENY-05": {
+        "axis": "DENY",
+        "total": 1,
+        "pass": 1,
+        "toolCallRate": "0/1"
+      },
+      "EC-FILTER-01": {
+        "axis": "FILTER",
+        "total": 1,
+        "pass": 0,
+        "toolCallRate": "0/1"
+      },
+      "EC-FILTER-02": {
+        "axis": "FILTER",
+        "total": 1,
+        "pass": 0,
+        "toolCallRate": "0/1"
+      },
+      "EC-FILTER-03": {
+        "axis": "FILTER",
+        "total": 1,
+        "pass": 1,
+        "toolCallRate": "0/1"
+      },
+      "EC-FILTER-04": {
+        "axis": "FILTER",
+        "total": 1,
+        "pass": 1,
+        "toolCallRate": "0/1"
+      },
+      "EC-FILTER-05": {
+        "axis": "FILTER",
+        "total": 1,
+        "pass": 1,
+        "toolCallRate": "0/1"
+      },
+      "EC-FILTER-06": {
+        "axis": "FILTER",
+        "total": 1,
+        "pass": 0,
+        "toolCallRate": "0/1"
+      },
+      "EC-FILTER-07": {
+        "axis": "FILTER",
+        "total": 1,
+        "pass": 0,
+        "toolCallRate": "0/1"
+      }
+    },
+    "byAxis": {
+      "ALLOW": {
+        "total": 10,
+        "pass": 0
+      },
+      "DENY": {
+        "total": 5,
+        "pass": 5
+      },
+      "FILTER": {
+        "total": 7,
+        "pass": 3
+      }
+    },
+    "overall": {
+      "total": 22,
+      "pass": 8,
+      "fail": 14,
+      "passRate": "8/22 (36.4%)"
+    }
+  }
+}

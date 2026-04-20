@@ -1,0 +1,263 @@
+{
+  "$comment": "Embed tool calling E2E scenarios. Axes: ALLOW (tool calling ON, all skills), DENY (tool calling OFF), FILTER (allowlist filter). Design: docs/02-design/features/embed-tool-calling-e2e-runner.design.md §3.1, §8.3. NO @agent prefix — embed uses native LLM tool calling.",
+  "scenarios": [
+    {
+      "id": "EC-ALLOW-01",
+      "axis": "ALLOW",
+      "label": "근태 출퇴근 (상대 표현)",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 지난달 출퇴근 기록 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/attendance/timesheet(\\?.*)?$"
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-ALLOW-02",
+      "axis": "ALLOW",
+      "label": "근태 업무계획",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 이번주 업무계획 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/attendance/work-plan/weekly(\\?.*)?$"
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-ALLOW-03",
+      "axis": "ALLOW",
+      "label": "근태 연차잔여 (연도 미명시)",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 연차 잔여일 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/attendance/annual-leave/balance(\\?.*)?$"
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-ALLOW-04",
+      "axis": "ALLOW",
+      "label": "급여 명세서 (연월 명시)",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 2025년 3월 급여명세서 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/salary/payslip\\?.*year_month=202503"
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-ALLOW-05",
+      "axis": "ALLOW",
+      "label": "급여 공제항목",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 2024년 12월 급여 공제항목 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/salary/deductions\\?.*year_month=202412"
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-ALLOW-06",
+      "axis": "ALLOW",
+      "label": "급여 보너스 내역",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 보너스 내역 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/salary/bonus(\\?.*)?$"
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-ALLOW-07",
+      "axis": "ALLOW",
+      "label": "인사 현재 직위",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 현재 직위 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/appointment/current(\\?.*)?$"
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-ALLOW-08",
+      "axis": "ALLOW",
+      "label": "인사 자격증",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 보유 자격증 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/licenses(\\?.*)?$"
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-ALLOW-09",
+      "axis": "ALLOW",
+      "label": "연말정산 의료비",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 의료비 공제 내역 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/year-end-tax/medical(\\?.*)?$"
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-ALLOW-10",
+      "axis": "ALLOW",
+      "label": "연말정산 부양가족 공제",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "사번 20070133 직원의 부양가족 공제 대상 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/year-end-tax/family(\\?.*)?$"
+      },
+      "repeat": 1
+    },
+
+    {
+      "id": "EC-DENY-01",
+      "axis": "DENY",
+      "label": "근태 질의 (tool calling OFF → RAG fallback)",
+      "embed_config": "e2e-embed-deny",
+      "message": "사번 20070133 직원의 지난달 출퇴근 기록 조회해줘",
+      "expect": {
+        "tool_call": false
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-DENY-02",
+      "axis": "DENY",
+      "label": "급여 질의 (tool calling OFF)",
+      "embed_config": "e2e-embed-deny",
+      "message": "사번 20070133 직원의 2025년 3월 급여명세서 조회해줘",
+      "expect": {
+        "tool_call": false
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-DENY-03",
+      "axis": "DENY",
+      "label": "인사 질의 (tool calling OFF)",
+      "embed_config": "e2e-embed-deny",
+      "message": "사번 20070133 직원의 현재 직위 알려줘",
+      "expect": {
+        "tool_call": false
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-DENY-04",
+      "axis": "DENY",
+      "label": "연말정산 질의 (tool calling OFF)",
+      "embed_config": "e2e-embed-deny",
+      "message": "사번 20070133 직원의 의료비 공제 내역 알려줘",
+      "expect": {
+        "tool_call": false
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-DENY-05",
+      "axis": "DENY",
+      "label": "일반 대화 (tool 필요 없음)",
+      "embed_config": "e2e-embed-deny",
+      "message": "안녕하세요, 회사 복지 제도를 설명해주세요.",
+      "expect": {
+        "tool_call": false
+      },
+      "repeat": 1
+    },
+
+    {
+      "id": "EC-FILTER-01",
+      "axis": "FILTER",
+      "label": "allowlist=hr-attendance, 출퇴근 요청 → PASS",
+      "embed_config": "e2e-embed-filter-attendance",
+      "message": "사번 20070133 직원의 이번달 출퇴근 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/attendance/timesheet(\\?.*)?$"
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-FILTER-02",
+      "axis": "FILTER",
+      "label": "allowlist=hr-attendance, 연차 요청 → PASS (같은 skill)",
+      "embed_config": "e2e-embed-filter-attendance",
+      "message": "사번 20070133 직원의 2024년 연차 잔여일 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/attendance/annual-leave/balance\\?.*year=2024"
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-FILTER-03",
+      "axis": "FILTER",
+      "label": "allowlist=hr-attendance, 급여 요청 → BLOCK",
+      "embed_config": "e2e-embed-filter-attendance",
+      "message": "사번 20070133 직원의 이번달 급여명세서 보여줘",
+      "expect": {
+        "tool_call": false
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-FILTER-04",
+      "axis": "FILTER",
+      "label": "allowlist=hr-attendance, 인사 요청 → BLOCK",
+      "embed_config": "e2e-embed-filter-attendance",
+      "message": "사번 20070133 직원의 현재 직위 알려줘",
+      "expect": {
+        "tool_call": false
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-FILTER-05",
+      "axis": "FILTER",
+      "label": "allowlist=hr-attendance, 연말정산 요청 → BLOCK",
+      "embed_config": "e2e-embed-filter-attendance",
+      "message": "사번 20070133 직원의 의료비 공제 내역 알려줘",
+      "expect": {
+        "tool_call": false
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-FILTER-06",
+      "axis": "FILTER",
+      "label": "allowlist=hr-salary,hr-personnel, 급여 요청 → PASS",
+      "embed_config": "e2e-embed-filter-salary-personnel",
+      "message": "사번 20070133 직원의 2025년 3월 급여명세서 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/salary/payslip\\?.*year_month=202503"
+      },
+      "repeat": 1
+    },
+    {
+      "id": "EC-FILTER-07",
+      "axis": "FILTER",
+      "label": "allowlist=hr-salary,hr-personnel, 인사 요청 → PASS (복수 allow)",
+      "embed_config": "e2e-embed-filter-salary-personnel",
+      "message": "사번 20070133 직원의 보유 자격증 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/licenses(\\?.*)?$"
+      },
+      "repeat": 1
+    }
+  ]
+}
