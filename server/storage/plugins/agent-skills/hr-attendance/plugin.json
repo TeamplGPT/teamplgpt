@@ -5,7 +5,7 @@
   "version": "1.5.0",
   "hubId": "hr-attendance",
   "author": "teamplgpt",
-  "description": "직원 근태(연차, 출퇴근, 휴가, 연장근무, 출장, 주간근무계획/스케줄/일정, 재택 등)를 조회합니다. 사용자가 근무계획/스케줄/일정/연차/출퇴근/휴가/연장/야근/출장/재택 등을 물으면 이 skill을 사용하세요. query_type에 따라 선택적 기간 파라미터를 추가할 수 있으며, 언급하지 않으면 생략하세요(서버 기본값 적용). query_type 종류: annual_leave_balance(연차잔여), timesheet(출퇴근기록), leave_requests(휴가신청), work_plan_weekly(주간근무계획/업무계획/스케줄/일정), overtime(연장근무/야근/OT), timesheet_requests(출퇴근변경신청), substitute_leave(대체휴무), business_trips(출장), annual_leave_plan(연차계획/휴가계획), work_type(오늘근무유형/재택). 종류가 불분명하면 annual_leave_balance를 사용하세요.",
+  "description": "직원 근태(연차, 출퇴근, 휴가, 연장근무, 출장, 주간근무계획/스케줄/일정, 재택 등)를 조회합니다. 사용자가 근무계획/스케줄/일정/연차/출퇴근/휴가/연장/야근/출장/재택 등을 물으면 이 skill을 사용하세요. query_type에 따라 선택적 기간 파라미터를 추가할 수 있으며, 언급하지 않으면 생략하세요(서버 기본값 적용). query_type 종류: annual_leave_balance(연차잔여), timesheet(출퇴근기록), leave_requests(휴가신청), work_plan_weekly(주간근무계획/업무계획/스케줄/일정), overtime(연장근무/야근/OT), timesheet_requests(출퇴근변경신청), substitute_leave(대체휴무), business_trips(출장), annual_leave_plan(연차계획/연차 사용 계획/휴가계획/연차일정), work_type(오늘근무유형/재택). 종류가 불분명하면 annual_leave_balance를 사용하세요.",
   "entrypoint": {
     "file": "handler.js",
     "params": {
@@ -14,7 +14,7 @@
         "type": "string"
       },
       "query_type": {
-        "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표에 있는 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 해당 query_type으로 매핑하세요. 매핑표: annual_leave_balance=연차잔여(연차/잔여/남은휴가), timesheet=출퇴근기록(출퇴근/출근/퇴근/근태), leave_requests=휴가신청(휴가신청/신청내역/결재), work_plan_weekly=주간근무계획(업무계획/주간계획/스케줄/일정/계획), overtime=연장근무(연장/야근/OT/초과근무), timesheet_requests=출퇴근변경신청(출퇴근정정/근태변경/정정신청), substitute_leave=대체휴무(대체휴무/대휴), business_trips=출장내역(출장/출장내역), annual_leave_plan=연차계획(연차계획/휴가계획/연차일정), work_type=오늘근무유형(근무유형/재택/출근유형/오늘근무).",
+        "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표에 있는 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 해당 query_type으로 매핑하세요. 매핑표: annual_leave_balance=연차잔여(연차/잔여/남은휴가), timesheet=출퇴근기록(출퇴근/출근/퇴근/근태), leave_requests=휴가신청(휴가신청/신청내역/결재), work_plan_weekly=주간근무계획(업무계획/주간계획/스케줄/일정/계획), overtime=연장근무(연장/야근/OT/초과근무), timesheet_requests=출퇴근변경신청(출퇴근정정/근태변경/정정신청)—기간 파라미터 불필요, 즉시 tool-call, substitute_leave=대체휴무(대체휴무/대휴)—기간 파라미터 불필요, 즉시 tool-call, business_trips=출장내역(출장/출장내역)—기간 파라미터 불필요, 즉시 tool-call, annual_leave_plan=연차계획(연차계획/연차 계획/연차 사용 계획/휴가계획/휴가 계획/연차일정/연차 일정)—기간 파라미터 불필요, 즉시 tool-call, work_type=오늘근무유형(근무유형/재택/출근유형/오늘근무).",
         "type": "string",
         "enum": [
           "annual_leave_balance",
@@ -148,6 +148,26 @@
     {
       "prompt": "이번주 일정 보여줘",
       "call": "{\"emp_no\": \"12345\", \"query_type\": \"work_plan_weekly\", \"base_date\": \"이번주\"}"
+    },
+    {
+      "prompt": "출퇴근 정정 신청 내역 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet_requests\"}"
+    },
+    {
+      "prompt": "근태 변경 신청 목록 조회해줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet_requests\"}"
+    },
+    {
+      "prompt": "연차 사용 계획 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_leave_plan\"}"
+    },
+    {
+      "prompt": "연차일정 보여줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_leave_plan\"}"
+    },
+    {
+      "prompt": "휴가계획 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_leave_plan\"}"
     }
   ],
   "imported": true,

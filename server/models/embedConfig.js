@@ -15,6 +15,8 @@ const EmbedConfig = {
     "chat_mode",
     "workspace_id",
     "message_limit",
+    "allow_tool_calling",
+    "allowed_skill_hashes",
   ],
 
   new: async function (data, creatorId = null) {
@@ -189,6 +191,7 @@ const BOOLEAN_KEYS = [
   "allow_temperature_override",
   "allow_prompt_override",
   "enabled",
+  "allow_tool_calling",
 ];
 
 const NUMBER_KEYS = [
@@ -229,6 +232,13 @@ function validatedCreationData(value, field) {
     } catch {
       return null;
     }
+  }
+
+  if (field === "allowed_skill_hashes") {
+    // NULL → 전체 허용 (필터 미적용), "" → 빈 목록(실질 off), csv → 원본 저장 (runtime 파싱)
+    if (value === null || value === undefined) return null;
+    if (typeof value !== "string") return null;
+    return value;
   }
 
   if (BOOLEAN_KEYS.includes(field)) {

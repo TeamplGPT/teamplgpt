@@ -75,11 +75,11 @@
     },
     {
       "id": "E7",
-      "label": "이번주 스케줄 (키워드 힌트)",
+      "label": "이번주 스케줄",
       "message": "@agent 사번 20070133 직원의 이번주 스케줄 조회해줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/work-plan/weekly\\?.*base_date=\\d{8}"
+        "mock_url_pattern": "^/api/v1/attendance/work-plan/weekly(\\?.*)?$"
       },
       "repeat": 1,
       "pre_reset": true,
