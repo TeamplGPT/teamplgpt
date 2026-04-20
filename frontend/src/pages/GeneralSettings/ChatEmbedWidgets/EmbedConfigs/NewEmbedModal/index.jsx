@@ -3,6 +3,7 @@ import { X } from "@phosphor-icons/react";
 import Workspace from "@/models/workspace";
 import { TagsInput } from "react-tag-input-component";
 import Embed from "@/models/embed";
+import AllowedSkillsMultiSelect from "../components/AllowedSkillsMultiSelect";
 
 export function enforceSubmissionSchema(form) {
   const data = {};
@@ -21,17 +22,30 @@ export function enforceSubmissionSchema(form) {
   if (!data.hasOwnProperty("allow_prompt_override"))
     data.allow_prompt_override = false;
   if (!data.hasOwnProperty("message_limit")) data.message_limit = 20;
+  if (!data.hasOwnProperty("allow_tool_calling"))
+    data.allow_tool_calling = false;
+  // allowed_skill_hashes is handled by submit handler (Option B) to preserve
+  // DB value when toggle is OFF. See design doc §4.3-4.4.
   return data;
 }
 
 export default function NewEmbedModal({ closeModal }) {
   const [error, setError] = useState(null);
+  const [allowToolCalling, setAllowToolCalling] = useState(false);
+  const [selectedHubIds, setSelectedHubIds] = useState(null);
 
   const handleCreate = async (e) => {
     setError(null);
     e.preventDefault();
     const form = new FormData(e.target);
     const data = enforceSubmissionSchema(form);
+    data.allow_tool_calling = allowToolCalling;
+    if (allowToolCalling) {
+      data.allowed_skill_hashes =
+        !selectedHubIds || selectedHubIds.length === 0
+          ? null
+          : selectedHubIds.join(",");
+    }
     const { embed, error } = await Embed.newEmbed(data);
     if (!!embed) window.location.reload();
     setError(error);
@@ -91,6 +105,15 @@ export default function NewEmbedModal({ closeModal }) {
                 title="Enable Prompt Override"
                 hint="Allow setting of the system prompt to override the workspace default."
               />
+              <BooleanInput
+                name="allow_tool_calling"
+                title="Tool calling 허용 (HR 스킬 자동 호출)"
+                hint="이 embed에서 HR 데이터 조회 도구를 자동 호출할 수 있도록 허용합니다. OFF가 기본값이며 보안 모범사례입니다. 토글 OFF 시에도 허용 스킬 설정은 유지되어, 재활성화 시 자동 복원됩니다."
+                onChange={setAllowToolCalling}
+              />
+              {allowToolCalling && (
+                <AllowedSkillsMultiSelect onChange={setSelectedHubIds} />
+              )}
 
               {error && <p className="text-red-400 text-sm">Error: {error}</p>}
               <p className="text-white text-opacity-60 text-xs md:text-sm">
@@ -339,8 +362,20 @@ export const NumberInput = ({ name, title, hint, defaultValue = 0 }) => {
   );
 };
 
-export const BooleanInput = ({ name, title, hint, defaultValue = null }) => {
+export const BooleanInput = ({
+  name,
+  title,
+  hint,
+  defaultValue = null,
+  onChange,
+}) => {
   const [status, setStatus] = useState(defaultValue ?? false);
+
+  const handleClick = () => {
+    const next = !status;
+    setStatus(next);
+    onChange?.(next);
+  };
 
   return (
     <div>
@@ -354,7 +389,8 @@ export const BooleanInput = ({ name, title, hint, defaultValue = null }) => {
         <input
           name={name}
           type="checkbox"
-          onClick={() => setStatus(!status)}
+          onClick={handleClick}
+          onChange={() => {}}
           checked={status}
           className="peer sr-only pointer-events-none"
         />
