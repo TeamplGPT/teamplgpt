@@ -79,14 +79,17 @@ async function toolCallingLoop(opts) {
     toolRuntimeOverrides,
   } = opts;
 
-  const resolvedLlmOptions = injectToolChoice({ llmOptions, caller, tools });
-
   let currentMessages = [...opts.messages];
   let completeText = "";
   let metrics = {};
   const toolTrace = [];
 
   for (let round = 0; round <= maxRounds; round++) {
+    const roundLlmOptions =
+      round === 0
+        ? injectToolChoice({ llmOptions, caller, tools })
+        : llmOptions;
+
     if (LLMConnector.streamingEnabled() !== true) {
       // --- Non-streaming path ---
       logger.llmStart?.({
@@ -94,7 +97,7 @@ async function toolCallingLoop(opts) {
         streaming: false,
       });
       const result = await LLMConnector.getChatCompletion(currentMessages, {
-        ...resolvedLlmOptions,
+        ...roundLlmOptions,
         tools,
       });
       logger.llmEnd?.({
@@ -138,7 +141,7 @@ async function toolCallingLoop(opts) {
       });
       const stream = await LLMConnector.streamGetChatCompletion(
         currentMessages,
-        { ...resolvedLlmOptions, tools }
+        { ...roundLlmOptions, tools }
       );
       const streamResult = await LLMConnector.handleStream(response, stream, {
         uuid,

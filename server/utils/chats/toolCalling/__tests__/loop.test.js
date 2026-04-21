@@ -12,6 +12,12 @@ jest.mock("../../../helpers/chat/responses", () => ({
   writeResponseChunk: jest.fn(),
 }));
 
+jest.mock("../executor", () => ({
+  ToolExecutor: {
+    execute: jest.fn().mockResolvedValue('{"ok":true}'),
+  },
+}));
+
 const {
   toolCallingLoop,
   injectToolChoice,
@@ -235,5 +241,49 @@ describe("toolCallingLoop — caller → LLMConnector forward 통합", () => {
     });
     const callArgs = LLMConnector.streamGetChatCompletion.mock.calls[0][1];
     expect(callArgs).not.toHaveProperty("tool_choice");
+  });
+
+  test("TC-8d: embed에서는 첫 호출만 tool_choice='required', tool 결과 재호출부터는 미전달", async () => {
+    const LLMConnector = buildMockLLMConnector();
+    LLMConnector.handleStream
+      .mockResolvedValueOnce({
+        text: "",
+        toolCalls: [
+          {
+            name: "hr-attendance",
+            call_id: "call-1",
+            arguments: '{"emp_no":"12345"}',
+          },
+        ],
+      })
+      .mockResolvedValueOnce({ text: "final answer" });
+
+    await toolCallingLoop({
+      response: buildMockResponse(),
+      LLMConnector,
+      messages: [{ role: "user", content: "hi" }],
+      tools: [{ type: "function", name: "hr-attendance" }],
+      llmOptions: { temperature: 0.7 },
+      uuid: "u-1",
+      sources: [],
+      logger: {},
+      caller: "embed",
+    });
+
+    expect(LLMConnector.streamGetChatCompletion).toHaveBeenCalledTimes(2);
+    expect(LLMConnector.streamGetChatCompletion.mock.calls[0][1]).toEqual(
+      expect.objectContaining({
+        temperature: 0.7,
+        tool_choice: "required",
+      })
+    );
+    expect(LLMConnector.streamGetChatCompletion.mock.calls[1][1]).toEqual(
+      expect.objectContaining({
+        temperature: 0.7,
+      })
+    );
+    expect(
+      LLMConnector.streamGetChatCompletion.mock.calls[1][1]
+    ).not.toHaveProperty("tool_choice");
   });
 });
