@@ -12,6 +12,9 @@ class ToolExecutor {
    * @param {object} toolCall - { name: string, arguments: object }
    * @param {object} options
    * @param {Function} [options.logger] - 로그/introspect 출력 함수
+   * @param {Object<string,string>} [options.runtimeOverrides] - runtimeArgs 덮어쓰기 (null/undefined 값은 무시).
+   *   Call-site별 runtime param override 용도 (e.g., E2E test에서 HR_API_BASE_URL을 mock 포트로 override).
+   *   plugin.json의 setup_args.value는 변경되지 않음 (읽기 전용 기본값 유지).
    * @returns {Promise<string>} 실행 결과 문자열
    */
   static async execute(toolCall, options = {}) {
@@ -23,7 +26,11 @@ class ToolExecutor {
         return `Error: Tool "${toolCall.name}" is not active.`;
       }
 
-      const runtimeArgs = plugin.parseCallOptions();
+      const baseRuntimeArgs = plugin.parseCallOptions();
+      const runtimeArgs = ToolExecutor.#mergeRuntimeOverrides(
+        baseRuntimeArgs,
+        options.runtimeOverrides
+      );
       const context = {
         runtimeArgs,
         introspect: options.logger || (() => {}),
@@ -44,6 +51,23 @@ class ToolExecutor {
       );
       return `Error executing tool "${toolCall.name}": ${error.message}`;
     }
+  }
+
+  /**
+   * Merge runtime overrides into base runtimeArgs without mutating either input.
+   * null/undefined values in overrides are ignored (they would silently blank legitimate params otherwise).
+   * @param {Object<string,string>} baseRuntimeArgs
+   * @param {Object<string,string>|null|undefined} overrides
+   * @returns {Object<string,string>}
+   */
+  static #mergeRuntimeOverrides(baseRuntimeArgs, overrides) {
+    if (!overrides || typeof overrides !== "object") return baseRuntimeArgs;
+    const merged = { ...baseRuntimeArgs };
+    for (const [k, v] of Object.entries(overrides)) {
+      if (v === null || v === undefined) continue;
+      merged[k] = v;
+    }
+    return merged;
   }
 }
 

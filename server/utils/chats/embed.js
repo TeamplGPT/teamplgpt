@@ -24,7 +24,13 @@ async function streamChatWithForEmbed(
   message,
   /** @type {String} */
   sessionId,
-  { promptOverride, modelOverride, temperatureOverride, username }
+  {
+    promptOverride,
+    modelOverride,
+    temperatureOverride,
+    username,
+    toolRuntimeOverrides,
+  }
 ) {
   const chatMode = embed.chat_mode;
   const chatModel = embed.allow_model_override ? modelOverride : null;
@@ -216,6 +222,8 @@ async function streamChatWithForEmbed(
     uuid,
     sources: [],
     logger: loopLogger,
+    caller: "embed",
+    toolRuntimeOverrides,
   });
   completeText = finalText;
   metrics = finalMetrics;

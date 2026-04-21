@@ -27,7 +27,36 @@ const MAX_TOOL_ROUNDS = 5;
  * @property {Array}  sources                         응답 citation
  * @property {ToolCallingLoopLogger} logger
  * @property {number} [maxRounds=MAX_TOOL_ROUNDS]    override용
+ * @property {'workspace'|'embed'} [caller='workspace']  tool_choice 주입 분기 (embed + tools≥1 + env≠'false' 시 'required' 주입)
+ * @property {Object<string,string>} [toolRuntimeOverrides]  call-site별 runtimeArgs 덮어쓰기 (e.g., {HR_API_BASE_URL: "http://localhost:8001"}).
+ *   plugin.json의 setup_args.value는 변경되지 않고, ToolExecutor 호출 시에만 merge됨.
  */
+
+/**
+ * Decide tool_choice based on caller context, tools list, and env kill-switch.
+ * Pure function — returns a new llmOptions object when injection applies, otherwise the original reference.
+ *
+ * Injection conditions (all must be true):
+ *   - caller === 'embed'
+ *   - Array.isArray(tools) && tools.length >= 1
+ *   - process.env.EMBED_TOOL_CHOICE_REQUIRED !== 'false' (strict equality)
+ *
+ * Env is evaluated per-call (no module-load freeze) so kill-switch takes effect on the next request.
+ *
+ * @param {Object} params
+ * @param {Object} params.llmOptions
+ * @param {'workspace'|'embed'} params.caller
+ * @param {Array|null|undefined} params.tools
+ * @returns {Object} llmOptions (possibly with tool_choice='required' added)
+ */
+function injectToolChoice({ llmOptions, caller, tools }) {
+  const envDisabled = process.env.EMBED_TOOL_CHOICE_REQUIRED === "false";
+  const hasTools = Array.isArray(tools) && tools.length >= 1;
+  if (caller === "embed" && hasTools && !envDisabled) {
+    return { ...llmOptions, tool_choice: "required" };
+  }
+  return llmOptions;
+}
 
 /**
  * Shared tool calling loop — streams text chunks to response and executes tools as needed.
@@ -46,7 +75,11 @@ async function toolCallingLoop(opts) {
     sources,
     logger,
     maxRounds = MAX_TOOL_ROUNDS,
+    caller = "workspace",
+    toolRuntimeOverrides,
   } = opts;
+
+  const resolvedLlmOptions = injectToolChoice({ llmOptions, caller, tools });
 
   let currentMessages = [...opts.messages];
   let completeText = "";
@@ -61,7 +94,7 @@ async function toolCallingLoop(opts) {
         streaming: false,
       });
       const result = await LLMConnector.getChatCompletion(currentMessages, {
-        ...llmOptions,
+        ...resolvedLlmOptions,
         tools,
       });
       logger.llmEnd?.({
@@ -78,6 +111,7 @@ async function toolCallingLoop(opts) {
             LLMConnector,
             toolTrace,
             logger,
+            toolRuntimeOverrides,
           });
         }
         metrics = result.metrics || {};
@@ -104,7 +138,7 @@ async function toolCallingLoop(opts) {
       });
       const stream = await LLMConnector.streamGetChatCompletion(
         currentMessages,
-        { ...llmOptions, tools }
+        { ...resolvedLlmOptions, tools }
       );
       const streamResult = await LLMConnector.handleStream(response, stream, {
         uuid,
@@ -128,6 +162,7 @@ async function toolCallingLoop(opts) {
             LLMConnector,
             toolTrace,
             logger,
+            toolRuntimeOverrides,
           });
         }
         metrics = stream.metrics || {};
@@ -186,10 +221,13 @@ async function executeAndAppend({
   LLMConnector,
   toolTrace,
   logger,
+  toolRuntimeOverrides,
 }) {
   logger.toolCall?.({ name: tc.name, arguments: tc.arguments, round });
   const tcStart = Date.now();
-  const toolResult = await ToolExecutor.execute(tc);
+  const toolResult = await ToolExecutor.execute(tc, {
+    runtimeOverrides: toolRuntimeOverrides,
+  });
   const durationMs = Date.now() - tcStart;
   const isError =
     typeof toolResult === "string" && toolResult.startsWith("Error");
@@ -210,4 +248,4 @@ async function executeAndAppend({
   );
 }
 
-module.exports = { toolCallingLoop, MAX_TOOL_ROUNDS };
+module.exports = { toolCallingLoop, injectToolChoice, MAX_TOOL_ROUNDS };

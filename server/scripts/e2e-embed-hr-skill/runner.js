@@ -312,6 +312,10 @@ async function embedStreamChat(embedUuid, body) {
     headers: {
       "Content-Type": "application/json",
       "Content-Length": Buffer.byteLength(json),
+      // Redirect HR skill HTTP target to the mock server spawned by this runner.
+      // Server must be in NODE_ENV=development (or ALLOW_TOOL_RUNTIME_OVERRIDE=true) for this to take effect.
+      // In production the header is silently ignored.
+      "x-tool-runtime-override-hr_api_base_url": `http://localhost:${MOCK_PORT}`,
     },
     body: json,
   });
@@ -440,13 +444,23 @@ async function runScenarioOnce(scenario, iteration, configMap, mockLogPath) {
       ? relevantMock[relevantMock.length - 1].fullUrl
       : null;
 
+  // Embed tool calling path does not emit "Assembling Tool Call" SSE events
+  // (those are agent-mode specific, see server/utils/agents/aibitat/providers/*).
+  // Mock API hit is the ground truth of tool execution — if the mock logged a /api/v1/*
+  // request for this scenario window, a tool was actually invoked regardless of SSE shape.
+  const effectiveToolCall =
+    toolCall || (mockUrl ? `[mock-hit:${mockUrl.split("?")[0]}]` : null);
+
   let pass = true;
   let reason = null;
   if (errorMsg) {
     pass = false;
     reason = `request error: ${errorMsg}`;
   } else {
-    const verdict = assertByAxis(scenario, { toolCall, mockUrl });
+    const verdict = assertByAxis(scenario, {
+      toolCall: effectiveToolCall,
+      mockUrl,
+    });
     pass = verdict.pass;
     reason = verdict.reason;
   }
@@ -458,7 +472,12 @@ async function runScenarioOnce(scenario, iteration, configMap, mockLogPath) {
     embedConfig: scenario.embed_config,
     message: scenario.message,
     elapsedMs,
-    toolCall,
+    toolCall: effectiveToolCall,
+    toolCallSource: toolCall
+      ? "sse"
+      : mockUrl
+        ? "mock-hit-fallback"
+        : null,
     finalText,
     mockUrl,
     eventCount,
