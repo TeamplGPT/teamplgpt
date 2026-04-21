@@ -98,6 +98,16 @@ describe("injectToolChoice — 4분기 decision matrix", () => {
     expect(out).not.toHaveProperty("tool_choice");
   });
 
+  test("TC-5b: forceToolChoiceRequired=false면 embed여도 tool_choice 미주입", () => {
+    const out = injectToolChoice({
+      llmOptions: { temperature: 0.7 },
+      caller: "embed",
+      tools: [{ type: "function", name: "hr-attendance" }],
+      forceToolChoiceRequired: false,
+    });
+    expect(out).not.toHaveProperty("tool_choice");
+  });
+
   test("TC-6: caller='embed' + tools.length≥1 + env='FALSE' (대문자) → tool_choice='required' (엄격 equality, Q-C)", () => {
     process.env[ENV_KEY] = "FALSE";
     const out = injectToolChoice({
@@ -285,5 +295,25 @@ describe("toolCallingLoop — caller → LLMConnector forward 통합", () => {
     expect(
       LLMConnector.streamGetChatCompletion.mock.calls[1][1]
     ).not.toHaveProperty("tool_choice");
+  });
+
+  test("TC-8e: forceToolChoiceRequired=false면 첫 호출에도 tool_choice를 전달하지 않는다", async () => {
+    const LLMConnector = buildMockLLMConnector();
+
+    await toolCallingLoop({
+      response: buildMockResponse(),
+      LLMConnector,
+      messages: [{ role: "user", content: "hi" }],
+      tools: [{ type: "function", name: "hr-attendance" }],
+      llmOptions: { temperature: 0.7 },
+      uuid: "u-1",
+      sources: [],
+      logger: {},
+      caller: "embed",
+      forceToolChoiceRequired: false,
+    });
+
+    const callArgs = LLMConnector.streamGetChatCompletion.mock.calls[0][1];
+    expect(callArgs).not.toHaveProperty("tool_choice");
   });
 });

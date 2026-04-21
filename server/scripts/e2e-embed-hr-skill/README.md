@@ -88,28 +88,23 @@ Schema (see [design §3.1](../../../docs/02-design/features/embed-tool-calling-e
 
 This runner is an **independent fork**. It shares only `mock-hr-api.js` (via symlink). `e2e-hr-skill` uses `MOCK_PORT=8000` (default) while this runner uses `MOCK_PORT=8001`, so both can be run sequentially without state conflict.
 
-## Known Limitation (2026-04-20 initial Do-phase run)
+## Expected Behavior
 
-**Current pass pattern**: DENY 5/5 (100%), ALLOW 0/10 (0%), FILTER 3/7 (43%, block cases only).
+After the embed follow-up fix, the first embed LLM call injects `tool_choice="required"` when:
+- `allow_tool_calling=true`
+- provider tool calling is supported
+- filtered tools length is at least 1
+- `EMBED_TOOL_CHOICE_REQUIRED !== "false"`
 
-**Root cause** (verified via instrumented debug logging):
-- Phase 1-2 code is correct — tools ARE passed (`allTools=4, filtered=4`), `applyAllowedHashes` filters properly, `allow_tool_calling` gate works.
-- gpt-5-mini with RAG context chooses **text answer over tool calls**. Even with a dedicated test workspace (no vectors), the LLM still receives 1 merged-shared pinned doc and prefers it.
-- DENY passes because tools=null forces text fallback (gate works correctly).
-- FILTER-block passes vacuously (blocked skill → tools array empty → text fallback, same as DENY).
-- ALLOW and FILTER-allow require the LLM to **prefer** tools over text — behavior not guaranteed without `tool_choice="required"` injection.
+This removes the earlier ambiguity where ALLOW / FILTER-allow scenarios could fall back to plain text before any tool invocation. The current expected pattern is:
+- **ALLOW**: tool call required, mock HR API request captured
+- **DENY**: no tool call, text fallback
+- **FILTER-allow**: only whitelisted HR skills may invoke
+- **FILTER-block**: no tool call when the requested skill is not whitelisted
 
-**Next-phase remediation options**:
-1. Inject `tool_choice: "required"` when test config sets a marker flag (embed.js change).
-2. Add `E2E_FORCE_TOOL_CALL` env to runner that passes a `tool_choice` override in request body.
-3. Accept DENY/FILTER-block as the primary Phase 1-2 verification; use Phase 3 (observability) to instrument tool-call attempts for ALLOW/FILTER-allow.
+## Historical Note
 
-**What this test DOES verify today**:
-- `allow_tool_calling=false` correctly suppresses tool definitions (DENY 100%)
-- `allowed_skill_hashes` correctly blocks unauthorized skills (FILTER-block 100%)
-- Embed config lifecycle (create/teardown) works
-- Test workspace isolation helper works
-- SSE parsing, mock HR API capture, result.json schema all function
+The initial 2026-04-20 Do-phase run predated `tool_choice="required"` injection for embed. In that state, DENY and FILTER-block were meaningful, but ALLOW and FILTER-allow could fail because the model sometimes preferred a text answer over tool calls. That limitation should no longer apply after the current embed loop behavior.
 
 ## Troubleshooting
 

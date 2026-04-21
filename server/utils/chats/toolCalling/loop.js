@@ -28,6 +28,7 @@ const MAX_TOOL_ROUNDS = 5;
  * @property {ToolCallingLoopLogger} logger
  * @property {number} [maxRounds=MAX_TOOL_ROUNDS]    override용
  * @property {'workspace'|'embed'} [caller='workspace']  tool_choice 주입 분기 (embed + tools≥1 + env≠'false' 시 'required' 주입)
+ * @property {boolean} [forceToolChoiceRequired=true]  embed에서 tool_choice='required' 강제 여부
  * @property {Object<string,string>} [toolRuntimeOverrides]  call-site별 runtimeArgs 덮어쓰기 (e.g., {HR_API_BASE_URL: "http://localhost:8001"}).
  *   plugin.json의 setup_args.value는 변경되지 않고, ToolExecutor 호출 시에만 merge됨.
  */
@@ -49,10 +50,10 @@ const MAX_TOOL_ROUNDS = 5;
  * @param {Array|null|undefined} params.tools
  * @returns {Object} llmOptions (possibly with tool_choice='required' added)
  */
-function injectToolChoice({ llmOptions, caller, tools }) {
+function injectToolChoice({ llmOptions, caller, tools, forceToolChoiceRequired = true }) {
   const envDisabled = process.env.EMBED_TOOL_CHOICE_REQUIRED === "false";
   const hasTools = Array.isArray(tools) && tools.length >= 1;
-  if (caller === "embed" && hasTools && !envDisabled) {
+  if (caller === "embed" && hasTools && !envDisabled && forceToolChoiceRequired) {
     return { ...llmOptions, tool_choice: "required" };
   }
   return llmOptions;
@@ -76,6 +77,7 @@ async function toolCallingLoop(opts) {
     logger,
     maxRounds = MAX_TOOL_ROUNDS,
     caller = "workspace",
+    forceToolChoiceRequired = true,
     toolRuntimeOverrides,
   } = opts;
 
@@ -87,7 +89,12 @@ async function toolCallingLoop(opts) {
   for (let round = 0; round <= maxRounds; round++) {
     const roundLlmOptions =
       round === 0
-        ? injectToolChoice({ llmOptions, caller, tools })
+        ? injectToolChoice({
+            llmOptions,
+            caller,
+            tools,
+            forceToolChoiceRequired,
+          })
         : llmOptions;
 
     if (LLMConnector.streamingEnabled() !== true) {

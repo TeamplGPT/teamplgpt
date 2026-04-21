@@ -145,4 +145,4 @@ function embeddedEndpoints(app) {
   );
 }
 
-module.exports = { embeddedEndpoints };
+module.exports = { embeddedEndpoints, parseToolRuntimeOverrideHeaders };

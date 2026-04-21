@@ -169,9 +169,20 @@ async function streamChatWithForEmbed(
 
   // Compress message to ensure prompt passes token limit with room for response
   // and build system messages based on inputs and history.
+  const format =
+    typeof LLMConnector.toolCallingFormat === "function"
+      ? LLMConnector.toolCallingFormat()
+      : null;
+  const allTools =
+    format != null ? ChatToolsManager.getToolDefinitions(format) : [];
+  const allowedToolNames =
+    format != null ? extractAllowedToolNames(allTools, embed.allowed_skill_hashes, format) : [];
   const messages = await LLMConnector.compressMessages(
     {
-      systemPrompt: await chatPrompt(embed.workspace, username),
+      systemPrompt: buildEmbedSystemPrompt(
+        await chatPrompt(embed.workspace, username),
+        allowedToolNames
+      ),
       userPrompt: message,
       contextTexts,
       chatHistory,
@@ -187,8 +198,6 @@ async function streamChatWithForEmbed(
 
   let tools = null;
   if (toolsEnabled) {
-    const format = LLMConnector.toolCallingFormat();
-    const allTools = ChatToolsManager.getToolDefinitions(format);
     tools = applyAllowedHashes(allTools, embed.allowed_skill_hashes, format);
   }
 
@@ -223,6 +232,7 @@ async function streamChatWithForEmbed(
     sources: [],
     logger: loopLogger,
     caller: "embed",
+    forceToolChoiceRequired: shouldForceToolChoice(embed.allowed_skill_hashes),
     toolRuntimeOverrides,
   });
   completeText = finalText;
@@ -278,6 +288,31 @@ function applyAllowedHashes(tools, raw, format) {
   return tools.filter((t) => allowed.includes(extractToolName(t, format)));
 }
 
+function extractAllowedToolNames(tools, raw, format) {
+  return applyAllowedHashes(tools, raw, format)
+    .map((tool) => extractToolName(tool, format))
+    .filter(Boolean);
+}
+
+function shouldForceToolChoice(rawAllowedSkillHashes) {
+  return rawAllowedSkillHashes === null || rawAllowedSkillHashes === undefined;
+}
+
+function buildEmbedSystemPrompt(basePrompt, allowedToolNames = []) {
+  if (!Array.isArray(allowedToolNames) || allowedToolNames.length === 0) {
+    return basePrompt;
+  }
+
+  const allowedList = allowedToolNames.join(", ");
+  return `${basePrompt}
+
+Tool usage policy for this embed:
+- Only these tools are available: ${allowedList}
+- If the user's request does not match one of those tools, do not call a tool.
+- Do not force an unrelated available tool just because a request is about HR.
+- When the request is out of scope for the available tools, answer without tool calls using only normal chat/query behavior.`;
+}
+
 function extractToolName(tool, format) {
   switch (format) {
     case "openai-responses":
@@ -302,4 +337,9 @@ async function recentEmbedChatHistory(sessionId, embed, messageLimit = 20) {
 
 module.exports = {
   streamChatWithForEmbed,
+  applyAllowedHashes,
+  extractToolName,
+  extractAllowedToolNames,
+  shouldForceToolChoice,
+  buildEmbedSystemPrompt,
 };
