@@ -60,6 +60,42 @@ function applyTierFilter(scenarios, tier) {
   return scenarios.filter((s) => !s.tier || s.tier === "primary");
 }
 
+function parseOnlyArg() {
+  const argv = process.argv.slice(2);
+  let raw = null;
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a.startsWith("--only=")) {
+      raw = a.slice("--only=".length);
+      break;
+    }
+    if (a === "--only" && argv[i + 1]) {
+      raw = argv[i + 1];
+      break;
+    }
+  }
+  if (!raw && process.env.E2E_ONLY) raw = process.env.E2E_ONLY;
+  if (!raw) return null;
+  const ids = raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return ids.length > 0 ? new Set(ids) : null;
+}
+
+function applyOnlyFilter(scenarios, onlyIds) {
+  if (!onlyIds) return scenarios;
+  const missing = [...onlyIds].filter(
+    (id) => !scenarios.find((s) => s.id === id)
+  );
+  if (missing.length > 0) {
+    fatal(
+      `--only: unknown scenario id(s): ${missing.join(", ")} (tier filter may have excluded them — try --tier=full)`
+    );
+  }
+  return scenarios.filter((s) => onlyIds.has(s.id));
+}
+
 const COLOR = {
   reset: "\x1b[0m",
   green: "\x1b[32m",
@@ -468,9 +504,11 @@ function gitHead() {
 async function main() {
   const rawScenarios = loadScenarios();
   const tier = resolveTier();
-  const scenarios = applyTierFilter(rawScenarios, tier);
+  const onlyIds = parseOnlyArg();
+  const tierFiltered = applyTierFilter(rawScenarios, tier);
+  const scenarios = applyOnlyFilter(tierFiltered, onlyIds);
   info(
-    `tier="${tier}", ${scenarios.length}/${rawScenarios.length} scenarios after filter (${scenarios.reduce(
+    `tier="${tier}"${onlyIds ? `, --only=${[...onlyIds].join(",")}` : ""}, ${scenarios.length}/${rawScenarios.length} scenarios after filter (${scenarios.reduce(
       (n, s) => n + s.repeat,
       0
     )} total runs)`
