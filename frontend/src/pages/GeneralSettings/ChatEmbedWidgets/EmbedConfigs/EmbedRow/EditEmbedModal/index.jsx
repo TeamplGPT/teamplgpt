@@ -8,18 +8,41 @@ import {
   WorkspaceSelection,
   enforceSubmissionSchema,
 } from "../../NewEmbedModal";
+import AllowedSkillsMultiSelect from "../../components/AllowedSkillsMultiSelect";
 import Embed from "@/models/embed";
 import showToast from "@/utils/toast";
 import { safeJsonParse } from "@/utils/request";
 
+function parseAllowedSkillHashes(value) {
+  if (!value) return null;
+  const arr = value
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return arr.length === 0 ? null : arr;
+}
+
 export default function EditEmbedModal({ embed, closeModal }) {
   const [error, setError] = useState(null);
+  const [allowToolCalling, setAllowToolCalling] = useState(
+    embed.allow_tool_calling ?? false
+  );
+  const [selectedHubIds, setSelectedHubIds] = useState(() =>
+    parseAllowedSkillHashes(embed.allowed_skill_hashes)
+  );
 
   const handleUpdate = async (e) => {
     setError(null);
     e.preventDefault();
     const form = new FormData(e.target);
     const data = enforceSubmissionSchema(form);
+    data.allow_tool_calling = allowToolCalling;
+    if (allowToolCalling) {
+      data.allowed_skill_hashes =
+        !selectedHubIds || selectedHubIds.length === 0
+          ? null
+          : selectedHubIds.join(",");
+    }
     const { success, error } = await Embed.updateEmbed(embed.id, data);
     if (success) {
       showToast("Embed updated successfully.", "success", { clear: true });
@@ -93,6 +116,19 @@ export default function EditEmbedModal({ embed, closeModal }) {
                 hint="Allow setting of the system prompt to override the workspace default."
                 defaultValue={embed.allow_prompt_override}
               />
+              <BooleanInput
+                name="allow_tool_calling"
+                title="Tool calling 허용 (HR 스킬 자동 호출)"
+                hint="이 embed에서 HR 데이터 조회 도구를 자동 호출할 수 있도록 허용합니다. OFF가 기본값이며 보안 모범사례입니다. 토글 OFF 시에도 허용 스킬 설정은 유지되어, 재활성화 시 자동 복원됩니다."
+                defaultValue={embed.allow_tool_calling ?? false}
+                onChange={setAllowToolCalling}
+              />
+              {allowToolCalling && (
+                <AllowedSkillsMultiSelect
+                  defaultValue={embed.allowed_skill_hashes}
+                  onChange={setSelectedHubIds}
+                />
+              )}
 
               {error && <p className="text-red-400 text-sm">Error: {error}</p>}
               <p className="text-white text-opacity-60 text-xs md:text-sm">

@@ -33,7 +33,19 @@
         "tool_call": true,
         "mock_url_pattern": "^/api/v1/attendance/timesheet\\?.*year_month=\\d{4}03"
       },
-      "repeat": 5,
+      "repeat": 10,
+      "pre_reset": true,
+      "tier": "primary"
+    },
+    {
+      "id": "E3b",
+      "label": "지난달 연장근무 (year_month 상대표현 결정론성)",
+      "message": "@agent 사번 20070133 직원의 지난달 연장근무 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/attendance/overtime\\?.*year_month=\\d{6}"
+      },
+      "repeat": 10,
       "pre_reset": true,
       "tier": "primary"
     },
@@ -69,17 +81,29 @@
         "tool_call": true,
         "mock_url_pattern": "^/api/v1/attendance/work-plan/weekly\\?.*base_date=\\d{8}"
       },
-      "repeat": 1,
+      "repeat": 10,
+      "pre_reset": true,
+      "tier": "primary"
+    },
+    {
+      "id": "E6b",
+      "label": "어제 근무계획 (base_date 상대표현 결정론성)",
+      "message": "@agent 사번 20070133 직원의 어제 근무계획 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/attendance/work-plan/weekly\\?.*base_date=\\d{8}"
+      },
+      "repeat": 10,
       "pre_reset": true,
       "tier": "primary"
     },
     {
       "id": "E7",
-      "label": "이번주 스케줄 (키워드 힌트)",
+      "label": "이번주 스케줄",
       "message": "@agent 사번 20070133 직원의 이번주 스케줄 조회해줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/work-plan/weekly\\?.*base_date=\\d{8}"
+        "mock_url_pattern": "^/api/v1/attendance/work-plan/weekly(\\?.*)?$"
       },
       "repeat": 1,
       "pre_reset": true,

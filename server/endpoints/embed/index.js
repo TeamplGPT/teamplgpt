@@ -13,6 +13,41 @@ const {
   writeResponseChunk,
 } = require("../../utils/helpers/chat/responses");
 
+/**
+ * Parse `x-tool-runtime-override-<PARAM>` request headers into a runtimeArgs override map.
+ * Test/dev-only mechanism — allows E2E runners to redirect skill HTTP targets (e.g., mock API port)
+ * without mutating plugin.json. Header names are case-insensitive; param names are uppercased.
+ *
+ * Gated by NODE_ENV === 'development' OR ALLOW_TOOL_RUNTIME_OVERRIDE === 'true'.
+ * Returns null in production so merge layer becomes a no-op.
+ *
+ * @param {import('express').Request} request
+ * @returns {Object<string,string>|null}
+ */
+function parseToolRuntimeOverrideHeaders(request) {
+  const gateOpen =
+    process.env.NODE_ENV === "development" ||
+    process.env.ALLOW_TOOL_RUNTIME_OVERRIDE === "true";
+  if (!gateOpen) return null;
+
+  const PREFIX = "x-tool-runtime-override-";
+  const overrides = {};
+  for (const [rawKey, rawValue] of Object.entries(request.headers || {})) {
+    const key = rawKey.toLowerCase();
+    if (!key.startsWith(PREFIX)) continue;
+    const paramName = key.slice(PREFIX.length).toUpperCase();
+    if (!paramName) continue;
+    const value = Array.isArray(rawValue) ? rawValue[0] : rawValue;
+    if (typeof value !== "string" || value.length === 0) continue;
+    overrides[paramName] = value;
+  }
+  if (Object.keys(overrides).length === 0) return null;
+  console.log(
+    `[tool-runtime-override] embed applying overrides: ${Object.keys(overrides).join(", ")}`
+  );
+  return overrides;
+}
+
 function embeddedEndpoints(app) {
   if (!app) return;
 
@@ -38,11 +73,14 @@ function embeddedEndpoints(app) {
         response.setHeader("Connection", "keep-alive");
         response.flushHeaders();
 
+        const toolRuntimeOverrides =
+          parseToolRuntimeOverrideHeaders(request);
         await streamChatWithForEmbed(response, embed, message, sessionId, {
           promptOverride: prompt,
           modelOverride: model,
           temperatureOverride: temperature,
           username,
+          toolRuntimeOverrides,
         });
         await Telemetry.sendTelemetry("embed_sent_chat", {
           multiUserMode: multiUserMode(response),
@@ -107,4 +145,4 @@ function embeddedEndpoints(app) {
   );
 }
 
-module.exports = { embeddedEndpoints };
+module.exports = { embeddedEndpoints, parseToolRuntimeOverrideHeaders };

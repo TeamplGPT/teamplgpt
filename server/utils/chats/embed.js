@@ -7,6 +7,8 @@ const {
   writeResponseChunk,
 } = require("../helpers/chat/responses");
 const { DocumentManager } = require("../DocumentManager");
+const { ChatToolsManager } = require("./toolCalling/manager");
+const { toolCallingLoop } = require("./toolCalling/loop");
 const { performMergedSearch } = require("../vectorSearch/mergeSharedResults");
 const {
   shouldUseHybridSearch,
@@ -22,7 +24,13 @@ async function streamChatWithForEmbed(
   message,
   /** @type {String} */
   sessionId,
-  { promptOverride, modelOverride, temperatureOverride, username }
+  {
+    promptOverride,
+    modelOverride,
+    temperatureOverride,
+    username,
+    toolRuntimeOverrides,
+  }
 ) {
   const chatMode = embed.chat_mode;
   const chatModel = embed.allow_model_override ? modelOverride : null;
@@ -161,9 +169,20 @@ async function streamChatWithForEmbed(
 
   // Compress message to ensure prompt passes token limit with room for response
   // and build system messages based on inputs and history.
+  const format =
+    typeof LLMConnector.toolCallingFormat === "function"
+      ? LLMConnector.toolCallingFormat()
+      : null;
+  const allTools =
+    format != null ? ChatToolsManager.getToolDefinitions(format) : [];
+  const allowedToolNames =
+    format != null ? extractAllowedToolNames(allTools, embed.allowed_skill_hashes, format) : [];
   const messages = await LLMConnector.compressMessages(
     {
-      systemPrompt: await chatPrompt(embed.workspace, username),
+      systemPrompt: buildEmbedSystemPrompt(
+        await chatPrompt(embed.workspace, username),
+        allowedToolNames
+      ),
       userPrompt: message,
       contextTexts,
       chatHistory,
@@ -171,41 +190,64 @@ async function streamChatWithForEmbed(
     rawHistory
   );
 
-  // If streaming is not explicitly enabled for connector
-  // we do regular waiting of a response and send a single chunk.
-  if (LLMConnector.streamingEnabled() !== true) {
-    console.log(
-      `\x1b[31m[STREAMING DISABLED]\x1b[0m Streaming is not available for ${LLMConnector.constructor.name}. Will use regular chat method.`
-    );
-    const { textResponse, metrics: performanceMetrics } =
-      await LLMConnector.getChatCompletion(messages, {
-        temperature: embed.workspace?.openAiTemp ?? LLMConnector.defaultTemp,
-      });
-    completeText = textResponse;
-    metrics = performanceMetrics;
-    writeResponseChunk(response, {
-      uuid,
-      sources: [],
-      type: "textResponseChunk",
-      textResponse: completeText,
-      close: true,
-      error: false,
-    });
-  } else {
-    const stream = await LLMConnector.streamGetChatCompletion(messages, {
-      temperature: embed.workspace?.openAiTemp ?? LLMConnector.defaultTemp,
-    });
-    completeText = await LLMConnector.handleStream(response, stream, {
-      uuid,
-      sources: [],
-    });
-    metrics = stream.metrics;
+  // Tool calling setup — embed-specific: opt-in via allow_tool_calling + provider support
+  const toolsEnabled =
+    embed.allow_tool_calling === true &&
+    typeof LLMConnector.supportsToolCalling === "function" &&
+    LLMConnector.supportsToolCalling();
+
+  let tools = null;
+  if (toolsEnabled) {
+    tools = applyAllowedHashes(allTools, embed.allowed_skill_hashes, format);
   }
+
+  // Phase 2 초기: console 기반 경량 로거
+  // Phase 4 에서 traceLogger 채택 시 동일 인터페이스로 교체 예정
+  const loopLogger = {
+    llmStart: () => {},
+    llmEnd: () => {},
+    toolCall: (evt) =>
+      console.log(`[embed-tool] ${evt.name} args=`, evt.arguments),
+    toolCallEnd: (evt) =>
+      console.log(
+        `[embed-tool] ${evt.name} done ${evt.durationMs}ms err=${evt.isError}`
+      ),
+    toolCallMax: (evt) =>
+      console.warn(`[embed-tool] max rounds ${evt.rounds} reached`),
+  };
+
+  const {
+    completeText: finalText,
+    metrics: finalMetrics,
+    toolTrace,
+  } = await toolCallingLoop({
+    response,
+    LLMConnector,
+    messages,
+    tools,
+    llmOptions: {
+      temperature: embed.workspace?.openAiTemp ?? LLMConnector.defaultTemp,
+    },
+    uuid,
+    sources: [],
+    logger: loopLogger,
+    caller: "embed",
+    forceToolChoiceRequired: shouldForceToolChoice(embed.allowed_skill_hashes),
+    toolRuntimeOverrides,
+  });
+  completeText = finalText;
+  metrics = finalMetrics;
 
   await EmbedChats.new({
     embedId: embed.id,
     prompt: message,
-    response: { text: completeText, type: chatMode, sources, metrics },
+    response: {
+      text: completeText,
+      type: chatMode,
+      sources,
+      metrics,
+      ...(toolTrace?.length ? { toolTrace } : {}),
+    },
     connection_information: response.locals.connection
       ? {
           ...response.locals.connection,
@@ -223,6 +265,67 @@ async function streamChatWithForEmbed(
  * @param {Number} messageLimit the number of messages to return
  * @returns {Promise<{rawHistory: import("@prisma/client").embed_chats[], chatHistory: {role: string, content: string, attachments?: Object[]}[]}>
  */
+/**
+ * ChatToolsManager는 수정하지 않고, 반환된 tool 배열을 embed별 화이트리스트로 필터링.
+ *
+ * 저장 값 해석 (embed_configs.allowed_skill_hashes):
+ *  - NULL      → 필터 미적용 (전체 tool 노출)
+ *  - ""        → 빈 허용 목록 → 빈 배열 (실질적 tool off)
+ *  - "a,b"     → trim + 빈 항목 제거 후 허용 목록
+ *
+ * @param {Array} tools - ChatToolsManager.getToolDefinitions() 결과
+ * @param {string|null} raw - embed_configs.allowed_skill_hashes (csv or NULL)
+ * @param {"openai-responses"|"anthropic"|"chat-completions"} format
+ * @returns {Array} 필터링된 tools
+ */
+function applyAllowedHashes(tools, raw, format) {
+  if (raw === null || raw === undefined) return tools;
+  const allowed = raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (allowed.length === 0) return [];
+  return tools.filter((t) => allowed.includes(extractToolName(t, format)));
+}
+
+function extractAllowedToolNames(tools, raw, format) {
+  return applyAllowedHashes(tools, raw, format)
+    .map((tool) => extractToolName(tool, format))
+    .filter(Boolean);
+}
+
+function shouldForceToolChoice(rawAllowedSkillHashes) {
+  return rawAllowedSkillHashes === null || rawAllowedSkillHashes === undefined;
+}
+
+function buildEmbedSystemPrompt(basePrompt, allowedToolNames = []) {
+  if (!Array.isArray(allowedToolNames) || allowedToolNames.length === 0) {
+    return basePrompt;
+  }
+
+  const allowedList = allowedToolNames.join(", ");
+  return `${basePrompt}
+
+Tool usage policy for this embed:
+- Only these tools are available: ${allowedList}
+- If the user's request does not match one of those tools, do not call a tool.
+- Do not force an unrelated available tool just because a request is about HR.
+- When the request is out of scope for the available tools, answer without tool calls using only normal chat/query behavior.`;
+}
+
+function extractToolName(tool, format) {
+  switch (format) {
+    case "openai-responses":
+      return tool.name;
+    case "anthropic":
+      return tool.name;
+    case "chat-completions":
+      return tool.function?.name;
+    default:
+      return null;
+  }
+}
+
 async function recentEmbedChatHistory(sessionId, embed, messageLimit = 20) {
   const rawHistory = (
     await EmbedChats.forEmbedByUser(embed.id, sessionId, messageLimit, {
@@ -234,4 +337,9 @@ async function recentEmbedChatHistory(sessionId, embed, messageLimit = 20) {
 
 module.exports = {
   streamChatWithForEmbed,
+  applyAllowedHashes,
+  extractToolName,
+  extractAllowedToolNames,
+  shouldForceToolChoice,
+  buildEmbedSystemPrompt,
 };

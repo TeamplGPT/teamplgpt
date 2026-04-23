@@ -351,13 +351,38 @@ class Provider {
     workspace = null,
     user = null,
   }) {
-    if (!workspace?.openAiPrompt)
-      return Provider.defaultSystemPromptForProvider(provider);
-    return await SystemPromptVariables.expandSystemPromptVariables(
-      workspace.openAiPrompt,
-      user?.id || null,
-      workspace.id
-    );
+    const base = !workspace?.openAiPrompt
+      ? Provider.defaultSystemPromptForProvider(provider)
+      : await SystemPromptVariables.expandSystemPromptVariables(
+          workspace.openAiPrompt,
+          user?.id || null,
+          workspace.id
+        );
+    const hrGuard = Provider.hrSkillPeriodGuard();
+    return hrGuard ? `${base}\n\n${hrGuard}` : base;
+  }
+
+  /**
+   * Returns HR skill period-parameter strict directive when any HR skill
+   * (hr-attendance/hr-salary/hr-personnel/hr-year-end-tax) is active.
+   * Injected into Provider.systemPrompt() to prevent the LLM from asking
+   * users to clarify omitted year/base_date — server applies defaults.
+   * See docs/conventions/hr-skill-description-pattern.md §Location E.
+   * @returns {string|null}
+   */
+  static hrSkillPeriodGuard() {
+    const ImportedPlugin = require("../../imported");
+    const active = ImportedPlugin.activeImportedPlugins();
+    const hrActive = active.some((name) => name.startsWith("@@hr-"));
+    if (!hrActive) return null;
+    return [
+      "[HR_PERIOD_PARAM_STRICT]",
+      "HR skill(hr-attendance/hr-salary/hr-personnel/hr-year-end-tax)의 주기 파라미터(year, year_month, base_date, cal_yy, current_month, previous_month)는 사용자 발화에 연도·월·기준일이 명시되지 않아도 절대 되묻지 마세요.",
+      "파라미터가 불명확하면 해당 파라미터를 생략하고 즉시 tool_call을 실행하세요. 서버가 기본값(현재 연도/연월 등)을 자동 적용합니다.",
+      "'연도를 알려주십시오'·'기준일을 알려주십시오'·'어느 것으로 진행할까요' 같은 확인 질문을 생성하지 마세요.",
+      "[ORDER] HR skill 대상 요청이면 응답의 첫 액션은 반드시 tool_call이어야 합니다. '조회 결과 안내'·'질문 요지'·'요청:' 같은 요약·정리·안내 텍스트를 tool_call보다 먼저 생성하지 마세요. tool_call 결과를 수신한 후에만 텍스트 응답을 작성하세요.",
+      "[EXAMPLES] '3월 출퇴근' → 즉시 hr-attendance(query_type='timesheet', year_month='3'). '다음주 업무계획' → 즉시 hr-attendance(query_type='work_plan_weekly', base_date='다음주'). '어제 근무계획' → 즉시 hr-attendance(query_type='work_plan_weekly', base_date='어제'). '지난달 연장근무' → 즉시 hr-attendance(query_type='overtime', year_month='지난달').",
+    ].join("\n");
   }
 
   /**

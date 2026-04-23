@@ -24,6 +24,7 @@ docs/
 # Test results
 test-results/
 **/test-results/
+server/scripts/**/runs/
 
 # Test files
 frontend/e2e/documents/
