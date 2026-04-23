@@ -219,7 +219,29 @@ function safeJSONStringify(obj) {
   });
 }
 
+/**
+ * Determine if an Express response (or any Node Writable-like stream) can still accept writes.
+ * Used as a guard before writeResponseChunk to prevent ERR_STREAM_WRITE_AFTER_END when
+ * the client has disconnected mid-stream (e.g., closed the tab during a multi-round
+ * tool-calling loop).
+ *
+ * @param {import("express").Response | null | undefined} response
+ * @returns {boolean} true if response.write() is safe to call
+ */
+function isResponseWritable(response) {
+  if (!response) return false;
+  if (response.writableEnded === true) return false;
+  if (response.writable === false) return false;
+  return true;
+}
+
 function writeResponseChunk(response, data) {
+  if (!isResponseWritable(response)) {
+    console.debug(
+      `[STREAM GUARD] skip write after end (uuid=${data?.uuid ?? "n/a"} type=${data?.type ?? "n/a"})`
+    );
+    return;
+  }
   response.write(`data: ${safeJSONStringify(data)}\n\n`);
   return;
 }
@@ -272,6 +294,7 @@ module.exports = {
   convertToChatHistory,
   convertToPromptHistory,
   writeResponseChunk,
+  isResponseWritable,
   clientAbortedHandler,
   formatChatHistory,
   safeJSONStringify,

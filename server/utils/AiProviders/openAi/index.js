@@ -214,7 +214,7 @@ class OpenAiLLM {
 
   async streamGetChatCompletion(
     messages = null,
-    { temperature = 0.7, tools = null, tool_choice } = {}
+    { temperature = 0.7, tools = null, tool_choice, signal } = {}
   ) {
     if (!(await this.isValidChatCompletionModel(this.model)))
       throw new Error(
@@ -222,15 +222,18 @@ class OpenAiLLM {
       );
 
     const measuredStreamRequest = await LLMPerformanceMonitor.measureStream({
-      func: this.openai.responses.create({
-        model: this.model,
-        stream: true,
-        input: messages,
-        store: false,
-        temperature: this.#temperature(this.model, temperature),
-        ...(tools?.length > 0 ? { tools } : {}),
-        ...(tool_choice ? { tool_choice } : {}),
-      }),
+      func: this.openai.responses.create(
+        {
+          model: this.model,
+          stream: true,
+          input: messages,
+          store: false,
+          temperature: this.#temperature(this.model, temperature),
+          ...(tools?.length > 0 ? { tools } : {}),
+          ...(tool_choice ? { tool_choice } : {}),
+        },
+        signal ? { signal } : undefined
+      ),
       messages,
       runPromptTokenCalculation: false,
       modelTag: this.model,
@@ -250,13 +253,31 @@ class OpenAiLLM {
     return new Promise(async (resolve) => {
       let fullText = "";
       const pendingToolCalls = [];
+      let measurementEnded = false;
+      const endMeasurementOnce = () => {
+        if (measurementEnded) return;
+        measurementEnded = true;
+        stream?.endMeasurement(usage);
+      };
+
+      let cleanupDone = false;
+      const cleanupOnce = () => {
+        if (cleanupDone) return;
+        cleanupDone = true;
+        response.removeListener("close", handleAbort);
+        endMeasurementOnce();
+      };
 
       const handleAbort = () => {
-        stream?.endMeasurement(usage);
+        cleanupOnce();
         clientAbortedHandler(resolve, fullText);
       };
       response.on("close", handleAbort);
 
+      // Note: cleanup is performed synchronously BEFORE `resolve()` in every exit
+      // path (normal/toolCall/error/abort). A `finally` block alone is unreliable
+      // here because `for await`'s early-return schedules async iterator cleanup
+      // that can run AFTER the resolver's microtask unblocks the awaiter.
       try {
         for await (const chunk of stream) {
           if (chunk.type === "response.output_text.delta") {
@@ -297,10 +318,13 @@ class OpenAiLLM {
 
             // Tool calls detected — return for tool execution without closing stream
             if (pendingToolCalls.length > 0) {
-              response.removeListener("close", handleAbort);
-              stream?.endMeasurement(usage);
-              resolve({ text: fullText, toolCalls: pendingToolCalls });
-              break;
+              cleanupOnce();
+              resolve({
+                text: fullText,
+                toolCalls: pendingToolCalls,
+                closeChunkSent: false,
+              });
+              return;
             }
 
             writeResponseChunk(response, {
@@ -311,10 +335,9 @@ class OpenAiLLM {
               close: true,
               error: false,
             });
-            response.removeListener("close", handleAbort);
-            stream?.endMeasurement(usage);
-            resolve(fullText);
-            break;
+            cleanupOnce();
+            resolve({ text: fullText, closeChunkSent: true });
+            return;
           }
         }
       } catch (e) {
@@ -327,9 +350,13 @@ class OpenAiLLM {
           close: true,
           error: e.message,
         });
-        stream?.endMeasurement(usage);
-        resolve(fullText);
+        cleanupOnce();
+        resolve({ text: fullText, closeChunkSent: true });
+        return;
       }
+      // Safety net for rare no-op paths (stream yields 0 chunks without error).
+      cleanupOnce();
+      resolve({ text: fullText, closeChunkSent: false });
     });
   }
 

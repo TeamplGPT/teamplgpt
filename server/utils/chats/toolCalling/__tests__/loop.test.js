@@ -10,6 +10,7 @@
 
 jest.mock("../../../helpers/chat/responses", () => ({
   writeResponseChunk: jest.fn(),
+  isResponseWritable: jest.fn().mockReturnValue(true),
 }));
 
 jest.mock("../executor", () => ({

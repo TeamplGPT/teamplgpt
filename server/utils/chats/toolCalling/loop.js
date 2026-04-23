@@ -1,6 +1,9 @@
 const { ToolExecutor } = require("./executor");
 const { appendToolResult } = require("./appendToolResult");
-const { writeResponseChunk } = require("../../helpers/chat/responses");
+const {
+  writeResponseChunk,
+  isResponseWritable,
+} = require("../../helpers/chat/responses");
 
 const MAX_TOOL_ROUNDS = 5;
 
@@ -81,130 +84,181 @@ async function toolCallingLoop(opts) {
     toolRuntimeOverrides,
   } = opts;
 
+  // AbortController: propagate client disconnect to upstream fetch (best-effort).
+  // Provider must support `signal` in streamGetChatCompletion for this to take effect.
+  const abortController =
+    typeof AbortController !== "undefined" ? new AbortController() : null;
+  const abortOnClose = () => abortController?.abort();
+  if (abortController && response && typeof response.on === "function") {
+    response.on("close", abortOnClose);
+  }
+
   let currentMessages = [...opts.messages];
   let completeText = "";
   let metrics = {};
   const toolTrace = [];
+  let closeChunkSent = false;
 
-  for (let round = 0; round <= maxRounds; round++) {
-    const roundLlmOptions =
-      round === 0
-        ? injectToolChoice({
-            llmOptions,
-            caller,
-            tools,
-            forceToolChoiceRequired,
-          })
-        : llmOptions;
-
-    if (LLMConnector.streamingEnabled() !== true) {
-      // --- Non-streaming path ---
-      logger.llmStart?.({
-        messageCount: currentMessages.length,
-        streaming: false,
-      });
-      const result = await LLMConnector.getChatCompletion(currentMessages, {
-        ...roundLlmOptions,
-        tools,
-      });
-      logger.llmEnd?.({
-        responseLength: result?.textResponse?.length || 0,
-        isEmpty: !result?.textResponse,
-      });
-
-      if (result?.toolCalls?.length > 0 && round < maxRounds) {
-        for (const tc of result.toolCalls) {
-          currentMessages = await executeAndAppend({
-            tc,
-            round,
-            currentMessages,
-            LLMConnector,
-            toolTrace,
-            logger,
-            toolRuntimeOverrides,
-          });
-        }
-        metrics = result.metrics || {};
-        continue;
+  try {
+    for (let round = 0; round <= maxRounds; round++) {
+      // L1 Guard: client already disconnected — don't waste another LLM round.
+      if (!isResponseWritable(response)) {
+        logger.streamGuard?.({ round, reason: "client-disconnected" });
+        break;
       }
 
-      completeText = result?.textResponse ?? "";
-      metrics = result?.metrics || {};
-      writeResponseChunk(response, {
-        uuid,
-        sources,
-        type: "textResponseChunk",
-        textResponse: completeText,
-        close: true,
-        error: false,
-        metrics,
-      });
-      break;
-    } else {
-      // --- Streaming path ---
-      logger.llmStart?.({
-        messageCount: currentMessages.length,
-        streaming: true,
-      });
-      const stream = await LLMConnector.streamGetChatCompletion(
-        currentMessages,
-        { ...roundLlmOptions, tools }
-      );
-      const streamResult = await LLMConnector.handleStream(response, stream, {
-        uuid,
-        sources,
-      });
+      const roundLlmOptions =
+        round === 0
+          ? injectToolChoice({
+              llmOptions,
+              caller,
+              tools,
+              forceToolChoiceRequired,
+            })
+          : llmOptions;
 
-      if (
-        typeof streamResult === "object" &&
-        streamResult?.toolCalls?.length > 0 &&
-        round < maxRounds
-      ) {
-        logger.llmEnd?.({
-          responseLength: streamResult.text?.length || 0,
-          isEmpty: !streamResult.text,
+      if (LLMConnector.streamingEnabled() !== true) {
+        // --- Non-streaming path ---
+        logger.llmStart?.({
+          messageCount: currentMessages.length,
+          streaming: false,
         });
-        for (const tc of streamResult.toolCalls) {
-          currentMessages = await executeAndAppend({
-            tc,
-            round,
-            currentMessages,
-            LLMConnector,
-            toolTrace,
-            logger,
-            toolRuntimeOverrides,
-          });
-        }
-        metrics = stream.metrics || {};
-        continue;
-      }
+        const result = await LLMConnector.getChatCompletion(currentMessages, {
+          ...roundLlmOptions,
+          tools,
+        });
+        logger.llmEnd?.({
+          responseLength: result?.textResponse?.length || 0,
+          isEmpty: !result?.textResponse,
+        });
 
-      // Max rounds reached but tool calls still present → flush close chunk
-      if (
-        typeof streamResult === "object" &&
-        streamResult?.toolCalls?.length > 0
-      ) {
-        logger.toolCallMax?.({ rounds: maxRounds });
+        if (result?.toolCalls?.length > 0 && round < maxRounds) {
+          for (const tc of result.toolCalls) {
+            currentMessages = await executeAndAppend({
+              tc,
+              round,
+              currentMessages,
+              LLMConnector,
+              toolTrace,
+              logger,
+              toolRuntimeOverrides,
+            });
+          }
+          metrics = result.metrics || {};
+          continue;
+        }
+
+        completeText = result?.textResponse ?? "";
+        metrics = result?.metrics || {};
         writeResponseChunk(response, {
           uuid,
           sources,
           type: "textResponseChunk",
-          textResponse: "",
+          textResponse: completeText,
           close: true,
           error: false,
+          metrics,
         });
-      }
+        closeChunkSent = true;
+        break;
+      } else {
+        // --- Streaming path ---
+        logger.llmStart?.({
+          messageCount: currentMessages.length,
+          streaming: true,
+        });
+        const stream = await LLMConnector.streamGetChatCompletion(
+          currentMessages,
+          {
+            ...roundLlmOptions,
+            tools,
+            ...(abortController ? { signal: abortController.signal } : {}),
+          }
+        );
+        const streamResult = await LLMConnector.handleStream(response, stream, {
+          uuid,
+          sources,
+        });
 
-      completeText =
-        typeof streamResult === "string"
-          ? streamResult
-          : streamResult?.text ?? "";
-      logger.llmEnd?.({
-        responseLength: completeText?.length || 0,
-        isEmpty: !completeText,
+        // Hybrid contract: providers may return a string (legacy) or
+        // { text, toolCalls?, closeChunkSent } (extended — openAi Responses).
+        const resultText =
+          typeof streamResult === "string"
+            ? streamResult
+            : streamResult?.text ?? "";
+        const resultToolCalls =
+          typeof streamResult === "object" && streamResult !== null
+            ? streamResult?.toolCalls
+            : null;
+        const resultCloseChunkSent =
+          typeof streamResult === "string"
+            ? true
+            : streamResult?.closeChunkSent === true;
+        if (resultCloseChunkSent) closeChunkSent = true;
+
+        if (resultToolCalls?.length > 0 && round < maxRounds) {
+          logger.llmEnd?.({
+            responseLength: resultText.length,
+            isEmpty: !resultText,
+          });
+          for (const tc of resultToolCalls) {
+            currentMessages = await executeAndAppend({
+              tc,
+              round,
+              currentMessages,
+              LLMConnector,
+              toolTrace,
+              logger,
+              toolRuntimeOverrides,
+            });
+          }
+          metrics = stream.metrics || {};
+          continue;
+        }
+
+        // Max rounds reached but tool calls still present → flush close chunk (idempotent).
+        if (resultToolCalls?.length > 0) {
+          logger.toolCallMax?.({ rounds: maxRounds });
+          if (!closeChunkSent) {
+            writeResponseChunk(response, {
+              uuid,
+              sources,
+              type: "textResponseChunk",
+              textResponse: "",
+              close: true,
+              error: false,
+            });
+            closeChunkSent = true;
+          }
+        }
+
+        completeText = resultText;
+        logger.llmEnd?.({
+          responseLength: completeText?.length || 0,
+          isEmpty: !completeText,
+        });
+        metrics = stream.metrics || {};
+        break;
+      }
+    }
+
+    // Safety net: if no close chunk was sent along any path (e.g., tool-only
+    // termination, early break, legacy provider abort), emit a single final close.
+    if (!closeChunkSent && isResponseWritable(response)) {
+      logger.streamGuard?.({ round: -1, reason: "final-close-fallback" });
+      writeResponseChunk(response, {
+        uuid,
+        sources,
+        type: "textResponseChunk",
+        textResponse: "",
+        close: true,
+        error: false,
       });
-      metrics = stream.metrics || {};
-      break;
+      closeChunkSent = true;
+    }
+  } finally {
+    if (abortController && response && typeof response.removeListener === "function") {
+      response.removeListener("close", abortOnClose);
     }
   }
 
