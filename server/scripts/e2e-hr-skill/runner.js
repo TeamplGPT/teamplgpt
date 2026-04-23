@@ -135,7 +135,7 @@ function loadScenarios() {
   }
   const ids = new Set();
   for (const s of raw.scenarios) {
-    if (!s.id || !/^[A-Z0-9\-]+$/.test(s.id)) {
+    if (!s.id || !/^[A-Za-z0-9\-]+$/.test(s.id)) {
       fatal(`Invalid scenario id: ${JSON.stringify(s.id)}`);
     }
     if (ids.has(s.id)) fatal(`Duplicate scenario id: ${s.id}`);
