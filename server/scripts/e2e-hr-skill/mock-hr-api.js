@@ -50,9 +50,11 @@ function writeLog(entry) {
   }
 }
 
+const BODYLESS_METHODS = new Set(["GET", "HEAD", "DELETE", "OPTIONS"]);
+
 const server = http.createServer((req, res) => {
   const parsed = url.parse(req.url, false);
-  const entry = {
+  const baseEntry = {
     ts: new Date().toISOString(),
     method: req.method,
     path: parsed.pathname,
@@ -60,16 +62,45 @@ const server = http.createServer((req, res) => {
     fullUrl: req.url,
     headers: { host: req.headers.host || "" },
   };
-  writeLog(entry);
 
-  if (parsed.pathname === "/health") {
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ ok: true }));
+  function respond() {
+    if (parsed.pathname === "/health") {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ ok: true }));
+    } else {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, data: [], message: "mock" }));
+    }
+  }
+
+  // Fast-path: body 없는 메서드는 즉시 logging + 응답 + drain
+  // (GET 요청은 'end' 이벤트가 환경에 따라 지연될 수 있어 응답 누락 발생)
+  if (BODYLESS_METHODS.has(req.method)) {
+    writeLog({ ...baseEntry, body: null });
+    respond();
+    req.resume();
     return;
   }
 
-  res.writeHead(200, { "Content-Type": "application/json" });
-  res.end(JSON.stringify({ success: true, data: [], message: "mock" }));
+  // body 있는 메서드: chunks 수집 후 logging. 응답은 즉시 보내 race를 피함
+  respond();
+  const chunks = [];
+  req.on("data", (c) => chunks.push(c));
+  req.on("end", () => {
+    const rawBody = Buffer.concat(chunks).toString("utf8");
+    let parsedBody = null;
+    if (rawBody) {
+      try {
+        parsedBody = JSON.parse(rawBody);
+      } catch {
+        parsedBody = { _raw: rawBody };
+      }
+    }
+    writeLog({ ...baseEntry, body: parsedBody });
+  });
+  req.on("error", (e) => {
+    writeLog({ ...baseEntry, body: { _error: e.message } });
+  });
 });
 
 server.listen(portNum, "0.0.0.0", () => {

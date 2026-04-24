@@ -132,6 +132,81 @@ describe("plugin.json 스키마 검증", () => {
     });
   });
 
+  describe("hr-personnel-search (검색형 신규 skill)", () => {
+    const plugin = loadPluginJson("hr-personnel-search");
+
+    it("required에 query_type과 university_names만 있어야 한다 (emp_no 없음)", () => {
+      expect(plugin.entrypoint.required).toEqual([
+        "query_type",
+        "university_names",
+      ]);
+      expect(plugin.entrypoint.required).not.toContain("emp_no");
+    });
+
+    it("params에 query_type/university_names/region이 정의되어 있어야 한다", () => {
+      const params = plugin.entrypoint.params;
+      expect(params).toHaveProperty("query_type");
+      expect(params).toHaveProperty("university_names");
+      expect(params).toHaveProperty("region");
+      expect(params).not.toHaveProperty("emp_no");
+    });
+
+    it("query_type enum은 graduates_by_region 1개여야 한다", () => {
+      expect(plugin.entrypoint.params.query_type.enum).toEqual([
+        "graduates_by_region",
+      ]);
+    });
+
+    it("university_names는 array 타입이고 items는 string이어야 한다", () => {
+      const param = plugin.entrypoint.params.university_names;
+      expect(param.type).toBe("array");
+      expect(param.items).toEqual({ type: "string" });
+    });
+
+    it("query_type description에 [CRITICAL] 3단 지시가 포함되어야 한다", () => {
+      const desc = plugin.entrypoint.params.query_type.description;
+      expect(desc).toContain("[CRITICAL]");
+      expect(desc).toContain("graduates_by_region");
+      expect(desc).toContain("hr-personnel.education");
+    });
+
+    it("university_names description에 Non-period T-C 핵심 요소가 포함되어야 한다", () => {
+      const desc = plugin.entrypoint.params.university_names.description;
+      expect(desc).toContain("[CRITICAL]");
+      expect(desc).toContain("[재강조]");
+      expect(desc).toContain("되묻지 마세요");
+      expect(desc).toContain("hallucination");
+      // Few-shot 최소 2건 언급 (경상도, 수도권)
+      expect(desc).toMatch(/경상도.*경북대학교/);
+      expect(desc).toMatch(/수도권.*서울대학교/);
+    });
+
+    it("skill-level description에 hr-personnel 경계 명시가 있어야 한다", () => {
+      expect(plugin.description).toContain("hr-personnel");
+      expect(plugin.description).toContain("emp_no");
+      expect(plugin.description).toContain("graduates_by_region");
+    });
+
+    it("examples는 최소 6건 이상이어야 한다 (6 광역권 커버)", () => {
+      expect(plugin.examples.length).toBeGreaterThanOrEqual(6);
+    });
+
+    it("모든 examples가 array 리터럴 university_names를 포함해야 한다 (LLM 학습용)", () => {
+      for (const ex of plugin.examples) {
+        const call = JSON.parse(ex.call);
+        expect(Array.isArray(call.university_names)).toBe(true);
+        expect(call.university_names.length).toBeGreaterThanOrEqual(2);
+        expect(call.query_type).toBe("graduates_by_region");
+      }
+    });
+
+    it("setup_args.HR_API_BASE_URL이 기존 4 skill과 동일 default를 가져야 한다", () => {
+      expect(plugin.setup_args.HR_API_BASE_URL.input.default).toBe(
+        "http://kiwibox-hr-api:8000"
+      );
+    });
+  });
+
   describe("전체 plugin description 품질", () => {
     const SKILLS = ["hr-attendance", "hr-salary", "hr-year-end-tax", "hr-personnel"];
 

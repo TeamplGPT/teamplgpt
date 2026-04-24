@@ -1443,6 +1443,84 @@
       "repeat": 1,
       "pre_reset": true,
       "tier": "secondary"
+    },
+    {
+      "id": "E119",
+      "label": "hr-personnel-search: graduates_by_region (경상도)",
+      "message": "@agent 경상도 지역 대학을 졸업한 직원목록 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "body 검증(Check 단계 mock.jsonl): university_names length >= 5, region contains '경상'"
+    },
+    {
+      "id": "E120",
+      "label": "hr-personnel-search: graduates_by_region (전라도)",
+      "message": "@agent 전라도 대학 졸업한 직원 검색해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "body 검증: university_names length >= 3, region contains '전라'"
+    },
+    {
+      "id": "E121",
+      "label": "hr-personnel-search: graduates_by_region (충청도)",
+      "message": "@agent 충청도 출신 대학 졸업자 목록 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "body 검증: university_names length >= 3, region contains '충청'"
+    },
+    {
+      "id": "E122",
+      "label": "hr-personnel-search: graduates_by_region (강원도)",
+      "message": "@agent 강원도 소재 대학 나온 직원 조회",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "body 검증: university_names length >= 3, region contains '강원'"
+    },
+    {
+      "id": "E123",
+      "label": "hr-personnel-search: graduates_by_region (제주도)",
+      "message": "@agent 제주도 대학 졸업한 직원들 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "body 검증: university_names length >= 2, region contains '제주'"
+    },
+    {
+      "id": "E124",
+      "label": "hr-personnel-search: graduates_by_region (수도권)",
+      "message": "@agent 수도권 대학 졸업한 직원목록",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "body 검증: university_names length >= 6, region contains '수도'/'서울'"
     }
   ]
 }
