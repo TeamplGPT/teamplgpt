@@ -57,6 +57,28 @@ class ChatToolsManager {
       const prop = { type: def.type || "string" };
       if (def.description) prop.description = def.description;
       if (def.enum) prop.enum = def.enum;
+
+      if (prop.type === "array") {
+        if (def.items) {
+          prop.items = def.items;
+        } else {
+          console.warn(
+            `[ChatToolsManager] Plugin "${pluginConfig.hubId}" param "${key}" ` +
+              `is array type but missing "items". Falling back to { type: "string" }.`
+          );
+          prop.items = { type: "string" };
+        }
+      }
+
+      if (prop.type === "object" && def.properties) {
+        prop.properties = def.properties;
+        if (def.required) prop.required = def.required;
+      }
+
+      if (def.default !== undefined) prop.default = def.default;
+      if (typeof def.minItems === "number") prop.minItems = def.minItems;
+      if (typeof def.maxItems === "number") prop.maxItems = def.maxItems;
+
       properties[key] = prop;
     }
     return {

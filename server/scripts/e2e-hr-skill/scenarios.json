@@ -1521,6 +1521,19 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "body 검증: university_names length >= 6, region contains '수도'/'서울'"
+    },
+    {
+      "id": "E125",
+      "label": "hr-personnel-search: chat/query 경로 array items 스키마 검증 (경상도)",
+      "message": "경상도 지역 대학을 졸업한 직원목록 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "@agent 접두사 없음 → ChatToolsManager 경유 (chat/query 모드). fix 전: OpenAI 400 invalid_function_parameters (array schema missing items). fix 후: tool_call 성공 + university_names 배열 body 포함."
     }
   ]
 }
