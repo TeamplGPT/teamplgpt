@@ -74,8 +74,13 @@ describe("toolCallingLoop — L1 stream guard", () => {
         closeChunkSent: false,
       });
 
-    // writable matrix: round 0 → true, round 1 → true, round 2 → false (break)
+    // writable matrix includes toolCallInvocation SSE checks:
+    // round 0 guard → true, round 0 SSE → true,
+    // round 1 guard → true, round 1 SSE → true,
+    // round 2 guard → false (break)
     responsesMock.isResponseWritable
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(true)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(false)

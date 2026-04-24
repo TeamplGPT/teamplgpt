@@ -298,6 +298,51 @@ describe("toolCallingLoop — caller → LLMConnector forward 통합", () => {
     ).not.toHaveProperty("tool_choice");
   });
 
+  test("TC-8d-2: workspace 라우팅으로 전달된 tool_choice도 tool 결과 재호출부터는 제거", async () => {
+    const LLMConnector = buildMockLLMConnector();
+    LLMConnector.handleStream
+      .mockResolvedValueOnce({
+        text: "",
+        toolCalls: [
+          {
+            name: "hr-personnel-search",
+            call_id: "call-1",
+            arguments:
+              '{"query_type":"graduates_by_region","university_names":["서울대학교"],"region":"수도권"}',
+          },
+        ],
+      })
+      .mockResolvedValueOnce({ text: "final answer" });
+
+    await toolCallingLoop({
+      response: buildMockResponse(),
+      LLMConnector,
+      messages: [{ role: "user", content: "수도권 대학 졸업자" }],
+      tools: [{ type: "function", name: "hr-personnel-search" }],
+      llmOptions: { temperature: 0.7, tool_choice: "required" },
+      uuid: "u-1",
+      sources: [],
+      logger: {},
+      caller: "workspace",
+    });
+
+    expect(LLMConnector.streamGetChatCompletion).toHaveBeenCalledTimes(2);
+    expect(LLMConnector.streamGetChatCompletion.mock.calls[0][1]).toEqual(
+      expect.objectContaining({
+        temperature: 0.7,
+        tool_choice: "required",
+      })
+    );
+    expect(LLMConnector.streamGetChatCompletion.mock.calls[1][1]).toEqual(
+      expect.objectContaining({
+        temperature: 0.7,
+      })
+    );
+    expect(
+      LLMConnector.streamGetChatCompletion.mock.calls[1][1]
+    ).not.toHaveProperty("tool_choice");
+  });
+
   test("TC-8e: forceToolChoiceRequired=false면 첫 호출에도 tool_choice를 전달하지 않는다", async () => {
     const LLMConnector = buildMockLLMConnector();
 

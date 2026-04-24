@@ -358,11 +358,21 @@ async function streamChatWithWorkspace(
   };
 
   // Tool calling setup — get tool definitions if provider supports it
-  const tools =
+  const providerFormat =
+    typeof LLMConnector.toolCallingFormat === "function"
+      ? LLMConnector.toolCallingFormat()
+      : null;
+  const rawTools =
     typeof LLMConnector.supportsToolCalling === "function" &&
     LLMConnector.supportsToolCalling()
-      ? ChatToolsManager.getToolDefinitions(LLMConnector.toolCallingFormat())
+      ? ChatToolsManager.getToolDefinitions(providerFormat)
       : null;
+  const { routeHrToolsForMessage } = require("./toolCalling/hrRouting");
+  const { tools, toolChoice } = routeHrToolsForMessage({
+    tools: rawTools,
+    providerFormat,
+    message: updatedMessage,
+  });
 
   const { completeText: finalText, metrics: finalMetrics } =
     await toolCallingLoop({
@@ -373,6 +383,7 @@ async function streamChatWithWorkspace(
       llmOptions: {
         temperature: workspace?.openAiTemp ?? LLMConnector.defaultTemp,
         user,
+        ...(toolChoice ? { tool_choice: toolChoice } : {}),
       },
       uuid,
       sources,

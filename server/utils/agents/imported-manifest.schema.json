@@ -142,6 +142,17 @@
       "type": "boolean",
       "enum": [true],
       "description": "Must be set to true."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional skill metadata flags consumed by ChatToolsManager / embed. Introduced by hr-personnel-search-web-search-assist (2026-04-24).",
+      "properties": {
+        "enable_web_search": {
+          "type": "boolean",
+          "description": "If true, ChatToolsManager injects { type: 'web_search_preview' } into the tool list returned for providerFormat='openai-responses' when this skill is active. Anthropic / chat-completions providers ignore this flag (built-in tool 비호환)."
+        }
+      },
+      "additionalProperties": true
     }
   },
   "required": [

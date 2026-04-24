@@ -62,6 +62,17 @@ function injectToolChoice({ llmOptions, caller, tools, forceToolChoiceRequired =
   return llmOptions;
 }
 
+function omitToolChoice(llmOptions) {
+  if (
+    !llmOptions ||
+    !Object.prototype.hasOwnProperty.call(llmOptions, "tool_choice")
+  ) {
+    return llmOptions;
+  }
+  const { tool_choice: _toolChoice, ...rest } = llmOptions;
+  return rest;
+}
+
 /**
  * Shared tool calling loop — streams text chunks to response and executes tools as needed.
  * Returns final text + metrics + toolTrace for caller to persist.
@@ -115,7 +126,7 @@ async function toolCallingLoop(opts) {
               tools,
               forceToolChoiceRequired,
             })
-          : llmOptions;
+          : omitToolChoice(llmOptions);
 
       if (LLMConnector.streamingEnabled() !== true) {
         // --- Non-streaming path ---
@@ -129,11 +140,22 @@ async function toolCallingLoop(opts) {
         });
         logger.llmEnd?.({
           responseLength: result?.textResponse?.length || 0,
-          isEmpty: !result?.textResponse,
+          isEmpty: !result?.textResponse && !result?.toolCalls?.length,
         });
 
         if (result?.toolCalls?.length > 0 && round < maxRounds) {
           for (const tc of result.toolCalls) {
+            // Non-streaming path: also emit toolCallInvocation for runner parity.
+            if (isResponseWritable(response)) {
+              writeResponseChunk(response, {
+                uuid,
+                sources,
+                type: "toolCallInvocation",
+                content: `Assembling Tool Call: ${tc.name}(${tc.arguments ?? ""})`,
+                close: false,
+                error: false,
+              });
+            }
             currentMessages = await executeAndAppend({
               tc,
               round,
@@ -199,9 +221,24 @@ async function toolCallingLoop(opts) {
         if (resultToolCalls?.length > 0 && round < maxRounds) {
           logger.llmEnd?.({
             responseLength: resultText.length,
-            isEmpty: !resultText,
+            isEmpty: false,
           });
           for (const tc of resultToolCalls) {
+            // DX + E2E runner visibility: emit a dedicated `toolCallInvocation`
+            // SSE event (parallel to aibitat's @agent-path "Assembling Tool Call").
+            // Frontend ignores unknown types, so textResponseChunk aggregation is
+            // unaffected. Runner (scripts/e2e-hr-skill/runner.js) detects tool calls
+            // by matching `type === "toolCallInvocation"` + content prefix.
+            if (isResponseWritable(response)) {
+              writeResponseChunk(response, {
+                uuid,
+                sources,
+                type: "toolCallInvocation",
+                content: `Assembling Tool Call: ${tc.name}(${tc.arguments ?? ""})`,
+                close: false,
+                error: false,
+              });
+            }
             currentMessages = await executeAndAppend({
               tc,
               round,

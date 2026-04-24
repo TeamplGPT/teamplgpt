@@ -1534,6 +1534,19 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "@agent 접두사 없음 → ChatToolsManager 경유 (chat/query 모드). fix 전: OpenAI 400 invalid_function_parameters (array schema missing items). fix 후: tool_call 성공 + university_names 배열 body 포함."
+    },
+    {
+      "id": "E126",
+      "label": "hr-personnel-search-web-search-assist: LLM 자율 web_search 연계 (경상도, length>=8)",
+      "message": "경상도 지역 대학교 졸업자들을 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "chat/query 모드(@agent 없음). description anchor 제거 + metadata.enable_web_search=true로 web_search_preview 자동 주입. Check body (jq '.body.university_names | length'): 목표 >= 8 (기존 5 baseline 대비 60%+ 증가). LLM이 web_search를 쓰지 않고 자체 지식만으로 8개 이상 뽑아도 PASS (자율성 원칙). hallucination (지역 무관 대학 포함)은 manual review 권장."
     }
   ]
 }

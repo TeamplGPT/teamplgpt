@@ -170,15 +170,22 @@ describe("plugin.json 스키마 검증", () => {
       expect(desc).toContain("hr-personnel.education");
     });
 
-    it("university_names description에 Non-period T-C 핵심 요소가 포함되어야 한다", () => {
+    it("university_names description에 T-D(LLM-as-researcher) 핵심 요소가 포함되어야 한다", () => {
       const desc = plugin.entrypoint.params.university_names.description;
+      // T-D 핵심: [CRITICAL] 1단 단축형 + [재강조] + 되묻기 금지 + hallucination 가드
       expect(desc).toContain("[CRITICAL]");
       expect(desc).toContain("[재강조]");
       expect(desc).toContain("되묻지 마세요");
       expect(desc).toContain("hallucination");
-      // Few-shot 최소 2건 언급 (경상도, 수도권)
-      expect(desc).toMatch(/경상도.*경북대학교/);
-      expect(desc).toMatch(/수도권.*서울대학교/);
+      // T-D 필수: web_search_preview 연계 지시 + 자체 지식 + 양적 하한
+      expect(desc).toContain("web_search_preview");
+      expect(desc).toContain("자체 지식");
+      expect(desc).toContain("고정 목록에서 복사하지 말고");
+      expect(desc).toMatch(/최소\s*\d+개/);
+      // T-D 금지: description 내 지역→대학 고정 예시 배열 anchor (copy-paste 원인)
+      // hr-personnel-search-web-search-assist (2026-04-24)에서 제거 전환.
+      expect(desc).not.toMatch(/경상도.*경북대학교/);
+      expect(desc).not.toMatch(/수도권.*서울대학교/);
     });
 
     it("skill-level description에 hr-personnel 경계 명시가 있어야 한다", () => {
@@ -187,17 +194,8 @@ describe("plugin.json 스키마 검증", () => {
       expect(plugin.description).toContain("graduates_by_region");
     });
 
-    it("examples는 최소 6건 이상이어야 한다 (6 광역권 커버)", () => {
-      expect(plugin.examples.length).toBeGreaterThanOrEqual(6);
-    });
-
-    it("모든 examples가 array 리터럴 university_names를 포함해야 한다 (LLM 학습용)", () => {
-      for (const ex of plugin.examples) {
-        const call = JSON.parse(ex.call);
-        expect(Array.isArray(call.university_names)).toBe(true);
-        expect(call.university_names.length).toBeGreaterThanOrEqual(2);
-        expect(call.query_type).toBe("graduates_by_region");
-      }
+    it("examples는 고정 대학 배열 anchor를 노출하지 않아야 한다", () => {
+      expect(plugin.examples).toEqual([]);
     });
 
     it("setup_args.HR_API_BASE_URL이 기존 4 skill과 동일 default를 가져야 한다", () => {
