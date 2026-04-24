@@ -285,7 +285,20 @@ function applyAllowedHashes(tools, raw, format) {
     .map((s) => s.trim())
     .filter(Boolean);
   if (allowed.length === 0) return [];
-  return tools.filter((t) => allowed.includes(extractToolName(t, format)));
+  return tools.filter((t) => {
+    if (isBuiltInTool(t)) return true;
+    return allowed.includes(extractToolName(t, format));
+  });
+}
+
+function isBuiltInTool(tool) {
+  if (!tool || typeof tool !== "object") return false;
+  return (
+    tool.type === "web_search_preview" ||
+    tool.type === "web_search" ||
+    tool.type === "file_search" ||
+    tool.type === "code_interpreter"
+  );
 }
 
 function extractAllowedToolNames(tools, raw, format) {

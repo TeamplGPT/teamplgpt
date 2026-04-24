@@ -16,6 +16,27 @@ const {
 const { ApiChatHandler } = require("../../../utils/chats/apiChatHandler");
 const { getModelTag } = require("../../utils");
 
+function parseToolRuntimeOverrideHeaders(request) {
+  const gateOpen =
+    process.env.NODE_ENV === "development" ||
+    process.env.ALLOW_TOOL_RUNTIME_OVERRIDE === "true";
+  if (!gateOpen) return null;
+
+  const prefix = "x-tool-runtime-override-";
+  const overrides = {};
+  for (const [rawKey, rawValue] of Object.entries(request.headers || {})) {
+    const key = rawKey.toLowerCase();
+    if (!key.startsWith(prefix)) continue;
+    const paramName = key.slice(prefix.length).toUpperCase();
+    if (!paramName) continue;
+    const value = Array.isArray(rawValue) ? rawValue[0] : rawValue;
+    if (typeof value !== "string" || value.length === 0) continue;
+    overrides[paramName] = value;
+  }
+
+  return Object.keys(overrides).length > 0 ? overrides : null;
+}
+
 function apiWorkspaceEndpoints(app) {
   if (!app) return;
 
@@ -840,6 +861,8 @@ function apiWorkspaceEndpoints(app) {
         response.setHeader("Connection", "keep-alive");
         response.flushHeaders();
 
+        response.locals.toolRuntimeOverrides =
+          parseToolRuntimeOverrideHeaders(request);
         await ApiChatHandler.streamChat({
           response,
           workspace,

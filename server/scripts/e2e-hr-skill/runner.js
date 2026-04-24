@@ -287,6 +287,7 @@ async function streamChat(apiKey, body) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
+      "x-tool-runtime-override-HR_API_BASE_URL": `http://localhost:${MOCK_PORT}`,
       "Content-Length": Buffer.byteLength(json),
     },
     body: json,
@@ -309,6 +310,12 @@ function parseSSE(text) {
     const tr = p.textResponse;
     if (tr && tr.type === "toolCallInvocation" && typeof tr.content === "string") {
       const cm = tr.content.match(/^Assembling Tool Call: (.+)$/);
+      if (cm) toolCall = cm[1];
+    }
+    // Top-level toolCallInvocation type (chat/query + embed paths via toolCallingLoop).
+    // Introduced by hr-personnel-search-web-search-assist (2026-04-24) for E2E parity.
+    if (p.type === "toolCallInvocation" && typeof p.content === "string") {
+      const cm = p.content.match(/^Assembling Tool Call: (.+)$/);
       if (cm) toolCall = cm[1];
     }
     if (

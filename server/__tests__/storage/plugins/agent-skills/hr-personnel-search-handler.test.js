@@ -5,7 +5,7 @@
  * - Guard: query_type / university_names 유효성
  * - POST + JSON body 전송 (university_names + 선택 region)
  * - 응답 3 variant 처리 (A.3.1 중첩/ A.3.2 빈 배열 / A.3.3 실패)
- * - Truncation (MAX_RESULTS=50)
+ * - Truncation (MAX_RESULTS=200)
  * - 에러 분기 (HTTP non-ok / Timeout)
  */
 
@@ -264,10 +264,10 @@ describe("hr-personnel-search handler", () => {
   });
 
   // ── Truncation ─────────────────────────────────────────────────────────────
-  describe("Truncation (MAX_RESULTS=50)", () => {
-    it("items 60건이면 상위 50건만 표시하고 cap 안내를 포함한다", async () => {
+  describe("Truncation (MAX_RESULTS=200)", () => {
+    it("items 210건이면 상위 200건만 표시하고 cap 안내를 포함한다", async () => {
       const mod = loadHandler();
-      const items = Array.from({ length: 60 }, (_, i) => ({
+      const items = Array.from({ length: 210 }, (_, i) => ({
         emp_no: String(10000 + i),
         name: `직원${i + 1}`,
         graduated_university: "서울대학교",
@@ -275,7 +275,7 @@ describe("hr-personnel-search handler", () => {
       }));
       mockFetchOk({
         success: true,
-        data: { items, total: 60 },
+        data: { items, total: 210 },
       });
 
       const result = await mod.runtime.handler.call(createMockContext(), {
@@ -283,11 +283,11 @@ describe("hr-personnel-search handler", () => {
         university_names: ["서울대학교"],
       });
 
-      // 50번째 직원은 표시되고 51번째(직원51)는 미표시
-      expect(result).toContain("직원50");
-      expect(result).not.toContain("| 직원51 |");
-      expect(result).toContain("총 **60건** 중 **50건** 표시");
-      expect(result).toContain("상위 50건 cap 적용");
+      // 200번째 직원은 표시되고 201번째(직원201)는 미표시
+      expect(result).toContain("직원200");
+      expect(result).not.toContain("| 직원201 |");
+      expect(result).toContain("총 **210건** 중 **200건** 표시");
+      expect(result).toContain("상위 200건 cap 적용");
     });
 
     it("items 30건이면 cap 메시지 없이 전량 표시한다", async () => {

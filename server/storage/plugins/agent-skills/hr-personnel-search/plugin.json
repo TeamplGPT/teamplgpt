@@ -2,7 +2,7 @@
   "active": true,
   "name": "HR 인사 직원 검색",
   "schema": "skill-1.0.0",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "hubId": "hr-personnel-search",
   "author": "teamplgpt",
   "description": "직원을 속성 기반으로 검색합니다. 단일 직원의 정보가 아니라 '조건에 맞는 직원 목록'을 반환합니다. 사용자가 '지역 대학을 졸업한 직원', '특정 대학교 출신 직원', '{지역명} 지역 대학 졸업자 목록' 등 다수 직원을 검색·필터링하는 질의를 하면 이 skill을 사용하세요. 단일 직원의 학력·경력 조회는 hr-personnel(emp_no 필수)을 사용하세요—본 skill은 emp_no 없이 조건으로만 검색합니다. query_type 종류: graduates_by_region(지역-대학-졸업자 검색). 종류가 불분명하면 graduates_by_region을 사용하세요.",
@@ -17,7 +17,7 @@
         ]
       },
       "university_names": {
-        "description": "정규화된 대학교명 배열 (필수). [CRITICAL] 절대로 사용자에게 어떤 대학교를 포함할지 되묻지 마세요. 사용자가 '경상도', '수도권', '전라도' 등 지역명으로 질의하면 해당 지역 소재 주요 4년제 대학교 목록을 자체 지식으로 추출해 배열로 전달하세요. 전달 규칙: 각 원소는 정식명칭('경북대학교', '부산대학교', '서울대학교' 등) 우선, 한 지역당 최소 3개 이상 포함(주요 4년제 기준). 예시: 경상도 → ['경북대학교','부산대학교','동아대학교','영남대학교','계명대학교'], 수도권 → ['서울대학교','연세대학교','고려대학교','한양대학교','성균관대학교','경희대학교']. 지역과 무관한 대학교는 포함하지 마세요(hallucination 금지). [재강조] 지역 키워드가 명확하면 해당 지역 대학 목록을 즉시 추출해 되묻지 말고 tool-call하세요. graduates_by_region에서 사용.",
+        "description": "정규화된 대학교명 배열 (필수). [TOOL-CALL PRIORITY] 사용자 발화에 지역명이 명시되어 있으면 모호성 검사/확인 질문/scope 재확인(부서·기간·화면명 등)을 모두 생략하고 전 사원 대상 검색으로 즉시 진행하세요. [CRITICAL] 절대로 사용자에게 어떤 대학교를 포함할지 되묻지 마세요. 지역명으로 질의 시 해당 지역의 주요 대학교를 plugin 설명이나 예시의 고정 목록에서 복사하지 말고, 먼저 자체 지식으로 최대한 많이(최소 8개 이상) 정식명칭으로 구성하세요. 자체 지식이 불확실하거나 더 많은 학교가 필요하면 hr-personnel-search 호출 전에 web_search_preview tool로 '{지역} 대학 목록', '{지역} 4년제 대학교 목록'을 조회한 뒤 결과를 반영해 배열을 확장하세요. 숫자/개수의 특정 예시는 참고하지 말고 실제 지역의 주요 대학 수만큼 포함하세요. 지역과 무관한 대학 포함 금지(hallucination 금지). [재강조] 지역 키워드가 명확하면 되묻지 말고 자체 지식 또는 web_search_preview 결과로 대학 목록을 새로 구성해 tool-call하세요. graduates_by_region에서 사용.",
         "type": "array",
         "items": {
           "type": "string"
@@ -46,40 +46,10 @@
       "value": "http://kiwibox-hr-api:8000"
     }
   },
-  "examples": [
-    {
-      "prompt": "경상도 지역 대학을 졸업한 직원목록 알려줘",
-      "call": "{\"query_type\": \"graduates_by_region\", \"region\": \"경상도\", \"university_names\": [\"경북대학교\",\"부산대학교\",\"동아대학교\",\"영남대학교\",\"계명대학교\",\"울산대학교\"]}"
-    },
-    {
-      "prompt": "전라도 대학 졸업한 직원 검색해줘",
-      "call": "{\"query_type\": \"graduates_by_region\", \"region\": \"전라도\", \"university_names\": [\"전남대학교\",\"전북대학교\",\"조선대학교\",\"원광대학교\"]}"
-    },
-    {
-      "prompt": "충청도 출신 대학 졸업자 목록 보여줘",
-      "call": "{\"query_type\": \"graduates_by_region\", \"region\": \"충청도\", \"university_names\": [\"충남대학교\",\"충북대학교\",\"한밭대학교\",\"공주대학교\"]}"
-    },
-    {
-      "prompt": "강원도 소재 대학 나온 직원 조회",
-      "call": "{\"query_type\": \"graduates_by_region\", \"region\": \"강원도\", \"university_names\": [\"강원대학교\",\"한림대학교\",\"강릉원주대학교\"]}"
-    },
-    {
-      "prompt": "제주도 대학 졸업한 직원들 알려줘",
-      "call": "{\"query_type\": \"graduates_by_region\", \"region\": \"제주도\", \"university_names\": [\"제주대학교\",\"제주국제대학교\"]}"
-    },
-    {
-      "prompt": "수도권 대학 졸업한 직원목록",
-      "call": "{\"query_type\": \"graduates_by_region\", \"region\": \"수도권\", \"university_names\": [\"서울대학교\",\"연세대학교\",\"고려대학교\",\"한양대학교\",\"성균관대학교\",\"경희대학교\"]}"
-    },
-    {
-      "prompt": "서울 지역 대학 출신 직원 검색",
-      "call": "{\"query_type\": \"graduates_by_region\", \"region\": \"서울\", \"university_names\": [\"서울대학교\",\"연세대학교\",\"고려대학교\",\"한양대학교\",\"중앙대학교\",\"서강대학교\"]}"
-    },
-    {
-      "prompt": "경북 지역 대학 나온 직원 목록",
-      "call": "{\"query_type\": \"graduates_by_region\", \"region\": \"경북\", \"university_names\": [\"경북대학교\",\"영남대학교\",\"포항공과대학교\",\"계명대학교\"]}"
-    }
-  ],
+  "examples": [],
   "imported": true,
-  "license": "MIT"
+  "license": "MIT",
+  "metadata": {
+    "enable_web_search": true
+  }
 }

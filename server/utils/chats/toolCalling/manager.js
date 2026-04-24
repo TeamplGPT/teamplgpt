@@ -42,6 +42,20 @@ class ChatToolsManager {
         );
       }
     }
+
+    // OpenAI Responses API built-in tool 자동 주입.
+    // active plugin 중 metadata.enable_web_search === true가 1개라도 있으면
+    // web_search_preview를 추가해 LLM이 자체 지식 보강이 필요할 때 자율 호출하도록 함.
+    // Anthropic/chat-completions는 해당 built-in tool을 인식하지 못하므로 주입 금지.
+    if (providerFormat === "openai-responses") {
+      const needsWebSearch = plugins.some(
+        (p) => p?.metadata?.enable_web_search === true
+      );
+      if (needsWebSearch) {
+        tools.push({ type: "web_search_preview" });
+      }
+    }
+
     return tools;
   }
 

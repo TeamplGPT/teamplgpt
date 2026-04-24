@@ -899,14 +899,60 @@ async function streamChat({
       metrics,
     });
   } else {
-    logger.llmStart({ messageCount: messages.length, streaming: true });
-    const stream = await LLMConnector.streamGetChatCompletion(messages, {
-      temperature: workspace?.openAiTemp ?? LLMConnector.defaultTemp,
-      user: user,
+    // Tool calling support parity with /workspace/:slug/stream-chat (UI path).
+    // ApiChatHandler previously bypassed tool calling (direct streamGetChatCompletion).
+    // This blocked HR skill E2E (E125/E126) validation from chat/query mode.
+    const { ChatToolsManager } = require("./toolCalling/manager");
+    const { routeHrToolsForMessage } = require("./toolCalling/hrRouting");
+    const { toolCallingLoop } = require("./toolCalling/loop");
+    const providerFormat =
+      typeof LLMConnector.toolCallingFormat === "function"
+        ? LLMConnector.toolCallingFormat()
+        : null;
+    const rawTools =
+      typeof LLMConnector.supportsToolCalling === "function" &&
+      LLMConnector.supportsToolCalling()
+        ? ChatToolsManager.getToolDefinitions(providerFormat)
+        : null;
+    const { tools, toolChoice } = routeHrToolsForMessage({
+      tools: rawTools,
+      providerFormat,
+      message,
     });
-    completeText = await LLMConnector.handleStream(response, stream, { uuid });
-    logger.llmEnd({ responseLength: completeText?.length || 0, isEmpty: !completeText });
-    metrics = stream.metrics;
+    const { completeText: finalText, metrics: finalMetrics } =
+      await toolCallingLoop({
+        response,
+        LLMConnector,
+        messages,
+        tools,
+        llmOptions: {
+          temperature: workspace?.openAiTemp ?? LLMConnector.defaultTemp,
+          user,
+          ...(toolChoice ? { tool_choice: toolChoice } : {}),
+        },
+        uuid,
+        sources,
+        toolRuntimeOverrides:
+          response.locals?.toolRuntimeOverrides &&
+          typeof response.locals.toolRuntimeOverrides === "object"
+            ? response.locals.toolRuntimeOverrides
+            : null,
+        logger: {
+          llmStart: (evt) => logger.llmStart?.(evt),
+          llmEnd: (evt) => logger.llmEnd?.(evt),
+          toolCall: (evt) =>
+            typeof logger.toolCall === "function" && logger.toolCall(evt),
+          toolCallEnd: (evt) =>
+            typeof logger.toolCallEnd === "function" &&
+            logger.toolCallEnd(evt),
+          toolCallMax: ({ rounds }) =>
+            console.warn(
+              `[ApiChatHandler] Max tool rounds (${rounds}) reached, using partial response`
+            ),
+        },
+      });
+    completeText = finalText;
+    metrics = finalMetrics;
   }
 
   if (completeText?.length > 0) {

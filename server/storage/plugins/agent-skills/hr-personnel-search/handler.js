@@ -8,7 +8,7 @@ const {
 } = require("../_shared/formatTable");
 
 const ENDPOINT = "/api/v1/personnel/search/graduates";
-const MAX_RESULTS = 50;
+const MAX_RESULTS = 200;
 
 const QUERY_LABELS = {
   graduates_by_region: "지역-대학-졸업자 검색",

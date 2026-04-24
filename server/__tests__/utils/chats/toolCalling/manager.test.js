@@ -296,4 +296,85 @@ describe("ChatToolsManager", () => {
       expect(tools[1].name).toBe("hr-salary");
     });
   });
+
+  // FR-03, FR-04 — hr-personnel-search-web-search-assist
+  describe("web_search_preview 조건부 주입 (metadata.enable_web_search)", () => {
+    const MOCK_WEB_SEARCH_PLUGIN = {
+      active: true,
+      hubId: "hr-personnel-search",
+      description: "직원 검색",
+      metadata: { enable_web_search: true },
+      entrypoint: {
+        params: {
+          query_type: { type: "string", description: "조회" },
+          university_names: {
+            type: "array",
+            description: "대학 배열",
+            items: { type: "string" },
+          },
+        },
+        required: ["query_type", "university_names"],
+      },
+    };
+    const MOCK_NON_WEB_SEARCH_PLUGIN = {
+      active: true,
+      hubId: "hr-attendance",
+      description: "출퇴근 조회",
+      entrypoint: {
+        params: { emp_no: { type: "string" } },
+        required: ["emp_no"],
+      },
+    };
+
+    it("openai-responses: enable_web_search=true plugin 존재 시 web_search_preview 추가", () => {
+      ImportedPlugin.listImportedPlugins.mockReturnValue([
+        MOCK_WEB_SEARCH_PLUGIN,
+      ]);
+      const tools = ChatToolsManager.getToolDefinitions("openai-responses");
+      expect(tools).toContainEqual({ type: "web_search_preview" });
+      expect(
+        tools.filter((t) => t.type === "web_search_preview")
+      ).toHaveLength(1);
+      expect(tools.filter((t) => t.type === "function")).toHaveLength(1);
+    });
+
+    it("openai-responses: enable_web_search=false/미설정 plugin만 있으면 web_search_preview 미추가", () => {
+      ImportedPlugin.listImportedPlugins.mockReturnValue([
+        MOCK_NON_WEB_SEARCH_PLUGIN,
+      ]);
+      const tools = ChatToolsManager.getToolDefinitions("openai-responses");
+      expect(tools.some((t) => t.type === "web_search_preview")).toBe(false);
+    });
+
+    it("anthropic: enable_web_search=true plugin이 있어도 web_search_preview 미주입 (provider 비호환)", () => {
+      ImportedPlugin.listImportedPlugins.mockReturnValue([
+        MOCK_WEB_SEARCH_PLUGIN,
+      ]);
+      const tools = ChatToolsManager.getToolDefinitions("anthropic");
+      expect(tools.some((t) => t?.type === "web_search_preview")).toBe(false);
+    });
+
+    it("chat-completions(OpenRouter): enable_web_search=true plugin이 있어도 미주입 (provider 비호환)", () => {
+      ImportedPlugin.listImportedPlugins.mockReturnValue([
+        MOCK_WEB_SEARCH_PLUGIN,
+      ]);
+      const tools = ChatToolsManager.getToolDefinitions("chat-completions");
+      expect(tools.some((t) => t?.type === "web_search_preview")).toBe(false);
+    });
+
+    // M1 (design-validator R2): built-in tool은 name 필드 부재로
+    // embed.applyAllowedHashes의 name 기반 filter에서 자연 제외 위험.
+    // 본 테스트는 manager가 built-in tool에 name을 부여하지 않음을 확증 →
+    // embed 쪽에서 type 기반 guard로 보존 책임 분리 (embed.js isBuiltInTool).
+    it("web_search_preview built-in tool은 name 필드가 없어야 한다 (embed whitelist 필터 우회 전제)", () => {
+      ImportedPlugin.listImportedPlugins.mockReturnValue([
+        MOCK_WEB_SEARCH_PLUGIN,
+      ]);
+      const tools = ChatToolsManager.getToolDefinitions("openai-responses");
+      const webSearchTool = tools.find((t) => t.type === "web_search_preview");
+      expect(webSearchTool).toBeDefined();
+      expect(webSearchTool.name).toBeUndefined();
+      expect(webSearchTool.function).toBeUndefined();
+    });
+  });
 });
