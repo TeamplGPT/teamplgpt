@@ -41,6 +41,43 @@ const MOCK_INACTIVE_PLUGIN = {
   entrypoint: { params: {}, required: [] },
 };
 
+const MOCK_ARRAY_PLUGIN = {
+  active: true,
+  hubId: "hr-personnel-search",
+  description: "직원을 속성 기반으로 검색합니다.",
+  entrypoint: {
+    params: {
+      query_type: {
+        type: "string",
+        description: "조회 종류",
+        enum: ["graduates_by_region"],
+      },
+      university_names: {
+        type: "array",
+        description: "정규화된 대학교명 배열",
+        items: { type: "string" },
+      },
+      region: {
+        type: "string",
+        description: "지역 원문",
+      },
+    },
+    required: ["query_type", "university_names"],
+  },
+};
+
+const MOCK_ARRAY_MISSING_ITEMS_PLUGIN = {
+  active: true,
+  hubId: "broken-array",
+  description: "Items 누락 플러그인(회귀 방어).",
+  entrypoint: {
+    params: {
+      tags: { type: "array", description: "태그 배열" },
+    },
+    required: ["tags"],
+  },
+};
+
 beforeEach(() => {
   jest.clearAllMocks();
 });
@@ -185,6 +222,55 @@ describe("ChatToolsManager", () => {
           },
         },
       });
+    });
+  });
+
+  describe("array type with items (FR-05, FR-06)", () => {
+    it("openai-responses: array items를 보존해야 한다", () => {
+      ImportedPlugin.listImportedPlugins.mockReturnValue([MOCK_ARRAY_PLUGIN]);
+      const [tool] = ChatToolsManager.getToolDefinitions("openai-responses");
+      expect(tool.parameters.properties.university_names).toEqual({
+        type: "array",
+        description: "정규화된 대학교명 배열",
+        items: { type: "string" },
+      });
+    });
+
+    it("anthropic: array items를 보존해야 한다", () => {
+      ImportedPlugin.listImportedPlugins.mockReturnValue([MOCK_ARRAY_PLUGIN]);
+      const [tool] = ChatToolsManager.getToolDefinitions("anthropic");
+      expect(tool.input_schema.properties.university_names.items).toEqual({
+        type: "string",
+      });
+    });
+
+    it("chat-completions: array items를 보존해야 한다", () => {
+      ImportedPlugin.listImportedPlugins.mockReturnValue([MOCK_ARRAY_PLUGIN]);
+      const [tool] = ChatToolsManager.getToolDefinitions("chat-completions");
+      expect(
+        tool.function.parameters.properties.university_names.items
+      ).toEqual({ type: "string" });
+    });
+
+    it("items 미선언 array는 defensive default { type: string }을 주입해야 한다", () => {
+      const warnSpy = jest
+        .spyOn(console, "warn")
+        .mockImplementation(() => {});
+      ImportedPlugin.listImportedPlugins.mockReturnValue([
+        MOCK_ARRAY_MISSING_ITEMS_PLUGIN,
+      ]);
+      const [tool] = ChatToolsManager.getToolDefinitions("openai-responses");
+      expect(tool.parameters.properties.tags).toEqual({
+        type: "array",
+        description: "태그 배열",
+        items: { type: "string" },
+      });
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'param "tags" is array type but missing "items"'
+        )
+      );
+      warnSpy.mockRestore();
     });
   });
 
