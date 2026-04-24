@@ -121,4 +121,72 @@ describe("HR API mock integration", () => {
     expect(result).toContain("HR 연말정산 - 연말정산 공제 요약");
     expect(result).toContain("1,000,000");
   });
+
+  it("hr-personnel-search가 POST + JSON body로 university_names/region을 전달한다", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: jest.fn().mockResolvedValue({
+        success: true,
+        data: {
+          items: [
+            {
+              emp_no: "10234",
+              name: "홍길동",
+              graduated_university: "경북대학교",
+              degree: "학사",
+            },
+          ],
+          total: 1,
+        },
+      }),
+    });
+
+    const mod = loadHandler("hr-personnel-search");
+    const result = await mod.runtime.handler.call(createContext(baseUrl), {
+      query_type: "graduates_by_region",
+      university_names: ["경북대학교", "부산대학교", "동아대학교"],
+      region: "경상도",
+    });
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      `${baseUrl}/api/v1/personnel/search/graduates`,
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({ "Content-Type": "application/json" }),
+      })
+    );
+    const [, opts] = global.fetch.mock.calls[0];
+    const body = JSON.parse(opts.body);
+    expect(body.university_names).toEqual([
+      "경북대학교",
+      "부산대학교",
+      "동아대학교",
+    ]);
+    expect(body.region).toBe("경상도");
+
+    expect(result).toContain("HR 지역-대학-졸업자 검색 - 경상도");
+    expect(result).toContain("홍길동");
+    expect(result).toContain("경북대학교");
+  });
+
+  it("hr-personnel-search가 빈 결과 응답을 '결과 없음' 메시지로 처리한다", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: jest
+        .fn()
+        .mockResolvedValue({ success: true, data: [], message: "no matches" }),
+    });
+
+    const mod = loadHandler("hr-personnel-search");
+    const result = await mod.runtime.handler.call(createContext(baseUrl), {
+      query_type: "graduates_by_region",
+      university_names: ["제주대학교"],
+      region: "제주도",
+    });
+
+    expect(result).toContain("결과가 존재하지 않습니다");
+    expect(result).toContain("제주도");
+  });
 });
