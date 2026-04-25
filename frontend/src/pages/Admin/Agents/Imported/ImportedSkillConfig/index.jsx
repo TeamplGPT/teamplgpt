@@ -4,6 +4,13 @@ import { Gear, Plug } from "@phosphor-icons/react";
 import { useEffect, useState, useRef } from "react";
 import { sentenceCase } from "text-case";
 
+// `sentenceCase` drops non-Latin characters (e.g. "HR 인사 직원 검색" → "Hr").
+// Preserve raw name when any non-ASCII character is present.
+function displayName(name = "") {
+  if (typeof name !== "string" || !name) return name;
+  return /[^\x00-\x7F]/.test(name) ? name : sentenceCase(name);
+}
+
 /**
  * Converts setup_args to inputs for the form builder
  * @param {object} setupArgs - The setup arguments object
@@ -149,7 +156,7 @@ export default function ImportedSkillConfig({
           <div className="flex items-center gap-x-2">
             <Plug size={24} weight="bold" className="text-white" />
             <label htmlFor="name" className="text-white text-md font-bold">
-              {sentenceCase(config.name)}
+              {displayName(config.name)}
             </label>
             <label className="border-none relative inline-flex items-center ml-auto cursor-pointer">
               <input

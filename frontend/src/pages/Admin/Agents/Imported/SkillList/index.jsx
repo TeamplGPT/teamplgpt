@@ -1,6 +1,14 @@
 import { CaretRight } from "@phosphor-icons/react";
 import { sentenceCase } from "text-case";
 
+// `sentenceCase` (text-case) drops non-Latin characters from titles, e.g.
+// "HR 인사 직원 검색" → "Hr". Use the raw name for any string containing
+// non-ASCII characters and only sentence-case purely ASCII names.
+function displayName(name = "") {
+  if (typeof name !== "string" || !name) return name;
+  return /[^\x00-\x7F]/.test(name) ? name : sentenceCase(name);
+}
+
 export default function ImportedSkillList({
   skills = [],
   selectedSkill = null,
@@ -42,7 +50,7 @@ export default function ImportedSkillList({
           }`}
           onClick={() => handleClick?.({ ...config, imported: true })}
         >
-          <div className="text-sm font-light">{sentenceCase(config.name)}</div>
+          <div className="text-sm font-light">{displayName(config.name)}</div>
           <div className="flex items-center gap-x-2">
             <div className="text-sm text-theme-text-secondary font-medium">
               {config.active ? "On" : "Off"}
