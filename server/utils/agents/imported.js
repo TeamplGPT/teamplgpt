@@ -122,6 +122,21 @@ class ImportedPlugin {
     if (!currentConfig) return;
 
     const updatedConfig = { ...currentConfig, ...config };
+
+    // metadata: 1-level deep merge so partial metadata updates (e.g. single flag
+    // toggle from admin UI) preserve other metadata keys. Other fields keep the
+    // existing shallow-merge semantics because callers (UI) send the full object.
+    if (
+      config.metadata &&
+      typeof config.metadata === "object" &&
+      !Array.isArray(config.metadata)
+    ) {
+      updatedConfig.metadata = {
+        ...(currentConfig.metadata || {}),
+        ...config.metadata,
+      };
+    }
+
     fs.writeFileSync(configLocation, JSON.stringify(updatedConfig, null, 2));
     return updatedConfig;
   }
