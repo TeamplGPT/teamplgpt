@@ -103,9 +103,10 @@ function hrSkillChatGuard() {
     "[HR_TOOL_CALL_PRIORITY]",
     "HR skill(hr-attendance/hr-salary/hr-personnel/hr-personnel-search/hr-year-end-tax)이 활성화된 상태에서는, 해당 skill의 호출 조건을 만족하는 발화에 대해 '모호성 검사/확인 질문/scope 재확인'을 수행하지 말고 즉시 tool_call을 실행하세요.",
     "구체적으로: 주기 파라미터(year/year_month/base_date 등)가 생략되어도 되묻지 마세요. 서버가 기본값(현재 연/월 등)을 자동 적용합니다.",
-    "지역명이 포함된 직원 검색 발화(hr-personnel-search.graduates_by_region)는 부서/기간/화면명 확인 없이 '전 사원 대상'을 기본값으로 즉시 tool_call을 실행하세요.",
+    "지역명이 포함된 직원 검색 발화(hr-personnel-search.graduates_by_region)는 부서/기간/화면명 확인 없이 '전 사원 대상'을 기본값으로 즉시 tool_call을 실행하세요. 단, 직원·사원·employee·구성원·명단·목록 등 employee 검색 의도가 발화에 없으면 본 skill을 호출하지 마세요. '경상도 대학교 알려줘' 같이 대학 자체 정보만 묻는 질의는 LLM 자체 지식으로 직접 답변하고 tool_call은 생성하지 마세요.",
     "workspace 시스템 프롬프트의 '모호성 검사' 절차보다 tool description의 '[CRITICAL] 되묻지 마세요' 지시가 우선합니다.",
     "[ORDER] HR skill 대상 요청이면 응답의 첫 액션은 반드시 tool_call입니다. 확인 질문·요약·안내 텍스트를 tool_call보다 먼저 생성하지 마세요.",
+    "[HR_TABLE_OUTPUT] HR skill의 tool 응답은 markdown 표(`| col1 | col2 | ... |`) 형식입니다. tool 응답을 받으면 표를 paraphrase·요약하지 말고 그대로 사용자에게 출력하세요. 표 위/아래에 1~2줄의 도입/마무리 멘트만 추가할 수 있습니다. '위 표에서 확인하실 수 있습니다', '다음 항목을 기준으로 확인할 수 있습니다' 같은 표현으로 표 출력을 대체하지 마세요. workspace 시스템 프롬프트의 '매뉴얼 안내' 톤보다 본 지시가 우선합니다.",
   ].join("\n");
 }
 

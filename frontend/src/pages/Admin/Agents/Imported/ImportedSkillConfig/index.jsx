@@ -40,10 +40,46 @@ export default function ImportedSkillConfig({
   const [inputs, setInputs] = useState(
     inputsFromArgs(selectedSkill?.setup_args)
   );
+  const [metadata, setMetadata] = useState(selectedSkill?.metadata || {});
 
   const hasSetupArgs =
     selectedSkill?.setup_args &&
     Object.keys(selectedSkill.setup_args).length > 0;
+  const hasMetadata =
+    selectedSkill?.metadata &&
+    Object.keys(selectedSkill.metadata).length > 0;
+
+  async function updateMetadata(key, value) {
+    const prevMetadata = { ...metadata };
+    const newMetadata = { ...metadata, [key]: value };
+
+    setMetadata(newMetadata);
+    setConfig({ ...config, metadata: newMetadata });
+
+    const success =
+      await System.experimentalFeatures.agentPlugins.updatePluginConfig(
+        config.hubId,
+        { metadata: { [key]: value } }
+      );
+
+    if (!success) {
+      setMetadata(prevMetadata);
+      setConfig({ ...config, metadata: prevMetadata });
+      showToast(`Failed to update ${key}.`, "error", { clear: true });
+      return;
+    }
+
+    setImportedSkills((prev) =>
+      prev.map((s) =>
+        s.hubId === config.hubId ? { ...s, metadata: newMetadata } : s
+      )
+    );
+    showToast(
+      `${key} ${value ? "enabled" : "disabled"}.`,
+      "success",
+      { clear: true }
+    );
+  }
 
   async function toggleSkill() {
     const updatedConfig = { ...selectedSkill, active: !config.active };
@@ -179,13 +215,83 @@ export default function ImportedSkillConfig({
               )}
             </div>
           ) : (
-            <p className="text-white text-opacity-60 text-sm font-medium py-1.5">
-              There are no options to modify for this skill.
-            </p>
+            !hasMetadata && (
+              <p className="text-white text-opacity-60 text-sm font-medium py-1.5">
+                There are no options to modify for this skill.
+              </p>
+            )
+          )}
+
+          {hasMetadata && (
+            <SkillMetadataSection
+              metadata={metadata}
+              onChange={updateMetadata}
+            />
           )}
         </div>
       </div>
     </>
+  );
+}
+
+const METADATA_LABELS = {
+  enable_web_search: {
+    title: "웹 검색 (web_search_preview)",
+    hint: "끄면 LLM 자체 지식만 사용합니다. 저명도 지역에서 대학 목록이 부족하거나 폐교/통합 정보가 부정확할 수 있습니다.",
+  },
+};
+
+function SkillMetadataSection({ metadata, onChange }) {
+  return (
+    <div
+      data-testid="skill-metadata-section"
+      className="flex flex-col gap-y-3 pt-4 mt-2 border-t border-white/10"
+    >
+      <label className="text-white text-sm font-bold">Skill Settings</label>
+      {Object.entries(metadata).map(([key, value]) => {
+        if (typeof value !== "boolean") {
+          return (
+            <div
+              key={key}
+              className="flex items-center justify-between"
+              data-testid={`metadata-row-${key}`}
+            >
+              <span className="text-white text-sm">{key}</span>
+              <span className="text-white/50 text-xs">
+                Non-boolean — edit via plugin.json
+              </span>
+            </div>
+          );
+        }
+        const meta = METADATA_LABELS[key];
+        return (
+          <div
+            key={key}
+            className="flex flex-col gap-y-1"
+            data-testid={`metadata-row-${key}`}
+          >
+            <div className="flex items-center justify-between">
+              <label className="text-white text-sm">{meta?.title || key}</label>
+              <label className="border-none relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="peer sr-only"
+                  checked={value}
+                  onChange={(e) => onChange(key, e.target.checked)}
+                  aria-label={key}
+                />
+                <div className="peer-disabled:opacity-50 pointer-events-none peer h-6 w-11 rounded-full bg-[#CFCFD0] after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:shadow-xl after:border-none after:bg-white after:box-shadow-md after:transition-all after:content-[''] peer-checked:bg-[#32D583] peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-transparent"></div>
+              </label>
+            </div>
+            {meta?.hint && (
+              <p className="text-white text-opacity-60 text-xs font-medium">
+                {meta.hint}
+              </p>
+            )}
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
