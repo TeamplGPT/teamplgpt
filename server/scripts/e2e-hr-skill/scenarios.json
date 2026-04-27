@@ -1547,6 +1547,58 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "chat/query 모드(@agent 없음). description anchor 제거 + metadata.enable_web_search=true로 web_search_preview 자동 주입. Check body (jq '.body.university_names | length'): 목표 >= 8 (기존 5 baseline 대비 60%+ 증가). LLM이 web_search를 쓰지 않고 자체 지식만으로 8개 이상 뽑아도 PASS (자율성 원칙). hallucination (지역 무관 대학 포함)은 manual review 권장."
+    },
+    {
+      "id": "E127",
+      "label": "hr-personnel-search-table-enrichment: graduates_by_region + 대학 주소 컬럼 enrichment (Design E48)",
+      "message": "서울 소재 대학교 졸업생 명단 표로 작성해줘, 대학교 소재지 주소도 추가해줘 데이터가 없다면 웹검색을 활용해서 만들어줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "Design §4.1 E48 (positive single-column enrichment). [HR_TABLE_OUTPUT_ENRICHMENT] 가드 발동 → 응답 markdown 표 우측에 '대학교 주소' 컬럼 1개 추가 + SSE/response trace에 web_search_call event ≥ 1건 기대. Minimal schema (tool_call + mock_url_pattern만 자동 검증). web_search_call/new_columns 자동 검증은 후속 피처(hr-skill-enrichment-e2e-runner)."
+    },
+    {
+      "id": "E128",
+      "label": "hr-personnel-search-table-enrichment: no-trigger 회귀 ([HR_TABLE_OUTPUT] 원칙 유지, Design E49)",
+      "message": "서울 소재 대학교 졸업생 명단 표로 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "Design §4.1 E49 (negative no-enrichment-trigger). 트리거 키워드(추가해줘/같이/더해줘/붙여줘) 부재 → 컬럼 추가 0건, 원본 표 그대로 출력. [HR_TABLE_OUTPUT] paraphrase 금지 가드 회귀 보호. R1 (트리거 광범위) mitigation 검증."
+    },
+    {
+      "id": "E129",
+      "label": "hr-personnel-search-table-enrichment: multi-column enrichment 2개 (Design E50)",
+      "message": "수도권 대학 졸업생 명단 + 대학 주소 + 학과 영문명 추가해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "Design §4.1 E50 (positive multi-column). 2개 컬럼('대학 주소', '학과 영문명') 우측 추가 + web_search_call ≥ 1건 기대. 다중 enrichment 안정성 검증. repeat=2: 3차 E2E에서 1차 PASS / 2차 FAIL / 3차 PASS의 gpt-5.1 비결정성 관찰 → 2회 중 1회 PASS로 흡수."
+    },
+    {
+      "id": "E130",
+      "label": "hr-personnel-search-table-enrichment: cross-skill hr-personnel.education + 주소 enrichment (Design E51)",
+      "message": "사번 12345 직원 학력 조회해줘, 졸업 대학 주소도 추가해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/api/v1/personnel/education(\\?.*)?$"
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "Design §4.1 E51 (cross-skill 검증). 발화 강화 (E35 컨벤션 따라 '사번 + 직원 + 조회해줘'): hasSearchIntent ✅(조회) 매치로 hr-personnel.education tool 호출 의도 명확화. hrRouting.js::isPersonnelSearchGraduateRegionQuery()는 hasRegion ❌ 부재로 여전히 미발동(graduates_by_region 분기 차단) → LLM 자율로 hr-personnel.education(emp_no=12345) 선택. L2 [HR_TABLE_OUTPUT_ENRICHMENT] 가드는 5개 HR skill 공통 적용이므로 hr-personnel 표에서도 enrichment 동작('졸업 대학 주소' 컬럼 + web_search_call ≥ 1). repeat=2로 gpt-5.1 비결정성 흡수. mock_url_pattern은 E35 컨벤션 `^/api/v1/personnel/education(\\?.*)?$`로 통일 (query string 옵션)."
     }
   ]
 }
