@@ -34,3 +34,11 @@ frontend/test-login.cjs
 frontend/test-login.js
 server/__tests__/integration/
 server/test-login-redirect.js
+
+# --- spec-kit + superpowers (upstream ignore override) ---
+# spec-kit 스캐폴딩은 커밋 대상 (SPEC_KIT_GUIDE.md §7 커밋 정책)
+!.claude/
+.claude/settings.local.json
+!CLAUDE.md
+# superpowers 격리 워크스페이스 (스크래치)
+.worktrees/
