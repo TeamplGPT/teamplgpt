@@ -1,7 +1,7 @@
-# AGENTS.md — TeamplGPT (AnythingLLM fork) 가이드
+# CLAUDE.md — TeamplGPT (AnythingLLM fork) 가이드
 
 상세 원칙은 `.specify/memory/constitution.md`(헌장) 참조 — 이 파일은 요약 + 라우팅 진입점.
-CLAUDE.md와 동일 내용(멀티-agent tool 표준 준수). SPECKIT 컨텍스트 블록은 CLAUDE.md에만 존재.
+AGENTS.md는 이 파일과 동일 내용(멀티-agent tool 표준 준수).
 
 ## 작업 라우팅 (spec-kit × superpowers)
 
@@ -74,3 +74,7 @@ HR agent-skill(`hr-attendance`, `hr-salary`, `hr-personnel`, `hr-year-end-tax`) 
 
 자세한 내용은 `docs/rag-search-flow-chat-vs-react.md` 참조.
 
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->
