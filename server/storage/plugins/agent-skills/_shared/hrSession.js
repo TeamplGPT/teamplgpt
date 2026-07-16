@@ -103,8 +103,10 @@ async function hrFetch(ctx, { path, form, gate = false }) {
   const baseUrl = String(
     ctx.runtimeArgs["HR_BASE_URL"] || "https://ntest.5240.kr"
   ).replace(/\/+$/, "");
+  // ntest.5240.kr은 루트 배포(getContextPath()="" → /Main.do). 기본 빈 값.
+  // /kiwibox 등 컨텍스트 경로 배포면 setup_arg HR_CONTEXT_PATH로 지정.
   const contextPath = String(
-    ctx.runtimeArgs["HR_CONTEXT_PATH"] ?? "/kiwibox"
+    ctx.runtimeArgs["HR_CONTEXT_PATH"] ?? ""
   ).replace(/\/+$/, "");
   const cookie = normalizeCookie(ctx.runtimeArgs["HR_SESSION_COOKIE"]);
   if (!cookie) {

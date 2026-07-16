@@ -49,11 +49,11 @@
       "required": false,
       "input": {
         "type": "text",
-        "default": "/kiwibox",
-        "placeholder": "/kiwibox",
-        "hint": "kiwibox 컨텍스트 경로. 루트 배포면 빈 값."
+        "default": "",
+        "placeholder": "(루트 배포는 비움) 예: /kiwibox",
+        "hint": "kiwibox 컨텍스트 경로. ntest.5240.kr 등 루트 배포는 빈 값. /kiwibox 하위 배포면 \"/kiwibox\"."
       },
-      "value": "/kiwibox"
+      "value": ""
     },
     "HR_SESSION_COOKIE": {
       "type": "string",
