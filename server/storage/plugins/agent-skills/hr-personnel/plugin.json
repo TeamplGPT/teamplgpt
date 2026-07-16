@@ -2,17 +2,13 @@
   "active": true,
   "name": "HR 인사기록 조회",
   "schema": "skill-1.0.0",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "hubId": "hr-personnel",
   "author": "teamplgpt",
-  "description": "본인 인사정보(사원증 기본정보, 인사카드 상세, 조직도, 조직원, 할일/미결 건수, 일정 캘린더, 운영자 연락처)를 5240 HR 시스템에서 조회합니다. 사용자가 직위/직급/소속/재직상태/연락처/인사카드/조직도/팀원/부서원/할일/미결/일정/생일 등을 물으면 이 skill을 사용하세요. query_type 종류: profile(사원증 기본정보: 성명/소속/직위/직책/근무유형/재직상태/연락처), profile_detail(인사카드 상세: 학력/경력/자격증 등 인사카드 항목), org_tree(조직도/부서 목록), org_members(특정 조직의 조직원 목록—org_cd 필요), todo_count(할일/미결 결재/알림 건수), schedule_day(일자별 일정/생일자/공휴일), contact_directory(운영자/담당자 연락처). 종류가 불분명하면 profile을 사용하세요. 가족정보/부양가족은 이 skill에서 제공하지 않습니다(개인정보 보호).",
+  "description": "본인 인사정보(사원증 기본정보, 인사카드 상세, 조직도, 조직원, 할일/미결 건수, 일정 캘린더, 운영자 연락처)를 5240 HR 시스템에서 조회합니다. 항상 대화 중인 본인 기준으로 조회되며 사번은 필요 없습니다. 사용자가 직위/직급/소속/재직상태/연락처/인사카드/조직도/팀원/부서원/할일/미결/일정/생일 등을 물으면 이 skill을 사용하세요. query_type 종류: profile(사원증 기본정보: 성명/소속/직위/직책/근무유형/재직상태/연락처), profile_detail(인사카드 상세: 학력/경력/자격증 등 인사카드 항목), org_tree(조직도/부서 목록), org_members(특정 조직의 조직원 목록—org_cd 필요), todo_count(할일/미결 결재/알림 건수), schedule_day(일자별 일정/생일자/공휴일), contact_directory(운영자/담당자 연락처). 종류가 불분명하면 profile을 사용하세요. 가족정보/부양가족은 이 skill에서 제공하지 않습니다(개인정보 보호).",
   "entrypoint": {
     "file": "handler.js",
     "params": {
-      "emp_no": {
-        "description": "사원번호 (필수). 예: '12345'. 반드시 대화 중인 본인의 사번만 사용하세요. 다른 직원의 사번을 임의로 추측해 넣지 마세요.",
-        "type": "string"
-      },
       "query_type": {
         "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표에 있는 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 해당 query_type으로 매핑하세요. 매핑표: profile=사원증(직위/직급/직책/소속/재직상태/근무유형/내 연락처/내 정보/사원증)—파라미터 불필요, 즉시 tool-call, profile_detail=인사카드상세(인사카드/학력/경력/자격증/포상/징계 등 인사기록 상세)—즉시 tool-call, org_tree=조직도(조직도/부서 목록/조직 구조/팀 목록)—즉시 tool-call, org_members=조직원(팀원/부서원/조직원/구성원—org_cd 필요, 없으면 org_tree 먼저), todo_count=할일건수(할일/미결/미확인 알림/결재 대기 건수)—즉시 tool-call, schedule_day=일정캘린더(일정/생일/생일자/공휴일), contact_directory=운영자연락처(운영자/담당자/관리자 연락처)—즉시 tool-call.",
         "type": "string",
@@ -36,7 +32,6 @@
       }
     },
     "required": [
-      "emp_no",
       "query_type"
     ]
   },
@@ -65,12 +60,12 @@
     },
     "HR_SESSION_COOKIE": {
       "type": "string",
-      "required": true,
+      "required": false,
       "input": {
         "type": "text",
         "default": "",
         "placeholder": "JSESSIONID=ABCDEF0123456789",
-        "hint": "5240 HR 로그인 세션 쿠키(JSESSIONID). 세션 신원(ssnStaffId)은 서버가 강제 주입하므로 이 세션의 사용자 기준으로 조회됩니다."
+        "hint": "서버 폴백(단일 사용자/테스트)용 5240 HR 세션 쿠키. embed 클라이언트 위임(client_tool_execution) 사용 시 불필요."
       },
       "value": ""
     },
@@ -84,48 +79,59 @@
         "hint": "권한 게이트(AUTF_SRCH_STAFF_YN)용 메뉴 컨텍스트. 설정 시 profile_detail 조회 전 setSessionActiveTabMenuCd.do를 선호출합니다."
       },
       "value": ""
+    },
+    "HR_STAFF_ID": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "예: 10001 (STAFF_ID)",
+        "hint": "서버 폴백용 본인 kiwibox 내부 STAFF_ID(세션 ssnStaffId와 동일 값). 사번(STAFF_NO)과 다를 수 있음 — 실측 확인. 클라이언트 위임 모드에서는 브리지가 페이지의 ssnStaffId로 자동 치환하므로 불필요."
+      },
+      "value": ""
     }
   },
   "examples": [
     {
       "prompt": "내 현재 직위 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"profile\"}"
+      "call": "{\"query_type\": \"profile\"}"
     },
     {
       "prompt": "내 사원증 정보 보여줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"profile\"}"
+      "call": "{\"query_type\": \"profile\"}"
     },
     {
       "prompt": "내 인사카드 상세 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"profile_detail\"}"
+      "call": "{\"query_type\": \"profile_detail\"}"
     },
     {
       "prompt": "학력 정보 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"profile_detail\"}"
+      "call": "{\"query_type\": \"profile_detail\"}"
     },
     {
       "prompt": "조직도 보여줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"org_tree\"}"
+      "call": "{\"query_type\": \"org_tree\"}"
     },
     {
       "prompt": "그 팀 팀원 목록 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"org_members\", \"org_cd\": \"ORG123\"}"
+      "call": "{\"query_type\": \"org_members\", \"org_cd\": \"ORG123\"}"
     },
     {
       "prompt": "내 할일이랑 미결 결재 몇 건이야?",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"todo_count\"}"
+      "call": "{\"query_type\": \"todo_count\"}"
     },
     {
       "prompt": "이번 달 생일자 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"schedule_day\"}"
+      "call": "{\"query_type\": \"schedule_day\"}"
     },
     {
       "prompt": "3월 공휴일 일정 보여줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"schedule_day\", \"year_month\": \"3\"}"
+      "call": "{\"query_type\": \"schedule_day\", \"year_month\": \"3\"}"
     },
     {
       "prompt": "시스템 운영자 연락처 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"contact_directory\"}"
+      "call": "{\"query_type\": \"contact_directory\"}"
     }
   ],
   "imported": true,

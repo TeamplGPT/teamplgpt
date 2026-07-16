@@ -1,12 +1,16 @@
 // hr-personnel/handler.js
-// 5240 HR(kiwibox) 직접 호출 버전. 스펙: specs/002-hr-personnel-kiwibox/spec.md
+// 5240 HR(kiwibox) 조회 — R1 클라이언트 위임 정본 + 서버 폴백 (specs/002·003).
 // 근거 카탈로그: kiwibox_eGov4.2/spec-docs/SYS/CMM/cmmAiAssistantToolEndpoints.md §4.8~4.9
-//  - 사원증 계열 searchStaffId는 emp_no로 self 강제 — LLM에 타인 사번 파라미터 미노출.
+//  - 사원증 계열 searchStaffId는 $SELF_STAFF_ID 마커 — 브리지/폴백이 본인 사번 치환 (self 강제).
 //  - family(주민번호 반환 SCIRegDependent)는 카탈로그 §7 등록 금지 — 미노출.
-//  - 인증: JSESSIONID 쿠키 pass-through (계층1 세션 파라미터는 서버가 자동 주입).
 const { resolveDateParam } = require("../_shared/dateResolver");
+const {
+  hrFetch,
+  monthRange,
+  todayYmd,
+  SELF_STAFF_ID_MARKER,
+} = require("../_shared/hrSession");
 
-// staffParam: 사원증 계열 self 강제 대상. gate: b게이트 — HR_ACTIVE_MENU_CD 선세팅 대상.
 // dateParam: "today"=searchSymd 오늘, "month-range"=staYmd/endYmd(월초~말일)
 const ENDPOINT_MAP = {
   profile: {
@@ -45,62 +49,21 @@ const QUERY_LABELS = {
   contact_directory: "운영자 연락처",
 };
 
-function monthRange(ym) {
-  const y = Number(ym.slice(0, 4));
-  const m = Number(ym.slice(4, 6));
-  const lastDay = new Date(y, m, 0).getDate();
-  return [`${ym}01`, `${ym}${String(lastDay).padStart(2, "0")}`];
-}
-
-function todayYmd() {
-  const d = new Date();
-  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
-}
-
-function normalizeCookie(raw) {
-  const v = String(raw || "").trim();
-  if (!v) return "";
-  return v.includes("=") ? v : `JSESSIONID=${v}`;
-}
-
-function isHtmlOrLogin(response, bodyText) {
-  const ct = response.headers.get("content-type") || "";
-  if (ct.includes("text/html")) return true;
-  if (/login|\.jsp/i.test(response.url || "")) return true;
-  return typeof bodyText === "string" && /^\s*</.test(bodyText);
-}
-
 module.exports.runtime = {
-  handler: async function ({ emp_no, query_type, year_month, org_cd }) {
+  handler: async function ({ query_type, year_month, org_cd }) {
     try {
-      if (!emp_no || emp_no.trim() === "") {
-        return "> ⚠️ 사원번호(emp_no)가 필요합니다.";
-      }
       if (!query_type || !ENDPOINT_MAP[query_type]) {
         const types = Object.keys(ENDPOINT_MAP).join(", ");
         return `> ⚠️ query_type이 올바르지 않습니다. 가능한 값: ${types}`;
       }
 
-      const baseUrl = String(
-        this.runtimeArgs["HR_BASE_URL"] || "https://ntest.5240.kr"
-      ).replace(/\/+$/, "");
-      const contextPath = String(
-        this.runtimeArgs["HR_CONTEXT_PATH"] ?? "/kiwibox"
-      ).replace(/\/+$/, "");
-      const cookie = normalizeCookie(this.runtimeArgs["HR_SESSION_COOKIE"]);
-      if (!cookie) {
-        return "> ⚠️ HR 세션(HR_SESSION_COOKIE)이 설정되지 않았습니다. 5240 HR 로그인 세션(JSESSIONID)을 skill 설정에 등록하세요.";
-      }
-      const activeMenuCd = String(this.runtimeArgs["HR_ACTIVE_MENU_CD"] || "").trim();
-
       const spec = ENDPOINT_MAP[query_type];
       const label = QUERY_LABELS[query_type];
-      const staffId = emp_no.trim();
 
-      const form = new URLSearchParams();
+      const form = {};
 
-      // 대상 사번 self 강제 (카탈로그 §6.1 — d 옵션분기의 타인 검색 경로 차단)
-      if (spec.staffParam) form.append(spec.staffParam, staffId);
+      // 대상 사번 self 강제 — 마커 치환은 브리지/폴백이 수행 (§6.1)
+      if (spec.staffParam) form[spec.staffParam] = SELF_STAFF_ID_MARKER;
 
       // 조직코드: 계층3 체이닝 — org_tree 결과값만 (plugin.json description에서 강제)
       if (spec.orgParam) {
@@ -108,84 +71,45 @@ module.exports.runtime = {
         if (spec.orgParam.required && !org) {
           return "> ⚠️ 조직코드(org_cd)가 필요합니다. 먼저 org_tree(조직도)로 조직코드를 조회하세요.";
         }
-        if (org) form.append(spec.orgParam.name, org);
+        if (org) form[spec.orgParam.name] = org;
       }
 
-      // 날짜 파라미터
       if (spec.dateParam === "today") {
-        form.append("searchSymd", todayYmd());
+        form.searchSymd = todayYmd();
       } else if (spec.dateParam === "month-range") {
         const ym =
           resolveDateParam(year_month, "year_month") ||
           resolveDateParam("이번달", "year_month");
         const [sYmd, eYmd] = monthRange(ym);
-        form.append("staYmd", sYmd);
-        form.append("endYmd", eYmd);
+        form.staYmd = sYmd;
+        form.endYmd = eYmd;
       }
 
-      const headers = {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Cookie: cookie,
-      };
-
-      // b 범위 게이트: 세션 activeMenuCd 기준 (카탈로그 §1.2/§8)
-      if (activeMenuCd && spec.gate) {
-        await fetch(
-          `${baseUrl}${contextPath}/setSessionActiveTabMenuCd.do?tabMenuCd=${encodeURIComponent(activeMenuCd)}`,
-          { method: "GET", headers, signal: AbortSignal.timeout(5000) }
-        ).catch(() => {});
-      }
-
-      const url = `${baseUrl}${contextPath}${spec.path}`;
-      this.introspect(`${label} 조회 중 (사번: ${staffId})...`);
-
-      const response = await fetch(url, {
-        method: "POST",
-        headers,
-        body: form.toString(),
-        signal: AbortSignal.timeout(10000),
+      this.introspect(`${label} 조회 중...`);
+      const { errorMessage, records, isEmpty } = await hrFetch(this, {
+        path: spec.path,
+        form,
+        gate: spec.gate,
       });
-
-      const bodyText = await response.text();
-      if (isHtmlOrLogin(response, bodyText)) {
-        return "> ⚠️ HR 세션이 만료되었거나 로그인 페이지로 이동되었습니다. HR_SESSION_COOKIE(JSESSIONID)를 갱신하세요.";
-      }
-      if (!response.ok) {
-        return `> ⚠️ HR 시스템 호출 실패 (HTTP ${response.status}).`;
-      }
-
-      let data;
-      try {
-        data = JSON.parse(bodyText);
-      } catch {
-        return "> ⚠️ HR 시스템 응답을 해석할 수 없습니다 (JSON 아님). 세션 상태를 확인하세요.";
-      }
-
-      const records = data && "result" in data ? data.result : data;
-      const isEmpty =
-        records === null ||
-        records === undefined ||
-        (Array.isArray(records) && records.length === 0) ||
-        (typeof records === "object" && !Array.isArray(records) && Object.keys(records).length === 0);
+      if (errorMessage) return errorMessage;
       if (isEmpty) {
-        return `> ⚠️ **${label}** 조회 결과가 존재하지 않습니다 (사번: ${staffId}).`;
+        return `> ⚠️ **${label}** 조회 결과가 존재하지 않습니다.`;
       }
 
       this.introspect(`${label} 조회 완료.`);
-      return formatPersonnel(records, label, staffId);
+      return formatPersonnel(records, label);
     } catch (e) {
       this.logger("Error in hr-personnel", e.message);
-      if (e.name === "TimeoutError") return "> ⚠️ HR 시스템 응답 시간이 초과되었습니다.";
       return `> ⚠️ 인사기록 조회 중 오류가 발생했습니다: ${e.message}`;
     }
   },
 };
 
-function formatPersonnel(data, label, staffId) {
+function formatPersonnel(data, label) {
   const { normalizeData, renderTable, renderSummary } = require("../_shared/formatTable");
   const { rows, summary } = normalizeData(data);
 
-  let md = `## HR 인사기록 - ${label} (사번: ${staffId})\n\n`;
+  let md = `## HR 인사기록 - ${label}\n\n`;
 
   if (rows.length === 0) return md + "> 조회된 데이터가 없습니다.";
 

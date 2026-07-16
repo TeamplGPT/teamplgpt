@@ -2,17 +2,13 @@
   "active": true,
   "name": "HR 근태 조회",
   "schema": "skill-1.0.0",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "hubId": "hr-attendance",
   "author": "teamplgpt",
-  "description": "직원 근태(연차, 출퇴근, 근무현황, 근무캘린더, 휴가, 연장근무 등)를 5240 HR 시스템에서 조회합니다. 사용자가 연차/출퇴근/근무현황/근무캘린더/휴가/연장/야근/OT 등을 물으면 이 skill을 사용하세요. 조회 기간은 year_month 하나로만 전달하며, 언급하지 않으면 생략하세요(이번 달 자동 적용). query_type 종류: annual_leave_balance(연차 발생/사용/잔여), timesheet(출퇴근기록), work_status(근무현황 요약: 시업/종업·지각/조퇴·승인OT), work_calendar(월 근무캘린더: 근무유형/근무시간/누적시간), leave_requests(본인 휴가신청 상세), vacation_calendar(조직/팀 휴가캘린더), overtime(연장근무 신청 내역), overtime_limit(연장근무 한도/잔여시간). 종류가 불분명하면 annual_leave_balance를 사용하세요.",
+  "description": "본인 근태(연차, 출퇴근, 근무현황, 근무캘린더, 휴가, 연장근무 등)를 5240 HR 시스템에서 조회합니다. 항상 대화 중인 본인 기준으로 조회되며 사번은 필요 없습니다. 사용자가 연차/출퇴근/근무현황/근무캘린더/휴가/연장/야근/OT 등을 물으면 이 skill을 사용하세요. 조회 기간은 year_month 하나로만 전달하며, 언급하지 않으면 생략하세요(이번 달 자동 적용). query_type 종류: annual_leave_balance(연차 발생/사용/잔여), timesheet(출퇴근기록), work_status(근무현황 요약: 시업/종업·지각/조퇴·승인OT), work_calendar(월 근무캘린더: 근무유형/근무시간/누적시간), leave_requests(본인 휴가신청 상세), vacation_calendar(조직/팀 휴가캘린더), overtime(연장근무 신청 내역), overtime_limit(연장근무 한도/잔여시간). 종류가 불분명하면 annual_leave_balance를 사용하세요.",
   "entrypoint": {
     "file": "handler.js",
     "params": {
-      "emp_no": {
-        "description": "사원번호 (필수). 예: '12345'. 반드시 대화 중인 본인의 사번만 사용하세요. 다른 직원의 사번을 임의로 추측해 넣지 마세요.",
-        "type": "string"
-      },
       "query_type": {
         "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표에 있는 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 해당 query_type으로 매핑하세요. 매핑표: annual_leave_balance=연차잔여(연차/잔여/남은휴가/연차현황)—기간 파라미터 불필요, 즉시 tool-call, timesheet=출퇴근기록(출퇴근/출근/퇴근/근태기록), work_status=근무현황(근무현황/근무요약/지각/조퇴/외출), work_calendar=근무캘린더(근무캘린더/월간근무/근무표/근무시간 누적), leave_requests=휴가신청상세(휴가신청/신청내역/내 휴가)—기간 파라미터 불필요, 즉시 tool-call, vacation_calendar=조직휴가캘린더(팀 휴가/부서 휴가/조직 휴가/휴가자 현황), overtime=연장근무(연장/야근/OT/초과근무 신청/내역), overtime_limit=연장한도(OT 한도/잔여 OT/연장 가능 시간).",
         "type": "string",
@@ -33,7 +29,6 @@
       }
     },
     "required": [
-      "emp_no",
       "query_type"
     ]
   },
@@ -62,12 +57,23 @@
     },
     "HR_SESSION_COOKIE": {
       "type": "string",
-      "required": true,
+      "required": false,
       "input": {
         "type": "text",
         "default": "",
         "placeholder": "JSESSIONID=ABCDEF0123456789",
-        "hint": "5240 HR 로그인 세션 쿠키(JSESSIONID). 세션 신원(ssnStaffId)은 서버가 강제 주입하므로 이 세션의 사용자 기준으로 조회됩니다."
+        "hint": "서버 폴백(단일 사용자/테스트)용 5240 HR 세션 쿠키. embed 클라이언트 위임(client_tool_execution) 사용 시 불필요."
+      },
+      "value": ""
+    },
+    "HR_STAFF_ID": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "예: 10001 (STAFF_ID)",
+        "hint": "서버 폴백용 본인 kiwibox 내부 STAFF_ID(세션 ssnStaffId와 동일 값). 사번(STAFF_NO)과 다를 수 있음 — 실측 확인. 클라이언트 위임 모드에서는 브리지가 페이지의 ssnStaffId로 자동 치환하므로 불필요."
       },
       "value": ""
     },
@@ -86,59 +92,59 @@
   "examples": [
     {
       "prompt": "연차 잔여일 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_leave_balance\"}"
+      "call": "{\"query_type\": \"annual_leave_balance\"}"
     },
     {
       "prompt": "출퇴근 기록 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet\"}"
+      "call": "{\"query_type\": \"timesheet\"}"
     },
     {
       "prompt": "이번 달 근무현황 요약해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"work_status\"}"
+      "call": "{\"query_type\": \"work_status\"}"
     },
     {
       "prompt": "이번 달 근무캘린더 보여줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"work_calendar\"}"
+      "call": "{\"query_type\": \"work_calendar\"}"
     },
     {
       "prompt": "내 휴가 신청 내역 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"leave_requests\"}"
+      "call": "{\"query_type\": \"leave_requests\"}"
     },
     {
       "prompt": "우리 팀 휴가자 현황 보여줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"vacation_calendar\"}"
+      "call": "{\"query_type\": \"vacation_calendar\"}"
     },
     {
       "prompt": "연장근무 내역 보여줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"overtime\"}"
+      "call": "{\"query_type\": \"overtime\"}"
     },
     {
       "prompt": "이번 달 남은 OT 시간 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"overtime_limit\"}"
+      "call": "{\"query_type\": \"overtime_limit\"}"
     },
     {
       "prompt": "2월 출퇴근 기록 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet\", \"year_month\": \"2\"}"
+      "call": "{\"query_type\": \"timesheet\", \"year_month\": \"2\"}"
     },
     {
       "prompt": "2월 27일자 출퇴근 내역 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet\", \"year_month\": \"2\"}"
+      "call": "{\"query_type\": \"timesheet\", \"year_month\": \"2\"}"
     },
     {
       "prompt": "지난달 출퇴근 기록",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet\", \"year_month\": \"지난달\"}"
+      "call": "{\"query_type\": \"timesheet\", \"year_month\": \"지난달\"}"
     },
     {
       "prompt": "2025년 1월 출퇴근 기록 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet\", \"year_month\": \"202501\"}"
+      "call": "{\"query_type\": \"timesheet\", \"year_month\": \"202501\"}"
     },
     {
       "prompt": "2024년 12월 연장근무 내역 보여줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"overtime\", \"year_month\": \"202412\"}"
+      "call": "{\"query_type\": \"overtime\", \"year_month\": \"202412\"}"
     },
     {
       "prompt": "3월 근무캘린더",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"work_calendar\", \"year_month\": \"3\"}"
+      "call": "{\"query_type\": \"work_calendar\", \"year_month\": \"3\"}"
     }
   ],
   "imported": true,
