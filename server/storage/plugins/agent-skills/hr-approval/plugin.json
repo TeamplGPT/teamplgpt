@@ -1,0 +1,114 @@
+{
+  "active": true,
+  "name": "HR 전자결재 조회",
+  "schema": "skill-1.0.0",
+  "version": "1.0.0",
+  "hubId": "hr-approval",
+  "author": "teamplgpt",
+  "description": "본인 전자결재 문서함(미결/기안/기결/반려/참조)을 5240 HR 시스템에서 조회합니다. 항상 대화 중인 본인 기준으로 조회되며 사번은 필요 없습니다. 사용자가 결재/전자결재/미결/결재대기/내가 올린 문서/기안/상신/기결/결재완료/반려/참조 문서 등을 물으면 이 skill을 사용하세요. 조회 기간은 year_month 하나로만 전달하며, 언급하지 않으면 생략하세요(이번 달 자동 적용). 각 문서의 문서명·상태·경과일·기안자·신청사유·결재라인을 목록으로 보여줍니다(문서 본문 전문은 제공하지 않음). query_type 종류: pending(미결함-내가 결재할 문서), drafted(기안함-내가 상신한 문서), completed(기결함-결재완료), rejected(반려함), referenced(참조). 종류가 불분명하면 pending을 사용하세요.",
+  "entrypoint": {
+    "file": "handler.js",
+    "params": {
+      "query_type": {
+        "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표에 있는 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 해당 query_type으로 매핑하세요. 매핑표: pending=미결함(미결/결재대기/결재할/내가 결재/승인대기), drafted=기안함(기안/상신/내가 올린/내가 신청한/상신함), completed=기결함(기결/결재완료/완료된 결재/승인완료), rejected=반려함(반려/반려된/반송), referenced=참조(참조/참조문서/수신참조).",
+        "type": "string",
+        "enum": [
+          "pending",
+          "drafted",
+          "completed",
+          "rejected",
+          "referenced"
+        ]
+      },
+      "year_month": {
+        "description": "조회 연월 (선택). [CRITICAL] 절대로 사용자에게 연도나 기간을 되묻지 마세요. 기간 없이도 즉시 tool-call을 실행하세요. 연도를 추론해 추가하지도 마세요. 월 단위 조회이므로 일(day) 정보는 무시됩니다. 전달 규칙: 연도 명시 시 'YYYYMM'(예: '202503') / 'YYYY-MM' / 'YYYY년 M월' 중 하나. 연도 미명시 시 월만 '3', '11', '2월', '지난달' 등으로 그대로 전달—현재 연도가 자동으로 적용됩니다. 미지정 시 생략—이번 달이 자동 적용됩니다. [재강조] 기간이 사용자 발화에 없으면 되묻지 말고 year_month를 생략하고 즉시 tool-call하세요.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "query_type"
+    ]
+  },
+  "setup_args": {
+    "HR_BASE_URL": {
+      "type": "string",
+      "required": true,
+      "input": {
+        "type": "text",
+        "default": "https://ntest.5240.kr",
+        "placeholder": "https://ntest.5240.kr",
+        "hint": "5240 HR 시스템 base URL."
+      },
+      "value": "https://ntest.5240.kr"
+    },
+    "HR_CONTEXT_PATH": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "(루트 배포는 비움) 예: /kiwibox",
+        "hint": "kiwibox 컨텍스트 경로. ntest.5240.kr 등 루트 배포는 빈 값. /kiwibox 하위 배포면 \"/kiwibox\"."
+      },
+      "value": ""
+    },
+    "HR_SESSION_COOKIE": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "JSESSIONID=ABCDEF0123456789",
+        "hint": "서버 폴백(단일 사용자/테스트)용 5240 HR 세션 쿠키. embed 클라이언트 위임(client_tool_execution) 사용 시 불필요."
+      },
+      "value": ""
+    },
+    "HR_ACTIVE_MENU_CD": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "예: EAP0101",
+        "hint": "권한 게이트용 메뉴 컨텍스트. 설정 시 결재함 조회 전 setSessionActiveTabMenuCd.do를 선호출합니다."
+      },
+      "value": ""
+    }
+  },
+  "examples": [
+    {
+      "prompt": "내가 결재할 문서 있어?",
+      "call": "{\"query_type\": \"pending\"}"
+    },
+    {
+      "prompt": "미결 결재 목록 보여줘",
+      "call": "{\"query_type\": \"pending\"}"
+    },
+    {
+      "prompt": "내가 올린 결재 문서 알려줘",
+      "call": "{\"query_type\": \"drafted\"}"
+    },
+    {
+      "prompt": "결재 완료된 문서 조회해줘",
+      "call": "{\"query_type\": \"completed\"}"
+    },
+    {
+      "prompt": "반려된 결재 있어?",
+      "call": "{\"query_type\": \"rejected\"}"
+    },
+    {
+      "prompt": "참조로 받은 문서 보여줘",
+      "call": "{\"query_type\": \"referenced\"}"
+    },
+    {
+      "prompt": "지난달 내가 상신한 문서",
+      "call": "{\"query_type\": \"drafted\", \"year_month\": \"지난달\"}"
+    },
+    {
+      "prompt": "3월 미결함",
+      "call": "{\"query_type\": \"pending\", \"year_month\": \"3\"}"
+    }
+  ],
+  "imported": true,
+  "license": "MIT"
+}
