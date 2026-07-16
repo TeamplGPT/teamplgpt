@@ -251,6 +251,7 @@ model embed_configs {
   message_limit              Int?          @default(20)
   allow_tool_calling         Boolean       @default(false)
   allowed_skill_hashes       String?
+  client_tool_execution      Boolean       @default(false)
   workspace_id               Int
   createdBy                  Int?
   usersId                    Int?

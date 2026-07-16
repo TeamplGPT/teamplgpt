@@ -15,6 +15,9 @@ class ToolExecutor {
    * @param {Object<string,string>} [options.runtimeOverrides] - runtimeArgs 덮어쓰기 (null/undefined 값은 무시).
    *   Call-site별 runtime param override 용도 (e.g., E2E test에서 HR_API_BASE_URL을 mock 포트로 override).
    *   plugin.json의 setup_args.value는 변경되지 않음 (읽기 전용 기본값 유지).
+   * @param {Function} [options.clientToolTransport] - R1 클라이언트 실행 위임 transport.
+   *   (spec) => Promise<{ok, status, body}>. 존재하면 handler가 this.clientToolTransport로
+   *   kiwibox 등 외부 호출을 브라우저 브리지에 위임할 수 있다 (specs/003).
    * @returns {Promise<string>} 실행 결과 문자열
    */
   static async execute(toolCall, options = {}) {
@@ -35,6 +38,7 @@ class ToolExecutor {
         runtimeArgs,
         introspect: options.logger || (() => {}),
         logger: options.logger || console.log,
+        clientToolTransport: options.clientToolTransport || null,
       };
 
       const args =

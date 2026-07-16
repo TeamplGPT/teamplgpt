@@ -17,6 +17,7 @@ const EmbedConfig = {
     "message_limit",
     "allow_tool_calling",
     "allowed_skill_hashes",
+    "client_tool_execution",
   ],
 
   new: async function (data, creatorId = null) {
@@ -192,6 +193,7 @@ const BOOLEAN_KEYS = [
   "allow_prompt_override",
   "enabled",
   "allow_tool_calling",
+  "client_tool_execution",
 ];
 
 const NUMBER_KEYS = [

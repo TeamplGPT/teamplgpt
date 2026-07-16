@@ -34,6 +34,8 @@ const MAX_TOOL_ROUNDS = 5;
  * @property {boolean} [forceToolChoiceRequired=true]  embed에서 tool_choice='required' 강제 여부
  * @property {Object<string,string>} [toolRuntimeOverrides]  call-site별 runtimeArgs 덮어쓰기 (e.g., {HR_API_BASE_URL: "http://localhost:8001"}).
  *   plugin.json의 setup_args.value는 변경되지 않고, ToolExecutor 호출 시에만 merge됨.
+ * @property {import('./clientToolBroker').ClientToolBroker} [clientToolBroker]  R1 클라이언트 실행 위임
+ *   브로커 (embed 전용, specs/003). 존재 시 skill handler에 clientToolTransport가 주입된다.
  */
 
 /**
@@ -93,6 +95,7 @@ async function toolCallingLoop(opts) {
     caller = "workspace",
     forceToolChoiceRequired = true,
     toolRuntimeOverrides,
+    clientToolBroker = null,
   } = opts;
 
   // AbortController: propagate client disconnect to upstream fetch (best-effort).
@@ -164,6 +167,7 @@ async function toolCallingLoop(opts) {
               toolTrace,
               logger,
               toolRuntimeOverrides,
+              clientToolBroker,
             });
           }
           metrics = result.metrics || {};
@@ -247,6 +251,7 @@ async function toolCallingLoop(opts) {
               toolTrace,
               logger,
               toolRuntimeOverrides,
+              clientToolBroker,
             });
           }
           metrics = stream.metrics || {};
@@ -323,11 +328,15 @@ async function executeAndAppend({
   toolTrace,
   logger,
   toolRuntimeOverrides,
+  clientToolBroker,
 }) {
   logger.toolCall?.({ name: tc.name, arguments: tc.arguments, round });
   const tcStart = Date.now();
   const toolResult = await ToolExecutor.execute(tc, {
     runtimeOverrides: toolRuntimeOverrides,
+    clientToolTransport: clientToolBroker
+      ? (spec) => clientToolBroker.request(spec)
+      : null,
   });
   const durationMs = Date.now() - tcStart;
   const isError =

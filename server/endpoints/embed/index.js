@@ -12,6 +12,9 @@ const {
   convertToChatHistory,
   writeResponseChunk,
 } = require("../../utils/helpers/chat/responses");
+const {
+  ClientToolBroker,
+} = require("../../utils/chats/toolCalling/clientToolBroker");
 
 /**
  * Parse `x-tool-runtime-override-<PARAM>` request headers into a runtimeArgs override map.
@@ -100,6 +103,39 @@ function embeddedEndpoints(app) {
           error: e.message,
         });
         response.end();
+      }
+    }
+  );
+
+  // R1 클라이언트 실행 위임 결과 회신 (specs/003).
+  // 위젯이 부모 브리지의 kiwibox 호출 결과를 여기로 POST하면
+  // 스트림 중 대기 중인 clientToolRequest(callId)가 resolve된다.
+  // 보안: embed opt-in(client_tool_execution) + callId(uuid) + embedUuid/sessionId 일치 검증.
+  app.post(
+    "/embed/:embedId/client-tool-result",
+    [validEmbedConfig],
+    async (request, response) => {
+      try {
+        const embed = response.locals.embedConfig;
+        if (embed.client_tool_execution !== true) {
+          response.sendStatus(403);
+          return;
+        }
+        const { callId, sessionId, ok, status, body } = reqBody(request);
+        if (!callId || !sessionId) {
+          response.sendStatus(400);
+          return;
+        }
+        const matched = ClientToolBroker.resolveResult({
+          callId: String(callId),
+          embedUuid: embed.uuid,
+          sessionId: String(sessionId),
+          result: { ok, status, body },
+        });
+        response.status(matched ? 200 : 404).json({ matched });
+      } catch (e) {
+        console.error(e);
+        response.sendStatus(500);
       }
     }
   );

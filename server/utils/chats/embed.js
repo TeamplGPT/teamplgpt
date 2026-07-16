@@ -9,6 +9,7 @@ const {
 const { DocumentManager } = require("../DocumentManager");
 const { ChatToolsManager } = require("./toolCalling/manager");
 const { toolCallingLoop } = require("./toolCalling/loop");
+const { ClientToolBroker } = require("./toolCalling/clientToolBroker");
 const { performMergedSearch } = require("../vectorSearch/mergeSharedResults");
 const {
   shouldUseHybridSearch,
@@ -201,6 +202,19 @@ async function streamChatWithForEmbed(
     tools = applyAllowedHashes(allTools, embed.allowed_skill_hashes, format);
   }
 
+  // R1 클라이언트 실행 위임 (specs/003): embed 단위 opt-in.
+  // broker가 있으면 skill handler에 clientToolTransport가 주입되어
+  // kiwibox 호출을 부모 브리지(브라우저)로 위임한다.
+  const clientToolBroker =
+    toolsEnabled && embed.client_tool_execution === true
+      ? new ClientToolBroker({
+          response,
+          uuid,
+          embedUuid: embed.uuid,
+          sessionId,
+        })
+      : null;
+
   // Phase 2 초기: console 기반 경량 로거
   // Phase 4 에서 traceLogger 채택 시 동일 인터페이스로 교체 예정
   const loopLogger = {
@@ -216,25 +230,34 @@ async function streamChatWithForEmbed(
       console.warn(`[embed-tool] max rounds ${evt.rounds} reached`),
   };
 
+  let loopResult;
+  try {
+    loopResult = await toolCallingLoop({
+      response,
+      LLMConnector,
+      messages,
+      tools,
+      llmOptions: {
+        temperature: embed.workspace?.openAiTemp ?? LLMConnector.defaultTemp,
+      },
+      uuid,
+      sources: [],
+      logger: loopLogger,
+      caller: "embed",
+      forceToolChoiceRequired: shouldForceToolChoice(
+        embed.allowed_skill_hashes
+      ),
+      toolRuntimeOverrides,
+      clientToolBroker,
+    });
+  } finally {
+    clientToolBroker?.disposeAll();
+  }
   const {
     completeText: finalText,
     metrics: finalMetrics,
     toolTrace,
-  } = await toolCallingLoop({
-    response,
-    LLMConnector,
-    messages,
-    tools,
-    llmOptions: {
-      temperature: embed.workspace?.openAiTemp ?? LLMConnector.defaultTemp,
-    },
-    uuid,
-    sources: [],
-    logger: loopLogger,
-    caller: "embed",
-    forceToolChoiceRequired: shouldForceToolChoice(embed.allowed_skill_hashes),
-    toolRuntimeOverrides,
-  });
+  } = loopResult;
   completeText = finalText;
   metrics = finalMetrics;
 
