@@ -2,136 +2,138 @@
   "active": true,
   "name": "HR 급여 조회",
   "schema": "skill-1.0.0",
-  "version": "1.5.0",
+  "version": "2.2.0",
   "hubId": "hr-salary",
   "author": "teamplgpt",
-  "description": "직원 급여(월급/급여명세서/공제/성과급/보너스/연봉/기본급/호봉/이체계좌 등)를 조회합니다. 사용자가 월급/급여/명세서/공제/보너스/상여/성과급/연봉/기본급/호봉/이체/계좌/비교 등을 물으면 이 skill을 사용하세요. query_type에 따라 선택적 기간 파라미터를 추가할 수 있으며, 언급하지 않으면 생략하세요(서버 기본값 적용). query_type 종류: payslip(급여명세서), deductions(공제항목), compare(월별비교), retroactive(소급급여), annual_total(연간총액), bonus(성과급상여), account(이체계좌), base_amount(기본급연봉), leave_pay_rate(휴직급여율), pay_step(호봉). 종류가 불분명하면 payslip을 사용하세요.",
+  "description": "본인 급여(급여명세서, 공제내역, 실수령 요약, 기간 급여명세, 일용직 급여)를 5240 HR 시스템에서 조회합니다. 항상 대화 중인 본인 기준으로 조회되며 사번은 필요 없습니다. 사용자가 월급/급여/명세서/실수령/공제/원천징수/4대보험/일용직 급여 등을 물으면 이 skill을 사용하세요. 급여명세는 2단계입니다: 먼저 query_type=pay_periods로 해당 월의 지급 건 목록(급여일자+유형)을 조회하고, 그 결과의 코드값(CODE)을 pay_item으로 넘겨 payslip/deductions/payslip_summary/salary_statement 상세를 조회합니다. 일용직(daylabor)은 pay_item 없이 year_month만으로 조회합니다. 이체계좌/성과급/호봉/기본급연봉 정보는 이 skill에서 제공하지 않습니다. 연말정산(공제신고/부양가족 공제/종전근무지)은 hr-year-end-tax skill을 사용하세요.",
   "entrypoint": {
     "file": "handler.js",
     "params": {
-      "emp_no": {
-        "description": "사원번호 (필수). 예: '12345'",
-        "type": "string"
-      },
       "query_type": {
-        "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표에 있는 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 해당 query_type으로 매핑하세요. 매핑표: payslip=급여명세서(월급/급여/명세서/월급얼마), deductions=공제항목(공제/공제내역/원천징수/4대보험), compare=월별비교(비교/지난달비교/월별추이), retroactive=소급급여(소급/추가지급/미지급), annual_total=연간총액(연간/총액/연봉총합), bonus=성과급상여(보너스/상여/상여금/성과급), account=이체계좌(이체/계좌/급여계좌/입금계좌), base_amount=기본급연봉(기본급/연봉/연봉계약), leave_pay_rate=휴직급여율(휴직/휴직급여/지급률), pay_step=호봉(호봉/직급호봉).",
+        "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표에 있는 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 해당 query_type으로 매핑하세요. 매핑표: pay_periods=지급건목록(어떤 급여/지급 내역 목록/급여일 목록 — payslip 계열 조회 전 pay_item을 얻기 위한 선행 단계), payslip=급여명세(월급/급여/명세서/월급얼마/지급항목 — pay_item 필요), deductions=공제내역(공제/공제내역/원천징수/4대보험 — pay_item 필요), payslip_summary=실수령요약(실수령/실수령액/총지급/총공제/차감/합계 — pay_item 필요), salary_statement=기간급여명세(기간 급여/급여 내역/월별 명세 — pay_item 필요), daylabor=일용직급여(일용직/일급/일당 — pay_item 불요). [중요] payslip/deductions/payslip_summary/salary_statement는 pay_item이 있어야 조회됩니다. pay_item을 모르면 먼저 query_type=pay_periods로 목록을 조회한 뒤 그 결과의 CODE 값으로 재요청하세요. 연말정산 관련(공제신고/부양가족 공제/종전근무지)은 이 skill이 아니라 hr-year-end-tax를 사용.",
         "type": "string",
         "enum": [
-          "account",
-          "annual_total",
-          "base_amount",
-          "bonus",
-          "compare",
-          "deductions",
-          "leave_pay_rate",
-          "pay_step",
+          "pay_periods",
           "payslip",
-          "retroactive"
+          "deductions",
+          "payslip_summary",
+          "salary_statement",
+          "daylabor"
         ]
       },
-      "year": {
-        "description": "조회 연도 (선택). [CRITICAL] 절대로 사용자에게 연도를 되묻지 마세요. 연도 없이도 즉시 tool-call을 실행하세요. 연도를 추론해 추가하지도 마세요. 전달 규칙: 사용자가 연도를 명시한 경우에만 'YYYY'(예: '2024') 또는 자연어('작년', '올해') 로 전달하세요. 연도 미명시 시 year 파라미터를 생략하세요—서버가 현재 연도를 자동으로 적용합니다. [재강조] 연도가 사용자 발화에 없으면 되묻지 말고 year를 생략하고 즉시 tool-call하세요. annual_total, bonus에서 사용.",
-        "type": "string"
-      },
       "year_month": {
-        "description": "조회 연월 (선택). [CRITICAL] 절대로 사용자에게 연도를 되묻지 마세요. 연도 없이도 즉시 tool-call을 실행하세요. 연도를 추론하거나 추가하지도 마세요. 전달 규칙: 연도 명시 시 'YYYYMM'(예: '202503') / 'YYYY-MM' / 'YYYY년 M월' 중 하나로 연도 포함. 연도 미명시 시 월만 '3', '02', '2월', '지난달' 등으로 그대로 전달—서버가 현재 연도를 자동으로 붙입니다. [재강조] 연도가 사용자 발화에 없으면 되묻지 말고 월만 즉시 tool-call로 전달하세요. payslip, deductions, retroactive에서 사용. 기간을 언급하지 않으면 생략하세요.",
+        "description": "조회 연월 (선택). [CRITICAL] 절대로 사용자에게 연도나 기간을 되묻지 마세요. 기간 없이도 즉시 tool-call을 실행하세요. 연도를 추론해 추가하지도 마세요. 월 단위 조회이므로 일(day) 정보는 무시됩니다. 전달 규칙: 연도 명시 시 'YYYYMM'(예: '202503') / 'YYYY-MM' / 'YYYY년 M월' 중 하나. 연도 미명시 시 월만 '3', '11', '2월', '지난달' 등으로 그대로 전달—현재 연도가 자동으로 적용됩니다. 미지정 시 생략—이번 달이 자동 적용됩니다. [재강조] 기간이 사용자 발화에 없으면 되묻지 말고 year_month를 생략하고 즉시 tool-call하세요. pay_periods와 daylabor에서 사용(월 기준). payslip 계열은 pay_item으로 지급 건이 특정되므로 year_month 불요.",
         "type": "string"
       },
-      "current_month": {
-        "description": "비교 기준 월 (선택). [CRITICAL] 절대로 연도를 되묻지 마세요. 연도 없이도 즉시 tool-call을 실행하세요. 연도를 추론해 추가하지도 마세요. 전달 규칙: 연도 명시 시 'YYYYMM'(예: '202503') / 'YYYY-MM' / 'YYYY년 M월' 중 하나로 포함. 연도 미명시 시 '3', '02', '이번달', '2월' 등으로 그대로 전달—서버가 현재 연도를 자동으로 붙입니다. [재강조] 연도가 사용자 발화에 없으면 되묻지 말고 월만 즉시 tool-call로 전달하세요. compare에서 사용. 언급하지 않으면 생략하세요.",
+      "pay_item": {
+        "description": "급여 건 코드 (payslip/deductions/payslip_summary/salary_statement에서 필수). [CRITICAL] 이 값을 사용자에게 되묻거나 임의로 추측해 만들지 마세요. 반드시 query_type=pay_periods 조회 결과의 코드값(CODE, 예: '20260625'+급여유형코드)만 사용하세요. pay_item을 모르면 먼저 pay_periods로 해당 월 지급 건 목록을 조회한 뒤, 사용자가 원하는 건(또는 가장 최근 건)의 CODE 값으로 상세를 요청하세요.",
         "type": "string"
-      },
-      "previous_month": {
-        "description": "비교 대상 월 (선택). [CRITICAL] 절대로 연도를 되묻지 마세요. 연도 없이도 즉시 tool-call을 실행하세요. 연도를 추론해 추가하지도 마세요. 전달 규칙: 연도 명시 시 'YYYYMM'(예: '202502') / 'YYYY-MM' / 'YYYY년 M월' 중 하나로 포함. 연도 미명시 시 '1', '02', '지난달', '1월' 등으로 그대로 전달—서버가 현재 연도를 자동으로 붙입니다. [재강조] 연도가 사용자 발화에 없으면 되묻지 말고 월만 즉시 tool-call로 전달하세요. compare에서 사용. 언급하지 않으면 생략하세요.",
-        "type": "string"
-      },
-      "limit": {
-        "description": "조회 건수 (선택). [CRITICAL] 절대로 사용자에게 조회 건수를 되묻지 마세요. 건수 없이도 즉시 tool-call을 실행하세요. 전달 규칙: 사용자가 '최근 5건'/'10개' 등 건수를 명시한 경우에만 숫자로 전달하세요. 미지정 시 limit 파라미터를 생략하세요—서버가 기본값 20을 자동으로 적용합니다. [재강조] 건수가 사용자 발화에 없으면 되묻지 말고 limit을 생략하고 즉시 tool-call하세요. retroactive에서 사용.",
-        "type": "number"
       }
     },
     "required": [
-      "emp_no",
       "query_type"
     ]
   },
   "setup_args": {
-    "HR_API_BASE_URL": {
+    "HR_BASE_URL": {
       "type": "string",
       "required": true,
       "input": {
         "type": "text",
-        "default": "http://kiwibox-hr-api:8000",
-        "placeholder": "http://kiwibox-hr-api:8000",
-        "hint": "HR REST API 서버 주소 (Docker 네트워크 내 서비스명 사용)."
+        "default": "https://ntest.5240.kr",
+        "placeholder": "https://ntest.5240.kr",
+        "hint": "5240 HR 시스템 base URL."
       },
-      "value": "http://kiwibox-hr-api:8000"
+      "value": "https://ntest.5240.kr"
+    },
+    "HR_CONTEXT_PATH": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "(루트 배포는 비움) 예: /kiwibox",
+        "hint": "kiwibox 컨텍스트 경로. ntest.5240.kr 등 루트 배포는 빈 값. /kiwibox 하위 배포면 \"/kiwibox\"."
+      },
+      "value": ""
+    },
+    "HR_SESSION_COOKIE": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "JSESSIONID=ABCDEF0123456789",
+        "hint": "서버 폴백(단일 사용자/테스트)용 5240 HR 세션 쿠키. embed 클라이언트 위임(client_tool_execution) 사용 시 불필요."
+      },
+      "value": ""
+    },
+    "HR_STAFF_ID": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "예: 10001 (STAFF_ID)",
+        "hint": "서버 폴백용 본인 kiwibox 내부 STAFF_ID(세션 ssnStaffId와 동일 값). 사번(STAFF_NO)과 다를 수 있음 — 실측 확인. 클라이언트 위임 모드에서는 브리지가 페이지의 ssnStaffId로 자동 치환하므로 불필요."
+      },
+      "value": ""
+    },
+    "HR_ACTIVE_MENU_CD": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "예: SAL0101",
+        "hint": "권한 게이트(AUTF_SRCH_STAFF_YN)용 메뉴 컨텍스트. 설정 시 조회 전 setSessionActiveTabMenuCd.do를 선호출합니다."
+      },
+      "value": ""
+    },
+    "HR_SAL_APPL_CD": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "급여 프로그램코드(applCd)",
+        "hint": "급여 지급 건 콤보(pay_periods) 필터용 프로그램코드. 빈 값이면 전체 급여유형 반환. 클라이언트 위임 모드에서는 브리지가 페이지 applCd를 주입할 수 있음(실환경 확정 항목)."
+      },
+      "value": ""
     }
   },
   "examples": [
     {
-      "prompt": "급여명세서 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"payslip\"}"
+      "prompt": "이번 달 급여 지급 내역 뭐 있어?",
+      "call": "{\"query_type\": \"pay_periods\"}"
     },
     {
-      "prompt": "연간 급여 총액 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_total\"}"
+      "prompt": "급여명세서 보여줘",
+      "call": "{\"query_type\": \"pay_periods\"}"
     },
     {
-      "prompt": "내 기본급 얼마야?",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"base_amount\"}"
+      "prompt": "그 급여 명세 상세 보여줘",
+      "call": "{\"query_type\": \"payslip\", \"pay_item\": \"20260625NN\"}"
     },
     {
-      "prompt": "공제 항목 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"deductions\"}"
+      "prompt": "그 건 공제내역 알려줘",
+      "call": "{\"query_type\": \"deductions\", \"pay_item\": \"20260625NN\"}"
     },
     {
-      "prompt": "급여 비교해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"compare\"}"
+      "prompt": "그거 실수령액 얼마야?",
+      "call": "{\"query_type\": \"payslip_summary\", \"pay_item\": \"20260625NN\"}"
     },
     {
-      "prompt": "2월 급여명세서 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"payslip\", \"year_month\": \"2월\"}"
+      "prompt": "3월 지급 건 목록",
+      "call": "{\"query_type\": \"pay_periods\", \"year_month\": \"3\"}"
     },
     {
-      "prompt": "지난달 공제항목 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"deductions\", \"year_month\": \"지난달\"}"
+      "prompt": "일용직 급여 내역 알려줘",
+      "call": "{\"query_type\": \"daylabor\"}"
     },
     {
-      "prompt": "3월 공제항목 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"deductions\", \"year_month\": \"3월\"}"
-    },
-    {
-      "prompt": "1월과 2월 급여 비교해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"compare\", \"current_month\": \"2월\", \"previous_month\": \"1월\"}"
-    },
-    {
-      "prompt": "2025년 1월 급여명세서 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"payslip\", \"year_month\": \"202501\"}"
-    },
-    {
-      "prompt": "2024년 12월 공제항목 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"deductions\", \"year_month\": \"202412\"}"
-    },
-    {
-      "prompt": "2024년 연간 급여 총액 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_total\", \"year\": \"2024\"}"
-    },
-    {
-      "prompt": "2025년 3월과 2월 급여 비교해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"compare\", \"current_month\": \"202503\", \"previous_month\": \"202502\"}"
-    },
-    {
-      "prompt": "이번달 월급 얼마야",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"payslip\"}"
-    },
-    {
-      "prompt": "보너스 내역 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"bonus\"}"
-    },
-    {
-      "prompt": "급여 이체 계좌 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"account\"}"
+      "prompt": "지난달 일용직 급여",
+      "call": "{\"query_type\": \"daylabor\", \"year_month\": \"지난달\"}"
     }
   ],
   "imported": true,

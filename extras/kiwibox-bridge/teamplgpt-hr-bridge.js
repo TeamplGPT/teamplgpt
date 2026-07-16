@@ -20,8 +20,13 @@
   var REQUEST_TYPE = "teamplgpt:hr-tool-request";
   var RESULT_TYPE = "teamplgpt:hr-tool-result";
 
-  // hr-attendance + hr-personnel 이 사용하는 kiwibox 경로 전체 (카탈로그 §4.1~4.3, §4.8~4.9)
+  // hr-attendance + hr-personnel + hr-salary 가 사용하는 kiwibox 경로 전체
+  // (카탈로그 §4.1~4.3, §4.5, §4.8~4.9)
   var DEFAULT_ALLOWED_PATHS = [
+    "/CommonCode.do",
+    "/SALPayslipNewMgr.do",
+    "/SALSalaryDtstmnMgr.do",
+    "/SALDaylabMgr.do",
     "/TAAWrkTimeListMgrByDate.do",
     "/TAAWrkTimeStatusMgr.do",
     "/TAADclzWorkSearchCldr.do",
@@ -41,6 +46,12 @@
   // 게이트 스킵/위험 파라미터 값 차단 (카탈로그 §4.5)
   var FORBIDDEN_PARAM_VALUES = { searchType: ["mobile"] };
 
+  // 범용 endpoint(/CommonCode.do)는 queryId 화이트리스트로 제한 — 임의 쿼리 실행 차단.
+  // path → 허용 queryId 목록. 목록에 없는 path는 이 제약을 받지 않음.
+  var QUERY_ID_ALLOWLIST = {
+    "/CommonCode.do": ["getSalYmdTypeCdList", "getSalYmdTypeCdList2"],
+  };
+
   function TeamplGPTHRBridge(config) {
     if (!config || !config.widgetOrigin) {
       throw new Error("TeamplGPTHRBridge: widgetOrigin is required");
@@ -50,8 +61,10 @@
       config.iframe ||
       document.querySelector(config.iframeSelector || "iframe[data-teamplgpt]");
     this.staffId = config.staffId || null; // JSP가 렌더한 본인 사번 (self 치환용)
+    // ntest.5240.kr은 루트 배포(getContextPath()="") → 기본 빈 값.
+    // /kiwibox 하위 배포면 config.contextPath="/kiwibox" 명시.
     this.contextPath =
-      config.contextPath !== undefined ? config.contextPath : "/kiwibox";
+      config.contextPath !== undefined ? config.contextPath : "";
     this.allowedPaths = config.allowedPaths || DEFAULT_ALLOWED_PATHS;
     this.timeoutMs = config.timeoutMs || 20000;
     this._listener = this._onMessage.bind(this);
@@ -92,6 +105,20 @@
         body: "bridge: path not allowed",
       });
       return;
+    }
+
+    // 범용 endpoint queryId 화이트리스트 검사
+    var allowedQueryIds = QUERY_ID_ALLOWLIST[spec.path];
+    if (allowedQueryIds) {
+      var reqQueryId = spec.form ? String(spec.form.queryId || "") : "";
+      if (allowedQueryIds.indexOf(reqQueryId) === -1) {
+        this._reply(callId, {
+          ok: false,
+          status: 0,
+          body: "bridge: queryId not allowed",
+        });
+        return;
+      }
     }
 
     var form = new URLSearchParams();

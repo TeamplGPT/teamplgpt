@@ -1,121 +1,165 @@
 // hr-salary/handler.js
-const { parseErrorMessage } = require("../_shared/parseErrorMessage");
-const { unwrapResponse } = require("../_shared/unwrapResponse");
+// 5240 HR(kiwibox) 조회 — R1 클라이언트 위임 정본 + 서버 폴백 (specs/004 r2·003).
+// 근거 카탈로그: cmmAiAssistantToolEndpoints.md §4.5 + kiwibox SQL 실측.
+//  - 급여명세는 2단계: pay_periods(월→지급건 목록) → searchItem(급여일자+유형 복합키)로 명세 조회.
+//  - searchItem = SAL_YMD(8) + SAL_TYPE_CD, 콤보 getSalYmdTypeCdList2의 CODE 값(체이닝).
+//  - 전 항목 데스크탑 정본(b, 게이트). 계좌 항목 미제공(§7). searchType=mobile 차단.
+//  - 대상 식별자는 LLM 미노출: $SELF_STAFF_ID 마커 → 브리지(ssnStaffId)/HR_STAFF_ID(폴백) 치환.
 const { resolveDateParam } = require("../_shared/dateResolver");
+const {
+  hrFetch,
+  monthRange,
+  SELF_STAFF_ID_MARKER,
+} = require("../_shared/hrSession");
 
+// 1단계: 지급 건 목록(급여일자+유형) — pay_item(searchItem)의 유효값 소스
+const PAY_PERIODS = {
+  path: "/CommonCode.do",
+  cmd: "getCommonNSCodeList",
+  gate: false,
+};
+
+// 2단계: pay_item(=searchItem 복합키) 필요한 명세 endpoint
 const ENDPOINT_MAP = {
-  account:        "/api/v1/salary/account",
-  annual_total:   "/api/v1/salary/annual-total",
-  base_amount:    "/api/v1/salary/base-amount",
-  bonus:          "/api/v1/salary/bonus",
-  compare:        "/api/v1/salary/compare",
-  deductions:     "/api/v1/salary/deductions",
-  leave_pay_rate: "/api/v1/salary/leave-pay-rate",
-  pay_step:       "/api/v1/salary/pay-step",
-  payslip:        "/api/v1/salary/payslip",
-  retroactive:    "/api/v1/salary/retroactive",
+  payslip: {
+    path: "/SALPayslipNewMgr.do", cmd: "getSALPayslipNewMgrList",
+    needsPayItem: true, staffParam: "cmmSearchStaffId", gate: true,
+  },
+  deductions: {
+    path: "/SALPayslipNewMgr.do", cmd: "getSALPayslipNewMgrList2",
+    needsPayItem: true, staffParam: "cmmSearchStaffId", gate: true,
+  },
+  payslip_summary: {
+    path: "/SALPayslipNewMgr.do", cmd: "getSALPayslipNewMgrMap",
+    needsPayItem: true, staffParam: "cmmSearchStaffId", gate: true,
+  },
+  salary_statement: {
+    path: "/SALSalaryDtstmnMgr.do", cmd: "getSALSalaryDtstmnMgrList",
+    needsPayItem: true, staffParam: "cmmSearchStaffId", gate: true,
+  },
+  daylabor: {
+    path: "/SALDaylabMgr.do", cmd: "getSALDaylabMgrList",
+    needsPayItem: false, period: "range", staffParam: "cmmSearchStaffId", gate: true,
+  },
 };
 
 const QUERY_LABELS = {
-  account:        "급여 이체 계좌",
-  annual_total:   "연간 급여 총액",
-  base_amount:    "기본급/연봉 기준금액",
-  bonus:          "성과급/상여금 내역",
-  compare:        "월별 급여 비교",
-  deductions:     "급여 공제 항목",
-  leave_pay_rate: "휴직 시 급여 지급률",
-  pay_step:       "호봉 정보",
-  payslip:        "급여명세서",
-  retroactive:    "소급 급여 내역",
+  pay_periods: "급여 지급 건 목록",
+  payslip: "급여 지급항목 명세",
+  deductions: "급여 공제내역",
+  payslip_summary: "급여 요약(지급/공제/실수령 합계)",
+  salary_statement: "기간 급여명세",
+  daylabor: "일용직 급여 내역",
 };
 
-const PARAMS_MAP = {
-  payslip:        ["year_month"],
-  deductions:     ["year_month"],
-  compare:        ["current_month", "previous_month"],
-  retroactive:    ["year_month", "limit"],
-  annual_total:   ["year"],
-  bonus:          ["year"],
-  account:        [],
-  base_amount:    [],
-  leave_pay_rate: [],
-  pay_step:       [],
-};
-
-const DATE_FORMAT_MAP = {
-  year: "year",
-  year_month: "year_month",
-  current_month: "year_month",
-  previous_month: "year_month",
-};
+const FORBIDDEN_FIXED_VALUES = { searchType: ["mobile"] };
 
 module.exports.runtime = {
-  handler: async function ({ emp_no, query_type, year, year_month, current_month, previous_month, limit }) {
+  handler: async function ({ query_type, year_month, pay_item }) {
     try {
-      if (!emp_no || emp_no.trim() === "") {
-        return "> ⚠️ 사원번호(emp_no)가 필요합니다.";
-      }
-      if (!query_type || !ENDPOINT_MAP[query_type]) {
-        const types = Object.keys(ENDPOINT_MAP).join(", ");
-        return `> ⚠️ query_type이 올바르지 않습니다. 가능한 값: ${types}`;
+      const valid = ["pay_periods", ...Object.keys(ENDPOINT_MAP)];
+      if (!query_type || !valid.includes(query_type)) {
+        return `> ⚠️ query_type이 올바르지 않습니다. 가능한 값: ${valid.join(", ")}`;
       }
 
-      const baseUrl = this.runtimeArgs["HR_API_BASE_URL"] || "http://kiwibox-hr-api:8000";
-      const params = new URLSearchParams({ emp_no: emp_no.trim() });
-      const allOptional = { year, year_month, current_month, previous_month, limit };
-      const validKeys = PARAMS_MAP[query_type] || [];
-      for (const key of validKeys) {
-        let val = allOptional[key];
-        if (DATE_FORMAT_MAP[key]) {
-          val = resolveDateParam(val, DATE_FORMAT_MAP[key]);
-        }
-        if (val !== undefined && val !== null && String(val).trim() !== "") {
-          params.append(key, String(val).trim());
-        }
-      }
-
-      const endpoint = ENDPOINT_MAP[query_type];
-      const url = `${baseUrl}${endpoint}?${params.toString()}`;
+      const ym =
+        resolveDateParam(year_month, "year_month") ||
+        resolveDateParam("이번달", "year_month");
       const label = QUERY_LABELS[query_type];
 
-      this.introspect(`${label} 조회 중 (사번: ${emp_no})...`);
+      // --- 1단계: 지급 건 목록 ---
+      if (query_type === "pay_periods") {
+        const applCd = String(this.runtimeArgs["HR_SAL_APPL_CD"] || "").trim();
+        const form = {
+          cmd: PAY_PERIODS.cmd,
+          queryId: "getSalYmdTypeCdList2",
+          closeChk: "Y",
+          searchYm: ym,
+          staffId: SELF_STAFF_ID_MARKER,
+        };
+        if (applCd) form.applCd = applCd;
 
-      const response = await fetch(url, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        signal: AbortSignal.timeout(10000),
-      });
-
-      if (!response.ok) {
-        return await parseErrorMessage(response, `> ⚠️ HR API 호출 실패 (HTTP ${response.status}).`);
+        this.introspect(`${label} 조회 중...`);
+        const { errorMessage, records, isEmpty } = await hrFetch(this, {
+          path: PAY_PERIODS.path,
+          form,
+          gate: PAY_PERIODS.gate,
+        });
+        if (errorMessage) return errorMessage;
+        if (isEmpty) {
+          return `> ⚠️ **${label}**: 해당 월에 지급된 급여 건이 없습니다.`;
+        }
+        return formatPayPeriods(records);
       }
 
-      const data = await response.json();
-      const { isEmpty, records } = unwrapResponse(data);
+      // --- 2단계: 명세 조회 ---
+      const spec = ENDPOINT_MAP[query_type];
+      const form = {};
+      if (spec.cmd) form.cmd = spec.cmd;
 
+      if (spec.needsPayItem) {
+        const item = String(pay_item || "").trim();
+        if (!item) {
+          return "> ⚠️ 급여 건(pay_item)이 필요합니다. 먼저 query_type=pay_periods로 지급 건 목록을 조회한 뒤, 그 결과의 코드값(CODE)으로 다시 요청하세요.";
+        }
+        form.searchItem = item;
+      } else if (spec.period === "range") {
+        const [sYmd, eYmd] = monthRange(ym);
+        form.searchDateSYmd = sYmd;
+        form.searchDateEYmd = eYmd;
+      }
+
+      if (spec.staffParam) form[spec.staffParam] = SELF_STAFF_ID_MARKER;
+
+      for (const [k, v] of Object.entries(spec.fixed || {})) {
+        if ((FORBIDDEN_FIXED_VALUES[k] || []).includes(v)) continue;
+        form[k] = v;
+      }
+
+      this.introspect(`${label} 조회 중...`);
+      const { errorMessage, records, isEmpty } = await hrFetch(this, {
+        path: spec.path,
+        form,
+        gate: spec.gate,
+      });
+      if (errorMessage) return errorMessage;
       if (isEmpty) {
-        return `> ⚠️ **${label}** 조회 결과가 존재하지 않습니다 (사번: ${emp_no}).`;
+        return `> ⚠️ **${label}** 조회 결과가 존재하지 않습니다.`;
       }
 
       this.introspect(`${label} 조회 완료.`);
-      return formatSalary(records, label, emp_no);
+      return formatSalary(records, label);
     } catch (e) {
       this.logger("Error in hr-salary", e.message);
-      if (e.name === "TimeoutError") return "> ⚠️ HR API 서버 응답 시간이 초과되었습니다.";
       return `> ⚠️ 급여 조회 중 오류가 발생했습니다: ${e.message}`;
     }
   },
 };
 
-function formatSalary(data, label, staffId) {
+function formatPayPeriods(data) {
+  // 콤보 응답: [{ CODE_NM: "2026-06-25 정기급여", CODE: "20260625NN", ... }]
+  const list = Array.isArray(data) ? data : data ? [data] : [];
+  let md = `## HR 급여 - 지급 건 목록\n\n`;
+  if (list.length === 0) return md + "> 지급된 급여 건이 없습니다.";
+  md += "아래 급여 건 중 하나를 선택해 상세를 조회할 수 있습니다.\n\n";
+  md += "| 급여 건 | 코드(pay_item) |\n|---|---|\n";
+  for (const it of list) {
+    const nm = it.CODE_NM ?? it.codeNm ?? it.code_nm ?? "";
+    const code = it.CODE ?? it.code ?? "";
+    md += `| ${nm} | \`${code}\` |\n`;
+  }
+  md += `\n> 총 **${list.length}건**. 특정 건 상세는 query_type=payslip/deductions/payslip_summary/salary_statement + pay_item=코드값.`;
+  return md;
+}
+
+function formatSalary(data, label) {
   const { normalizeData, renderTable, renderSummary } = require("../_shared/formatTable");
   const { rows, summary } = normalizeData(data);
 
-  let md = `## HR 급여 - ${label} (사번: ${staffId})\n\n`;
-
+  let md = `## HR 급여 - ${label}\n\n`;
   if (rows.length === 0) return md + "> 조회된 데이터가 없습니다.";
 
-  md += renderTable(rows, { boldNumbers: true });
+  md += renderTable(rows);
   md += `\n> 총 **${rows.length}건** 조회됨`;
   if (summary) {
     md += `\n${renderSummary(summary)}`;

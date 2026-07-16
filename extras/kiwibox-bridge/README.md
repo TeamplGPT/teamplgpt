@@ -29,16 +29,18 @@ specs/003 R1(클라이언트 실행 위임) 배포 가이드. kiwibox(5240 HR) �
   style="position:fixed;bottom:20px;right:20px;width:400px;height:600px;border:0;z-index:9999;"
   title="AI Assistant"></iframe>
 
-<script src="/kiwibox/common/js/teamplgpt-hr-bridge.js"></script>
+<script src="<%= request.getContextPath() %>/common/js/teamplgpt-hr-bridge.js"></script>
 <script>
   new TeamplGPTHRBridge({
     widgetOrigin: "https://<위젯서버-도메인>",   // postMessage origin 검증용 — 정확히 일치해야 함
-    contextPath: "/kiwibox",                     // kiwibox 컨텍스트 경로
-    staffId: "<%= session.getAttribute("ssnStaffId") %>"  // 본인 사번 — $SELF_STAFF_ID 치환용
+    contextPath: "<%= request.getContextPath() %>",  // 루트 배포(ntest.5240.kr)는 "" — /kiwibox 하위 배포면 "/kiwibox"
+    staffId: "<%= session.getAttribute("ssnStaffId") %>"  // 본인 STAFF_ID — $SELF_STAFF_ID 치환용
   });
 </script>
 ```
 
+- `contextPath`는 `request.getContextPath()`로 렌더 — 배포 형태에 자동 정합. ntest.5240.kr은
+  루트 배포라 `""`, `/kiwibox` 하위 배포면 `"/kiwibox"`가 자동으로 들어간다. **하드코딩 금지.**
 - `teamplgpt-hr-bridge.js`는 이 폴더의 파일을 kiwibox 정적 리소스 경로에 배치.
 - `staffId`에는 반드시 **세션 `ssnStaffId`(kiwibox 내부 STAFF_ID)**를 렌더할 것 —
   사번(STAFF_NO)과 다를 수 있으며, kiwibox SQL이 바인딩하는 값은 STAFF_ID다.
