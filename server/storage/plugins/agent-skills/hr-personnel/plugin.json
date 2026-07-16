@@ -2,33 +2,37 @@
   "active": true,
   "name": "HR 인사기록 조회",
   "schema": "skill-1.0.0",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "hubId": "hr-personnel",
   "author": "teamplgpt",
-  "description": "직원 인사기록(인적사항/현재직위직급/전직경력/연락처/주소/학력/자격증/가족정보/포상/징계/비자 등)을 조회합니다. 사용자가 직위/직급/발령/경력/이전직장/연락처/전화/주소/거주지/학력/학교/자격증/면허/가족/배우자/자녀/포상/상/징계/비자 등 인사기록 관련 항목을 물으면 이 skill을 사용하세요. query_type 종류: address(주소), appointment_current(현재직위직급), career(전직경력), contact(연락처), disciplines(징계이력), education(학력), employment(입사일근속), family(가족정보-인사기록), licenses(자격증), rewards(포상이력), visa(비자정보). 종류가 불분명하면 employment를 사용하세요.",
+  "description": "본인 인사정보(사원증 기본정보, 인사카드 상세, 조직도, 조직원, 할일/미결 건수, 일정 캘린더, 운영자 연락처)를 5240 HR 시스템에서 조회합니다. 사용자가 직위/직급/소속/재직상태/연락처/인사카드/조직도/팀원/부서원/할일/미결/일정/생일 등을 물으면 이 skill을 사용하세요. query_type 종류: profile(사원증 기본정보: 성명/소속/직위/직책/근무유형/재직상태/연락처), profile_detail(인사카드 상세: 학력/경력/자격증 등 인사카드 항목), org_tree(조직도/부서 목록), org_members(특정 조직의 조직원 목록—org_cd 필요), todo_count(할일/미결 결재/알림 건수), schedule_day(일자별 일정/생일자/공휴일), contact_directory(운영자/담당자 연락처). 종류가 불분명하면 profile을 사용하세요. 가족정보/부양가족은 이 skill에서 제공하지 않습니다(개인정보 보호).",
   "entrypoint": {
     "file": "handler.js",
     "params": {
       "emp_no": {
-        "description": "사원번호 (필수). 예: '12345'",
+        "description": "사원번호 (필수). 예: '12345'. 반드시 대화 중인 본인의 사번만 사용하세요. 다른 직원의 사번을 임의로 추측해 넣지 마세요.",
         "type": "string"
       },
       "query_type": {
-        "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표에 있는 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 해당 query_type으로 매핑하세요. 매핑표: address=주소(주소/거주지/자택), appointment_current=현재직위직급(직위/직급/발령/현재직책), career=전직경력(경력/전직/이전직장/전직장-인사기록용이며 연말정산 종전근무지는 hr-year-end-tax.previous_employer 사용), contact=연락처(연락처/전화/휴대폰/이메일), disciplines=징계이력(징계/징계이력/처분), education=학력(학력/학교/졸업), employment=입사일근속(입사일/근속/재직기간), family=가족정보(가족/가족관계/배우자/자녀-인사기록용이며 연말정산 부양가족 공제는 hr-year-end-tax.family 사용), licenses=자격증(자격증/면허/자격), rewards=포상이력(포상/수상/표창), visa=비자정보(비자/체류/외국인).",
+        "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표에 있는 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 해당 query_type으로 매핑하세요. 매핑표: profile=사원증(직위/직급/직책/소속/재직상태/근무유형/내 연락처/내 정보/사원증)—파라미터 불필요, 즉시 tool-call, profile_detail=인사카드상세(인사카드/학력/경력/자격증/포상/징계 등 인사기록 상세)—즉시 tool-call, org_tree=조직도(조직도/부서 목록/조직 구조/팀 목록)—즉시 tool-call, org_members=조직원(팀원/부서원/조직원/구성원—org_cd 필요, 없으면 org_tree 먼저), todo_count=할일건수(할일/미결/미확인 알림/결재 대기 건수)—즉시 tool-call, schedule_day=일정캘린더(일정/생일/생일자/공휴일), contact_directory=운영자연락처(운영자/담당자/관리자 연락처)—즉시 tool-call.",
         "type": "string",
         "enum": [
-          "address",
-          "appointment_current",
-          "career",
-          "contact",
-          "disciplines",
-          "education",
-          "employment",
-          "family",
-          "licenses",
-          "rewards",
-          "visa"
+          "profile",
+          "profile_detail",
+          "org_tree",
+          "org_members",
+          "todo_count",
+          "schedule_day",
+          "contact_directory"
         ]
+      },
+      "year_month": {
+        "description": "조회 연월 (선택). [CRITICAL] 절대로 사용자에게 연도나 기간을 되묻지 마세요. 기간 없이도 즉시 tool-call을 실행하세요. 연도를 추론해 추가하지도 마세요. 전달 규칙: 연도 명시 시 'YYYYMM'(예: '202503') / 'YYYY-MM' / 'YYYY년 M월' 중 하나. 연도 미명시 시 월만 '3', '11', '2월', '지난달' 등으로 그대로 전달—현재 연도가 자동으로 적용됩니다. 미지정 시 생략—이번 달이 자동 적용됩니다. [재강조] 기간이 사용자 발화에 없으면 되묻지 말고 year_month를 생략하고 즉시 tool-call하세요. schedule_day에서만 사용.",
+        "type": "string"
+      },
+      "org_cd": {
+        "description": "조직코드 (org_members에서 필수, org_tree에서 선택). [CRITICAL] 조직코드를 사용자에게 되묻거나 임의로 추측해 만들지 마세요. 반드시 org_tree(조직도) 조회 결과에 포함된 조직코드 값만 사용하세요. 조직코드를 모르면 먼저 query_type=org_tree로 조회한 뒤, 그 결과의 조직코드로 org_members를 호출하세요.",
+        "type": "string"
       }
     },
     "required": [
@@ -37,46 +41,91 @@
     ]
   },
   "setup_args": {
-    "HR_API_BASE_URL": {
+    "HR_BASE_URL": {
       "type": "string",
       "required": true,
       "input": {
         "type": "text",
-        "default": "http://kiwibox-hr-api:8000",
-        "placeholder": "http://kiwibox-hr-api:8000",
-        "hint": "HR REST API 서버 주소 (Docker 네트워크 내 서비스명 사용)."
+        "default": "https://ntest.5240.kr",
+        "placeholder": "https://ntest.5240.kr",
+        "hint": "5240 HR 시스템 base URL."
       },
-      "value": "http://kiwibox-hr-api:8000"
+      "value": "https://ntest.5240.kr"
+    },
+    "HR_CONTEXT_PATH": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "/kiwibox",
+        "placeholder": "/kiwibox",
+        "hint": "kiwibox 컨텍스트 경로. 루트 배포면 빈 값."
+      },
+      "value": "/kiwibox"
+    },
+    "HR_SESSION_COOKIE": {
+      "type": "string",
+      "required": true,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "JSESSIONID=ABCDEF0123456789",
+        "hint": "5240 HR 로그인 세션 쿠키(JSESSIONID). 세션 신원(ssnStaffId)은 서버가 강제 주입하므로 이 세션의 사용자 기준으로 조회됩니다."
+      },
+      "value": ""
+    },
+    "HR_ACTIVE_MENU_CD": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "예: PRC0101",
+        "hint": "권한 게이트(AUTF_SRCH_STAFF_YN)용 메뉴 컨텍스트. 설정 시 profile_detail 조회 전 setSessionActiveTabMenuCd.do를 선호출합니다."
+      },
+      "value": ""
     }
   },
   "examples": [
     {
       "prompt": "내 현재 직위 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"appointment_current\"}"
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"profile\"}"
     },
     {
-      "prompt": "입사일이 언제야?",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"employment\"}"
+      "prompt": "내 사원증 정보 보여줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"profile\"}"
+    },
+    {
+      "prompt": "내 인사카드 상세 조회해줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"profile_detail\"}"
     },
     {
       "prompt": "학력 정보 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"education\"}"
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"profile_detail\"}"
     },
     {
-      "prompt": "보유 자격증 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"licenses\"}"
+      "prompt": "조직도 보여줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"org_tree\"}"
     },
     {
-      "prompt": "현재 직위 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"appointment_current\"}"
+      "prompt": "그 팀 팀원 목록 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"org_members\", \"org_cd\": \"ORG123\"}"
     },
     {
-      "prompt": "보유 자격증 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"licenses\"}"
+      "prompt": "내 할일이랑 미결 결재 몇 건이야?",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"todo_count\"}"
     },
     {
-      "prompt": "가족관계 인사기록 보여줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"family\"}"
+      "prompt": "이번 달 생일자 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"schedule_day\"}"
+    },
+    {
+      "prompt": "3월 공휴일 일정 보여줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"schedule_day\", \"year_month\": \"3\"}"
+    },
+    {
+      "prompt": "시스템 운영자 연락처 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"contact_directory\"}"
     }
   ],
   "imported": true,
