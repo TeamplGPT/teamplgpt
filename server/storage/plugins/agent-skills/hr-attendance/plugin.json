@@ -2,56 +2,34 @@
   "active": true,
   "name": "HR 근태 조회",
   "schema": "skill-1.0.0",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "hubId": "hr-attendance",
   "author": "teamplgpt",
-  "description": "직원 근태(연차, 출퇴근, 휴가, 연장근무, 출장, 주간근무계획/스케줄/일정, 재택 등)를 조회합니다. 사용자가 근무계획/스케줄/일정/연차/출퇴근/휴가/연장/야근/출장/재택 등을 물으면 이 skill을 사용하세요. query_type에 따라 선택적 기간 파라미터를 추가할 수 있으며, 언급하지 않으면 생략하세요(서버 기본값 적용). query_type 종류: annual_leave_balance(연차잔여), timesheet(출퇴근기록), leave_requests(휴가신청), work_plan_weekly(주간근무계획/업무계획/스케줄/일정), overtime(연장근무/야근/OT), timesheet_requests(출퇴근변경신청), substitute_leave(대체휴무), business_trips(출장), annual_leave_plan(연차계획/연차 사용 계획/휴가계획/연차일정), work_type(오늘근무유형/재택). 종류가 불분명하면 annual_leave_balance를 사용하세요.",
+  "description": "직원 근태(연차, 출퇴근, 근무현황, 근무캘린더, 휴가, 연장근무 등)를 5240 HR 시스템에서 조회합니다. 사용자가 연차/출퇴근/근무현황/근무캘린더/휴가/연장/야근/OT 등을 물으면 이 skill을 사용하세요. 조회 기간은 year_month 하나로만 전달하며, 언급하지 않으면 생략하세요(이번 달 자동 적용). query_type 종류: annual_leave_balance(연차 발생/사용/잔여), timesheet(출퇴근기록), work_status(근무현황 요약: 시업/종업·지각/조퇴·승인OT), work_calendar(월 근무캘린더: 근무유형/근무시간/누적시간), leave_requests(본인 휴가신청 상세), vacation_calendar(조직/팀 휴가캘린더), overtime(연장근무 신청 내역), overtime_limit(연장근무 한도/잔여시간). 종류가 불분명하면 annual_leave_balance를 사용하세요.",
   "entrypoint": {
     "file": "handler.js",
     "params": {
       "emp_no": {
-        "description": "사원번호 (필수). 예: '12345'",
+        "description": "사원번호 (필수). 예: '12345'. 반드시 대화 중인 본인의 사번만 사용하세요. 다른 직원의 사번을 임의로 추측해 넣지 마세요.",
         "type": "string"
       },
       "query_type": {
-        "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표에 있는 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 해당 query_type으로 매핑하세요. 매핑표: annual_leave_balance=연차잔여(연차/잔여/남은휴가), timesheet=출퇴근기록(출퇴근/출근/퇴근/근태), leave_requests=휴가신청(휴가신청/신청내역/결재), work_plan_weekly=주간근무계획(업무계획/주간계획/스케줄/일정/계획), overtime=연장근무(연장/야근/OT/초과근무), timesheet_requests=출퇴근변경신청(출퇴근정정/근태변경/정정신청)—기간 파라미터 불필요, 즉시 tool-call, substitute_leave=대체휴무(대체휴무/대휴)—기간 파라미터 불필요, 즉시 tool-call, business_trips=출장내역(출장/출장내역)—기간 파라미터 불필요, 즉시 tool-call, annual_leave_plan=연차계획(연차계획/연차 계획/연차 사용 계획/휴가계획/휴가 계획/연차일정/연차 일정)—기간 파라미터 불필요, 즉시 tool-call, work_type=오늘근무유형(근무유형/재택/출근유형/오늘근무).",
+        "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표에 있는 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 해당 query_type으로 매핑하세요. 매핑표: annual_leave_balance=연차잔여(연차/잔여/남은휴가/연차현황)—기간 파라미터 불필요, 즉시 tool-call, timesheet=출퇴근기록(출퇴근/출근/퇴근/근태기록), work_status=근무현황(근무현황/근무요약/지각/조퇴/외출), work_calendar=근무캘린더(근무캘린더/월간근무/근무표/근무시간 누적), leave_requests=휴가신청상세(휴가신청/신청내역/내 휴가)—기간 파라미터 불필요, 즉시 tool-call, vacation_calendar=조직휴가캘린더(팀 휴가/부서 휴가/조직 휴가/휴가자 현황), overtime=연장근무(연장/야근/OT/초과근무 신청/내역), overtime_limit=연장한도(OT 한도/잔여 OT/연장 가능 시간).",
         "type": "string",
         "enum": [
           "annual_leave_balance",
-          "annual_leave_plan",
-          "business_trips",
-          "leave_requests",
-          "overtime",
-          "substitute_leave",
           "timesheet",
-          "timesheet_requests",
-          "work_plan_weekly",
-          "work_type"
+          "work_status",
+          "work_calendar",
+          "leave_requests",
+          "vacation_calendar",
+          "overtime",
+          "overtime_limit"
         ]
       },
-      "year": {
-        "description": "조회 연도 (선택). [CRITICAL] 절대로 사용자에게 연도를 되묻지 마세요. 연도 없이도 즉시 tool-call을 실행하세요. 연도를 추론해 추가하지도 마세요. 전달 규칙: 사용자가 연도를 명시한 경우에만 'YYYY'(예: '2024') 또는 자연어('작년', '올해') 로 전달하세요. 연도 미명시 시 year 파라미터를 생략하세요—서버가 현재 연도를 자동으로 적용합니다. [재강조] 연도가 사용자 발화에 없으면 되묻지 말고 year를 생략하고 즉시 tool-call하세요. annual_leave_balance에서 사용.",
-        "type": "string"
-      },
       "year_month": {
-        "description": "조회 연월 (선택). [CRITICAL] 절대로 사용자에게 연도를 되묻지 마세요. 연도 없이도 즉시 tool-call을 실행하세요. 연도를 추론해 추가하지도 마세요. 월 단위 조회이므로 일(day) 정보는 무시됩니다(사용자가 '2월 27일'이라 해도 월만 전달). 전달 규칙: 연도 명시 시 'YYYYMM'(예: '202503') / 'YYYY-MM' / 'YYYY년 M월' 중 하나. 연도 미명시 시 월만 '3', '11', '2월', '지난달' 등으로 그대로 전달—서버가 현재 연도를 자동으로 붙입니다. [재강조] 연도가 사용자 발화에 없으면 되묻지 말고 월만 즉시 tool-call로 전달하세요. timesheet, overtime에서 사용. 기간을 언급하지 않으면 생략하세요.",
+        "description": "조회 연월 (선택). [CRITICAL] 절대로 사용자에게 연도나 기간을 되묻지 마세요. 기간 없이도 즉시 tool-call을 실행하세요. 연도를 추론해 추가하지도 마세요. 월 단위 조회이므로 일(day) 정보는 무시됩니다(사용자가 '2월 27일'이라 해도 월만 전달). 전달 규칙: 연도 명시 시 'YYYYMM'(예: '202503') / 'YYYY-MM' / 'YYYY년 M월' 중 하나. 연도 미명시 시 월만 '3', '11', '2월', '지난달' 등으로 그대로 전달—현재 연도가 자동으로 적용됩니다. 미지정 시 생략—이번 달이 자동 적용됩니다. [재강조] 기간이 사용자 발화에 없으면 되묻지 말고 year_month를 생략하고 즉시 tool-call하세요. timesheet, work_status, work_calendar, vacation_calendar, overtime, overtime_limit에서 사용.",
         "type": "string"
-      },
-      "months": {
-        "description": "조회 개월 수 (선택). [CRITICAL] 절대로 사용자에게 조회 개월 수를 되묻지 마세요. 기간 없이도 즉시 tool-call을 실행하세요. 전달 규칙: 사용자가 '지난 3개월'/'최근 6개월' 등 개월 수를 명시한 경우에만 숫자로 전달하세요(예: '3', '6', '12'). 미지정 시 months 파라미터를 생략하세요—서버가 기본값 6을 자동으로 적용합니다. [재강조] 개월 수가 사용자 발화에 없으면 되묻지 말고 months를 생략하고 즉시 tool-call하세요. leave_requests에서 사용.",
-        "type": "number"
-      },
-      "status": {
-        "description": "승인상태 필터 (선택). [CRITICAL] 절대로 사용자에게 승인상태를 되묻지 마세요. 상태 없이도 즉시 tool-call을 실행하세요. 전달 규칙: 사용자가 '결재요청'/'결재완료'/'반려'/'임시저장' 등 상태를 명시한 경우에만 코드로 전달(10=임시저장, 20=결재요청, 30=결재완료, 40=반려). 미지정 시 status 파라미터를 생략하세요—서버가 전체 조회합니다. [재강조] 상태가 사용자 발화에 없으면 되묻지 말고 status를 생략하고 즉시 tool-call하세요. leave_requests에서 사용.",
-        "type": "string"
-      },
-      "base_date": {
-        "description": "기준일 (선택). [CRITICAL] 절대로 사용자에게 연도를 되묻지 마세요. 연도 없이도 즉시 tool-call을 실행하세요. 연도를 추론해 추가하지도 마세요. 전달 규칙: 연도 명시 시 'YYYYMMDD'(예: '20250315') / 'YYYY-MM-DD' / 'YYYY년 M월 D일' 중 하나. 연도 미명시 시 '27', '0227', '어제', '2월 27일' 등으로 그대로 전달—서버가 현재 연월을 자동으로 붙입니다. [재강조] 연도가 사용자 발화에 없으면 되묻지 말고 그대로 즉시 tool-call로 전달하세요. work_plan_weekly에서 사용. 날짜를 언급하지 않으면 생략하세요.",
-        "type": "string"
-      },
-      "limit": {
-        "description": "조회 건수 (선택). [CRITICAL] 절대로 사용자에게 조회 건수나 기간을 되묻지 마세요. 건수 없이도 즉시 tool-call을 실행하세요. 이 파라미터를 쓰는 query_type은 period(year/year_month)가 필요 없습니다—period를 되묻지 마세요. 전달 규칙: 사용자가 '최근 5건'/'10개' 등 건수를 명시한 경우에만 숫자로 전달하세요. 미지정 시 limit 파라미터를 생략하세요—서버가 기본값 10을 자동으로 적용합니다. [재강조] 건수가 사용자 발화에 없으면 되묻지 말고 limit을 생략하고 즉시 tool-call하세요. timesheet_requests, substitute_leave, business_trips에서 사용.",
-        "type": "number"
       }
     },
     "required": [
@@ -60,21 +38,54 @@
     ]
   },
   "setup_args": {
-    "HR_API_BASE_URL": {
+    "HR_BASE_URL": {
       "type": "string",
       "required": true,
       "input": {
         "type": "text",
-        "default": "http://kiwibox-hr-api:8000",
-        "placeholder": "http://kiwibox-hr-api:8000",
-        "hint": "HR REST API 서버 주소 (Docker 네트워크 내 서비스명 사용)."
+        "default": "https://ntest.5240.kr",
+        "placeholder": "https://ntest.5240.kr",
+        "hint": "5240 HR 시스템 base URL."
       },
-      "value": "http://kiwibox-hr-api:8000"
+      "value": "https://ntest.5240.kr"
+    },
+    "HR_CONTEXT_PATH": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "/kiwibox",
+        "placeholder": "/kiwibox",
+        "hint": "kiwibox 컨텍스트 경로. 루트 배포면 빈 값."
+      },
+      "value": "/kiwibox"
+    },
+    "HR_SESSION_COOKIE": {
+      "type": "string",
+      "required": true,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "JSESSIONID=ABCDEF0123456789",
+        "hint": "5240 HR 로그인 세션 쿠키(JSESSIONID). 세션 신원(ssnStaffId)은 서버가 강제 주입하므로 이 세션의 사용자 기준으로 조회됩니다."
+      },
+      "value": ""
+    },
+    "HR_ACTIVE_MENU_CD": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "예: TAA0101",
+        "hint": "권한 게이트(AUTF_SRCH_STAFF_YN)용 메뉴 컨텍스트. 설정 시 조회 전 setSessionActiveTabMenuCd.do를 선호출합니다."
+      },
+      "value": ""
     }
   },
   "examples": [
     {
-      "prompt": "이번 달 연차 잔여일 알려줘",
+      "prompt": "연차 잔여일 알려줘",
       "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_leave_balance\"}"
     },
     {
@@ -82,20 +93,28 @@
       "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet\"}"
     },
     {
+      "prompt": "이번 달 근무현황 요약해줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"work_status\"}"
+    },
+    {
+      "prompt": "이번 달 근무캘린더 보여줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"work_calendar\"}"
+    },
+    {
+      "prompt": "내 휴가 신청 내역 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"leave_requests\"}"
+    },
+    {
+      "prompt": "우리 팀 휴가자 현황 보여줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"vacation_calendar\"}"
+    },
+    {
       "prompt": "연장근무 내역 보여줘",
       "call": "{\"emp_no\": \"12345\", \"query_type\": \"overtime\"}"
     },
     {
-      "prompt": "오늘 근무 유형 뭐야",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"work_type\"}"
-    },
-    {
-      "prompt": "휴가 신청 목록 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"leave_requests\"}"
-    },
-    {
-      "prompt": "승인된 휴가 신청 목록",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"leave_requests\", \"status\": \"30\"}"
+      "prompt": "이번 달 남은 OT 시간 알려줘",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"overtime_limit\"}"
     },
     {
       "prompt": "2월 출퇴근 기록 조회해줘",
@@ -106,24 +125,8 @@
       "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet\", \"year_month\": \"2\"}"
     },
     {
-      "prompt": "3월 출퇴근 기록",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet\", \"year_month\": \"3\"}"
-    },
-    {
-      "prompt": "2월 연장근무 내역 보여줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"overtime\", \"year_month\": \"2\"}"
-    },
-    {
       "prompt": "지난달 출퇴근 기록",
       "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet\", \"year_month\": \"지난달\"}"
-    },
-    {
-      "prompt": "어제 근무계획 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"work_plan_weekly\", \"base_date\": \"어제\"}"
-    },
-    {
-      "prompt": "2024년 연차 잔여일 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_leave_balance\", \"year\": \"2024\"}"
     },
     {
       "prompt": "2025년 1월 출퇴근 기록 조회해줘",
@@ -134,40 +137,8 @@
       "call": "{\"emp_no\": \"12345\", \"query_type\": \"overtime\", \"year_month\": \"202412\"}"
     },
     {
-      "prompt": "2025년 3월 15일 근무계획 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"work_plan_weekly\", \"base_date\": \"20250315\"}"
-    },
-    {
-      "prompt": "이번주 업무계획 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"work_plan_weekly\", \"base_date\": \"이번주\"}"
-    },
-    {
-      "prompt": "다음주 스케줄 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"work_plan_weekly\", \"base_date\": \"다음주\"}"
-    },
-    {
-      "prompt": "이번주 일정 보여줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"work_plan_weekly\", \"base_date\": \"이번주\"}"
-    },
-    {
-      "prompt": "출퇴근 정정 신청 내역 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet_requests\"}"
-    },
-    {
-      "prompt": "근태 변경 신청 목록 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"timesheet_requests\"}"
-    },
-    {
-      "prompt": "연차 사용 계획 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_leave_plan\"}"
-    },
-    {
-      "prompt": "연차일정 보여줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_leave_plan\"}"
-    },
-    {
-      "prompt": "휴가계획 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"annual_leave_plan\"}"
+      "prompt": "3월 근무캘린더",
+      "call": "{\"emp_no\": \"12345\", \"query_type\": \"work_calendar\", \"year_month\": \"3\"}"
     }
   ],
   "imported": true,

@@ -1,55 +1,85 @@
 // hr-attendance/handler.js
-const { parseErrorMessage } = require("../_shared/parseErrorMessage");
-const { unwrapResponse } = require("../_shared/unwrapResponse");
+// 5240 HR(kiwibox) 직접 호출 버전.
+// 근거 카탈로그: kiwibox_eGov4.2/spec-docs/SYS/CMM/cmmAiAssistantToolEndpoints.md
+//  - 데스크탑 정본(b, AUTF_SRCH_STAFF_YN 게이트) 우선. 휴가만 모바일 self(a) 정본.
+//  - c 범위(searchId)는 handler가 emp_no로 self 강제 — LLM에 별도 사번 파라미터 미노출.
+//  - 인증: JSESSIONID 쿠키 pass-through (계층1 세션 파라미터는 서버가 자동 주입).
 const { resolveDateParam } = require("../_shared/dateResolver");
 
+// period: "range"=searchBaseSYmd/EYmd, "range-alt"=searchSYmd/EYmd, "ym"=searchYm, "none"
+// staffParam: b 범위 cmmSearchStaffId / c 범위 searchId (self 강제) / a 범위 없음(세션 신원)
 const ENDPOINT_MAP = {
-  annual_leave_balance: "/api/v1/attendance/annual-leave/balance",
-  annual_leave_plan:    "/api/v1/attendance/annual-leave/plan",
-  business_trips:       "/api/v1/attendance/business-trips",
-  leave_requests:       "/api/v1/attendance/leave-requests",
-  overtime:             "/api/v1/attendance/overtime",
-  substitute_leave:     "/api/v1/attendance/substitute-leave",
-  timesheet:            "/api/v1/attendance/timesheet",
-  timesheet_requests:   "/api/v1/attendance/timesheet-requests",
-  work_plan_weekly:     "/api/v1/attendance/work-plan/weekly",
-  work_type:            "/api/v1/attendance/work-type",
+  timesheet: {
+    path: "/TAAWrkTimeListMgrByDate.do", cmd: "getTAAWrkTimeListMgrByDateList",
+    period: "range", staffParam: "cmmSearchStaffId",
+  },
+  work_status: {
+    path: "/TAAWrkTimeStatusMgr.do", cmd: "getTAAWrkTimeStatusMgrList",
+    period: "range", staffParam: "cmmSearchStaffId",
+  },
+  work_calendar: {
+    path: "/TAADclzWorkSearchCldr.do", cmd: "getTAADclzWorkSearchCldr",
+    period: "ym", staffParam: "searchId", // 범위 c — self 강제 필수 (카탈로그 §4.1)
+  },
+  overtime: {
+    path: "/TAADclzWorkOtSchdul.do", cmd: "getTAADclzWorkOtSchdulList2",
+    period: "range", staffParam: "cmmSearchStaffId", fixed: { searchType: "3" },
+  },
+  overtime_limit: {
+    path: "/TAADclzWorkOtSchdul.do", cmd: "getTAADclzWorkOtSchdulList",
+    period: "range", staffParam: "cmmSearchStaffId", fixed: { searchType: "3" },
+  },
+  leave_requests: {
+    path: "/getMBLLeavDetailStaff.do", // 범위 a — 순수 self, ssnStaffId 고정 (카탈로그 §4.3)
+    period: "none", staffParam: null,
+  },
+  annual_leave_balance: {
+    path: "/getMBLHomeLeaveDetail.do", // 범위 a — searchType=1 고정으로 소속 경로 차단
+    period: "none", staffParam: null, fixed: { searchType: "1" },
+  },
+  vacation_calendar: {
+    path: "/TAADclzVcatnCldrMgr.do", cmd: "getTAADclzVcatnCldrMgr",
+    period: "range-alt", staffParam: null, // 조직 휴가캘린더(b) — 본인 외 사유 마스킹은 서버 처리
+  },
 };
 
 const QUERY_LABELS = {
-  annual_leave_balance: "연차 잔여일수",
-  annual_leave_plan:    "연차사용계획",
-  business_trips:       "출장 신청 내역",
-  leave_requests:       "휴가 신청 목록",
-  overtime:             "연장근무(OT) 내역",
-  substitute_leave:     "대체휴무 신청",
-  timesheet:            "출퇴근 기록",
-  timesheet_requests:   "출퇴근 변경신청 내역",
-  work_plan_weekly:     "주간 근무계획",
-  work_type:            "오늘의 근무유형",
+  timesheet: "출퇴근 기록",
+  work_status: "근무현황 요약",
+  work_calendar: "월 근무캘린더",
+  overtime: "연장근무(OT) 신청 내역",
+  overtime_limit: "연장근무(OT) 한도/잔여",
+  leave_requests: "본인 휴가신청 상세",
+  annual_leave_balance: "연차 발생/사용/잔여",
+  vacation_calendar: "조직 휴가캘린더",
 };
 
-const PARAMS_MAP = {
-  annual_leave_balance: ["year"],
-  annual_leave_plan:    [],
-  business_trips:       ["limit"],
-  leave_requests:       ["months", "status"],
-  overtime:             ["year_month"],
-  substitute_leave:     ["limit"],
-  timesheet:            ["year_month"],
-  timesheet_requests:   ["limit"],
-  work_plan_weekly:     ["base_date"],
-  work_type:            [],
-};
+// 게이트 스킵 파라미터 주입 금지 (카탈로그 §4.5 searchType=mobile 게이트 스킵 사례 방어)
+const FORBIDDEN_FIXED_VALUES = { searchType: ["mobile"] };
 
-const DATE_FORMAT_MAP = {
-  year: "year",
-  year_month: "year_month",
-  base_date: "base_date",
-};
+function monthRange(ym) {
+  // ym: "YYYYMM" -> [YYYYMM01, YYYYMM<말일>]
+  const y = Number(ym.slice(0, 4));
+  const m = Number(ym.slice(4, 6));
+  const lastDay = new Date(y, m, 0).getDate();
+  return [`${ym}01`, `${ym}${String(lastDay).padStart(2, "0")}`];
+}
+
+function normalizeCookie(raw) {
+  const v = String(raw || "").trim();
+  if (!v) return "";
+  return v.includes("=") ? v : `JSESSIONID=${v}`;
+}
+
+function isHtmlOrLogin(response, bodyText) {
+  const ct = response.headers.get("content-type") || "";
+  if (ct.includes("text/html")) return true;
+  if (/login|\.jsp/i.test(response.url || "")) return true;
+  return typeof bodyText === "string" && /^\s*</.test(bodyText);
+}
 
 module.exports.runtime = {
-  handler: async function ({ emp_no, query_type, year, year_month, months, status, base_date, limit }) {
+  handler: async function ({ emp_no, query_type, year_month }) {
     try {
       if (!emp_no || emp_no.trim() === "") {
         return "> ⚠️ 사원번호(emp_no)가 필요합니다.";
@@ -59,48 +89,104 @@ module.exports.runtime = {
         return `> ⚠️ query_type이 올바르지 않습니다. 가능한 값: ${types}`;
       }
 
-      const baseUrl = this.runtimeArgs["HR_API_BASE_URL"] || "http://kiwibox-hr-api:8000";
-      const params = new URLSearchParams({ emp_no: emp_no.trim() });
-      const allOptional = { year, year_month, months, status, base_date, limit };
-      const validKeys = PARAMS_MAP[query_type] || [];
-      for (const key of validKeys) {
-        let val = allOptional[key];
-        if (DATE_FORMAT_MAP[key]) {
-          val = resolveDateParam(val, DATE_FORMAT_MAP[key]);
-        }
-        if (val !== undefined && val !== null && String(val).trim() !== "") {
-          params.append(key, String(val).trim());
+      const baseUrl = String(
+        this.runtimeArgs["HR_BASE_URL"] || "https://ntest.5240.kr"
+      ).replace(/\/+$/, "");
+      const contextPath = String(
+        this.runtimeArgs["HR_CONTEXT_PATH"] ?? "/kiwibox"
+      ).replace(/\/+$/, "");
+      const cookie = normalizeCookie(this.runtimeArgs["HR_SESSION_COOKIE"]);
+      if (!cookie) {
+        return "> ⚠️ HR 세션(HR_SESSION_COOKIE)이 설정되지 않았습니다. 5240 HR 로그인 세션(JSESSIONID)을 skill 설정에 등록하세요.";
+      }
+      const activeMenuCd = String(this.runtimeArgs["HR_ACTIVE_MENU_CD"] || "").trim();
+
+      const spec = ENDPOINT_MAP[query_type];
+      const label = QUERY_LABELS[query_type];
+      const staffId = emp_no.trim();
+
+      // 계층2 조회조건: LLM은 year_month 하나만 — endpoint별 kiwibox 파라미터로 변환
+      const form = new URLSearchParams();
+      if (spec.cmd) form.append("cmd", spec.cmd);
+      const ym =
+        resolveDateParam(year_month, "year_month") ||
+        resolveDateParam("이번달", "year_month");
+      if (spec.period === "ym") {
+        form.append("searchYm", ym);
+      } else if (spec.period === "range" || spec.period === "range-alt") {
+        const [sYmd, eYmd] = monthRange(ym);
+        if (spec.period === "range") {
+          form.append("searchBaseSYmd", sYmd);
+          form.append("searchBaseEYmd", eYmd);
+        } else {
+          form.append("searchSYmd", sYmd);
+          form.append("searchEYmd", eYmd);
         }
       }
 
-      const endpoint = ENDPOINT_MAP[query_type];
-      const url = `${baseUrl}${endpoint}?${params.toString()}`;
-      const label = QUERY_LABELS[query_type];
+      // 대상 사번: self 강제 — LLM 노출 파라미터는 emp_no뿐, kiwibox 사번 파라미터는 handler가 주입
+      if (spec.staffParam) form.append(spec.staffParam, staffId);
 
-      this.introspect(`${label} 조회 중 (사번: ${emp_no})...`);
+      // endpoint 고정 파라미터 (게이트 스킵 값 방어)
+      for (const [k, v] of Object.entries(spec.fixed || {})) {
+        if ((FORBIDDEN_FIXED_VALUES[k] || []).includes(v)) continue;
+        form.append(k, v);
+      }
+
+      const headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Cookie: cookie,
+      };
+
+      // b 범위 게이트는 세션 activeMenuCd 기준(카탈로그 §1.2/§8) — 설정 시 메뉴 컨텍스트 선세팅
+      if (activeMenuCd && spec.staffParam) {
+        await fetch(
+          `${baseUrl}${contextPath}/setSessionActiveTabMenuCd.do?tabMenuCd=${encodeURIComponent(activeMenuCd)}`,
+          { method: "GET", headers, signal: AbortSignal.timeout(5000) }
+        ).catch(() => {});
+      }
+
+      const url = `${baseUrl}${contextPath}${spec.path}`;
+      this.introspect(`${label} 조회 중 (사번: ${staffId})...`);
 
       const response = await fetch(url, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        headers,
+        body: form.toString(),
         signal: AbortSignal.timeout(10000),
       });
 
+      const bodyText = await response.text();
+      if (isHtmlOrLogin(response, bodyText)) {
+        return "> ⚠️ HR 세션이 만료되었거나 로그인 페이지로 이동되었습니다. HR_SESSION_COOKIE(JSESSIONID)를 갱신하세요.";
+      }
       if (!response.ok) {
-        return await parseErrorMessage(response, `> ⚠️ HR API 호출 실패 (HTTP ${response.status}).`);
+        return `> ⚠️ HR 시스템 호출 실패 (HTTP ${response.status}).`;
       }
 
-      const data = await response.json();
-      const { isEmpty, records } = unwrapResponse(data);
+      let data;
+      try {
+        data = JSON.parse(bodyText);
+      } catch {
+        return "> ⚠️ HR 시스템 응답을 해석할 수 없습니다 (JSON 아님). 세션 상태를 확인하세요.";
+      }
 
+      // kiwibox jsonView: { result: [...] } 또는 { result: {...} }
+      const records = data && "result" in data ? data.result : data;
+      const isEmpty =
+        records === null ||
+        records === undefined ||
+        (Array.isArray(records) && records.length === 0) ||
+        (typeof records === "object" && !Array.isArray(records) && Object.keys(records).length === 0);
       if (isEmpty) {
-        return `> ⚠️ **${label}** 조회 결과가 존재하지 않습니다 (사번: ${emp_no}).`;
+        return `> ⚠️ **${label}** 조회 결과가 존재하지 않습니다 (사번: ${staffId}).`;
       }
 
       this.introspect(`${label} 조회 완료.`);
-      return formatAttendance(records, label, emp_no);
+      return formatAttendance(records, label, staffId);
     } catch (e) {
       this.logger("Error in hr-attendance", e.message);
-      if (e.name === "TimeoutError") return "> ⚠️ HR API 서버 응답 시간이 초과되었습니다.";
+      if (e.name === "TimeoutError") return "> ⚠️ HR 시스템 응답 시간이 초과되었습니다.";
       return `> ⚠️ 근태 조회 중 오류가 발생했습니다: ${e.message}`;
     }
   },
