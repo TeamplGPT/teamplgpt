@@ -8,18 +8,21 @@ AGENTS.md는 이 파일과 동일 내용(멀티-agent tool 표준 준수).
 작업 시작 전 유형 판정:
 
 1. **버그/회귀** → `superpowers:systematic-debugging` 먼저 → 수정 → 관련 E2E 재실행. 스펙 생략.
-2. **HR skill description·파라미터 변경** → `docs/conventions/hr-skill-description-pattern.md` §6 절차 → 시나리오 append → E2E tier 전건 PASS. 스펙 생략 가능.
+2. **HR skill description·파라미터 변경 (문구·매핑 조정에 한함)** → `docs/conventions/hr-skill-description-pattern.md` §6 절차 → 시나리오 append → E2E tier 전건 PASS. 스펙 생략 가능. 단 파라미터 계약 구조 변경·통합 대상 교체는 5번 스펙 경로.
 3. **소규모 수정 (≤3파일)** → 직접 수정 → 실동작 검증. 스펙 생략.
 4. **성능 개선** → 측정 → 수정 → 수치 확인.
 5. **신규 기능 (다중 파일 / 신규 화면 / API·스키마 변경 / 신규 agent-skill)** →
-   `superpowers:brainstorming` → `/speckit-specify` → `/speckit-plan` → `/speckit-tasks` → `/speckit-implement`
+   `superpowers:brainstorming` → `/speckit-specify` → **사용자 승인** → `/speckit-plan` → `/speckit-tasks` → **사용자 승인** → `/speckit-implement`
 6. **대형/불명확 기능** → 5번 + `/speckit-clarify`(plan 전) + `/speckit-analyze`(implement 전).
 7. **업스트림 동기화** → upstream-master 경유 머지 → fork 커스텀 회귀 확인. 스펙 생략.
 
 스펙 생략 경로에서 범위가 3파일 초과, API 변경, 3-Mode 횡단으로 커지면 → 중단, 5번으로 전환.
+**파일 수와 무관한 스펙 경로 트리거**: 외부 시스템 통합 추가·교체 / 파라미터 계약(entrypoint.params 등 인터페이스 스키마) 구조 변경 / 인증 방식 변경.
 
 ## 필수 규칙
 
+- **라우팅 선언**: 작업 착수 첫 응답에 적용 트랙(위 1~7)과 판정 근거를 한 줄로 명시.
+- **단계별 승인 게이트 (풀 게이트)**: 스펙 경로 산출물은 단계마다 사용자 승인 후 진행 — spec 승인 전 plan 금지, plan/tasks 승인 전 구현 금지. 설계 결정(제거·통합·보류)은 spec 결정표로 승인받는다.
 - **E2E-First**: LLM 행태 변경은 코드 전에 시나리오 append → FAIL 확인 → 수정 → 전건 PASS. 빌드 통과 ≠ 완료.
 - **handler.js 무수정 원칙**: HR skill LLM 제어는 `plugin.json` description으로.
 - **Multi-Layer Defense**: L1 description 가드 + L2 코드 가드 + L3 E2E 시나리오. 한 층만으로 완료 보고 금지.

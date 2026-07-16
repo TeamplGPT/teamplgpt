@@ -20,7 +20,15 @@ CLAUDE.md / AGENTS.md는 이 헌장의 요약 + 라우팅 진입점이다.
 버그 수정·3파일 이하 소규모 변경은 스펙 없이 진행한다.
 다중 파일 / 신규 화면 / API·스키마 변경 / server·frontend·embed 횡단 기능은
 spec-kit 경로(specify → plan → tasks → implement)를 통과해야 한다.
-스펙 생략 경로에서 범위가 3파일 초과, API 변경, 3-Mode 횡단으로 커지면 중단하고 스펙 경로로 전환한다.
+
+**파일 수와 무관한 스펙 경로 트리거** (계약 변경은 파일이 적어도 크다):
+
+- 외부 시스템 통합 추가·교체 (호출 대상 백엔드/프로토콜 변경 포함)
+- 파라미터 계약 구조 변경 (`entrypoint.params` 등 인터페이스 스키마의 추가·삭제·의미 변경)
+- 인증 방식 변경 (무인증 ↔ 세션/토큰, 자격증명 전달 경로 변경)
+
+스펙 생략 경로에서 범위가 3파일 초과, API 변경, 3-Mode 횡단, 또는 위 트리거에
+해당하게 커지면 중단하고 스펙 경로로 전환한다.
 
 ### III. 시나리오 우선 검증 — E2E-First (NON-NEGOTIABLE)
 
@@ -64,7 +72,7 @@ UI 문자열은 ko/en locale 동시 반영. 문자열 가공 유틸(sentenceCase
 | 작업 유형 | 워크플로우 |
 |---|---|
 | 버그/회귀 (`fix`) | superpowers:systematic-debugging → 수정 → 관련 E2E 재실행(전건 PASS) → 실동작 검증. 스펙 생략 |
-| HR skill description·파라미터 변경 | Convention doc §6 절차 필수 → 시나리오 append → E2E tier 전건 PASS. 스펙 생략 가능 |
+| HR skill description·파라미터 변경 (문구·매핑 조정에 한함) | Convention doc §6 절차 필수 → 시나리오 append → E2E tier 전건 PASS. 스펙 생략 가능. 단 파라미터 계약 구조 변경·통합 대상 교체는 §II 트리거 → 스펙 경로 |
 | 소규모 수정 (≤3파일, `style`/`chore`/단순 `feat`) | 직접 수정 → 실동작 검증. 스펙 생략 |
 | 성능 개선 (`perf`) | 측정 먼저(재현·계측) → 수정 → 개선 수치 확인 |
 | 신규 기능 (다중 파일 / 신규 화면 / API·스키마 변경 / 신규 agent-skill) | superpowers:brainstorming → /speckit-specify → /speckit-plan → /speckit-tasks → /speckit-implement |
@@ -84,6 +92,13 @@ UI 문자열은 ko/en locale 동시 반영. 문자열 가공 유틸(sentenceCase
 4. **plan 단계 필수 체크**: 3-Mode 영향(§V), 업스트림 발산(§I), Convention doc 적용 여부,
    E2E 시나리오 목록을 plan.md에 명시한다.
 5. **에스컬레이션**: 스펙 생략 경로에서 §II 임계 초과 시 중단하고 스펙 경로로 전환.
+6. **라우팅 선언 의무**: 모든 작업 착수 시 첫 응답에 적용 트랙(라우팅 표 행)과
+   판정 근거를 한 줄로 명시한다. 판정 자체를 산출물로 만들어 오분류를 드러낸다.
+7. **단계별 승인 게이트 (풀 게이트, NON-NEGOTIABLE)**: 스펙 경로에서 각 단계 산출물은
+   사용자 승인 후에만 다음 단계로 진행한다.
+   specify(spec.md) → **승인** → plan/tasks(plan.md·tasks.md) → **승인** → implement.
+   승인 없이 구현에 진입하지 않는다. 소급 스펙은 사고 보정 수단일 뿐 관문을 대체하지 않는다.
+   설계 결정(항목 제거·통합·보류 등)은 spec.md에 결정표로 명시해 승인 대상임을 드러낸다.
 
 ## PDCA 문서 매핑
 
@@ -106,4 +121,4 @@ Convention 승격 조건: 동일 패턴이 3회 이상 반복 검증되고 적�
 - 개정은 PR로 하며 버전·개정일을 갱신하고 사유를 커밋 본문에 남긴다.
 - 모든 스펙 경로 PR은 §III(E2E 전건 PASS)·§IV(Multi-Layer Defense) 준수를 리뷰에서 확인한다.
 
-**Version**: 1.0.0 | **Ratified**: 2026-07-15 | **Last Amended**: 2026-07-15
+**Version**: 1.2.0 | **Ratified**: 2026-07-15 | **Last Amended**: 2026-07-16
