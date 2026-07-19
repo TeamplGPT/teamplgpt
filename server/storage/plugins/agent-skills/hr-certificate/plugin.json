@@ -1,0 +1,88 @@
+{
+  "active": true,
+  "name": "HR 증명서 조회",
+  "schema": "skill-1.0.0",
+  "version": "1.0.0",
+  "hubId": "hr-certificate",
+  "author": "teamplgpt",
+  "description": "본인 증명서 신청내역(재직/경력/퇴직 등)을 5240 HR 시스템에서 조회합니다. 항상 대화 중인 본인 기준으로 조회되며 사번은 필요 없습니다. 사용자가 증명서/재직증명서/경력증명서/퇴직증명서/증명서 신청내역/증명서 발급/증명서 상태 등을 물으면 이 skill을 사용하세요. 증명서 종류·용도·제출처·발급번호·발급일·출력가능여부·근속기간을 목록으로 보여줍니다(주소 등 민감정보는 제외). query_type 종류: requests(증명서 신청내역).",
+  "entrypoint": {
+    "file": "handler.js",
+    "params": {
+      "query_type": {
+        "description": "조회 종류 (선택, 기본 requests). [CRITICAL] 증명서 관련 질문이면 즉시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 증명서/재직증명/경력증명/퇴직증명/발급/신청내역/증명서 상태 키워드가 나타나면 되묻지 말고 requests로 즉시 tool-call하세요. 매핑표: requests=증명서 신청내역(증명서/재직증명서/경력증명서/퇴직증명서/증명서 발급/증명서 상태).",
+        "type": "string",
+        "enum": [
+          "requests"
+        ]
+      }
+    },
+    "required": []
+  },
+  "setup_args": {
+    "HR_BASE_URL": {
+      "type": "string",
+      "required": true,
+      "input": {
+        "type": "text",
+        "default": "https://ntest.5240.kr",
+        "placeholder": "https://ntest.5240.kr",
+        "hint": "5240 HR 시스템 base URL."
+      },
+      "value": "https://ntest.5240.kr"
+    },
+    "HR_CONTEXT_PATH": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "(루트 배포는 비움) 예: /kiwibox",
+        "hint": "kiwibox 컨텍스트 경로. ntest.5240.kr 등 루트 배포는 빈 값. /kiwibox 하위 배포면 \"/kiwibox\"."
+      },
+      "value": ""
+    },
+    "HR_SESSION_COOKIE": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "JSESSIONID=ABCDEF0123456789",
+        "hint": "서버 폴백(단일 사용자/테스트)용 5240 HR 세션 쿠키. embed 클라이언트 위임(client_tool_execution) 사용 시 불필요."
+      },
+      "value": ""
+    },
+    "HR_STAFF_ID": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "예: 10001 (STAFF_ID)",
+        "hint": "서버 폴백용 본인 kiwibox 내부 STAFF_ID(세션 ssnStaffId와 동일 값). 클라이언트 위임 모드에서는 브리지가 페이지의 ssnStaffId로 자동 치환하므로 불필요."
+      },
+      "value": ""
+    }
+  },
+  "examples": [
+    {
+      "prompt": "내 증명서 신청내역 보여줘",
+      "call": "{\"query_type\": \"requests\"}"
+    },
+    {
+      "prompt": "재직증명서 신청했나 확인해줘",
+      "call": "{\"query_type\": \"requests\"}"
+    },
+    {
+      "prompt": "증명서 발급 상태 알려줘",
+      "call": "{\"query_type\": \"requests\"}"
+    },
+    {
+      "prompt": "경력증명서 발급번호 뭐야",
+      "call": "{\"query_type\": \"requests\"}"
+    }
+  ],
+  "imported": true,
+  "license": "MIT"
+}
