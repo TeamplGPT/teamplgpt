@@ -28,6 +28,9 @@ BUNDLED_SKILLS=(
   "hr-personnel"
   "hr-salary"
   "hr-year-end-tax"
+  "hr-approval"
+  "hr-certificate"
+  "hr-welfare"
 )
 
 # Helper: read "version" field from plugin.json (returns "unknown" if missing/unreadable)
