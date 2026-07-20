@@ -21,7 +21,10 @@ const {
  *   - 단일 프로세스 전제(인메모리 registry) — 다중 인스턴스 배포 시 sticky session 필요
  */
 
-const DEFAULT_TIMEOUT_MS = 30_000;
+// 위젯 브리지 fetch 타임아웃(25s) + kiwibox 응답 + postMessage 회신 + 위젯→프록시→upstream
+// POST 왕복을 모두 포괄해야 한다. 25s보다 충분히 커야 broker가 먼저 만료돼 matched:false가
+// 나지 않는다. env HR_CLIENT_TOOL_TIMEOUT_MS로 조정 가능.
+const DEFAULT_TIMEOUT_MS = Number(process.env.HR_CLIENT_TOOL_TIMEOUT_MS) || 45_000;
 
 /** @type {Map<string, {resolve: Function, reject: Function, embedUuid: string, sessionId: string, timer: NodeJS.Timeout}>} */
 const pendingCalls = new Map();
@@ -97,8 +100,19 @@ class ClientToolBroker {
    */
   static resolveResult({ callId, embedUuid, sessionId, result }) {
     const entry = pendingCalls.get(callId);
-    if (!entry) return false;
+    if (!entry) {
+      // matched:false 진단 — pending 없음: TTL 만료(왕복>timeout) 또는 다중 프로세스
+      // (stream 워커 ≠ tool-result 워커, 인메모리 registry 불일치). 단일 프로세스 배포 필수.
+      console.warn(
+        `[clientToolBroker] no pending call for callId=${callId} ` +
+          `(pending=${pendingCalls.size}) — TTL 만료 또는 다중 프로세스 registry 불일치 의심`
+      );
+      return false;
+    }
     if (entry.embedUuid !== embedUuid || entry.sessionId !== sessionId) {
+      console.warn(
+        `[clientToolBroker] callId=${callId} embed/session 불일치 — 위조 주입 차단`
+      );
       return false;
     }
     clearTimeout(entry.timer);
