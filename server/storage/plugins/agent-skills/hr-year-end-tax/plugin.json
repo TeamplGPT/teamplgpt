@@ -2,88 +2,122 @@
   "active": true,
   "name": "HR 연말정산 조회",
   "schema": "skill-1.0.0",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "hubId": "hr-year-end-tax",
   "author": "teamplgpt",
-  "description": "직원 연말정산(소득공제/세액공제/부양가족공제/의료비/교육비/기부금/보험료/신용카드/연금저축/종전근무지 등)을 조회합니다. 사용자가 연말정산/공제/환급/부양가족공제/의료비/교육비/기부금/보장성보험/신용카드공제/연금저축/종전근무지/종전급여 등 연말정산 맥락을 물으면 이 skill을 사용하세요. cal_yy(귀속연도)를 선택적으로 지정할 수 있으며, 연도를 언급하지 않으면 생략하세요(서버 기본값 적용). query_type 종류: credit_card(신용카드), donation(기부금), education(교육비), family(부양가족공제), insurance(보장성보험), medical(의료비), previous_employer(종전근무지), result(연말정산결과/연말정산 결과), savings(연금저축), summary(공제요약). 종류가 불분명하면 summary를 사용하세요.",
+  "description": "본인 연말정산(공제·결정세액 요약, 의료비, 부양가족, 종전근무지, 기부금)을 5240 HR 시스템에서 조회합니다. 항상 대화 중인 본인 기준으로 조회되며 사번은 필요 없습니다. 사용자가 연말정산/공제/환급/결정세액/의료비공제/부양가족/종전근무지/기부금공제 등을 물으면 이 skill을 사용하세요. 귀속연도는 cal_yy로 지정할 수 있으며(미지정 시 최신 연도), 지원 연도는 2022~2025입니다. 주민번호·계좌 등 민감정보는 제공하지 않습니다. query_type 종류: summary(공제요약 및 결정세액), medical(의료비 공제), family(부양가족 현황), previous_employer(종전근무지 급여·세액), donation(기부금 공제). 종류가 불분명하면 summary를 사용하세요.",
   "entrypoint": {
     "file": "handler.js",
     "params": {
-      "emp_no": {
-        "description": "사원번호 (필수). 예: '12345'",
-        "type": "string"
-      },
       "query_type": {
-        "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표에 있는 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 해당 query_type으로 매핑하세요. 매핑표: credit_card=신용카드(신용카드/체크카드/카드사용내역/카드공제), donation=기부금(기부/기부금/기부공제), education=교육비(교육비/학원비/등록금/교육공제), family=부양가족공제(부양가족/공제대상자/부양가족공제-연말정산용이며 인사기록 가족정보는 hr-personnel.family 사용), insurance=보장성보험(보험/보장성보험/보험료공제), medical=의료비(의료비/병원비/의료비공제), previous_employer=종전근무지(종전근무지/이전직장근로소득/종전급여-연말정산용이며 인사기록 전직경력은 hr-personnel.career 사용), result=연말정산결과(연말정산결과/연말정산 결과/결정세액/결정 세액/환급/환급 결과), savings=연금저축(연금저축/퇴직연금/IRP), summary=공제요약(공제요약/공제합계/연말정산요약).",
+        "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 매핑하세요. 매핑표: summary=연말정산요약(연말정산/공제요약/공제합계/결정세액/환급/환급액/연말정산결과), medical=의료비(의료비/의료비공제/병원비), family=부양가족(부양가족/부양가족현황/공제대상가족), previous_employer=종전근무지(종전근무지/이전직장/종전급여/전직장 근로소득), donation=기부금(기부/기부금/기부금공제). 인사기록 가족정보는 hr-personnel, 인사기록 전직경력도 hr-personnel을 사용.",
         "type": "string",
         "enum": [
-          "credit_card",
-          "donation",
-          "education",
-          "family",
-          "insurance",
+          "summary",
           "medical",
+          "family",
           "previous_employer",
-          "result",
-          "savings",
-          "summary"
+          "donation"
         ]
       },
       "cal_yy": {
-        "description": "귀속연도 (선택). [CRITICAL] 절대로 사용자에게 연도를 되묻지 마세요. 연도 없이도 즉시 tool-call을 실행하세요. 연도를 추론해 추가하지도 마세요. 전달 규칙: 사용자가 연도를 명시한 경우에만 'YYYY'(예: '2024') 또는 자연어('작년', '올해') 로 전달하세요. 연도 미명시 시 cal_yy 파라미터를 생략하세요—서버가 최근 연도를 자동으로 적용합니다. [재강조] 연도가 사용자 발화에 없으면 되묻지 말고 cal_yy를 생략하고 즉시 tool-call하세요.",
+        "description": "귀속연도 (선택). [CRITICAL] 절대로 사용자에게 연도를 되묻지 마세요. 연도 없이도 즉시 tool-call하세요. 전달 규칙: 사용자가 연도를 명시한 경우에만 'YYYY'(예: '2024') 또는 '작년'/'재작년'으로 전달. 미지정 시 생략—최신 지원 연도가 자동 적용됩니다. 지원 연도: 2022~2025. [재강조] 연도가 발화에 없으면 되묻지 말고 cal_yy를 생략하고 즉시 tool-call하세요.",
         "type": "string"
       }
     },
     "required": [
-      "emp_no",
       "query_type"
     ]
   },
   "setup_args": {
-    "HR_API_BASE_URL": {
+    "HR_BASE_URL": {
       "type": "string",
       "required": true,
       "input": {
         "type": "text",
-        "default": "http://kiwibox-hr-api:8000",
-        "placeholder": "http://kiwibox-hr-api:8000",
-        "hint": "HR REST API 서버 주소 (Docker 네트워크 내 서비스명 사용)."
+        "default": "https://ntest.5240.kr",
+        "placeholder": "https://ntest.5240.kr",
+        "hint": "5240 HR 시스템 base URL."
       },
-      "value": "http://kiwibox-hr-api:8000"
+      "value": "https://ntest.5240.kr"
+    },
+    "HR_CONTEXT_PATH": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "(루트 배포는 비움) 예: /kiwibox",
+        "hint": "kiwibox 컨텍스트 경로. ntest.5240.kr 등 루트 배포는 빈 값. /kiwibox 하위 배포면 \"/kiwibox\"."
+      },
+      "value": ""
+    },
+    "HR_SESSION_COOKIE": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "JSESSIONID=ABCDEF0123456789",
+        "hint": "서버 폴백(단일 사용자/테스트)용 5240 HR 세션 쿠키. embed 클라이언트 위임(client_tool_execution) 사용 시 불필요."
+      },
+      "value": ""
+    },
+    "HR_STAFF_ID": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "예: 10001 (STAFF_ID)",
+        "hint": "서버 폴백용 본인 kiwibox 내부 STAFF_ID(세션 ssnStaffId와 동일 값). 사번(STAFF_NO)과 다를 수 있음 — 실측 확인. 클라이언트 위임 모드에서는 브리지가 페이지의 ssnStaffId로 자동 치환하므로 불필요."
+      },
+      "value": ""
+    },
+    "HR_ACTIVE_MENU_CD": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "예: YTA0101",
+        "hint": "권한 게이트(AUTF_SRCH_STAFF_YN)용 메뉴 컨텍스트. 설정 시 조회 전 setSessionActiveTabMenuCd.do를 선호출합니다."
+      },
+      "value": ""
     }
   },
   "examples": [
     {
-      "prompt": "연말정산 결과 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"result\"}"
+      "prompt": "내 연말정산 결과 알려줘",
+      "call": "{\"query_type\": \"summary\"}"
     },
     {
-      "prompt": "연말정산 공제 요약 보여줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"summary\"}"
+      "prompt": "연말정산 환급 얼마야?",
+      "call": "{\"query_type\": \"summary\"}"
     },
     {
-      "prompt": "부양가족 공제 대상 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"family\"}"
+      "prompt": "의료비 공제 내역 보여줘",
+      "call": "{\"query_type\": \"medical\"}"
     },
     {
-      "prompt": "의료비 공제 내역 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"medical\"}"
+      "prompt": "부양가족 현황 알려줘",
+      "call": "{\"query_type\": \"family\"}"
     },
     {
-      "prompt": "2024년 연말정산 결과 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"result\", \"cal_yy\": \"2024\"}"
+      "prompt": "종전근무지 급여 조회해줘",
+      "call": "{\"query_type\": \"previous_employer\"}"
     },
     {
-      "prompt": "2023년 의료비 공제 내역 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"medical\", \"cal_yy\": \"2023\"}"
+      "prompt": "기부금 공제 내역",
+      "call": "{\"query_type\": \"donation\"}"
     },
     {
-      "prompt": "의료비 공제 내역 알려줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"medical\"}"
+      "prompt": "2024년 연말정산 요약",
+      "call": "{\"query_type\": \"summary\", \"cal_yy\": \"2024\"}"
     },
     {
-      "prompt": "부양가족 공제 대상 조회해줘",
-      "call": "{\"emp_no\": \"12345\", \"query_type\": \"family\"}"
+      "prompt": "작년 의료비 공제",
+      "call": "{\"query_type\": \"medical\", \"cal_yy\": \"작년\"}"
     }
   ],
   "imported": true,

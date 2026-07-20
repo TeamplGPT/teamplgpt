@@ -55,6 +55,10 @@
     "/CommonCode.do": ["getSalYmdTypeCdList", "getSalYmdTypeCdList2"],
   };
 
+  // 연말정산(hr-year-end-tax): 5 endpoint × 지원연도(2022~2025)만 허용.
+  var YTA_PATH_RE =
+    /^\/YTA(SummaryMgr|YndMedDtlMgr|YtaFamilySttusMgr|YndBefWrkDtlMgr|YndGivPayDtlMgr)(2022|2023|2024|2025)\.do$/;
+
   function TeamplGPTHRBridge(config) {
     if (!config || !config.widgetOrigin) {
       throw new Error("TeamplGPTHRBridge: widgetOrigin is required");
@@ -101,7 +105,12 @@
     var callId = msg.callId;
     var self = this;
 
-    if (this.allowedPaths.indexOf(spec.path) === -1) {
+    // 연말정산(YTA)은 컨트롤러가 연도별 분리 → 경로에 연도 박힘(/YTA{Name}Mgr{YYYY}.do).
+    // endpoint명 + 지원연도(2022~2025)를 정규식으로 정확 제한(임의 YTA 경로 차단).
+    var isAllowedPath =
+      this.allowedPaths.indexOf(spec.path) !== -1 ||
+      YTA_PATH_RE.test(spec.path);
+    if (!isAllowedPath) {
       this._reply(callId, {
         ok: false,
         status: 0,
