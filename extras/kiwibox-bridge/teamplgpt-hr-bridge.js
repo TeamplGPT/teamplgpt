@@ -23,6 +23,7 @@
   // hr-attendance + hr-personnel + hr-salary 가 사용하는 kiwibox 경로 전체
   // (카탈로그 §4.1~4.3, §4.5, §4.8~4.9)
   var DEFAULT_ALLOWED_PATHS = [
+    "/LONLoanReqstListMgr.do",
     "/PRCHrBassiemMgrTab220.do",
     "/CTIMcrtfReqstRefromMgr.do",
     "/EAPRequestMgr.do",

@@ -1,0 +1,88 @@
+{
+  "active": true,
+  "name": "HR 복리후생 조회",
+  "schema": "skill-1.0.0",
+  "version": "1.0.0",
+  "hubId": "hr-welfare",
+  "author": "teamplgpt",
+  "description": "본인 복리후생 대출 신청내역(대출종류·금액·이율·잔액·상환방식)을 5240 HR 시스템에서 조회합니다. 항상 대화 중인 본인 기준으로 조회되며 사번은 필요 없습니다. 사용자가 대출/사내대출/주택자금대출/대출신청/대출잔액/대출이율/상환 등을 물으면 이 skill을 사용하세요. 계좌 등 민감정보는 제공하지 않습니다. query_type 종류: loan(대출 신청내역). 의료비·학자금·경조금·연말정산은 이 skill이 아닙니다(의료비/학자금은 미지원, 연말정산 공제는 hr-year-end-tax).",
+  "entrypoint": {
+    "file": "handler.js",
+    "params": {
+      "query_type": {
+        "description": "조회 종류 (선택, 기본 loan). [CRITICAL] 대출 관련 질문이면 즉시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 대출/사내대출/주택자금대출/대출신청/대출잔액/대출이율/상환내역 키워드가 나타나면 되묻지 말고 loan으로 즉시 tool-call하세요. 매핑표: loan=대출 신청내역(대출/사내대출/주택자금대출/대출신청/대출잔액/이율/상환).",
+        "type": "string",
+        "enum": [
+          "loan"
+        ]
+      }
+    },
+    "required": []
+  },
+  "setup_args": {
+    "HR_BASE_URL": {
+      "type": "string",
+      "required": true,
+      "input": {
+        "type": "text",
+        "default": "https://ntest.5240.kr",
+        "placeholder": "https://ntest.5240.kr",
+        "hint": "5240 HR 시스템 base URL."
+      },
+      "value": "https://ntest.5240.kr"
+    },
+    "HR_CONTEXT_PATH": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "(루트 배포는 비움) 예: /kiwibox",
+        "hint": "kiwibox 컨텍스트 경로. ntest.5240.kr 등 루트 배포는 빈 값. /kiwibox 하위 배포면 \"/kiwibox\"."
+      },
+      "value": ""
+    },
+    "HR_SESSION_COOKIE": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "JSESSIONID=ABCDEF0123456789",
+        "hint": "서버 폴백(단일 사용자/테스트)용 5240 HR 세션 쿠키. embed 클라이언트 위임(client_tool_execution) 사용 시 불필요."
+      },
+      "value": ""
+    },
+    "HR_STAFF_ID": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "",
+        "placeholder": "예: 10001 (STAFF_ID)",
+        "hint": "서버 폴백용 본인 kiwibox 내부 STAFF_ID(세션 ssnStaffId와 동일 값). 클라이언트 위임 모드에서는 브리지가 페이지의 ssnStaffId로 자동 치환하므로 불필요."
+      },
+      "value": ""
+    }
+  },
+  "examples": [
+    {
+      "prompt": "내 대출 내역 보여줘",
+      "call": "{\"query_type\": \"loan\"}"
+    },
+    {
+      "prompt": "사내대출 잔액 얼마야?",
+      "call": "{\"query_type\": \"loan\"}"
+    },
+    {
+      "prompt": "주택자금대출 이율 알려줘",
+      "call": "{\"query_type\": \"loan\"}"
+    },
+    {
+      "prompt": "대출 상환 방식 조회해줘",
+      "call": "{\"query_type\": \"loan\"}"
+    }
+  ],
+  "imported": true,
+  "license": "MIT"
+}
