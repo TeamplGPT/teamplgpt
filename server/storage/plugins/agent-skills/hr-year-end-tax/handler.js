@@ -83,6 +83,49 @@ const QUERY_MAP = {
       DON_SUM: "합계",
     },
   },
+  // 소득공제 입력 화면(YTAInDctMgr) 탭별 항목 — Tab08 신용카드 / Tab13 보험 / Tab15 교육 / Tab06 연금
+  credit_card: {
+    name: "YTAInDctMgr",
+    cmd: "getYTAInDctMgrTab08List",
+    label: "신용카드 공제내역",
+    columns: {
+      FAM_NM: "사용자",
+      CARD_AMT: "신용카드",
+      CARD_ETC_AMT: "기타카드",
+      FIRST_HELF_AMT: "상반기",
+      SECOND_HELF_AMT: "하반기",
+    },
+  },
+  insurance: {
+    name: "YTAInDctMgr",
+    cmd: "getYTAInDctMgrTab13List",
+    label: "보장성보험 공제내역",
+    columns: {
+      FAM_NM: "대상",
+      INSU_AMT: "보험료",
+      INSU_ETC_AMT: "기타보험료",
+    },
+  },
+  education: {
+    name: "YTAInDctMgr",
+    cmd: "getYTAInDctMgrTab15List",
+    label: "교육비 공제내역",
+    columns: {
+      FAM_NM: "대상",
+      EDU_AMT: "교육비",
+      EDU_ETC_AMT: "기타교육비",
+    },
+  },
+  savings: {
+    name: "YTAInDctMgr",
+    cmd: "getYTAInDctMgrTab06List",
+    label: "연금저축 공제내역",
+    columns: {
+      // 계좌(BANK_CD/ACC_NO)·코드값 제외 — 납입 정보만
+      PAY_CNT: "납입횟수",
+      PAY_AMT: "납입금액",
+    },
+  },
 };
 
 function camel(snake) {

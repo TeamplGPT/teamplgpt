@@ -57,7 +57,7 @@
 
   // 연말정산(hr-year-end-tax): 5 endpoint × 지원연도(2022~2025)만 허용.
   var YTA_PATH_RE =
-    /^\/YTA(SummaryMgr|YndMedDtlMgr|YtaFamilySttusMgr|YndBefWrkDtlMgr|YndGivPayDtlMgr)(2022|2023|2024|2025)\.do$/;
+    /^\/YTA(SummaryMgr|YndMedDtlMgr|YtaFamilySttusMgr|YndBefWrkDtlMgr|YndGivPayDtlMgr|InDctMgr)(2022|2023|2024|2025)\.do$/;
 
   function TeamplGPTHRBridge(config) {
     if (!config || !config.widgetOrigin) {
