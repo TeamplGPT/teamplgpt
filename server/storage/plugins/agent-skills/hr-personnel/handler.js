@@ -37,6 +37,22 @@ const ENDPOINT_MAP = {
   contact_directory: {
     path: "/getContactList.do", staffParam: null, gate: false, // 공개 디렉터리
   },
+  education: {
+    // 인사카드 교육이력 탭 (EDUT_HST2, kiwibox AI self SQL과 동일 테이블 — specs/007)
+    path: "/PRCHrBassiemMgrTab220.do", cmd: "getPRCHrBassiemMgrTab220List",
+    staffParam: "staffId", gate: false, fixed: { checkHst: "N" },
+    // 코드값(*_CD)·내부 식별자 다수 → 화이트리스트 렌더 (columns)
+    columns: {
+      EDU_NM: "교육명",
+      STA_YMD: "시작일",
+      END_YMD: "종료일",
+      OFC_NM: "교육기관",
+      CONTENTS_NM: "교육내용",
+      EDU_TIME: "교육시간",
+      EDU_POINT: "교육포인트",
+      EDU_MEMO: "비고",
+    },
+  },
 };
 
 const QUERY_LABELS = {
@@ -47,6 +63,7 @@ const QUERY_LABELS = {
   todo_count: "할일/미결 건수",
   schedule_day: "일정/생일/공휴일 캘린더",
   contact_directory: "운영자 연락처",
+  education: "교육이력",
 };
 
 module.exports.runtime = {
@@ -61,6 +78,8 @@ module.exports.runtime = {
       const label = QUERY_LABELS[query_type];
 
       const form = {};
+      if (spec.cmd) form.cmd = spec.cmd;
+      for (const [k, v] of Object.entries(spec.fixed || {})) form[k] = v;
 
       // 대상 사번 self 강제 — 마커 치환은 브리지/폴백이 수행 (§6.1)
       if (spec.staffParam) form[spec.staffParam] = SELF_STAFF_ID_MARKER;
@@ -97,6 +116,8 @@ module.exports.runtime = {
       }
 
       this.introspect(`${label} 조회 완료.`);
+      // 화이트리스트 컬럼 정의가 있으면 선별 렌더(코드값·내부 식별자 제외)
+      if (spec.columns) return formatWhitelisted(records, label, spec.columns);
       return formatPersonnel(records, label);
     } catch (e) {
       this.logger("Error in hr-personnel", e.message);
@@ -118,5 +139,43 @@ function formatPersonnel(data, label) {
   if (summary) {
     md += `\n${renderSummary(summary)}`;
   }
+  return md;
+}
+
+function camel(snake) {
+  return snake.toLowerCase().replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+}
+
+// 컬럼 화이트리스트 렌더 — hr-approval/hr-certificate와 동일 패턴(코드값 제외 + union 정규화)
+function formatWhitelisted(records, label, columnLabels) {
+  const list = Array.isArray(records) ? records : records ? [records] : [];
+  let md = `## HR 인사기록 - ${label}\n\n`;
+  if (list.length === 0) return md + "> 조회된 데이터가 없습니다.";
+
+  const pick = (row) => {
+    const out = {};
+    for (const [col, lab] of Object.entries(columnLabels)) {
+      const v = row[col] ?? row[col.toLowerCase()] ?? row[camel(col)];
+      if (v !== undefined && v !== null && String(v).trim() !== "") out[lab] = v;
+    }
+    return out;
+  };
+
+  const picked = list.map(pick).filter((r) => Object.keys(r).length > 0);
+  if (picked.length === 0) return md + "> 표시할 데이터가 없습니다.";
+
+  const ordered = Object.values(columnLabels);
+  const present = new Set();
+  for (const r of picked) for (const k of Object.keys(r)) present.add(k);
+  const headerKeys = ordered.filter((l) => present.has(l));
+  const normalized = picked.map((r) => {
+    const row = {};
+    for (const k of headerKeys) row[k] = r[k] ?? "";
+    return row;
+  });
+
+  const { renderTable } = require("../_shared/formatTable");
+  md += renderTable(normalized);
+  md += `\n> 총 **${normalized.length}건** 조회됨`;
   return md;
 }
