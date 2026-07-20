@@ -27,6 +27,9 @@ export default function EditEmbedModal({ embed, closeModal }) {
   const [allowToolCalling, setAllowToolCalling] = useState(
     embed.allow_tool_calling ?? false
   );
+  const [clientToolExecution, setClientToolExecution] = useState(
+    embed.client_tool_execution ?? false
+  );
   const [selectedHubIds, setSelectedHubIds] = useState(() =>
     parseAllowedSkillHashes(embed.allowed_skill_hashes)
   );
@@ -37,6 +40,8 @@ export default function EditEmbedModal({ embed, closeModal }) {
     const form = new FormData(e.target);
     const data = enforceSubmissionSchema(form);
     data.allow_tool_calling = allowToolCalling;
+    // client_tool_execution은 tool calling에 종속 — OFF면 함께 OFF
+    data.client_tool_execution = allowToolCalling ? clientToolExecution : false;
     if (allowToolCalling) {
       data.allowed_skill_hashes =
         !selectedHubIds || selectedHubIds.length === 0
@@ -124,10 +129,19 @@ export default function EditEmbedModal({ embed, closeModal }) {
                 onChange={setAllowToolCalling}
               />
               {allowToolCalling && (
-                <AllowedSkillsMultiSelect
-                  defaultValue={embed.allowed_skill_hashes}
-                  onChange={setSelectedHubIds}
-                />
+                <>
+                  <BooleanInput
+                    name="client_tool_execution"
+                    title="클라이언트 실행 위임 (5240 HR 세션 연동)"
+                    hint="ON 시 HR 스킬이 서버가 아닌 사용자 브라우저(5240 화면 브리지)를 통해 kiwibox를 호출합니다. 사용자별 로그인 세션으로 본인 데이터만 조회되며, 세션 쿠키가 서버에 저장되지 않아 다중 사용자 운영에 안전합니다. 5240 페이지에 브리지 위젯이 배포된 경우에만 동작합니다."
+                    defaultValue={embed.client_tool_execution ?? false}
+                    onChange={setClientToolExecution}
+                  />
+                  <AllowedSkillsMultiSelect
+                    defaultValue={embed.allowed_skill_hashes}
+                    onChange={setSelectedHubIds}
+                  />
+                </>
               )}
 
               {error && <p className="text-red-400 text-sm">Error: {error}</p>}
