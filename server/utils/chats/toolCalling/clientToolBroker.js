@@ -61,8 +61,22 @@ class ClientToolBroker {
     const callId = uuidv4();
     this.ownCallIds.add(callId);
 
+    // tool 대기 구간은 SSE에 데이터가 흐르지 않아(브라우저 브리지 왕복 수십 초) 리버스
+    // 프록시가 idle 커넥션을 끊는다 → ERR_INCOMPLETE_CHUNKED_ENCODING. 주기적 SSE 주석
+    // (`: keepalive`)으로 커넥션을 살려둔다. 주석은 클라이언트 SSE 파서가 무시한다.
+    const heartbeat = setInterval(() => {
+      if (isResponseWritable(this.response)) {
+        try {
+          this.response.write(": keepalive\n\n");
+        } catch {
+          /* 쓰기 실패는 무시 — 타임아웃/close 경로가 정리 */
+        }
+      }
+    }, 10_000);
+
     const resultPromise = new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
+        clearInterval(heartbeat);
         pendingCalls.delete(callId);
         this.ownCallIds.delete(callId);
         reject(new Error("client tool call timed out"));
@@ -73,6 +87,7 @@ class ClientToolBroker {
         embedUuid: this.embedUuid,
         sessionId: this.sessionId,
         timer,
+        heartbeat,
       });
     });
 
@@ -116,7 +131,17 @@ class ClientToolBroker {
       return false;
     }
     clearTimeout(entry.timer);
+    clearInterval(entry.heartbeat);
     pendingCalls.delete(callId);
+    // 관측성 (env HR_DEBUG_TOOL_IO=true) — kiwibox 원 응답 body. 스킬 언랩/렌더 이전 원문이라
+    // "Message|DATA (31건)" 같은 응답 구조 불일치 진단에 필수. ⚠️ 민감정보 포함 → 진단 시에만.
+    if (process.env.HR_DEBUG_TOOL_IO === "true") {
+      const b = typeof result?.body === "string" ? result.body : "";
+      console.log(
+        `[tool-io] kiwibox raw response callId=${callId} ok=${result?.ok} ` +
+          `status=${result?.status} body(len=${b.length}):\n${b.slice(0, 4000)}`
+      );
+    }
     entry.resolve({
       ok: result?.ok === true,
       status: Number(result?.status) || 0,
@@ -131,6 +156,7 @@ class ClientToolBroker {
       const entry = pendingCalls.get(callId);
       if (!entry) continue;
       clearTimeout(entry.timer);
+      clearInterval(entry.heartbeat);
       pendingCalls.delete(callId);
       entry.reject(new Error("stream ended before client tool result"));
     }

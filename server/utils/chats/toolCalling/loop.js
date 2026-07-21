@@ -113,12 +113,37 @@ async function toolCallingLoop(opts) {
   const toolTrace = [];
   let closeChunkSent = false;
 
+  const debugIO = process.env.HR_DEBUG_TOOL_IO === "true";
   try {
     for (let round = 0; round <= maxRounds; round++) {
       // L1 Guard: client already disconnected — don't waste another LLM round.
       if (!isResponseWritable(response)) {
         logger.streamGuard?.({ round, reason: "client-disconnected" });
         break;
+      }
+
+      // 관측성 — LLM에 전달되는 메시지(role + 길이, tool 결과 미리보기).
+      if (debugIO) {
+        console.log(
+          `[tool-io] round=${round} → LLM messages(${currentMessages.length}): ` +
+            currentMessages
+              .map((m) => {
+                const c =
+                  typeof m.content === "string"
+                    ? m.content
+                    : JSON.stringify(m.content ?? m);
+                return `${m.role}[${c.length}]`;
+              })
+              .join(", ")
+        );
+        const last = currentMessages[currentMessages.length - 1];
+        if (last && (last.role === "tool" || last.role === "function")) {
+          const c =
+            typeof last.content === "string"
+              ? last.content
+              : JSON.stringify(last.content);
+          console.log(`[tool-io] round=${round} → LLM last(tool result):\n${c}`);
+        }
       }
 
       const roundLlmOptions =
@@ -304,6 +329,11 @@ async function toolCallingLoop(opts) {
     }
   }
 
+  if (debugIO) {
+    console.log(
+      `[tool-io] ← LLM final answer(len=${completeText?.length || 0}):\n${completeText}`
+    );
+  }
   return { completeText, metrics, toolTrace };
 }
 
@@ -338,6 +368,23 @@ async function executeAndAppend({
       ? (spec) => clientToolBroker.request(spec)
       : null,
   });
+
+  // 관측성 (env HR_DEBUG_TOOL_IO=true) — tool 입력 args + LLM에 들어갈 결과 원문.
+  // ⚠️ 급여·주민번호 등 민감정보 포함 가능 → 프로덕션 기본 off, 진단 시에만 켠다.
+  if (process.env.HR_DEBUG_TOOL_IO === "true") {
+    console.log(
+      `[tool-io] round=${round} ${tc.name} args=${
+        typeof tc.arguments === "string"
+          ? tc.arguments
+          : JSON.stringify(tc.arguments)
+      }`
+    );
+    console.log(
+      `[tool-io] round=${round} ${tc.name} result(len=${
+        toolResult?.length || 0
+      }):\n${toolResult}`
+    );
+  }
   const durationMs = Date.now() - tcStart;
   const isError =
     typeof toolResult === "string" && toolResult.startsWith("Error");
