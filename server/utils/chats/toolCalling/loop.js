@@ -122,28 +122,34 @@ async function toolCallingLoop(opts) {
         break;
       }
 
-      // 관측성 — LLM에 전달되는 메시지(role + 길이, tool 결과 미리보기).
+      // 관측성 — LLM에 전달되는 전체 메시지. 한 줄 JSON으로 찍어 `grep tool-io` 한 줄에
+      // 모두 잡히게 한다(개행 X). content는 문자열/객체/tool_calls 모두 직렬화. role이
+      // 없으면(tool 결과 등) name/tool_call_id로 폴백. 기본은 전체 content, 너무 길면
+      // HR_DEBUG_TOOL_IO_MAX(기본 8000)자로 절단.
       if (debugIO) {
+        const cap = Number(process.env.HR_DEBUG_TOOL_IO_MAX) || 8000;
+        const serialize = (m) => {
+          let c =
+            typeof m.content === "string"
+              ? m.content
+              : m.content != null
+                ? JSON.stringify(m.content)
+                : "";
+          // tool_calls(assistant가 tool 호출 결정)도 내용에 포함
+          if (m.tool_calls) c += " tool_calls=" + JSON.stringify(m.tool_calls);
+          if (c.length > cap) c = c.slice(0, cap) + `…(+${c.length - cap})`;
+          return {
+            role: m.role || m.name || (m.tool_call_id ? "tool" : "unknown"),
+            content: c,
+          };
+        };
         console.log(
-          `[tool-io] round=${round} → LLM messages(${currentMessages.length}): ` +
-            currentMessages
-              .map((m) => {
-                const c =
-                  typeof m.content === "string"
-                    ? m.content
-                    : JSON.stringify(m.content ?? m);
-                return `${m.role}[${c.length}]`;
-              })
-              .join(", ")
+          `[tool-io] round=${round} LLM_INPUT ` +
+            JSON.stringify({
+              count: currentMessages.length,
+              messages: currentMessages.map(serialize),
+            })
         );
-        const last = currentMessages[currentMessages.length - 1];
-        if (last && (last.role === "tool" || last.role === "function")) {
-          const c =
-            typeof last.content === "string"
-              ? last.content
-              : JSON.stringify(last.content);
-          console.log(`[tool-io] round=${round} → LLM last(tool result):\n${c}`);
-        }
       }
 
       const roundLlmOptions =
@@ -331,7 +337,8 @@ async function toolCallingLoop(opts) {
 
   if (debugIO) {
     console.log(
-      `[tool-io] ← LLM final answer(len=${completeText?.length || 0}):\n${completeText}`
+      `[tool-io] LLM_OUTPUT ` +
+        JSON.stringify({ len: completeText?.length || 0, answer: completeText })
     );
   }
   return { completeText, metrics, toolTrace };
@@ -369,20 +376,21 @@ async function executeAndAppend({
       : null,
   });
 
-  // 관측성 (env HR_DEBUG_TOOL_IO=true) — tool 입력 args + LLM에 들어갈 결과 원문.
-  // ⚠️ 급여·주민번호 등 민감정보 포함 가능 → 프로덕션 기본 off, 진단 시에만 켠다.
+  // 관측성 (env HR_DEBUG_TOOL_IO=true) — tool 입력 args + LLM에 들어갈 렌더 결과.
+  // 한 줄 JSON(개행 X)이라 `grep tool-io` 한 줄에 다 잡힘. ⚠️ 급여·주민번호 등 민감정보
+  // 포함 가능 → 프로덕션 기본 off, 진단 시에만 켠다.
   if (process.env.HR_DEBUG_TOOL_IO === "true") {
     console.log(
-      `[tool-io] round=${round} ${tc.name} args=${
-        typeof tc.arguments === "string"
-          ? tc.arguments
-          : JSON.stringify(tc.arguments)
-      }`
-    );
-    console.log(
-      `[tool-io] round=${round} ${tc.name} result(len=${
-        toolResult?.length || 0
-      }):\n${toolResult}`
+      `[tool-io] round=${round} TOOL_CALL ` +
+        JSON.stringify({
+          name: tc.name,
+          args:
+            typeof tc.arguments === "string"
+              ? tc.arguments
+              : tc.arguments,
+          resultLen: toolResult?.length || 0,
+          result: toolResult,
+        })
     );
   }
   const durationMs = Date.now() - tcStart;

@@ -137,9 +137,16 @@ class ClientToolBroker {
     // "Message|DATA (31건)" 같은 응답 구조 불일치 진단에 필수. ⚠️ 민감정보 포함 → 진단 시에만.
     if (process.env.HR_DEBUG_TOOL_IO === "true") {
       const b = typeof result?.body === "string" ? result.body : "";
+      const cap = Number(process.env.HR_DEBUG_TOOL_IO_MAX) || 8000;
       console.log(
-        `[tool-io] kiwibox raw response callId=${callId} ok=${result?.ok} ` +
-          `status=${result?.status} body(len=${b.length}):\n${b.slice(0, 4000)}`
+        `[tool-io] KIWIBOX_RAW ` +
+          JSON.stringify({
+            callId,
+            ok: result?.ok,
+            status: result?.status,
+            bodyLen: b.length,
+            body: b.length > cap ? b.slice(0, cap) + `…(+${b.length - cap})` : b,
+          })
       );
     }
     entry.resolve({
