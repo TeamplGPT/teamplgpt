@@ -64,6 +64,36 @@ const QUERY_LABELS = {
 // 게이트 스킵 파라미터 주입 금지 (§4.5 searchType=mobile 사례 방어)
 const FORBIDDEN_FIXED_VALUES = { searchType: ["mobile"] };
 
+// query_type별 응답 컬럼 화이트리스트 (실측 — 내부 PK·사번·코드 제외, 한글 라벨).
+// 정의 없는 query_type은 통짜 렌더(하위호환) — 실측 후 순차 추가.
+const COLUMNS_BY_QT = {
+  annual_leave_balance: {
+    wktypeNm: "근무유형",
+    creDd: "발생일수",
+    useDd: "사용일수",
+    remDd: "잔여일수",
+  },
+  work_status: {
+    workYmd: "일자",
+    week: "요일",
+    workComment: "근무내용",
+    mark: "상태",
+    baseStaTime: "기준출근",
+    baseEndTime: "기준퇴근",
+    inTime: "출근",
+    outTime: "퇴근",
+    lateTime: "지각(분)",
+    earlyTime: "조퇴(분)",
+    goOutTime: "외출(분)",
+    otTime: "연장(분)",
+    annualLeave: "연차",
+    etcLeave: "기타휴가",
+    bizTrip: "출장",
+    education: "교육",
+    leaveAbsence: "휴직",
+  },
+};
+
 module.exports.runtime = {
   handler: async function ({ query_type, year_month }) {
     try {
@@ -114,7 +144,7 @@ module.exports.runtime = {
       }
 
       this.introspect(`${label} 조회 완료.`);
-      return formatAttendance(records, label);
+      return formatAttendance(records, label, COLUMNS_BY_QT[query_type]);
     } catch (e) {
       this.logger("Error in hr-attendance", e.message);
       return `> ⚠️ 근태 조회 중 오류가 발생했습니다: ${e.message}`;
@@ -122,17 +152,30 @@ module.exports.runtime = {
   },
 };
 
-function formatAttendance(data, label) {
-  const { normalizeData, renderTable, renderSummary } = require("../_shared/formatTable");
-  const { rows, summary } = normalizeData(data);
+function formatAttendance(data, label, columns) {
+  const {
+    normalizeData,
+    renderTable,
+    renderSummary,
+    renderWhitelisted,
+  } = require("../_shared/formatTable");
 
   let md = `## HR 근태 - ${label}\n\n`;
 
+  // 화이트리스트 정의가 있으면 선별 렌더(내부 PK·사번·코드 제외).
+  if (columns) {
+    const table = renderWhitelisted(data, columns);
+    return table ? md + table : md + "> 조회된 데이터가 없습니다.";
+  }
+
+  // 정의 없는 query_type은 통짜 렌더(하위호환) — 단 공통 내부 식별자만 제외.
+  const { rows, summary } = normalizeData(data);
   if (rows.length === 0) {
     return md + "> 조회된 데이터가 없습니다.";
   }
-
-  md += renderTable(rows);
+  md += renderTable(rows, {
+    excludeKeys: ["code", "message", "servareaId", "staffId", "staffNo"],
+  });
   md += `\n> 총 **${rows.length}건** 조회됨`;
   if (summary) {
     md += `\n${renderSummary(summary)}`;

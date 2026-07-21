@@ -133,4 +133,52 @@ function renderSummary(summary) {
   return `> ${parts.join(" | ")}`;
 }
 
-module.exports = { formatCellValue, normalizeData, renderTable, renderSummary };
+/**
+ * 화이트리스트 컬럼만 골라 한글 라벨로 렌더한다. 내부 PK·코드값·주민번호 등 노이즈/민감
+ * 컬럼을 제외하고, kiwibox 응답이 배열이든 단일 객체든 균일 처리한다. 응답 키 대소문자·
+ * camelCase 변형을 모두 대응(egovMap 소문자 대비). hr-approval/certificate/personnel과 동일 패턴.
+ *
+ * @param {any} records - kiwibox 언랩 결과(배열 또는 객체)
+ * @param {Object<string,string>} columnLabels - { 원본키: 한글라벨 } 순서대로
+ * @returns {string} markdown 표 (없으면 빈 문자열)
+ */
+function renderWhitelisted(records, columnLabels) {
+  const list = Array.isArray(records) ? records : records ? [records] : [];
+  if (list.length === 0) return "";
+
+  const camel = (s) =>
+    s.toLowerCase().replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+  const pick = (row) => {
+    const out = {};
+    for (const [col, lab] of Object.entries(columnLabels)) {
+      const v = row[col] ?? row[col.toLowerCase()] ?? row[camel(col)];
+      if (v !== undefined && v !== null && String(v).trim() !== "")
+        out[lab] = v;
+    }
+    return out;
+  };
+
+  const picked = list.map(pick).filter((r) => Object.keys(r).length > 0);
+  if (picked.length === 0) return "";
+
+  // 문서별 컬럼 편차 대비 union 키(정의 순서 유지)
+  const ordered = Object.values(columnLabels);
+  const present = new Set();
+  for (const r of picked) for (const k of Object.keys(r)) present.add(k);
+  const headerKeys = ordered.filter((l) => present.has(l));
+  const normalized = picked.map((r) => {
+    const row = {};
+    for (const k of headerKeys) row[k] = r[k] ?? "";
+    return row;
+  });
+
+  return renderTable(normalized) + `\n> 총 **${normalized.length}건** 조회됨`;
+}
+
+module.exports = {
+  formatCellValue,
+  normalizeData,
+  renderTable,
+  renderSummary,
+  renderWhitelisted,
+};
