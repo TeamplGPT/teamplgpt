@@ -42,7 +42,15 @@ function parseKiwiboxBody(bodyText) {
         "> ⚠️ HR 시스템 응답을 해석할 수 없습니다 (JSON 아님). 세션 상태를 확인하세요.",
     };
   }
-  const records = data && "result" in data ? data.result : data;
+  // kiwibox 응답 래퍼 키는 endpoint별로 다르다: 일부는 { result: [...] }, 일부는
+  // 대문자 { Message, DATA: [...] }(예: getMBLHomeLeaveDetail), 일부는 { data: [...] }.
+  // 우선순위대로 언랩 — 없으면 통째(passthrough).
+  let records;
+  if (data && "result" in data) records = data.result;
+  else if (data && "DATA" in data) records = data.DATA;
+  else if (data && "data" in data && typeof data.data !== "string")
+    records = data.data;
+  else records = data;
   const isEmpty =
     records === null ||
     records === undefined ||
