@@ -6,7 +6,12 @@
 //    self 자동 도구화 부적합 — kiwibox 자체 AI도 복리후생 self 도구 미구현(실측 근거).
 //  - self 강제 필수: cmmSearchStaffId 미지정 시 전사 대출내역 노출(§4.10 경고) → 마커 항상 주입.
 //  - 계좌(BANK_CD/ACC_NO)·내부 PK 화이트리스트 제외.
-const { hrFetch, SELF_STAFF_ID_MARKER } = require("../_shared/hrSession");
+const {
+  hrFetch,
+  todayYmd,
+  monthsAgoFirstYmd,
+  SELF_STAFF_ID_MARKER,
+} = require("../_shared/hrSession");
 
 const ENDPOINT = {
   path: "/LONLoanReqstListMgr.do",
@@ -37,9 +42,14 @@ module.exports.runtime = {
         return "> ⚠️ query_type이 올바르지 않습니다. 가능한 값: loan";
       }
 
+      // self 강제(전사 노출 방지 §6.3) — 마커는 브리지/폴백에서 치환되며,
+      // 서버 폴백은 HR_STAFF_ID 미설정 시 hrFetch가 호출 전 중단한다(L2).
       const form = {
         cmd: ENDPOINT.cmd,
-        cmmSearchStaffId: SELF_STAFF_ID_MARKER, // self 강제(전사 노출 방지)
+        cmmSearchStaffId: SELF_STAFF_ID_MARKER,
+        // 신판 §6.3 실측 기간 (specs/011 D9): 18개월 전 초일 ~ 오늘
+        searchBaseSYmd: monthsAgoFirstYmd(18),
+        searchBaseEYmd: todayYmd(),
       };
 
       this.introspect("대출 신청내역 조회 중...");

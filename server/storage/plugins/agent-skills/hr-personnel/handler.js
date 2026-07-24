@@ -8,6 +8,7 @@ const {
   hrFetch,
   monthRange,
   todayYmd,
+  todayDashed,
   SELF_STAFF_ID_MARKER,
 } = require("../_shared/hrSession");
 
@@ -39,8 +40,10 @@ const ENDPOINT_MAP = {
   },
   education: {
     // 인사카드 교육이력 탭 (EDUT_HST2, kiwibox AI self SQL과 동일 테이블 — specs/007)
+    // 신판 카탈로그 §4 공통 BODY: 사번 3중 지정 + searchYmd (specs/011 D9)
     path: "/PRCHrBassiemMgrTab220.do", cmd: "getPRCHrBassiemMgrTab220List",
-    staffParam: "staffId", gate: false, fixed: { checkHst: "N" },
+    staffParam: ["staffId", "cmmSearchStaffId", "searchStaffId"],
+    gate: false, fixed: { checkHst: "N" }, dateParam: "today-dashed",
     // 코드값(*_CD)·내부 식별자 다수 → 화이트리스트 렌더 (columns)
     columns: {
       EDU_NM: "교육명",
@@ -81,8 +84,13 @@ module.exports.runtime = {
       if (spec.cmd) form.cmd = spec.cmd;
       for (const [k, v] of Object.entries(spec.fixed || {})) form[k] = v;
 
-      // 대상 사번 self 강제 — 마커 치환은 브리지/폴백이 수행 (§6.1)
-      if (spec.staffParam) form[spec.staffParam] = SELF_STAFF_ID_MARKER;
+      // 대상 사번 self 강제 — 마커 치환은 브리지/폴백이 수행. 배열이면 다중 주입 (§4 공통 BODY)
+      const staffParams = Array.isArray(spec.staffParam)
+        ? spec.staffParam
+        : spec.staffParam
+          ? [spec.staffParam]
+          : [];
+      for (const p of staffParams) form[p] = SELF_STAFF_ID_MARKER;
 
       // 조직코드: 계층3 체이닝 — org_tree 결과값만 (plugin.json description에서 강제)
       if (spec.orgParam) {
@@ -95,6 +103,8 @@ module.exports.runtime = {
 
       if (spec.dateParam === "today") {
         form.searchSymd = todayYmd();
+      } else if (spec.dateParam === "today-dashed") {
+        form.searchYmd = todayDashed(); // §4 공통 BODY
       } else if (spec.dateParam === "month-range") {
         const ym =
           resolveDateParam(year_month, "year_month") ||

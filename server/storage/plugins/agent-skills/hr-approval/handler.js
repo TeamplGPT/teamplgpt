@@ -80,6 +80,10 @@ module.exports.runtime = {
         selectGubun: qt.gubun,
         searchStaDate: sYmd,
         searchEndDate: eYmd,
+        // 신판 카탈로그 §5.1 실측 기간 파라미터 병행 전송 (specs/011 D8 —
+        // selectGubun 즉시 교체는 회귀 위험이라 양쪽 유지, 실동작 확인 후 정리)
+        searchSYmd: sYmd,
+        searchEYmd: eYmd,
       };
 
       this.introspect(`${qt.label} 조회 중...`);

@@ -42,12 +42,15 @@ function parseKiwiboxBody(bodyText) {
         "> ⚠️ HR 시스템 응답을 해석할 수 없습니다 (JSON 아님). 세션 상태를 확인하세요.",
     };
   }
-  // kiwibox 응답 래퍼 키는 endpoint별로 다르다: 일부는 { result: [...] }, 일부는
-  // 대문자 { Message, DATA: [...] }(예: getMBLHomeLeaveDetail), 일부는 { data: [...] }.
-  // 우선순위대로 언랩 — 없으면 통째(passthrough).
+  // kiwibox 응답 래퍼 키는 endpoint별로 다르다: { result: [...] } / 대문자
+  // { Message, DATA: [...] } / { Map: {...} }(SALPayslipNewMgrMap 등 단건 객체) /
+  // { codeList: [...] }(CommonCode 콤보) / { data: [...] }.
+  // 우선순위대로 언랩 — 없으면 통째(passthrough). (카탈로그 §0 응답 규약)
   let records;
   if (data && "result" in data) records = data.result;
   else if (data && "DATA" in data) records = data.DATA;
+  else if (data && "Map" in data) records = data.Map;
+  else if (data && "codeList" in data) records = data.codeList;
   else if (data && "data" in data && typeof data.data !== "string")
     records = data.data;
   else records = data;
@@ -65,7 +68,7 @@ function parseKiwiboxBody(bodyText) {
 /**
  * @param {object} ctx - skill handler의 `this` (runtimeArgs, clientToolTransport, logger)
  * @param {object} req
- * @param {string} req.path - kiwibox 경로 (컨텍스트 경로 제외, e.g. "/getMBLHomeLeaveDetail.do")
+ * @param {string} req.path - kiwibox 경로 (컨텍스트 경로 제외, e.g. "/TAADclzVcatnList.do")
  * @param {URLSearchParams|Object<string,string>} req.form - form 파라미터.
  *   대상 사번 자리에는 SELF_STAFF_ID_MARKER를 넣는다.
  * @param {boolean} [req.gate=false] - b범위 게이트 endpoint 여부 (서버 폴백 시 메뉴 선세팅)
@@ -192,4 +195,27 @@ function todayYmd() {
   return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
 }
 
-module.exports = { hrFetch, monthRange, todayYmd, SELF_STAFF_ID_MARKER };
+// "YYYY-MM-DD" — 카탈로그 searchBaseYmd 형식 (하이픈)
+function todayDashed() {
+  const ymd = todayYmd();
+  return `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`;
+}
+
+// n개월 전 달의 1일 "YYYYMM01" — 증명서·대출 등 장기 조회 기본 시작일
+function monthsAgoFirstYmd(n) {
+  const d = new Date();
+  d.setDate(1);
+  d.setMonth(d.getMonth() - n);
+  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}01`;
+}
+
+module.exports = {
+  hrFetch,
+  monthRange,
+  todayYmd,
+  todayDashed,
+  monthsAgoFirstYmd,
+  SELF_STAFF_ID_MARKER,
+  // 단위 테스트 전용 (specs/011 T005)
+  parseKiwiboxBody,
+};

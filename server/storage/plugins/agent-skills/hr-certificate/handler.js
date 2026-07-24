@@ -4,7 +4,12 @@
 //  - 정본: CTIMcrtfReqstRefromMgr getCTIMcrtfReqstRefromMgrList (웹).
 //  - self 강제: reqNoExist='N' + staffId=$SELF_STAFF_ID → 본인 신청내역만 (SQL:64).
 //  - reqNo 단건 상세(§4.4식 무검증 위험)·주소(§4.6 민감)는 미채택(specs/006 승인).
-const { hrFetch, SELF_STAFF_ID_MARKER } = require("../_shared/hrSession");
+const {
+  hrFetch,
+  todayYmd,
+  monthsAgoFirstYmd,
+  SELF_STAFF_ID_MARKER,
+} = require("../_shared/hrSession");
 
 const ENDPOINT = {
   path: "/CTIMcrtfReqstRefromMgr.do",
@@ -55,7 +60,12 @@ module.exports.runtime = {
       const form = {
         cmd: ENDPOINT.cmd,
         reqNoExist: "N", // 목록 분기 (self staffId 필터 활성)
-        staffId: SELF_STAFF_ID_MARKER, // self 강제
+        // 신판 카탈로그 §6.4 실측 BODY: 사번 3중 지정 + 기간 (specs/011 D9)
+        staffId: SELF_STAFF_ID_MARKER,
+        cmmSearchStaffId: SELF_STAFF_ID_MARKER,
+        searchStaffId: SELF_STAFF_ID_MARKER,
+        searchSYmd: monthsAgoFirstYmd(18),
+        searchEYmd: todayYmd(),
       };
 
       this.introspect("증명서 신청내역 조회 중...");

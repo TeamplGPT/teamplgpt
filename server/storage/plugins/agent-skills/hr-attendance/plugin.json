@@ -77,6 +77,17 @@
       },
       "value": ""
     },
+    "HR_WKAREA_CD": {
+      "type": "string",
+      "required": false,
+      "input": {
+        "type": "text",
+        "default": "1000",
+        "placeholder": "1000",
+        "hint": "사업장코드(WKAREA_CD). 휴가/연차 조회(§3) 필수 BODY. 단일 사업장 기본 1000, 다사업장은 소속 사업장 코드로 변경."
+      },
+      "value": "1000"
+    },
     "HR_ACTIVE_MENU_CD": {
       "type": "string",
       "required": false,
