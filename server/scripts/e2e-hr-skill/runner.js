@@ -161,6 +161,22 @@ function loadScenarios() {
         );
       }
     }
+    // kiwibox .do 계열: 파라미터가 POST body(urlencoded)에 있어 URL 대신 body를 검증
+    if (s.expect.mock_body_pattern != null) {
+      if (
+        !Array.isArray(s.expect.mock_body_pattern) ||
+        s.expect.mock_body_pattern.some((p) => typeof p !== "string")
+      ) {
+        fatal(`Scenario ${s.id}: expect.mock_body_pattern must be string[]`);
+      }
+      s._mockBodyRegexes = s.expect.mock_body_pattern.map((p) => {
+        try {
+          return new RegExp(p);
+        } catch (e) {
+          fatal(`Scenario ${s.id}: invalid body regex "${p}": ${e.message}`);
+        }
+      });
+    }
     s.repeat = Number.isInteger(s.repeat) ? s.repeat : 1;
     if (s.repeat < 1 || s.repeat > 20) {
       fatal(`Scenario ${s.id}: repeat must be 1..20`);
@@ -344,6 +360,26 @@ function readMockLogTail(mockLogPath, sinceIso) {
   return out;
 }
 
+// mock 로그 body를 검증용 단일 문자열로 정규화.
+// - { _raw: "a=1&b=2" } (urlencoded 원문) → URL 디코드된 "a=1&b=2"
+// - 파싱된 객체 → "k=v&k2=v2" 직렬화
+function mockBodyToString(body) {
+  if (body == null) return null;
+  if (typeof body === "object" && typeof body._raw === "string") {
+    try {
+      return decodeURIComponent(body._raw.replace(/\+/g, " "));
+    } catch (_) {
+      return body._raw;
+    }
+  }
+  if (typeof body === "object") {
+    return Object.entries(body)
+      .map(([k, v]) => `${k}=${v}`)
+      .join("&");
+  }
+  return String(body);
+}
+
 async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
   if (scenario.pre_reset) {
     try {
@@ -375,11 +411,16 @@ async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
   const { toolCall, finalText, eventCount } = parseSSE(body);
 
   const mockEntries = readMockLogTail(mockLogPath, startedAt);
+  // 구세대 REST(/api/v1/*) + 현행 kiwibox(*.do) 양쪽을 대조 대상으로 인정
   const relevantMock = mockEntries.filter((m) =>
-    /^\/api\/v1\//.test(m.path || "")
+    /^\/api\/v1\//.test(m.path || "") || /\.do$/.test(m.path || "")
   );
   const mockUrl =
     relevantMock.length > 0 ? relevantMock[relevantMock.length - 1].fullUrl : null;
+  const mockBody =
+    relevantMock.length > 0
+      ? mockBodyToString(relevantMock[relevantMock.length - 1].body)
+      : null;
 
   const asked =
     !toolCall && finalText ? /연도|년/.test(finalText) : false;
@@ -404,6 +445,21 @@ async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
       reason = `mock URL did not match pattern ${scenario.expect.mock_url_pattern}`;
     }
   }
+  // body 검증 (kiwibox urlencoded 필수 파라미터 — 전 패턴 매칭 필요)
+  if (pass && scenario._mockBodyRegexes) {
+    if (mockBody == null) {
+      pass = false;
+      reason = "no mock body captured";
+    } else {
+      const missed = scenario.expect.mock_body_pattern.filter(
+        (p, i) => !scenario._mockBodyRegexes[i].test(mockBody)
+      );
+      if (missed.length > 0) {
+        pass = false;
+        reason = `mock body missing pattern(s): ${missed.join(" | ")}`;
+      }
+    }
+  }
 
   return {
     scenario: scenario.id,
@@ -413,6 +469,7 @@ async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
     toolCall,
     finalText,
     mockUrl,
+    mockBody,
     asked,
     eventCount,
     pass,

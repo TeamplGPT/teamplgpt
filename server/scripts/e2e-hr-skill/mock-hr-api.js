@@ -67,6 +67,17 @@ const server = http.createServer((req, res) => {
     if (parsed.pathname === "/health") {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ ok: true }));
+    } else if (parsed.pathname === "/CommonCode.do") {
+      // 급여 2단 체인용 fixture: pay_periods(getSalYmdTypeCdList2) 응답 —
+      // LLM이 code(20260619P)를 pay_item으로 이어 호출할 수 있게 한다 (specs/011 K10).
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify({
+          codeList: [
+            { codeNm: "2026-06-19 급여", code: "20260619P", colorCode: null },
+          ],
+        })
+      );
     } else {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ success: true, data: [], message: "mock" }));
@@ -93,7 +104,13 @@ const server = http.createServer((req, res) => {
       try {
         parsedBody = JSON.parse(rawBody);
       } catch {
-        parsedBody = { _raw: rawBody };
+        // kiwibox 계열은 urlencoded — 객체 파싱 + 원문(_raw) 병기 (runner body 검증용)
+        if (/^[^=&\s]+=[^&]*(&[^=&\s]+=[^&]*)*$/.test(rawBody)) {
+          parsedBody = Object.fromEntries(new URLSearchParams(rawBody));
+          parsedBody._raw = rawBody;
+        } else {
+          parsedBody = { _raw: rawBody };
+        }
       }
     }
     writeLog({ ...baseEntry, body: parsedBody });

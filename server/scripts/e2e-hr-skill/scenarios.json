@@ -1,1604 +1,551 @@
 {
-  "$comment": "HR skill E2E scenarios. Schema: see ../../docs/02-design/features/hr-e2e-automation-script.design.md §3 + hr-skill-synonym-coverage-matrix.design.md §7 (tier field).",
+  "$comment": "2026-07-24 전면 재편(specs/011-hr-endpoint-catalog-realign FR-015). 구 스위트(E1~E130)는 agent-skills-backup/20260716(kiwibox-hr-api REST /api/v1) 시대 대상이라 폐기 — 원본은 scenarios-legacy-20260716.json 보존. 신규 체계: K##=kiwibox .do BODY 검증(mock_body_pattern), KB##=legacy 행태 승계(결정론성·되묻기 금지·YTA). mock_body_pattern: mock 로그 body(_raw URL디코드)에 전 항목 정규식 매칭 필요.",
   "scenarios": [
     {
-      "id": "E1",
-      "label": "연도 명시 급여",
-      "message": "@agent 사번 20070133 직원의 2025년 3월 정기급여명세서를 조회해줘",
+      "id": "K1",
+      "label": "연차 잔여 — TAA-1310 정본 BODY",
+      "message": "@agent 내 연차 잔여일수 알려줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/payslip\\?.*year_month=202503"
+        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAADclzVcatnList1",
+          "gubun=A",
+          "activeTab=0",
+          "chkAppYn=Y",
+          "wkareaCd=\\d+",
+          "searchSymdLv=\\d{4}0101",
+          "searchEymdLv=\\d{4}1231",
+          "searchSymdFy=\\d{4}0101",
+          "searchEymdFy=\\d{4}1231",
+          "searchBaseYmd=\\d{4}-\\d{2}-\\d{2}",
+          "staffId=",
+          "cmmSearchStaffId="
+        ]
       },
       "repeat": 1,
       "pre_reset": true,
-      "tier": "primary"
+      "tier": "primary",
+      "note": "specs/011 US1. §3.1 공통 BODY 전량 검증. 구현 전 FAIL(getMBLHomeLeaveDetail 호출)"
     },
     {
-      "id": "E2",
-      "label": "상대 표현 출퇴근",
-      "message": "@agent 사번 20070133 직원의 지난달 출퇴근 기록 조회해줘",
+      "id": "K2",
+      "label": "휴가 사용 상세 — TAA-0490 정본 BODY",
+      "message": "@agent 내 휴가 신청 내역 보여줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/timesheet\\?.*year_month=\\d{6}"
+        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAADclzVcatnList2",
+          "gubun=A",
+          "activeTab=0",
+          "chkAppYn=Y",
+          "wkareaCd=\\d+",
+          "searchSymdLv=\\d{4}0101",
+          "searchEymdLv=\\d{4}1231",
+          "searchSymdFy=\\d{4}0101",
+          "searchEymdFy=\\d{4}1231",
+          "searchBaseYmd=\\d{4}-\\d{2}-\\d{2}",
+          "staffId=",
+          "cmmSearchStaffId="
+        ]
       },
       "repeat": 1,
       "pre_reset": true,
-      "tier": "primary"
+      "tier": "primary",
+      "note": "specs/011 US1. §3.2. 구현 전 FAIL(getMBLLeavDetailStaff)"
     },
     {
-      "id": "E3",
-      "label": "연도 미명시 출퇴근 (결정론성)",
-      "message": "@agent 사번 20070133 직원의 3월 출퇴근 기록 조회해줘",
+      "id": "K3",
+      "label": "출퇴근 기록 — TAA-1410 교체",
+      "message": "@agent 이번 달 출퇴근 기록 조회해줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/timesheet\\?.*year_month=\\d{4}03"
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList",
+          "searchBaseSYmd=\\d{6}01",
+          "searchBaseEYmd=\\d{8}",
+          "searchSYmd=\\d{6}01",
+          "searchEYmd=\\d{8}",
+          "cmmSearchStaffId="
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/011 US2 D1. 구현 전 FAIL(TAAWrkTimeListMgrByDate 호출)"
+    },
+    {
+      "id": "K4",
+      "label": "근무현황 — range-both BODY",
+      "message": "@agent 이번 달 근무현황 요약해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList",
+          "searchBaseSYmd=\\d{8}",
+          "searchSYmd=\\d{8}",
+          "searchEYmd=\\d{8}"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/011 US2. §2.1 실측 BODY(양 range 동시). 구현 전 FAIL(searchSYmd 누락)"
+    },
+    {
+      "id": "K5",
+      "label": "근무캘린더 — §2.2 BODY 보강",
+      "message": "@agent 이번 달 근무캘린더 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzWorkSearchCldr\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAADclzWorkSearchCldr",
+          "searchId=",
+          "cmmSearchStaffId=",
+          "searchYm=\\d{6}",
+          "searchBaseYmd=\\d{4}-\\d{2}-\\d{2}"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/011 US2. 구현 전 FAIL(cmmSearchStaffId·searchBaseYmd 누락)"
+    },
+    {
+      "id": "K6",
+      "label": "연장근무 신청 내역 — searchType=2",
+      "message": "@agent 이번 달 연장근무 내역 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzWorkOtSchdul\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAADclzWorkOtSchdulList2",
+          "searchType=2",
+          "searchBaseSYmd=\\d{8}"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/011 US2 D3. 구현 전 FAIL(searchType=3)"
+    },
+    {
+      "id": "K7",
+      "label": "연장근무 한도 — searchType=2",
+      "message": "@agent 이번 달 남은 OT 시간 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzWorkOtSchdul\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAADclzWorkOtSchdulList(&|$)",
+          "searchType=2"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/011 US2 D3. List(한도) cmd — List2 오매칭 방지 경계 포함"
+    },
+    {
+      "id": "K8",
+      "label": "조직 휴가캘린더 — 현행 계약 회귀 고정",
+      "message": "@agent 우리 팀 휴가자 현황 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzVcatnCldrMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAADclzVcatnCldrMgr",
+          "searchSYmd=\\d{8}",
+          "searchEYmd=\\d{8}"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/011 D7 유지 회귀 — 구현 전에도 PASS 기대"
+    },
+    {
+      "id": "KB20",
+      "label": "출퇴근 결정론성 (E3 승계)",
+      "message": "@agent 3월 출퇴근 기록 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "mock_body_pattern": [
+          "searchBaseSYmd=\\d{4}0301"
+        ]
       },
       "repeat": 10,
       "pre_reset": true,
-      "tier": "primary"
+      "tier": "primary",
+      "note": "legacy E3 승계: 연도 미명시 월 → 현재 연도 자동, 되묻기 금지"
     },
     {
-      "id": "E3b",
-      "label": "지난달 연장근무 (year_month 상대표현 결정론성)",
-      "message": "@agent 사번 20070133 직원의 지난달 연장근무 조회해줘",
+      "id": "KB21",
+      "label": "연장근무 상대기간 결정론성 (E3b 승계)",
+      "message": "@agent 지난달 연장근무 조회해줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/overtime\\?.*year_month=\\d{6}"
+        "mock_url_pattern": "^/TAADclzWorkOtSchdul\\.do",
+        "mock_body_pattern": [
+          "searchBaseSYmd=\\d{6}01"
+        ]
       },
       "repeat": 10,
       "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E4",
-      "label": "과거 연도 공제",
-      "message": "@agent 사번 20070133 직원의 2024년 12월 급여 공제항목 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/deductions\\?.*year_month=202412"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E5",
-      "label": "주간 업무계획 (query_type 인식)",
-      "message": "@agent 사번 20070133 직원의 이번주 업무계획 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": null
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E6",
-      "label": "다음주 업무계획 (상대 표현)",
-      "message": "@agent 사번 20070133 직원의 다음주 업무계획 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/work-plan/weekly\\?.*base_date=\\d{8}"
-      },
-      "repeat": 10,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E6b",
-      "label": "어제 근무계획 (base_date 상대표현 결정론성)",
-      "message": "@agent 사번 20070133 직원의 어제 근무계획 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/work-plan/weekly\\?.*base_date=\\d{8}"
-      },
-      "repeat": 10,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E7",
-      "label": "이번주 스케줄",
-      "message": "@agent 사번 20070133 직원의 이번주 스케줄 조회해줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/work-plan/weekly(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E8",
-      "label": "급여 월급 자연어",
-      "message": "@agent 사번 20070133 직원의 이번달 월급 얼마야",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/payslip(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E9",
-      "label": "급여 보너스 내역",
-      "message": "@agent 사번 20070133 직원의 보너스 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/bonus(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E10",
-      "label": "인사 현재직위",
-      "message": "@agent 사번 20070133 직원의 현재 직위 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/appointment/current(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E11",
-      "label": "인사 자격증",
-      "message": "@agent 사번 20070133 직원의 보유 자격증 조회해줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/licenses(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E12",
-      "label": "연말정산 의료비",
-      "message": "@agent 사번 20070133 직원의 의료비 공제 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/medical(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E13",
-      "label": "경계 부양가족공제 (personnel.family 아님)",
-      "message": "@agent 사번 20070133 직원의 부양가족 공제 대상 조회해줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/family(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E14",
-      "label": "연차잔여 연도 명시 전달 (year=2024)",
-      "message": "@agent 사번 20070133 직원의 2024년 연차 잔여일 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/annual-leave/balance\\?.*year=2024"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E15",
-      "label": "연차잔여 연도 미명시 생략 (되묻기 방지)",
-      "message": "@agent 사번 20070133 직원의 연차 잔여일 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/annual-leave/balance\\?emp_no=\\d+$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E16",
-      "label": "근태 연차계획 (primary)",
-      "message": "@agent 사번 20070133 직원의 연차 사용 계획 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/annual-leave/plan(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E17",
-      "label": "근태 출장내역 (primary)",
-      "message": "@agent 사번 20070133 직원의 출장 내역 조회해줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/business-trips(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E18",
-      "label": "근태 휴가신청 (primary)",
-      "message": "@agent 사번 20070133 직원의 휴가 신청 목록 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/leave-requests(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E19",
-      "label": "근태 연장근무 (primary)",
-      "message": "@agent 사번 20070133 직원의 이번달 연장근무 내역 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/overtime(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E20",
-      "label": "근태 대체휴무 (primary)",
-      "message": "@agent 사번 20070133 직원의 대체휴무 신청 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/substitute-leave(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E21",
-      "label": "근태 출퇴근정정 (primary)",
-      "message": "@agent 사번 20070133 직원의 출퇴근 정정 신청 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/timesheet-requests(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E22",
-      "label": "근태 근무유형 (primary)",
-      "message": "@agent 사번 20070133 직원의 오늘 근무 유형 뭐야",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/work-type(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E23",
-      "label": "급여 이체계좌 (primary)",
-      "message": "@agent 사번 20070133 직원의 급여 이체 계좌 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/account(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E24",
-      "label": "급여 연간총액 (primary)",
-      "message": "@agent 사번 20070133 직원의 연간 급여 총액 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/annual-total(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E25",
-      "label": "급여 기본급 (primary)",
-      "message": "@agent 사번 20070133 직원의 기본급 얼마야",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/base-amount(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E26",
-      "label": "급여 비교 (primary)",
-      "message": "@agent 사번 20070133 직원의 이번달과 지난달 급여 비교해줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/compare(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E27",
-      "label": "급여 공제항목 (primary)",
-      "message": "@agent 사번 20070133 직원의 공제 항목 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/deductions(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E28",
-      "label": "급여 휴직급여율 (primary)",
-      "message": "@agent 사번 20070133 직원의 휴직급여 지급률 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/leave-pay-rate(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E29",
-      "label": "급여 호봉 (primary)",
-      "message": "@agent 사번 20070133 직원의 호봉 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/pay-step(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E30",
-      "label": "급여 소급 (primary)",
-      "message": "@agent 사번 20070133 직원의 소급 급여 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/retroactive(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E31",
-      "label": "인사 주소 (primary)",
-      "message": "@agent 사번 20070133 직원의 주소 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/address(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E32",
-      "label": "경계 인사.경력 (year-end-tax.previous_employer 아님) (primary)",
-      "message": "@agent 사번 20070133 직원의 전직 경력 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/career(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E33",
-      "label": "인사 연락처 (primary)",
-      "message": "@agent 사번 20070133 직원의 연락처 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/contact(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E34",
-      "label": "인사 징계 (primary)",
-      "message": "@agent 사번 20070133 직원의 징계 이력 조회해줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/disciplines(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E35",
-      "label": "경계 인사.학력 (year-end-tax.education 아님) (primary)",
-      "message": "@agent 사번 20070133 직원의 학력 정보 조회해줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/education(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E36",
-      "label": "인사 입사일 (primary)",
-      "message": "@agent 사번 20070133 직원의 입사일이 언제야?",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/employment(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E37",
-      "label": "경계 인사.가족 (year-end-tax.family 아님) (primary)",
-      "message": "@agent 사번 20070133 직원의 가족관계 인사기록 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/family(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E38",
-      "label": "인사 포상 (primary)",
-      "message": "@agent 사번 20070133 직원의 포상 이력 조회해줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/rewards(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E39",
-      "label": "인사 비자 (primary)",
-      "message": "@agent 사번 20070133 직원의 비자 정보 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/visa(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E40",
-      "label": "연말정산 신용카드 (primary)",
-      "message": "@agent 사번 20070133 직원의 신용카드 공제 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/credit-card(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E41",
-      "label": "연말정산 기부금 (primary)",
-      "message": "@agent 사번 20070133 직원의 기부금 공제 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/donation(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E42",
-      "label": "경계 연말정산.교육비 (personnel.education 아님) (primary)",
-      "message": "@agent 사번 20070133 직원의 교육비 공제 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/education(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E43",
-      "label": "연말정산 보장성보험 (primary)",
-      "message": "@agent 사번 20070133 직원의 보장성보험 공제 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/insurance(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E44",
-      "label": "경계 연말정산.종전근무지 (personnel.career 아님) (primary)",
-      "message": "@agent 사번 20070133 직원의 종전 근무지 소득 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/previous-employer(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E45",
-      "label": "연말정산 결과 (primary)",
-      "message": "@agent 사번 20070133 직원의 연말정산 결과 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/result(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E46",
-      "label": "연말정산 연금저축 (primary)",
-      "message": "@agent 사번 20070133 직원의 연금저축 공제 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/savings(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E47",
-      "label": "연말정산 공제요약 (primary)",
-      "message": "@agent 사번 20070133 직원의 연말정산 공제 요약 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/summary(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary"
-    },
-    {
-      "id": "E48",
-      "label": "근태 남은휴가 (secondary)",
-      "message": "@agent 사번 20070133 직원의 남은 휴가일수 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/annual-leave/balance(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E49",
-      "label": "근태 연차잔여 (secondary)",
-      "message": "@agent 사번 20070133 직원의 연차잔여일 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/annual-leave/balance(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E50",
-      "label": "근태 휴가계획 (secondary)",
-      "message": "@agent 사번 20070133 직원의 휴가계획 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/annual-leave/plan(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E51",
-      "label": "근태 연차일정 (secondary)",
-      "message": "@agent 사번 20070133 직원의 연차일정 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/annual-leave/plan(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E52",
-      "label": "근태 출장내역 (secondary)",
-      "message": "@agent 사번 20070133 직원의 출장내역 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/business-trips(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E53",
-      "label": "근태 휴가결재 (secondary)",
-      "message": "@agent 사번 20070133 직원의 휴가 결재 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/leave-requests(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E54",
-      "label": "근태 신청내역 (secondary)",
-      "message": "@agent 사번 20070133 직원의 휴가 신청내역 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/leave-requests(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E55",
-      "label": "근태 야근 (secondary)",
-      "message": "@agent 사번 20070133 직원의 이번달 야근 내역 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/overtime(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E56",
-      "label": "근태 OT (secondary)",
-      "message": "@agent 사번 20070133 직원의 이번달 OT 기록 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/overtime(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E57",
-      "label": "근태 대휴 (secondary)",
-      "message": "@agent 사번 20070133 직원의 대휴 신청 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/substitute-leave(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E58",
-      "label": "근태 출근기록 (secondary)",
-      "message": "@agent 사번 20070133 직원의 이번달 출근 기록 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/timesheet(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E59",
-      "label": "근태 근태기록 (secondary)",
-      "message": "@agent 사번 20070133 직원의 근태 기록 조회해줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/timesheet(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E60",
-      "label": "근태 근태변경 (secondary)",
-      "message": "@agent 사번 20070133 직원의 근태변경 신청 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/timesheet-requests(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E61",
-      "label": "근태 정정신청 (secondary)",
-      "message": "@agent 사번 20070133 직원의 출퇴근 정정신청 내역 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/timesheet-requests(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E62",
-      "label": "근태 주간계획 (secondary)",
-      "message": "@agent 사번 20070133 직원의 이번주 주간계획 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/work-plan/weekly(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E63",
-      "label": "근태 주간스케줄 (secondary)",
-      "message": "@agent 사번 20070133 직원의 다음주 스케줄 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/work-plan/weekly(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E64",
-      "label": "근태 재택 (secondary)",
-      "message": "@agent 사번 20070133 직원의 오늘 재택 여부 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/work-type(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E65",
-      "label": "근태 출근유형 (secondary)",
-      "message": "@agent 사번 20070133 직원의 오늘 출근유형 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/work-type(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-
-    {
-      "id": "E66",
-      "label": "급여 급여계좌 (secondary)",
-      "message": "@agent 사번 20070133 직원의 급여계좌 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/account(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E67",
-      "label": "급여 입금계좌 (secondary)",
-      "message": "@agent 사번 20070133 직원의 급여 입금계좌 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/account(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E68",
-      "label": "급여 연봉총합 (secondary)",
-      "message": "@agent 사번 20070133 직원의 연봉 총합 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/annual-total(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E69",
-      "label": "급여 연봉 (secondary)",
-      "message": "@agent 사번 20070133 직원의 연봉 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/base-amount(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E70",
-      "label": "급여 연봉계약 (secondary)",
-      "message": "@agent 사번 20070133 직원의 연봉계약 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/base-amount(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E71",
-      "label": "급여 상여 (secondary)",
-      "message": "@agent 사번 20070133 직원의 상여 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/bonus(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E72",
-      "label": "급여 상여금 (secondary)",
-      "message": "@agent 사번 20070133 직원의 상여금 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/bonus(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E73",
-      "label": "급여 성과급 (secondary)",
-      "message": "@agent 사번 20070133 직원의 성과급 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/bonus(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E74",
-      "label": "급여 지난달비교 (secondary)",
-      "message": "@agent 사번 20070133 직원의 지난달 대비 급여 비교 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/compare(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E75",
-      "label": "급여 월별추이 (secondary)",
-      "message": "@agent 사번 20070133 직원의 급여 월별 추이 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/compare(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E76",
-      "label": "급여 원천징수 (secondary)",
-      "message": "@agent 사번 20070133 직원의 원천징수 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/deductions(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E77",
-      "label": "급여 4대보험 (secondary)",
-      "message": "@agent 사번 20070133 직원의 4대보험 공제 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/deductions(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E78",
-      "label": "급여 지급률 (secondary)",
-      "message": "@agent 사번 20070133 직원의 육아휴직 지급률 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/leave-pay-rate(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E79",
-      "label": "급여 직급호봉 (secondary)",
-      "message": "@agent 사번 20070133 직원의 직급호봉 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/pay-step(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E80",
-      "label": "급여 월급 (secondary)",
-      "message": "@agent 사번 20070133 직원의 이번달 월급 내역 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/payslip(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E81",
-      "label": "급여 명세서 (secondary)",
-      "message": "@agent 사번 20070133 직원의 급여명세서 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/payslip(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E82",
-      "label": "급여 추가지급 (secondary)",
-      "message": "@agent 사번 20070133 직원의 급여 추가지급 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/retroactive(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E83",
-      "label": "급여 미지급 (secondary)",
-      "message": "@agent 사번 20070133 직원의 미지급 급여 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/retroactive(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-
-    {
-      "id": "E84",
-      "label": "인사 거주지 (secondary)",
-      "message": "@agent 사번 20070133 직원의 거주지 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/address(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E85",
-      "label": "인사 직급 (secondary)",
-      "message": "@agent 사번 20070133 직원의 현재 직급 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/appointment/current(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E86",
-      "label": "인사 발령 (secondary)",
-      "message": "@agent 사번 20070133 직원의 현재 발령 상태 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/appointment/current(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E87",
-      "label": "경계 인사.전직 (secondary)",
-      "message": "@agent 사번 20070133 직원의 전직 기록 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/career(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E88",
-      "label": "경계 인사.이전직장경력 (secondary)",
-      "message": "@agent 사번 20070133 직원의 이전 직장 경력 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/career(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E89",
-      "label": "인사 전화 (secondary)",
-      "message": "@agent 사번 20070133 직원의 회사 전화번호 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/contact(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E90",
-      "label": "인사 처분 (secondary)",
-      "message": "@agent 사번 20070133 직원의 처분 이력 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/disciplines(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E91",
-      "label": "경계 인사.학교 (secondary)",
-      "message": "@agent 사번 20070133 직원의 출신 학교 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/education(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E92",
-      "label": "경계 인사.졸업 (secondary)",
-      "message": "@agent 사번 20070133 직원의 졸업 정보 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/education(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E93",
-      "label": "인사 근속 (secondary)",
-      "message": "@agent 사번 20070133 직원의 근속기간 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/employment(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E94",
-      "label": "인사 재직기간 (secondary)",
-      "message": "@agent 사번 20070133 직원의 재직기간 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/employment(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E95",
-      "label": "경계 인사.배우자 (secondary)",
-      "message": "@agent 사번 20070133 직원의 배우자 인사정보 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/family(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E96",
-      "label": "경계 인사.자녀 (secondary)",
-      "message": "@agent 사번 20070133 직원의 자녀 인사기록 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/family(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E97",
-      "label": "인사 면허 (secondary)",
-      "message": "@agent 사번 20070133 직원의 보유 면허 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/licenses(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E98",
-      "label": "인사 자격 (secondary)",
-      "message": "@agent 사번 20070133 직원의 보유 자격 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/licenses(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E99",
-      "label": "인사 수상 (secondary)",
-      "message": "@agent 사번 20070133 직원의 수상 이력 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/rewards(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E100",
-      "label": "인사 표창 (secondary)",
-      "message": "@agent 사번 20070133 직원의 표창 이력 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/rewards(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E101",
-      "label": "인사 체류 (secondary)",
-      "message": "@agent 사번 20070133 직원의 체류 자격 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/visa(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-
-    {
-      "id": "E102",
-      "label": "연말정산 체크카드 (secondary)",
-      "message": "@agent 사번 20070133 직원의 체크카드 공제 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/credit-card(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E103",
-      "label": "연말정산 카드사용내역 (secondary)",
-      "message": "@agent 사번 20070133 직원의 카드 사용 공제 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/credit-card(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E104",
-      "label": "연말정산 기부 (secondary)",
-      "message": "@agent 사번 20070133 직원의 기부 공제 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/donation(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E105",
-      "label": "연말정산 기부공제 (secondary)",
-      "message": "@agent 사번 20070133 직원의 기부공제 내역 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/donation(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E106",
-      "label": "경계 연말정산.학원비 (secondary)",
-      "message": "@agent 사번 20070133 직원의 학원비 공제 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/education(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E107",
-      "label": "경계 연말정산.등록금 (secondary)",
-      "message": "@agent 사번 20070133 직원의 등록금 공제 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/education(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E108",
-      "label": "경계 연말정산.공제대상자 (secondary)",
-      "message": "@agent 사번 20070133 직원의 공제대상자 조회해줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/family(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E109",
-      "label": "연말정산 보험료공제 (secondary)",
-      "message": "@agent 사번 20070133 직원의 보험료 공제 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/insurance(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E110",
-      "label": "연말정산 병원비 (secondary)",
-      "message": "@agent 사번 20070133 직원의 병원비 공제 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/medical(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E111",
-      "label": "경계 연말정산.이전직장근로소득 (secondary)",
-      "message": "@agent 사번 20070133 직원의 이전 직장 근로소득 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/previous-employer(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E112",
-      "label": "경계 연말정산.종전급여 (secondary)",
-      "message": "@agent 사번 20070133 직원의 종전 급여 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/previous-employer(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E113",
-      "label": "연말정산 결정세액 (secondary)",
-      "message": "@agent 사번 20070133 직원의 연말정산 결정세액 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/result(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E114",
-      "label": "연말정산 환급 (secondary)",
-      "message": "@agent 사번 20070133 직원의 연말정산 환급액 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/result(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E115",
-      "label": "연말정산 퇴직연금 (secondary)",
-      "message": "@agent 사번 20070133 직원의 퇴직연금 공제 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/savings(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E116",
-      "label": "연말정산 IRP (secondary)",
-      "message": "@agent 사번 20070133 직원의 IRP 공제 내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/savings(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E117",
-      "label": "연말정산 공제합계 (secondary)",
-      "message": "@agent 사번 20070133 직원의 연말정산 공제합계 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/summary(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E118",
-      "label": "연말정산 연말정산요약 (secondary)",
-      "message": "@agent 사번 20070133 직원의 연말정산 요약 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/summary(\\?.*)?$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "secondary"
-    },
-    {
-      "id": "E119",
-      "label": "hr-personnel-search: graduates_by_region (경상도)",
-      "message": "@agent 경상도 지역 대학을 졸업한 직원목록 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
+      "tier": "primary",
+      "note": "legacy E3b 승계"
+    },
+    {
+      "id": "K9",
+      "label": "급여 지급 건 목록 — 하이픈 searchYm",
+      "message": "@agent 6월 급여 지급 건 목록 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/CommonCode\\.do",
+        "mock_body_pattern": [
+          "cmd=getCommonNSCodeList",
+          "queryId=getSalYmdTypeCdList2",
+          "closeChk=Y",
+          "searchYm=\\d{4}-\\d{2}",
+          "staffId="
+        ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "body 검증(Check 단계 mock.jsonl): university_names length >= 5, region contains '경상'"
+      "note": "specs/011 US3. §1.4 — 구현 전 FAIL(searchYm=YYYYMM 무하이픈)"
     },
     {
-      "id": "E120",
-      "label": "hr-personnel-search: graduates_by_region (전라도)",
-      "message": "@agent 전라도 대학 졸업한 직원 검색해줘",
+      "id": "K10",
+      "label": "급여명세 2단 체인 — SAL-0527 필수 BODY",
+      "message": "@agent 2026년 6월 급여명세서 상세 항목 조회해줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary",
-      "note": "body 검증: university_names length >= 3, region contains '전라'"
-    },
-    {
-      "id": "E121",
-      "label": "hr-personnel-search: graduates_by_region (충청도)",
-      "message": "@agent 충청도 출신 대학 졸업자 목록 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary",
-      "note": "body 검증: university_names length >= 3, region contains '충청'"
-    },
-    {
-      "id": "E122",
-      "label": "hr-personnel-search: graduates_by_region (강원도)",
-      "message": "@agent 강원도 소재 대학 나온 직원 조회",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary",
-      "note": "body 검증: university_names length >= 3, region contains '강원'"
-    },
-    {
-      "id": "E123",
-      "label": "hr-personnel-search: graduates_by_region (제주도)",
-      "message": "@agent 제주도 대학 졸업한 직원들 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary",
-      "note": "body 검증: university_names length >= 2, region contains '제주'"
-    },
-    {
-      "id": "E124",
-      "label": "hr-personnel-search: graduates_by_region (수도권)",
-      "message": "@agent 수도권 대학 졸업한 직원목록",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary",
-      "note": "body 검증: university_names length >= 6, region contains '수도'/'서울'"
-    },
-    {
-      "id": "E125",
-      "label": "hr-personnel-search: chat/query 경로 array items 스키마 검증 (경상도)",
-      "message": "경상도 지역 대학을 졸업한 직원목록 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary",
-      "note": "@agent 접두사 없음 → ChatToolsManager 경유 (chat/query 모드). fix 전: OpenAI 400 invalid_function_parameters (array schema missing items). fix 후: tool_call 성공 + university_names 배열 body 포함."
-    },
-    {
-      "id": "E126",
-      "label": "hr-personnel-search-web-search-assist: LLM 자율 web_search 연계 (경상도, length>=8)",
-      "message": "경상도 지역 대학교 졸업자들을 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary",
-      "note": "chat/query 모드(@agent 없음). description anchor 제거 + metadata.enable_web_search=true로 web_search_preview 자동 주입. Check body (jq '.body.university_names | length'): 목표 >= 8 (기존 5 baseline 대비 60%+ 증가). LLM이 web_search를 쓰지 않고 자체 지식만으로 8개 이상 뽑아도 PASS (자율성 원칙). hallucination (지역 무관 대학 포함)은 manual review 권장."
-    },
-    {
-      "id": "E127",
-      "label": "hr-personnel-search-table-enrichment: graduates_by_region + 대학 주소 컬럼 enrichment (Design E48)",
-      "message": "서울 소재 대학교 졸업생 명단 표로 작성해줘, 대학교 소재지 주소도 추가해줘 데이터가 없다면 웹검색을 활용해서 만들어줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary",
-      "note": "Design §4.1 E48 (positive single-column enrichment). [HR_TABLE_OUTPUT_ENRICHMENT] 가드 발동 → 응답 markdown 표 우측에 '대학교 주소' 컬럼 1개 추가 + SSE/response trace에 web_search_call event ≥ 1건 기대. Minimal schema (tool_call + mock_url_pattern만 자동 검증). web_search_call/new_columns 자동 검증은 후속 피처(hr-skill-enrichment-e2e-runner)."
-    },
-    {
-      "id": "E128",
-      "label": "hr-personnel-search-table-enrichment: no-trigger 회귀 ([HR_TABLE_OUTPUT] 원칙 유지, Design E49)",
-      "message": "서울 소재 대학교 졸업생 명단 표로 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary",
-      "note": "Design §4.1 E49 (negative no-enrichment-trigger). 트리거 키워드(추가해줘/같이/더해줘/붙여줘) 부재 → 컬럼 추가 0건, 원본 표 그대로 출력. [HR_TABLE_OUTPUT] paraphrase 금지 가드 회귀 보호. R1 (트리거 광범위) mitigation 검증."
-    },
-    {
-      "id": "E129",
-      "label": "hr-personnel-search-table-enrichment: multi-column enrichment 2개 (Design E50)",
-      "message": "수도권 대학 졸업생 명단 + 대학 주소 + 학과 영문명 추가해줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/search/graduates$"
+        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getSALPayslipNewMgrList",
+          "searchItem=20260619P",
+          "searchYm=2026-06",
+          "searchType=web",
+          "cmmSearchStaffId="
+        ]
       },
       "repeat": 2,
       "pre_reset": true,
-      "tier": "primary",
-      "note": "Design §4.1 E50 (positive multi-column). 2개 컬럼('대학 주소', '학과 영문명') 우측 추가 + web_search_call ≥ 1건 기대. 다중 enrichment 안정성 검증. repeat=2: 3차 E2E에서 1차 PASS / 2차 FAIL / 3차 PASS의 gpt-5.1 비결정성 관찰 → 2회 중 1회 PASS로 흡수."
+      "tier": "secondary",
+      "note": "specs/011 US3. mock /CommonCode.do fixture(20260619P) 경유 2단 체인. LLM 비결정성 감안 2회 중 1회 이상 PASS 허용"
     },
     {
-      "id": "E130",
-      "label": "hr-personnel-search-table-enrichment: cross-skill hr-personnel.education + 주소 enrichment (Design E51)",
-      "message": "사번 12345 직원 학력 조회해줘, 졸업 대학 주소도 추가해줘",
+      "id": "K11",
+      "label": "급여 공제내역 — 필수 BODY",
+      "message": "@agent 2026년 6월 급여 공제항목 알려줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/education(\\?.*)?$"
+        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getSALPayslipNewMgrList2",
+          "searchYm=\\d{4}-\\d{2}",
+          "searchType=web"
+        ]
       },
       "repeat": 2,
       "pre_reset": true,
+      "tier": "secondary",
+      "note": "specs/011 US3. 2단 체인 — pay_item 유도 searchYm 검증"
+    },
+    {
+      "id": "K12",
+      "label": "급여 요약 — Map 응답 cmd",
+      "message": "@agent 2026년 6월 실수령액 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getSALPayslipNewMgrMap",
+          "searchYm=\\d{4}-\\d{2}",
+          "searchType=web"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "secondary",
+      "note": "specs/011 US3. 요약(Map) — hrSession Map 언랩 경로"
+    },
+    {
+      "id": "K13",
+      "label": "월별 지급 이력 — SAL-0050 교체",
+      "message": "@agent 올해 월별 급여 지급 이력 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/SALSalaryBassMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getSALSalaryBassMgrTab110List",
+          "searchSYmd=\\d{8}",
+          "searchEYmd=\\d{8}",
+          "searchBaseYmd=\\d{4}-\\d{2}-\\d{2}",
+          "cmmSearchStaffId="
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
       "tier": "primary",
-      "note": "Design §4.1 E51 (cross-skill 검증). 발화 강화 (E35 컨벤션 따라 '사번 + 직원 + 조회해줘'): hasSearchIntent ✅(조회) 매치로 hr-personnel.education tool 호출 의도 명확화. hrRouting.js::isPersonnelSearchGraduateRegionQuery()는 hasRegion ❌ 부재로 여전히 미발동(graduates_by_region 분기 차단) → LLM 자율로 hr-personnel.education(emp_no=12345) 선택. L2 [HR_TABLE_OUTPUT_ENRICHMENT] 가드는 5개 HR skill 공통 적용이므로 hr-personnel 표에서도 enrichment 동작('졸업 대학 주소' 컬럼 + web_search_call ≥ 1). repeat=2로 gpt-5.1 비결정성 흡수. mock_url_pattern은 E35 컨벤션 `^/api/v1/personnel/education(\\?.*)?$`로 통일 (query string 옵션)."
+      "note": "specs/011 US3 D5. 구현 전 FAIL(SALSalaryDtstmnMgr 폐기 endpoint 호출)"
+    },
+    {
+      "id": "K14",
+      "label": "기안함 — 기간 파라미터 병행",
+      "message": "@agent 이번 달 내가 상신한 결재문서 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/EAPRequestMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getEAPRequestMgrList",
+          "selectGubun=2",
+          "searchStaDate=\\d{8}",
+          "searchSYmd=\\d{8}",
+          "searchEYmd=\\d{8}"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/011 US4 D8. 구현 전 FAIL(searchSYmd 누락)"
+    },
+    {
+      "id": "K15",
+      "label": "증명서 신청내역 — 3중 사번+기간",
+      "message": "@agent 내 증명서 신청내역 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/CTIMcrtfReqstRefromMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getCTIMcrtfReqstRefromMgrList",
+          "reqNoExist=N",
+          "cmmSearchStaffId=",
+          "staffId=",
+          "searchStaffId=",
+          "searchSYmd=\\d{8}",
+          "searchEYmd=\\d{8}"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/011 US4 D9. 구현 전 FAIL(3중 사번·기간 누락)"
+    },
+    {
+      "id": "K16",
+      "label": "대출 신청내역 — self+기간",
+      "message": "@agent 내 대출 신청내역 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/LONLoanReqstListMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getLONLoanReqstListMgrList1",
+          "cmmSearchStaffId=",
+          "searchBaseSYmd=\\d{8}",
+          "searchBaseEYmd=\\d{8}"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/011 US4 D9. §6.3 전사 노출 방지 self 필수. 구현 전 FAIL(기간 누락)"
+    },
+    {
+      "id": "K17",
+      "label": "교육이력 — §4 공통 BODY",
+      "message": "@agent 내 교육이력 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/PRCHrBassiemMgrTab220\\.do",
+        "mock_body_pattern": [
+          "cmd=getPRCHrBassiemMgrTab220List",
+          "checkHst=N",
+          "staffId=",
+          "cmmSearchStaffId=",
+          "searchStaffId=",
+          "searchYmd=\\d{4}-\\d{2}-\\d{2}"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/011 US4 D9. 구현 전 FAIL(staffId 단독)"
+    },
+    {
+      "id": "KB22",
+      "label": "연차 되묻기 금지 (E14~16 승계)",
+      "message": "@agent 연차 얼마나 남았어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAADclzVcatnList1"
+        ]
+      },
+      "repeat": 3,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "legacy E14~16 승계: 기간 미언급 → 되묻지 않고 즉시 tool-call"
+    },
+    {
+      "id": "KB23",
+      "label": "YTA summary (행태 승계)",
+      "message": "@agent 연말정산 결과 요약 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/YTASummaryMgr\\d{4}\\.do",
+        "mock_body_pattern": [
+          "cmd=getYTASummaryMgrList",
+          "cmmSearchStaffId="
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "secondary",
+      "note": "legacy E47/E45(result→summary 통합) 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+    },
+    {
+      "id": "KB24",
+      "label": "YTA medical (행태 승계)",
+      "message": "@agent 연말정산 의료비 공제내역 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/YTAYndMedDtlMgr\\d{4}\\.do",
+        "mock_body_pattern": [
+          "cmd=getYTAYndMedDtlMgrList",
+          "cmmSearchStaffId="
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "secondary",
+      "note": "legacy E12 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+    },
+    {
+      "id": "KB25",
+      "label": "YTA family (행태 승계)",
+      "message": "@agent 연말정산 부양가족 공제 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/YTAYtaFamilySttusMgr\\d{4}\\.do",
+        "mock_body_pattern": [
+          "cmd=getYTAYtaFamilySttusMgrList",
+          "cmmSearchStaffId="
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "secondary",
+      "note": "legacy E13 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+    },
+    {
+      "id": "KB26",
+      "label": "YTA previous_employer (행태 승계)",
+      "message": "@agent 연말정산 전 직장 급여 반영내역 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/YTAYndBefWrkDtlMgr\\d{4}\\.do",
+        "mock_body_pattern": [
+          "cmd=getYTAYndBefWrkDtlMgrList",
+          "cmmSearchStaffId="
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "secondary",
+      "note": "legacy E44 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+    },
+    {
+      "id": "KB27",
+      "label": "YTA donation (행태 승계)",
+      "message": "@agent 연말정산 기부금 공제내역 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/YTAYndGivPayDtlMgr\\d{4}\\.do",
+        "mock_body_pattern": [
+          "cmd=getYTAYndGivPayDtlMgrList",
+          "cmmSearchStaffId="
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "secondary",
+      "note": "legacy E41 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+    },
+    {
+      "id": "KB28",
+      "label": "YTA credit_card (행태 승계)",
+      "message": "@agent 연말정산 신용카드 공제내역 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/YTAInDctMgr\\d{4}\\.do",
+        "mock_body_pattern": [
+          "cmd=getYTAInDctMgrTab08List",
+          "cmmSearchStaffId="
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "secondary",
+      "note": "legacy E40 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+    },
+    {
+      "id": "KB29",
+      "label": "YTA insurance (행태 승계)",
+      "message": "@agent 연말정산 보험료 공제내역 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/YTAInDctMgr\\d{4}\\.do",
+        "mock_body_pattern": [
+          "cmd=getYTAInDctMgrTab13List",
+          "cmmSearchStaffId="
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "secondary",
+      "note": "legacy E43 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+    },
+    {
+      "id": "KB30",
+      "label": "YTA education (행태 승계)",
+      "message": "@agent 연말정산 교육비 공제내역 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/YTAInDctMgr\\d{4}\\.do",
+        "mock_body_pattern": [
+          "cmd=getYTAInDctMgrTab15List",
+          "cmmSearchStaffId="
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "secondary",
+      "note": "legacy E42 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+    },
+    {
+      "id": "KB31",
+      "label": "YTA savings (행태 승계)",
+      "message": "@agent 연말정산 저축 공제내역 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/YTAInDctMgr\\d{4}\\.do",
+        "mock_body_pattern": [
+          "cmd=getYTAInDctMgrTab06List",
+          "cmmSearchStaffId="
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "secondary",
+      "note": "legacy E46 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
     }
   ]
 }
