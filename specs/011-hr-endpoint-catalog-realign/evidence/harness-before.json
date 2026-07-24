@@ -1,0 +1,287 @@
+{
+  "label": "before",
+  "ts": "2026-07-24T04:16:18.994Z",
+  "pass": 1,
+  "fail": 16,
+  "results": [
+    {
+      "id": "K1",
+      "skill": "hr-attendance",
+      "args": {
+        "query_type": "annual_leave_balance"
+      },
+      "pass": false,
+      "reasons": [
+        "url /getMBLHomeLeaveDetail.do !~ ^/TAADclzVcatnList\\.do",
+        "body missing: cmd=getTAADclzVcatnList1",
+        "body missing: gubun=A",
+        "body missing: activeTab=0",
+        "body missing: chkAppYn=Y",
+        "body missing: wkareaCd=\\d+",
+        "body missing: searchSymdLv=\\d{4}0101",
+        "body missing: searchEymdLv=\\d{4}1231",
+        "body missing: searchSymdFy=\\d{4}0101",
+        "body missing: searchEymdFy=\\d{4}1231",
+        "body missing: searchBaseYmd=\\d{4}-\\d{2}-\\d{2}",
+        "body missing: staffId=",
+        "body missing: cmmSearchStaffId="
+      ],
+      "actualUrl": "/getMBLHomeLeaveDetail.do",
+      "actualBody": "searchType=1",
+      "handlerReturn": "> ⚠️ **연차 발생/사용/잔여** 조회 결과가 존재하지 않습니다."
+    },
+    {
+      "id": "K2",
+      "skill": "hr-attendance",
+      "args": {
+        "query_type": "leave_requests"
+      },
+      "pass": false,
+      "reasons": [
+        "url /getMBLLeavDetailStaff.do !~ ^/TAADclzVcatnList\\.do",
+        "body missing: cmd=getTAADclzVcatnList2",
+        "body missing: gubun=A",
+        "body missing: activeTab=0",
+        "body missing: chkAppYn=Y",
+        "body missing: wkareaCd=\\d+",
+        "body missing: searchSymdLv=\\d{4}0101",
+        "body missing: searchEymdLv=\\d{4}1231",
+        "body missing: searchSymdFy=\\d{4}0101",
+        "body missing: searchEymdFy=\\d{4}1231",
+        "body missing: searchBaseYmd=\\d{4}-\\d{2}-\\d{2}",
+        "body missing: staffId=",
+        "body missing: cmmSearchStaffId="
+      ],
+      "actualUrl": "/getMBLLeavDetailStaff.do",
+      "actualBody": "",
+      "handlerReturn": "> ⚠️ **본인 휴가신청 상세** 조회 결과가 존재하지 않습니다."
+    },
+    {
+      "id": "K3",
+      "skill": "hr-attendance",
+      "args": {
+        "query_type": "timesheet"
+      },
+      "pass": false,
+      "reasons": [
+        "url /TAAWrkTimeListMgrByDate.do !~ ^/TAAWrkTimeStatusMgr\\.do",
+        "body missing: cmd=getTAAWrkTimeStatusMgrList",
+        "body missing: searchSYmd=\\d{6}01",
+        "body missing: searchEYmd=\\d{8}"
+      ],
+      "actualUrl": "/TAAWrkTimeListMgrByDate.do",
+      "actualBody": "cmd=getTAAWrkTimeListMgrByDateList&searchBaseSYmd=20260701&searchBaseEYmd=20260731&cmmSearchStaffId=100:2007:00204:kkHT",
+      "handlerReturn": "> ⚠️ **출퇴근 기록** 조회 결과가 존재하지 않습니다."
+    },
+    {
+      "id": "K4",
+      "skill": "hr-attendance",
+      "args": {
+        "query_type": "work_status"
+      },
+      "pass": false,
+      "reasons": [
+        "body missing: searchSYmd=\\d{8}",
+        "body missing: searchEYmd=\\d{8}"
+      ],
+      "actualUrl": "/TAAWrkTimeStatusMgr.do",
+      "actualBody": "cmd=getTAAWrkTimeStatusMgrList&searchBaseSYmd=20260701&searchBaseEYmd=20260731&cmmSearchStaffId=100:2007:00204:kkHT",
+      "handlerReturn": "> ⚠️ **근무현황 요약** 조회 결과가 존재하지 않습니다."
+    },
+    {
+      "id": "K5",
+      "skill": "hr-attendance",
+      "args": {
+        "query_type": "work_calendar"
+      },
+      "pass": false,
+      "reasons": [
+        "body missing: cmmSearchStaffId=",
+        "body missing: searchBaseYmd=\\d{4}-\\d{2}-\\d{2}"
+      ],
+      "actualUrl": "/TAADclzWorkSearchCldr.do",
+      "actualBody": "cmd=getTAADclzWorkSearchCldr&searchYm=202607&searchId=100:2007:00204:kkHT",
+      "handlerReturn": "> ⚠️ **월 근무캘린더** 조회 결과가 존재하지 않습니다."
+    },
+    {
+      "id": "K6",
+      "skill": "hr-attendance",
+      "args": {
+        "query_type": "overtime"
+      },
+      "pass": false,
+      "reasons": [
+        "body missing: searchType=2"
+      ],
+      "actualUrl": "/TAADclzWorkOtSchdul.do",
+      "actualBody": "cmd=getTAADclzWorkOtSchdulList2&searchBaseSYmd=20260701&searchBaseEYmd=20260731&cmmSearchStaffId=100:2007:00204:kkHT&searchType=3",
+      "handlerReturn": "> ⚠️ **연장근무(OT) 신청 내역** 조회 결과가 존재하지 않습니다."
+    },
+    {
+      "id": "K7",
+      "skill": "hr-attendance",
+      "args": {
+        "query_type": "overtime_limit"
+      },
+      "pass": false,
+      "reasons": [
+        "body missing: searchType=2"
+      ],
+      "actualUrl": "/TAADclzWorkOtSchdul.do",
+      "actualBody": "cmd=getTAADclzWorkOtSchdulList&searchBaseSYmd=20260701&searchBaseEYmd=20260731&cmmSearchStaffId=100:2007:00204:kkHT&searchType=3",
+      "handlerReturn": "> ⚠️ **연장근무(OT) 한도/잔여** 조회 결과가 존재하지 않습니다."
+    },
+    {
+      "id": "K8",
+      "skill": "hr-attendance",
+      "args": {
+        "query_type": "vacation_calendar"
+      },
+      "pass": true,
+      "reasons": [],
+      "actualUrl": "/TAADclzVcatnCldrMgr.do",
+      "actualBody": "cmd=getTAADclzVcatnCldrMgr&searchSYmd=20260701&searchEYmd=20260731",
+      "handlerReturn": "> ⚠️ **조직 휴가캘린더** 조회 결과가 존재하지 않습니다."
+    },
+    {
+      "id": "K9",
+      "skill": "hr-salary",
+      "args": {
+        "query_type": "pay_periods",
+        "year_month": "202606"
+      },
+      "pass": false,
+      "reasons": [
+        "body missing: searchYm=\\d{4}-\\d{2}"
+      ],
+      "actualUrl": "/CommonCode.do",
+      "actualBody": "cmd=getCommonNSCodeList&queryId=getSalYmdTypeCdList2&closeChk=Y&searchYm=202606&staffId=100:2007:00204:kkHT",
+      "handlerReturn": "## HR 급여 - 지급 건 목록\n\n아래 급여 건 중 하나를 선택해 상세를 조회할 수 있습니다.\n\n| 급여 건 | 코드(pay_item) |\n|---|---|\n| 2026-06-19 급여 | `20260619P` |"
+    },
+    {
+      "id": "K10",
+      "skill": "hr-salary",
+      "args": {
+        "query_type": "payslip",
+        "pay_item": "20260619P"
+      },
+      "pass": false,
+      "reasons": [
+        "body missing: searchYm=2026-06",
+        "body missing: searchType=web"
+      ],
+      "actualUrl": "/SALPayslipNewMgr.do",
+      "actualBody": "cmd=getSALPayslipNewMgrList&searchItem=20260619P&cmmSearchStaffId=100:2007:00204:kkHT",
+      "handlerReturn": "> ⚠️ **급여 지급항목 명세** 조회 결과가 존재하지 않습니다."
+    },
+    {
+      "id": "K11",
+      "skill": "hr-salary",
+      "args": {
+        "query_type": "deductions",
+        "pay_item": "20260619P"
+      },
+      "pass": false,
+      "reasons": [
+        "body missing: searchYm=\\d{4}-\\d{2}",
+        "body missing: searchType=web"
+      ],
+      "actualUrl": "/SALPayslipNewMgr.do",
+      "actualBody": "cmd=getSALPayslipNewMgrList2&searchItem=20260619P&cmmSearchStaffId=100:2007:00204:kkHT",
+      "handlerReturn": "> ⚠️ **급여 공제내역** 조회 결과가 존재하지 않습니다."
+    },
+    {
+      "id": "K12",
+      "skill": "hr-salary",
+      "args": {
+        "query_type": "payslip_summary",
+        "pay_item": "20260619P"
+      },
+      "pass": false,
+      "reasons": [
+        "body missing: searchYm=\\d{4}-\\d{2}",
+        "body missing: searchType=web"
+      ],
+      "actualUrl": "/SALPayslipNewMgr.do",
+      "actualBody": "cmd=getSALPayslipNewMgrMap&searchItem=20260619P&cmmSearchStaffId=100:2007:00204:kkHT",
+      "handlerReturn": "> ⚠️ **급여 요약(지급/공제/실수령 합계)** 조회 결과가 존재하지 않습니다."
+    },
+    {
+      "id": "K13",
+      "skill": "hr-salary",
+      "args": {
+        "query_type": "salary_statement"
+      },
+      "pass": false,
+      "reasons": [
+        "no request captured"
+      ],
+      "actualUrl": null,
+      "actualBody": null,
+      "handlerReturn": "> ⚠️ 급여 건(pay_item)이 필요합니다. 먼저 query_type=pay_periods로 지급 건 목록을 조회한 뒤, 그 결과의 코드값(CODE)으로 다시 요청하세요."
+    },
+    {
+      "id": "K14",
+      "skill": "hr-approval",
+      "args": {
+        "query_type": "drafted"
+      },
+      "pass": false,
+      "reasons": [
+        "body missing: searchSYmd=\\d{8}",
+        "body missing: searchEYmd=\\d{8}"
+      ],
+      "actualUrl": "/EAPRequestMgr.do",
+      "actualBody": "cmd=getEAPRequestMgrList&selectGubun=2&searchStaDate=20260701&searchEndDate=20260731",
+      "handlerReturn": "> ⚠️ **기안함(내가 상신한 문서)**: 해당 기간에 문서가 없습니다."
+    },
+    {
+      "id": "K15",
+      "skill": "hr-certificate",
+      "args": {
+        "query_type": "requests"
+      },
+      "pass": false,
+      "reasons": [
+        "body missing: cmmSearchStaffId=",
+        "body missing: searchStaffId=",
+        "body missing: searchSYmd=\\d{8}",
+        "body missing: searchEYmd=\\d{8}"
+      ],
+      "actualUrl": "/CTIMcrtfReqstRefromMgr.do",
+      "actualBody": "cmd=getCTIMcrtfReqstRefromMgrList&reqNoExist=N&staffId=100:2007:00204:kkHT",
+      "handlerReturn": "> ⚠️ **증명서 신청내역**이 없습니다."
+    },
+    {
+      "id": "K16",
+      "skill": "hr-welfare",
+      "args": {
+        "query_type": "loan"
+      },
+      "pass": false,
+      "reasons": [
+        "body missing: searchBaseSYmd=\\d{8}",
+        "body missing: searchBaseEYmd=\\d{8}"
+      ],
+      "actualUrl": "/LONLoanReqstListMgr.do",
+      "actualBody": "cmd=getLONLoanReqstListMgrList1&cmmSearchStaffId=100:2007:00204:kkHT",
+      "handlerReturn": "> ⚠️ **대출 신청내역**이 없습니다."
+    },
+    {
+      "id": "K17",
+      "skill": "hr-personnel",
+      "args": {
+        "query_type": "education"
+      },
+      "pass": false,
+      "reasons": [
+        "body missing: cmmSearchStaffId=",
+        "body missing: searchStaffId=",
+        "body missing: searchYmd=\\d{4}-\\d{2}-\\d{2}"
+      ],
+      "actualUrl": "/PRCHrBassiemMgrTab220.do",
+      "actualBody": "cmd=getPRCHrBassiemMgrTab220List&checkHst=N&staffId=100:2007:00204:kkHT",
+      "handlerReturn": "> ⚠️ **교육이력** 조회 결과가 존재하지 않습니다."
+    }
+  ]
+}
