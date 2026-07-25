@@ -42,6 +42,35 @@ LLM 미개입이라 BODY 정확성 판정은 E2E보다 결정론적.
 3. 실동작 스모크: setup_args 실환경(ntest.5240.kr) 복원 후 연차/출퇴근/급여 2단 체인/월별 이력 + 민감정보 미노출 + 3-Mode/embed 브리지 `.do` 경로 통과 확인.
 4. D4 리스크 실측 판정: §2.1(orgCd 미전송)·§3(wkareaCd=1000) 실환경 성공 여부 — 실패 시 `HR_ORG_CD` setup_arg 후속.
 
+## 2026-07-25 추가 검증 — kiwibox-endpoint-test-guide.md 기반 유효성 검증
+
+가이드(`specs/kiwibox-endpoint-test-guide.md`) 절차로 세션 없이 가능한 범위 전부 수행:
+
+### ① 라이브 경로 실존 검증 (ntest.5240.kr 무세션 프로브)
+
+무세션 거동 실측: 실존 `.do` = 400(웹)/302→Error.do?code=905(모바일 getMBL), 부재 = 404.
+스킬 사용 **26경로 전건 실존** — 근태 5·휴가 1·급여 4(SAL-0050 포함)·결재 1·증명서 1·대출 1·
+인사 8(getMBL 7 + Tab220)·YTA 6(2025 연도판). 신규 교체 경로(TAADclzVcatnList·SALSalaryBassMgr)
+실존 확인 = D1/D2/D5 교체의 라우팅 리스크 해소.
+
+### ② 요청 BODY ↔ 가이드 §3 실측 본문 파라미터 대조 (하네스, LLM 미개입)
+
+[evidence/harness-validate.json](./evidence/harness-validate.json) — **K1~K17 17/17 PASS**. 파라미터셋 diff 전수:
+
+| 항목 | 결과 |
+|---|---|
+| 휴가 공통 BODY(§3.4)·캘린더(§3.3)·급여명세 3종(§3.1②)·증명서(§3.8)·대출(§3.8) | 가이드와 **완전 일치** |
+| orgCd (§3.2·3.5·3.6) | 의도적 미전송 — 승인 결정 D4 (사용자별 값, 실환경 판정 후 HR_ORG_CD 후속) |
+| eap_inbox (§3.7) | searchSYmd/EYmd 일치 + selectGubun/searchStaDate 병행 초과 — 승인 결정 D8 |
+| Tab220 checkHst 초과 | specs/007 실측 파라미터 — 가이드 §3.6 공통 패턴 외 무해 |
+| **applCd (§3.1①)** | **결함 발견·수정**: 빈 값 시 생략하던 것을 항상 전송으로 정정 (실측 본문 전량 원칙) |
+
+### ③ 미완 — JSESSIONID 필요 (가이드 §0.1)
+
+데이터 수준 검증(가이드 §4 스모크 러너: rows>0·응답 필드 카탈로그 대조·§5 체크리스트)은
+로그인 세션 없이는 불가. 로그인된 브라우저의 JSESSIONID 확보 시
+가이드 §4 러너 + HR_SESSION_COOKIE 설정 후 하네스로 즉시 실행 가능.
+
 ## 부수 확보물
 
 - `scenarios-legacy-20260716.json` — 폐기 132건 원본 보존 (기능 재도입 시 참조).
