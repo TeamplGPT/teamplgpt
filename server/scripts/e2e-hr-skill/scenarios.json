@@ -212,7 +212,8 @@
           "queryId=getSalYmdTypeCdList2",
           "closeChk=Y",
           "searchYm=\\d{4}-\\d{2}",
-          "staffId="
+          "staffId=",
+          "applCd="
         ]
       },
       "repeat": 1,

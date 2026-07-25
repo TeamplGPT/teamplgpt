@@ -85,9 +85,9 @@ module.exports.runtime = {
           queryId: "getSalYmdTypeCdList2",
           closeChk: "Y",
           searchYm: `${ym.slice(0, 4)}-${ym.slice(4, 6)}`, // §1.4 실측 형식 YYYY-MM(하이픈)
+          applCd, // §1.4 실측 본문 — 빈 값이라도 항상 전송(임의 축약 금지)
           staffId: SELF_STAFF_ID_MARKER,
         };
-        if (applCd) form.applCd = applCd;
 
         this.introspect(`${label} 조회 중...`);
         const { errorMessage, records, isEmpty } = await hrFetch(this, {
