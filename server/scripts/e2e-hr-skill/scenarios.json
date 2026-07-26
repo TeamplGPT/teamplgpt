@@ -547,6 +547,148 @@
       "pre_reset": true,
       "tier": "secondary",
       "note": "legacy E46 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+    },
+    {
+      "id": "KB40",
+      "label": "카탈로그 별칭: 잔여연차",
+      "message": "@agent 내 잔여연차 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAADclzVcatnList1"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "permission_catalog TAA-1310 별칭(잔여연차) → annual_leave_balance 매핑"
+    },
+    {
+      "id": "KB41",
+      "label": "카탈로그 별칭: 휴가현황",
+      "message": "@agent 내 휴가현황 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAADclzVcatnList1"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "TAA-0490 menuNm(휴가현황) → annual_leave_balance"
+    },
+    {
+      "id": "KB42",
+      "label": "카탈로그 별칭: 출근현황",
+      "message": "@agent 이번 달 출근현황 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "TAA-0340 menuNm(출근현황) → timesheet(TAA-1410 정본)"
+    },
+    {
+      "id": "KB43",
+      "label": "카탈로그 별칭: 페이슬립",
+      "message": "@agent 6월 페이슬립 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/CommonCode\\.do",
+        "mock_body_pattern": [
+          "queryId=getSalYmdTypeCdList2"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "SAL-0527 별칭(페이슬립) → payslip 1단계(pay_periods) 진입"
+    },
+    {
+      "id": "KB44",
+      "label": "카탈로그 menuNm: 월별지급내역",
+      "message": "@agent 내 월별지급내역 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/SALSalaryBassMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getSALSalaryBassMgrTab110List"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "SAL-0050 menuNm(월별지급내역) → salary_statement"
+    },
+    {
+      "id": "KB45",
+      "label": "카탈로그 별칭: 상환계획",
+      "message": "@agent 내 대출 상환계획 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/LONLoanReqstListMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getLONLoanReqstListMgrList1"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "LON-0040 별칭(상환계획 조회) → loan"
+    },
+    {
+      "id": "KB46",
+      "label": "카탈로그 menuNm: 결재문서함",
+      "message": "@agent 결재문서함 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/EAPRequestMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getEAPRequestMgrList"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "EAP-0070 menuNm(결재문서함) → hr-approval (기본 drafted 허용 — cmd만 검증)"
+    },
+    {
+      "id": "KB47",
+      "label": "카탈로그 별칭: 소득공제신청",
+      "message": "@agent 소득공제신청 내역 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/YTASummaryMgr\\d{4}\\.do",
+        "mock_body_pattern": [
+          "cmd=getYTASummaryMgrList"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "YTA22-0007 별칭(소득공제신청) → hr-year-end-tax summary"
+    },
+    {
+      "id": "KB48",
+      "label": "카탈로그 별칭: 사원카드",
+      "message": "@agent 내 사원카드 정보 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLPrtEmpCard\\.do",
+        "mock_body_pattern": []
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "PRC-0110 별칭(사원카드) → hr-personnel profile"
     }
   ]
 }

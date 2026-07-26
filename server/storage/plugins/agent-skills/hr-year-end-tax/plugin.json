@@ -5,12 +5,12 @@
   "version": "2.1.0",
   "hubId": "hr-year-end-tax",
   "author": "teamplgpt",
-  "description": "본인 연말정산(공제·결정세액 요약, 의료비, 부양가족, 종전근무지, 기부금)을 5240 HR 시스템에서 조회합니다. 항상 대화 중인 본인 기준으로 조회되며 사번은 필요 없습니다. 사용자가 연말정산/공제/환급/결정세액/의료비공제/부양가족/종전근무지/기부금공제 등을 물으면 이 skill을 사용하세요. 귀속연도는 cal_yy로 지정할 수 있으며(미지정 시 최신 연도), 지원 연도는 2022~2025입니다. 주민번호·계좌 등 민감정보는 제공하지 않습니다. query_type 종류: summary(공제요약 및 결정세액), medical(의료비 공제), family(부양가족 현황), previous_employer(종전근무지 급여·세액), donation(기부금 공제), credit_card(신용카드 공제), insurance(보장성보험 공제), education(교육비 공제), savings(연금저축 공제). 종류가 불분명하면 summary를 사용하세요.",
+  "description": "본인 연말정산(공제·결정세액 요약, 의료비, 부양가족, 종전근무지, 기부금)을 5240 HR 시스템에서 조회합니다. 항상 대화 중인 본인 기준으로 조회되며 사번은 필요 없습니다. 사용자가 연말정산/소득공제/소득공제신청/연말정산 간소화/13월의 월급/공제/환급/결정세액/의료비공제/부양가족/종전근무지/기부금공제 등을 물으면 이 skill을 사용하세요. 귀속연도는 cal_yy로 지정할 수 있으며(미지정 시 최신 연도), 지원 연도는 2022~2025입니다. 주민번호·계좌 등 민감정보는 제공하지 않습니다. query_type 종류: summary(공제요약 및 결정세액), medical(의료비 공제), family(부양가족 현황), previous_employer(종전근무지 급여·세액), donation(기부금 공제), credit_card(신용카드 공제), insurance(보장성보험 공제), education(교육비 공제), savings(연금저축 공제). 종류가 불분명하면 summary를 사용하세요.",
   "entrypoint": {
     "file": "handler.js",
     "params": {
       "query_type": {
-        "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 매핑하세요. 매핑표: summary=연말정산요약(연말정산/공제요약/공제합계/결정세액/환급/환급액/연말정산결과), medical=의료비(의료비/의료비공제/병원비), family=부양가족(부양가족/부양가족현황/공제대상가족), previous_employer=종전근무지(종전근무지/이전직장/종전급여/전직장 근로소득), donation=기부금(기부/기부금/기부금공제). 인사기록 가족정보는 hr-personnel, 인사기록 전직경력도 hr-personnel을 사용. credit_card=신용카드(신용카드/체크카드/카드공제/현금영수증), insurance=보장성보험(보험/보장성보험/보험료공제), education=교육비(교육비/학원비/등록금/교육공제 — 연말정산 공제용이며 인사기록 교육이력은 hr-personnel.education 사용), savings=연금저축(연금저축/퇴직연금/IRP).",
+        "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 매핑하세요. 매핑표: summary=연말정산요약(연말정산/소득공제/소득공제신청/연말정산 간소화/13월의 월급/공제요약/공제합계/결정세액/환급/환급액/연말정산결과), medical=의료비(의료비/의료비공제/병원비), family=부양가족(부양가족/부양가족현황/공제대상가족), previous_employer=종전근무지(종전근무지/이전직장/종전급여/전직장 근로소득), donation=기부금(기부/기부금/기부금공제). 인사기록 가족정보는 hr-personnel, 인사기록 전직경력도 hr-personnel을 사용. credit_card=신용카드(신용카드/체크카드/카드공제/현금영수증), insurance=보장성보험(보험/보장성보험/보험료공제), education=교육비(교육비/학원비/등록금/교육공제 — 연말정산 공제용이며 인사기록 교육이력은 hr-personnel.education 사용), savings=연금저축(연금저축/퇴직연금/IRP).",
         "type": "string",
         "enum": [
           "summary",
