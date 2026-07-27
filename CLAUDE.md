@@ -26,6 +26,7 @@ AGENTS.md는 이 파일과 동일 내용(멀티-agent tool 표준 준수).
 - **E2E-First**: LLM 행태 변경은 코드 전에 시나리오 append → FAIL 확인 → 수정 → 전건 PASS. 빌드 통과 ≠ 완료.
 - **handler.js 무수정 원칙**: HR skill LLM 제어는 `plugin.json` description으로.
 - **Multi-Layer Defense**: L1 description 가드 + L2 코드 가드 + L3 E2E 시나리오. 한 층만으로 완료 보고 금지.
+  L2 코드 가드에는 tool 결과 footer(조회 결과 소비 방식 제어, `_shared/formatTable.js` `ANSWER_GUIDE`) 포함 — 문구 정본은 `specs/012-hr-answer-quality/contracts/footer-contract.md`.
 - **업스트림 발산 최소화**: upstream 파일은 최소 diff, 신규 기능은 신규 파일·skill로 격리.
 - **최소 범위**: 요청된 변경만. 인접 개선은 제안만.
 - **커밋**: Conventional Commits, `type(feature-slug): 한국어 요약`. 사용자가 요청할 때만 커밋.
@@ -80,5 +81,5 @@ HR agent-skill(`hr-attendance`, `hr-salary`, `hr-personnel`, `hr-year-end-tax`) 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan:
-`specs/011-hr-endpoint-catalog-realign/plan.md`
+`specs/012-hr-answer-quality/plan.md`
 <!-- SPECKIT END -->

@@ -100,6 +100,13 @@ function normalizeData(data) {
  * @returns {string} Markdown table string (empty string if no rows)
  */
 function renderTable(rows, options = {}) {
+  const md = renderTableRaw(rows, options);
+  return md ? md + ANSWER_GUIDE : md;
+}
+
+// footer 미부착 내부 렌더 — renderWhitelisted가 "총 N건" 줄 뒤에 footer를 한 번만
+// 붙일 수 있도록 분리 (specs/012-hr-answer-quality contracts/footer-contract.md).
+function renderTableRaw(rows, options = {}) {
   const { boldNumbers = false, excludeKeys = ["code", "message"] } = options;
 
   if (!rows || rows.length === 0) return "";
@@ -117,6 +124,18 @@ function renderTable(rows, options = {}) {
 
   return md;
 }
+
+// LLM 대상 응답 지침 footer — 조회 데이터 표의 통짜 재출력(echo) 억제.
+// 고정 분량 숫자 금지, 질문 유형 적응 3분기 (specs/012 FR-001).
+// 문구 정본: specs/012-hr-answer-quality/contracts/footer-contract.md
+const ANSWER_GUIDE = `
+---
+[응답 지침] 위 표는 조회 데이터이며 그대로 출력하라는 지시가 아닙니다.
+- 특정 값을 묻는 질문: 해당 값과 이해에 필요한 맥락만 답변
+- 내역·현황을 묻는 질문: 질문과 관련된 행·열만 추려 제시(표 사용 가능)
+- 사용자가 전체/상세/표를 명시 요청한 경우: 전체 표 제공
+이 지침 문구 자체를 답변에 포함하지 마세요.
+`;
 
 /**
  * Render summary fields as a markdown blockquote.
@@ -172,7 +191,11 @@ function renderWhitelisted(records, columnLabels) {
     return row;
   });
 
-  return renderTable(normalized) + `\n> 총 **${normalized.length}건** 조회됨`;
+  return (
+    renderTableRaw(normalized) +
+    `\n> 총 **${normalized.length}건** 조회됨` +
+    ANSWER_GUIDE
+  );
 }
 
 module.exports = {
@@ -181,4 +204,5 @@ module.exports = {
   renderTable,
   renderSummary,
   renderWhitelisted,
+  ANSWER_GUIDE,
 };
