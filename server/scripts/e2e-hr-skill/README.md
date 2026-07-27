@@ -79,7 +79,16 @@ Overall: 7/9 (77.8%)
 | `expect.tool_call=true` 이나 tool-call 없음 (되묻기 등) | FAIL |
 | `expect.mock_url_pattern` 정규식이 Mock 로그의 최근 URL과 매칭 | PASS |
 | `expect.mock_url_pattern`이 `null` | URL 검증 skip, tool_call만 확인 |
+| `expect.answer_pattern` 중 최종 답변(finalText) 미매치 존재 | FAIL (`answer missing pattern(s)`) |
+| `expect.answer_not_pattern` 중 최종 답변 매치 존재 | FAIL (`answer contains forbidden pattern(s)`) |
+| answer 계열 필드 존재인데 최종 답변 미캡처 | FAIL (`no final answer captured`) |
+| Mock HR 호출 건수 > `expect.max_hr_calls` | FAIL (`hr calls N exceeded max M`) |
 | 요청 timeout | FAIL (해당 run만, 다음 시나리오는 계속 진행) |
+
+판정 순서: tool_call → mock_url → mock_body → answer_pattern → answer_not_pattern → max_hr_calls.
+answer 계열 3필드는 전부 옵셔널 — 미사용 시나리오 판정 무영향. `result.json` 각 run에
+`hrCallCount`(mock HR 실호출 건수) 기록. 스키마 정본:
+`specs/012-hr-answer-quality/contracts/e2e-assertion-schema.md`
 
 Exit code: 전원 PASS면 `0`, 하나라도 FAIL이면 `1`.
 
@@ -89,12 +98,13 @@ Exit code: 전원 PASS면 `0`, 하나라도 FAIL이면 `1`.
 
 ```json
 {
-  "id": "E6",
-  "label": "연말정산 과거 연도",
-  "message": "@agent 사번 20070133 직원의 2023년 연말정산 결과 조회해줘",
+  "id": "K99",
+  "label": "연차 잔여 — 예시",
+  "message": "@agent 내 연차 잔여일수 알려줘",
   "expect": {
     "tool_call": true,
-    "mock_url_pattern": "^/api/v1/.*year.*2023"
+    "mock_url_pattern": "^/TAADclzVcatnList\\.do",
+    "mock_body_pattern": ["cmd=getTAADclzVcatnList1"]
   },
   "repeat": 1,
   "pre_reset": true
@@ -110,6 +120,10 @@ Exit code: 전원 PASS면 `0`, 하나라도 FAIL이면 `1`.
 | `message` | string | ✅ | - | LLM에 보낼 질의 |
 | `expect.tool_call` | boolean | ✅ | - | tool-call 발생 기대 여부 |
 | `expect.mock_url_pattern` | string\|null | - | `null` | Mock URL 매칭 정규식 |
+| `expect.mock_body_pattern` | string[] | - | - | Mock POST body 매칭 정규식(전건 필수) |
+| `expect.answer_pattern` | string[] | - | - | 최종 답변 필수 포함 정규식(전건 필수) |
+| `expect.answer_not_pattern` | string[] | - | - | 최종 답변 금지 정규식(하나라도 매치 시 FAIL) |
+| `expect.max_hr_calls` | number | - | - | Mock HR 호출 건수 상한(정수 ≥1) |
 | `repeat` | number | - | `1` | 반복 횟수 (1~20) |
 | `pre_reset` | boolean | - | `true` | 직전 `/reset` 수행 |
 

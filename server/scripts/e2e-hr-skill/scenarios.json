@@ -602,15 +602,16 @@
       "message": "@agent 6월 페이슬립 보여줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/CommonCode\\.do",
+        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
         "mock_body_pattern": [
-          "queryId=getSalYmdTypeCdList2"
+          "cmd=getSALPayslipNewMgrList",
+          "searchItem=20260619P"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "SAL-0527 별칭(페이슬립) → payslip 1단계(pay_periods) 진입"
+      "note": "SAL-0527 별칭(페이슬립) → pay_periods 진입 후 CommonCode fixture 코드(20260619P)로 payslip까지 체인 완주 검증. (구기대 'CommonCode 1단계'는 runner가 마지막 URL만 대조해 체인 완주 시 구조적 FAIL — specs/012 T015 live 전수 실행에서 판명, 기대를 완주 기준으로 상향)"
     },
     {
       "id": "KB44",
@@ -689,6 +690,87 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "PRC-0110 별칭(사원카드) → hr-personnel profile"
+    },
+    {
+      "id": "Q1",
+      "label": "답변품질 — 연차 단일값 질문: 값 중심, 표 echo 금지",
+      "message": "@agent 남은 연차 개수는?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
+        "answer_pattern": [
+          "22"
+        ],
+        "answer_not_pattern": [
+          "배우자출산휴가",
+          "총 \\*?\\*?\\d+\\*?\\*?건 조회됨",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/012 US1/AS1. footer(T006) 구현 전 FAIL(표 echo로 배우자출산휴가 매치) 기대"
+    },
+    {
+      "id": "Q2",
+      "label": "답변품질 — 전체 표 명시 요청: 표 제공 유지(과억제 방지)",
+      "message": "@agent 휴가 현황 전체 표로 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
+        "answer_pattern": [
+          "연차",
+          "배우자출산휴가"
+        ],
+        "answer_not_pattern": [
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/012 US1/AS2. 명시 요청 예외 — footer 구현 후에도 전체 표 유지 검증"
+    },
+    {
+      "id": "Q3",
+      "label": "답변품질 — 지각 질문: fan-out 억제(HR 호출 1건)",
+      "message": "@agent 이번 달 지각 있어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "max_hr_calls": 1,
+        "answer_pattern": [
+          "지각"
+        ],
+        "answer_not_pattern": [
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/012 US2/AS1. description 가드(T010) 구현 전 FAIL(3건 fan-out) 기대"
+    },
+    {
+      "id": "Q4",
+      "label": "답변품질 — 사용내역 질문: 전건 포함(과요약 방지)",
+      "message": "@agent 이번 달 휴가 사용내역 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
+        "answer_pattern": [
+          "0710|07-10|7월 10일",
+          "0721|07-21|7월 21일"
+        ],
+        "answer_not_pattern": [
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/012 US3/AS1. footer 공유로 FAIL-first 불가 — 과요약 회귀 가드(tasks T012)"
     }
   ]
 }

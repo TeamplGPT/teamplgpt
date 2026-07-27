@@ -177,6 +177,31 @@ function loadScenarios() {
         }
       });
     }
+    // 012-hr-answer-quality: 최종 답변 텍스트·HR 호출 건수 검증 (옵셔널 —
+    // 미존재 시 스킵, 기존 시나리오 판정 무영향). contracts/e2e-assertion-schema.md
+    for (const key of ["answer_pattern", "answer_not_pattern"]) {
+      if (s.expect[key] == null) continue;
+      if (
+        !Array.isArray(s.expect[key]) ||
+        s.expect[key].some((p) => typeof p !== "string")
+      ) {
+        fatal(`Scenario ${s.id}: expect.${key} must be string[]`);
+      }
+      const compiled = s.expect[key].map((p) => {
+        try {
+          return new RegExp(p);
+        } catch (e) {
+          fatal(`Scenario ${s.id}: invalid ${key} regex "${p}": ${e.message}`);
+        }
+      });
+      if (key === "answer_pattern") s._answerRegexes = compiled;
+      else s._answerNotRegexes = compiled;
+    }
+    if (s.expect.max_hr_calls != null) {
+      if (!Number.isInteger(s.expect.max_hr_calls) || s.expect.max_hr_calls < 1) {
+        fatal(`Scenario ${s.id}: expect.max_hr_calls must be an integer >= 1`);
+      }
+    }
     s.repeat = Number.isInteger(s.repeat) ? s.repeat : 1;
     if (s.repeat < 1 || s.repeat > 20) {
       fatal(`Scenario ${s.id}: repeat must be 1..20`);
@@ -303,7 +328,12 @@ async function streamChat(apiKey, body) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
-      "x-tool-runtime-override-HR_API_BASE_URL": `http://localhost:${MOCK_PORT}`,
+      // 현행 kiwibox skill이 읽는 runtimeArgs 키로 override (hrSession.js).
+      // 구 REST 시대 키(HR_API_BASE_URL)는 무효라 제거 — setup_args(plugin.json)
+      // 무변경으로 mock 라우팅 (executor.js #mergeRuntimeOverrides 계약).
+      "x-tool-runtime-override-HR_BASE_URL": `http://localhost:${MOCK_PORT}`,
+      "x-tool-runtime-override-HR_SESSION_COOKIE": "JSESSIONID=E2E-MOCK",
+      "x-tool-runtime-override-HR_STAFF_ID": "E2E001",
       "Content-Length": Buffer.byteLength(json),
     },
     body: json,
@@ -380,6 +410,55 @@ function mockBodyToString(body) {
   return String(body);
 }
 
+// 워크스페이스 chat log 물리 삭제 (docker psql — helpers/apikey.js와 동일 패턴).
+// API 경로의 /reset은 workspace_chats를 지우지 않아(스레드 스코프) 직전 시나리오
+// 답변(표 데이터)이 히스토리로 유입 → LLM이 tool-call을 생략하는 오염 발생
+// (specs/012 T015에서 관측 — fixture 도입 전에는 빈 데이터라 무해했던 설계 공백).
+function wipeWorkspaceChats() {
+  execFileSync(
+    "docker",
+    [
+      "exec",
+      PG_CONTAINER,
+      "psql",
+      "-U",
+      process.env.E2E_PG_USER || "anythingllm",
+      "-d",
+      process.env.E2E_PG_DB || "anythingllm",
+      "-tA",
+      "-c",
+      `DELETE FROM workspace_chats WHERE "workspaceId" = (SELECT id FROM workspaces WHERE slug = '${WORKSPACE.replace(/'/g, "''")}');`,
+    ],
+    { encoding: "utf8" }
+  );
+}
+
+// wipe 후 히스토리가 실제로 비었는지 폴링 (최대 5s).
+async function waitForEmptyHistory(apiKey) {
+  const u = new URL(SERVER_URL);
+  const deadline = Date.now() + 5000;
+  while (Date.now() < deadline) {
+    try {
+      const { status, body } = await httpRequest({
+        hostname: u.hostname,
+        port: u.port || 80,
+        path: `/api/v1/workspace/${WORKSPACE}/chats`,
+        method: "GET",
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
+      if (status === 200) {
+        const parsed = JSON.parse(body);
+        const hist = parsed.history || parsed.chats || [];
+        if (Array.isArray(hist) && hist.length === 0) return true;
+      }
+    } catch (_) {
+      /* retry until deadline */
+    }
+    await sleep(300);
+  }
+  return false;
+}
+
 async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
   if (scenario.pre_reset) {
     try {
@@ -391,7 +470,17 @@ async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
     } catch (e) {
       warn(`${scenario.id}-${iteration}: /reset failed: ${e.message}`);
     }
-    await sleep(500);
+    try {
+      wipeWorkspaceChats();
+    } catch (e) {
+      warn(`${scenario.id}-${iteration}: chat wipe failed: ${e.message}`);
+    }
+    const cleared = await waitForEmptyHistory(apiKey);
+    if (!cleared) {
+      warn(
+        `${scenario.id}-${iteration}: chat history not empty after /reset+wipe (5s) — possible contamination`
+      );
+    }
   }
   const startedAt = new Date().toISOString();
   const t0 = Date.now();
@@ -411,10 +500,9 @@ async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
   const { toolCall, finalText, eventCount } = parseSSE(body);
 
   const mockEntries = readMockLogTail(mockLogPath, startedAt);
-  // 구세대 REST(/api/v1/*) + 현행 kiwibox(*.do) 양쪽을 대조 대상으로 인정
-  const relevantMock = mockEntries.filter((m) =>
-    /^\/api\/v1\//.test(m.path || "") || /\.do$/.test(m.path || "")
-  );
+  // 현행 kiwibox(*.do)만 대조 대상 (구세대 REST /api/v1/* 잔재 제거 —
+  // backup 방식 폐기 이후 유효 호출은 .do뿐, hrCallCount 계수 대상도 동일)
+  const relevantMock = mockEntries.filter((m) => /\.do$/.test(m.path || ""));
   const mockUrl =
     relevantMock.length > 0 ? relevantMock[relevantMock.length - 1].fullUrl : null;
   const mockBody =
@@ -460,6 +548,40 @@ async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
       }
     }
   }
+  // 012-hr-answer-quality: 최종 답변 검증 — 판정 4~7 (기존 체인 뒤 순차).
+  // contracts/e2e-assertion-schema.md
+  if (pass && (scenario._answerRegexes || scenario._answerNotRegexes)) {
+    if (finalText == null) {
+      pass = false;
+      reason = "no final answer captured";
+    }
+  }
+  if (pass && scenario._answerRegexes) {
+    const missed = scenario.expect.answer_pattern.filter(
+      (p, i) => !scenario._answerRegexes[i].test(finalText)
+    );
+    if (missed.length > 0) {
+      pass = false;
+      reason = `answer missing pattern(s): ${missed.join(" | ")}`;
+    }
+  }
+  if (pass && scenario._answerNotRegexes) {
+    const hit = scenario.expect.answer_not_pattern.filter((p, i) =>
+      scenario._answerNotRegexes[i].test(finalText)
+    );
+    if (hit.length > 0) {
+      pass = false;
+      reason = `answer contains forbidden pattern(s): ${hit.join(" | ")}`;
+    }
+  }
+  if (
+    pass &&
+    scenario.expect.max_hr_calls != null &&
+    relevantMock.length > scenario.expect.max_hr_calls
+  ) {
+    pass = false;
+    reason = `hr calls ${relevantMock.length} exceeded max ${scenario.expect.max_hr_calls}`;
+  }
 
   return {
     scenario: scenario.id,
@@ -470,6 +592,7 @@ async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
     finalText,
     mockUrl,
     mockBody,
+    hrCallCount: relevantMock.length,
     asked,
     eventCount,
     pass,

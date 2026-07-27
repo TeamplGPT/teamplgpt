@@ -52,6 +52,33 @@ function writeLog(entry) {
 
 const BODYLESS_METHODS = new Set(["GET", "HEAD", "DELETE", "OPTIONS"]);
 
+// 012-hr-answer-quality: cmd 기반 fixture (답변 품질 E2E의 answer_pattern 검증용).
+// 미등록 cmd는 기존 빈 응답 유지 — 기존 시나리오(tool_call/url/body 검증) 무영향.
+const FIXTURES_BY_CMD = {
+  // 연차 발생/사용/잔여 (TAA-1310) — Q1/Q2: 연차 잔여 22 + 무관 휴가종류 1건
+  getTAADclzVcatnList1: {
+    result: [
+      { workNm: "연차", creDd: "23", useDd: "1", remDd: "22", staYmd: "20260101", endYmd: "20261231" },
+      { workNm: "배우자출산휴가(유급)", creDd: "20", useDd: "0", remDd: "20", staYmd: "20260101", endYmd: "20261231" },
+    ],
+  },
+  // 휴가 사용내역 (TAA-0490) — Q4: 2건 전건 포함(과요약 방지)
+  getTAADclzVcatnList2: {
+    result: [
+      { ymd: "20260710", week: "금", leavNm: "연차", useDd: "1", reason: "개인사유" },
+      { ymd: "20260721", week: "화", leavNm: "반차", useDd: "0.5", reason: "병원" },
+    ],
+  },
+  // 근무현황 (TAA-1410) — Q3: 지각 1건(07-03, 10분) 포함 3행
+  getTAAWrkTimeStatusMgrList: {
+    result: [
+      { workYmd: "20260701", week: "수", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", inTime: "0855", outTime: "1810", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
+      { workYmd: "20260703", week: "금", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", inTime: "0910", outTime: "1805", lateTime: "10", earlyTime: "0", goOutTime: "0", otTime: "0" },
+      { workYmd: "20260706", week: "월", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", inTime: "0850", outTime: "1800", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
+    ],
+  },
+};
+
 const server = http.createServer((req, res) => {
   const parsed = url.parse(req.url, false);
   const baseEntry = {
@@ -63,7 +90,7 @@ const server = http.createServer((req, res) => {
     headers: { host: req.headers.host || "" },
   };
 
-  function respond() {
+  function respond(parsedBody) {
     if (parsed.pathname === "/health") {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ ok: true }));
@@ -78,6 +105,9 @@ const server = http.createServer((req, res) => {
           ],
         })
       );
+    } else if (parsedBody && parsedBody.cmd && FIXTURES_BY_CMD[parsedBody.cmd]) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(FIXTURES_BY_CMD[parsedBody.cmd]));
     } else {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ success: true, data: [], message: "mock" }));
@@ -88,13 +118,13 @@ const server = http.createServer((req, res) => {
   // (GET 요청은 'end' 이벤트가 환경에 따라 지연될 수 있어 응답 누락 발생)
   if (BODYLESS_METHODS.has(req.method)) {
     writeLog({ ...baseEntry, body: null });
-    respond();
+    respond(null);
     req.resume();
     return;
   }
 
-  // body 있는 메서드: chunks 수집 후 logging. 응답은 즉시 보내 race를 피함
-  respond();
+  // body 있는 메서드: cmd 기반 fixture 선택을 위해 body 수신 완료 후 응답
+  // (클라이언트가 body+end를 보내는 POST는 'end' 지연 문제 없음 — GET fast-path만 별도)
   const chunks = [];
   req.on("data", (c) => chunks.push(c));
   req.on("end", () => {
@@ -114,6 +144,7 @@ const server = http.createServer((req, res) => {
       }
     }
     writeLog({ ...baseEntry, body: parsedBody });
+    respond(parsedBody);
   });
   req.on("error", (e) => {
     writeLog({ ...baseEntry, body: { _error: e.message } });
