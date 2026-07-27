@@ -81,5 +81,5 @@ HR agent-skill(`hr-attendance`, `hr-salary`, `hr-personnel`, `hr-year-end-tax`) 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan:
-`specs/012-hr-answer-quality/plan.md`
+`specs/013-embed-e2e-kiwibox-realign/plan.md`
 <!-- SPECKIT END -->
