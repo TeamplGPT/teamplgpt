@@ -1,1 +1,0 @@
-../e2e-hr-skill/mock-hr-api.js

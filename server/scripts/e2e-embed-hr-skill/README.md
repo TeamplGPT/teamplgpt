@@ -83,10 +83,20 @@ Schema (see [design §3.1](../../../docs/02-design/features/embed-tool-calling-e
 - `embed_config` must match one of the `CONFIGS[]` entries in `runner.js`
 - For FILTER-block cases: `expect.tool_call: false` (no `mock_url_pattern`)
 - `repeat` caps at 20
+- 기대 정본: `specs/013-embed-e2e-kiwibox-realign/contracts/scenario-mapping.md` —
+  `.do` URL + `mock_body_pattern`(`cmd=`/`queryId=`), message는 본인 기준(사번 문구 금지)
+- 옵셔널 확장 필드(specs/012 `contracts/e2e-assertion-schema.md` 준용):
+  `answer_pattern[]`(최종 답변 필수 포함) / `answer_not_pattern[]`(금지) /
+  `max_hr_calls`(mock HR 호출 상한, 정수 ≥1). `result.json`에 `hrCallCount` 기록.
 
 ## Regression — does not affect `e2e-hr-skill`
 
-This runner is an **independent fork**. It shares only `mock-hr-api.js` (via symlink). `e2e-hr-skill` uses `MOCK_PORT=8000` (default) while this runner uses `MOCK_PORT=8001`, so both can be run sequentially without state conflict.
+This runner is an **independent fork**. It spawns the **shared mock**
+`../e2e-hr-skill/mock-hr-api.js` (cmd 기반 fixture 포함 — 자체 mock은 specs/013에서 제거).
+`e2e-hr-skill` uses `MOCK_PORT=8000` (default) while this runner uses `MOCK_PORT=8001`,
+so both can be run sequentially without state conflict. Mock 대조 필터는 현행 kiwibox
+`*.do`만 인정 (구 REST `/api/v1/*` 잔재 제거). Runtime override 헤더는 현행 키 3종
+(`HR_BASE_URL`/`HR_SESSION_COOKIE`/`HR_STAFF_ID`) — plugin.json setup_args 무변경.
 
 ## Expected Behavior
 

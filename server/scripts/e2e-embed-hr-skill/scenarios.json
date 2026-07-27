@@ -1,99 +1,126 @@
 {
-  "$comment": "Embed tool calling E2E scenarios. Axes: ALLOW (tool calling ON, all skills), DENY (tool calling OFF), FILTER (allowlist filter). Design: docs/02-design/features/embed-tool-calling-e2e-runner.design.md §3.1, §8.3. NO @agent prefix — embed uses native LLM tool calling.",
+  "$comment": "Embed tool calling E2E scenarios — kiwibox 재정렬 (specs/013). Axes: ALLOW(10)/DENY(5)/FILTER(7). 기대 정본: specs/013-embed-e2e-kiwibox-realign/contracts/scenario-mapping.md. NO @agent prefix — embed uses native LLM tool calling.",
   "scenarios": [
     {
       "id": "EC-ALLOW-01",
       "axis": "ALLOW",
       "label": "근태 출퇴근 (상대 표현)",
       "embed_config": "e2e-embed-allow-all",
-      "message": "사번 20070133 직원의 지난달 출퇴근 기록 조회해줘",
+      "message": "지난달 내 출퇴근 기록 조회해줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/timesheet(\\?.*)?$"
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList"
+        ]
       },
       "repeat": 1
     },
     {
       "id": "EC-ALLOW-02",
       "axis": "ALLOW",
-      "label": "근태 업무계획",
+      "label": "근무일정 캘린더",
       "embed_config": "e2e-embed-allow-all",
-      "message": "사번 20070133 직원의 이번주 업무계획 알려줘",
+      "message": "이번 달 내 근무일정 알려줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/work-plan/weekly(\\?.*)?$"
+        "mock_url_pattern": "^/TAADclzWorkSearchCldr\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAADclzWorkSearchCldr"
+        ]
       },
       "repeat": 1
     },
     {
       "id": "EC-ALLOW-03",
       "axis": "ALLOW",
-      "label": "근태 연차잔여 (연도 미명시)",
+      "label": "연차 잔여 + 답변 스모크",
       "embed_config": "e2e-embed-allow-all",
-      "message": "사번 20070133 직원의 연차 잔여일 알려줘",
+      "message": "내 연차 잔여일 알려줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/annual-leave/balance(\\?.*)?$"
+        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAADclzVcatnList1"
+        ],
+        "answer_pattern": [
+          "22"
+        ],
+        "answer_not_pattern": [
+          "\\[응답 지침\\]"
+        ]
       },
       "repeat": 1
     },
     {
       "id": "EC-ALLOW-04",
       "axis": "ALLOW",
-      "label": "급여 명세서 (연월 명시)",
+      "label": "급여명세 (pay 체인 완주)",
       "embed_config": "e2e-embed-allow-all",
-      "message": "사번 20070133 직원의 2025년 3월 급여명세서 조회해줘",
+      "message": "6월 급여명세서 보여줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/payslip\\?.*year_month=202503"
+        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getSALPayslipNewMgrList"
+        ]
       },
       "repeat": 1
     },
     {
       "id": "EC-ALLOW-05",
       "axis": "ALLOW",
-      "label": "급여 공제항목",
+      "label": "급여 지급 건 목록",
       "embed_config": "e2e-embed-allow-all",
-      "message": "사번 20070133 직원의 2024년 12월 급여 공제항목 알려줘",
+      "message": "6월 급여 지급 건 목록 알려줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/deductions\\?.*year_month=202412"
+        "mock_url_pattern": "^/CommonCode\\.do",
+        "mock_body_pattern": [
+          "queryId=getSalYmdTypeCdList2"
+        ]
       },
       "repeat": 1
     },
     {
       "id": "EC-ALLOW-06",
       "axis": "ALLOW",
-      "label": "급여 보너스 내역",
+      "label": "월별지급내역 (보너스 교체 — D5)",
       "embed_config": "e2e-embed-allow-all",
-      "message": "사번 20070133 직원의 보너스 내역 알려줘",
+      "message": "내 월별지급내역 조회해줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/bonus(\\?.*)?$"
+        "mock_url_pattern": "^/SALSalaryBassMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getSALSalaryBassMgrTab110List"
+        ]
       },
       "repeat": 1
     },
     {
       "id": "EC-ALLOW-07",
       "axis": "ALLOW",
-      "label": "인사 현재 직위",
+      "label": "인사 프로필 (사원카드)",
       "embed_config": "e2e-embed-allow-all",
-      "message": "사번 20070133 직원의 현재 직위 알려줘",
+      "message": "내 사원카드 정보 보여줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/appointment/current(\\?.*)?$"
+        "mock_url_pattern": "^/getMBLPrtEmpCard\\.do"
       },
       "repeat": 1
     },
     {
       "id": "EC-ALLOW-08",
       "axis": "ALLOW",
-      "label": "인사 자격증",
+      "label": "교육이력 (자격증 교체 — D5)",
       "embed_config": "e2e-embed-allow-all",
-      "message": "사번 20070133 직원의 보유 자격증 조회해줘",
+      "message": "내 교육이력 조회해줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/licenses(\\?.*)?$"
+        "mock_url_pattern": "^/PRCHrBassiemMgrTab220\\.do",
+        "mock_body_pattern": [
+          "cmd=getPRCHrBassiemMgrTab220List"
+        ]
       },
       "repeat": 1
     },
@@ -102,32 +129,37 @@
       "axis": "ALLOW",
       "label": "연말정산 의료비",
       "embed_config": "e2e-embed-allow-all",
-      "message": "사번 20070133 직원의 의료비 공제 내역 알려줘",
+      "message": "연말정산 의료비 공제 내역 알려줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/medical(\\?.*)?$"
+        "mock_url_pattern": "^/YTAYndMedDtlMgr\\d{0,4}\\.do",
+        "mock_body_pattern": [
+          "cmd=getYTAYndMedDtlMgrList"
+        ]
       },
       "repeat": 1
     },
     {
       "id": "EC-ALLOW-10",
       "axis": "ALLOW",
-      "label": "연말정산 부양가족 공제",
+      "label": "연말정산 부양가족",
       "embed_config": "e2e-embed-allow-all",
-      "message": "사번 20070133 직원의 부양가족 공제 대상 조회해줘",
+      "message": "연말정산 부양가족 공제 대상 조회해줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/year-end-tax/family(\\?.*)?$"
+        "mock_url_pattern": "^/YTAYtaFamilySttusMgr\\d{0,4}\\.do",
+        "mock_body_pattern": [
+          "cmd=getYTAYtaFamilySttusMgrList"
+        ]
       },
       "repeat": 1
     },
-
     {
       "id": "EC-DENY-01",
       "axis": "DENY",
-      "label": "근태 질의 (tool calling OFF → RAG fallback)",
+      "label": "근태 차단 (ALLOW-01 대비쌍)",
       "embed_config": "e2e-embed-deny",
-      "message": "사번 20070133 직원의 지난달 출퇴근 기록 조회해줘",
+      "message": "지난달 내 출퇴근 기록 조회해줘",
       "expect": {
         "tool_call": false
       },
@@ -136,9 +168,9 @@
     {
       "id": "EC-DENY-02",
       "axis": "DENY",
-      "label": "급여 질의 (tool calling OFF)",
+      "label": "급여 차단 (ALLOW-04 대비쌍)",
       "embed_config": "e2e-embed-deny",
-      "message": "사번 20070133 직원의 2025년 3월 급여명세서 조회해줘",
+      "message": "6월 급여명세서 보여줘",
       "expect": {
         "tool_call": false
       },
@@ -147,9 +179,9 @@
     {
       "id": "EC-DENY-03",
       "axis": "DENY",
-      "label": "인사 질의 (tool calling OFF)",
+      "label": "인사 차단 (ALLOW-07 대비쌍)",
       "embed_config": "e2e-embed-deny",
-      "message": "사번 20070133 직원의 현재 직위 알려줘",
+      "message": "내 사원카드 정보 보여줘",
       "expect": {
         "tool_call": false
       },
@@ -158,9 +190,9 @@
     {
       "id": "EC-DENY-04",
       "axis": "DENY",
-      "label": "연말정산 질의 (tool calling OFF)",
+      "label": "연말정산 차단 (ALLOW-09 대비쌍)",
       "embed_config": "e2e-embed-deny",
-      "message": "사번 20070133 직원의 의료비 공제 내역 알려줘",
+      "message": "연말정산 의료비 공제 내역 알려줘",
       "expect": {
         "tool_call": false
       },
@@ -169,7 +201,7 @@
     {
       "id": "EC-DENY-05",
       "axis": "DENY",
-      "label": "일반 대화 (tool 필요 없음)",
+      "label": "무관 질의 (일반 대화)",
       "embed_config": "e2e-embed-deny",
       "message": "안녕하세요, 회사 복지 제도를 설명해주세요.",
       "expect": {
@@ -177,37 +209,42 @@
       },
       "repeat": 1
     },
-
     {
       "id": "EC-FILTER-01",
       "axis": "FILTER",
-      "label": "allowlist=hr-attendance, 출퇴근 요청 → PASS",
+      "label": "근태 허용 (attendance 필터)",
       "embed_config": "e2e-embed-filter-attendance",
-      "message": "사번 20070133 직원의 이번달 출퇴근 알려줘",
+      "message": "이번 달 내 출퇴근 알려줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/timesheet(\\?.*)?$"
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList"
+        ]
       },
       "repeat": 1
     },
     {
       "id": "EC-FILTER-02",
       "axis": "FILTER",
-      "label": "allowlist=hr-attendance, 연차 요청 → PASS (같은 skill)",
+      "label": "연차 허용 (기간 조건 제거 — 계약상 불요)",
       "embed_config": "e2e-embed-filter-attendance",
-      "message": "사번 20070133 직원의 2024년 연차 잔여일 알려줘",
+      "message": "내 연차 잔여일 알려줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/attendance/annual-leave/balance\\?.*year=2024"
+        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAADclzVcatnList1"
+        ]
       },
       "repeat": 1
     },
     {
       "id": "EC-FILTER-03",
       "axis": "FILTER",
-      "label": "allowlist=hr-attendance, 급여 요청 → BLOCK",
+      "label": "급여 차단 (attendance 필터)",
       "embed_config": "e2e-embed-filter-attendance",
-      "message": "사번 20070133 직원의 이번달 급여명세서 보여줘",
+      "message": "6월 급여명세서 보여줘",
       "expect": {
         "tool_call": false
       },
@@ -216,9 +253,9 @@
     {
       "id": "EC-FILTER-04",
       "axis": "FILTER",
-      "label": "allowlist=hr-attendance, 인사 요청 → BLOCK",
+      "label": "인사 차단 (attendance 필터)",
       "embed_config": "e2e-embed-filter-attendance",
-      "message": "사번 20070133 직원의 현재 직위 알려줘",
+      "message": "내 사원카드 정보 보여줘",
       "expect": {
         "tool_call": false
       },
@@ -227,9 +264,9 @@
     {
       "id": "EC-FILTER-05",
       "axis": "FILTER",
-      "label": "allowlist=hr-attendance, 연말정산 요청 → BLOCK",
+      "label": "연말정산 차단 (attendance 필터)",
       "embed_config": "e2e-embed-filter-attendance",
-      "message": "사번 20070133 직원의 의료비 공제 내역 알려줘",
+      "message": "연말정산 의료비 공제 내역 알려줘",
       "expect": {
         "tool_call": false
       },
@@ -238,24 +275,30 @@
     {
       "id": "EC-FILTER-06",
       "axis": "FILTER",
-      "label": "allowlist=hr-salary,hr-personnel, 급여 요청 → PASS",
+      "label": "급여 허용 (salary-personnel 필터)",
       "embed_config": "e2e-embed-filter-salary-personnel",
-      "message": "사번 20070133 직원의 2025년 3월 급여명세서 조회해줘",
+      "message": "6월 급여명세서 보여줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/salary/payslip\\?.*year_month=202503"
+        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getSALPayslipNewMgrList"
+        ]
       },
       "repeat": 1
     },
     {
       "id": "EC-FILTER-07",
       "axis": "FILTER",
-      "label": "allowlist=hr-salary,hr-personnel, 인사 요청 → PASS (복수 allow)",
+      "label": "교육이력 허용 (자격증 교체 — D5)",
       "embed_config": "e2e-embed-filter-salary-personnel",
-      "message": "사번 20070133 직원의 보유 자격증 조회해줘",
+      "message": "내 교육이력 조회해줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/api/v1/personnel/licenses(\\?.*)?$"
+        "mock_url_pattern": "^/PRCHrBassiemMgrTab220\\.do",
+        "mock_body_pattern": [
+          "cmd=getPRCHrBassiemMgrTab220List"
+        ]
       },
       "repeat": 1
     }

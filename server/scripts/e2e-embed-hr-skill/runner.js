@@ -159,6 +159,46 @@ function loadScenarios() {
         );
       }
     }
+    // kiwibox POST body 검증 (specs/013 — hr-skill runner와 동일 계약)
+    if (s.expect.mock_body_pattern != null) {
+      if (
+        !Array.isArray(s.expect.mock_body_pattern) ||
+        s.expect.mock_body_pattern.some((p) => typeof p !== "string")
+      ) {
+        fatal(`Scenario ${s.id}: expect.mock_body_pattern must be string[]`);
+      }
+      s._mockBodyRegexes = s.expect.mock_body_pattern.map((p) => {
+        try {
+          return new RegExp(p);
+        } catch (e) {
+          fatal(`Scenario ${s.id}: invalid body regex "${p}": ${e.message}`);
+        }
+      });
+    }
+    // 최종 답변·HR 호출 건수 검증 (옵셔널 — specs/012 contracts/e2e-assertion-schema.md 준용)
+    for (const key of ["answer_pattern", "answer_not_pattern"]) {
+      if (s.expect[key] == null) continue;
+      if (
+        !Array.isArray(s.expect[key]) ||
+        s.expect[key].some((p) => typeof p !== "string")
+      ) {
+        fatal(`Scenario ${s.id}: expect.${key} must be string[]`);
+      }
+      const compiled = s.expect[key].map((p) => {
+        try {
+          return new RegExp(p);
+        } catch (e) {
+          fatal(`Scenario ${s.id}: invalid ${key} regex "${p}": ${e.message}`);
+        }
+      });
+      if (key === "answer_pattern") s._answerRegexes = compiled;
+      else s._answerNotRegexes = compiled;
+    }
+    if (s.expect.max_hr_calls != null) {
+      if (!Number.isInteger(s.expect.max_hr_calls) || s.expect.max_hr_calls < 1) {
+        fatal(`Scenario ${s.id}: expect.max_hr_calls must be an integer >= 1`);
+      }
+    }
     s.repeat = Number.isInteger(s.repeat) ? s.repeat : 1;
     if (s.repeat < 1 || s.repeat > 20) {
       fatal(`Scenario ${s.id}: repeat must be 1..20`);
@@ -238,7 +278,8 @@ function sleep(ms) {
 
 async function spawnMock(runDir) {
   const mockLogPath = path.join(runDir, "mock.jsonl");
-  const mockPath = path.join(SCRIPT_DIR, "mock-hr-api.js");
+  // 공유 mock (specs/013 D2 — cmd 기반 fixture 포함, 중복 mock 제거)
+  const mockPath = path.join(SCRIPT_DIR, "..", "e2e-hr-skill", "mock-hr-api.js");
   const child = spawn(
     process.execPath,
     [mockPath, "--port", String(MOCK_PORT), "--log-path", mockLogPath],
@@ -315,8 +356,12 @@ async function embedStreamChat(embedUuid, body) {
       // Redirect HR skill HTTP target to the mock server spawned by this runner.
       // Server must be in NODE_ENV=development (or ALLOW_TOOL_RUNTIME_OVERRIDE=true) for this to take effect.
       // In production the header is silently ignored.
-      // 현행 kiwibox skill이 읽는 runtimeArgs 키(HR_BASE_URL) — 구 REST 키(hr_api_base_url)는 무효 잔재라 교체.
+      // 현행 kiwibox skill이 읽는 runtimeArgs 키 3종 (hrSession.js 서버 폴백 계약).
+      // 쿠키·스태프 더미가 없으면 hrSession이 "연동 미구성" 즉시 반환 → HTTP 미발생
+      // → mock-hit 판정 불가 (specs/013 T002 실측). plugin.json setup_args 무변경.
       "x-tool-runtime-override-HR_BASE_URL": `http://localhost:${MOCK_PORT}`,
+      "x-tool-runtime-override-HR_SESSION_COOKIE": "JSESSIONID=E2E-MOCK",
+      "x-tool-runtime-override-HR_STAFF_ID": "E2E001",
     },
     body: json,
   });
@@ -326,6 +371,7 @@ function parseSSE(text) {
   const events = text.split("\n\n").filter((e) => e.startsWith("data:"));
   let toolCall = null;
   let finalText = null;
+  let chunkedText = "";
   for (const evt of events) {
     const m = evt.match(/^data:\s*(.*)$/m);
     if (!m) continue;
@@ -340,6 +386,14 @@ function parseSSE(text) {
       const cm = tr.content.match(/^Assembling Tool Call: (.+)$/);
       if (cm) toolCall = cm[1];
     }
+    // embed 스트림은 본문을 chunk로 전달하고 finalize의 textResponse가 빈 값일 수
+    // 있음 (specs/013 T002 실측: finalText="") — chunk 누적을 폴백으로 사용.
+    if (
+      p.type === "textResponseChunk" &&
+      typeof p.textResponse === "string"
+    ) {
+      chunkedText += p.textResponse;
+    }
     if (
       p.type === "finalizeResponseStream" &&
       typeof p.textResponse === "string"
@@ -347,6 +401,7 @@ function parseSSE(text) {
       finalText = p.textResponse;
     }
   }
+  if (!finalText && chunkedText) finalText = chunkedText;
   return { toolCall, finalText, eventCount: events.length };
 }
 
@@ -364,6 +419,24 @@ function readMockLogTail(mockLogPath, sinceIso) {
     }
   }
   return out;
+}
+
+// mock 로그 body를 검증용 단일 문자열로 정규화 (hr-skill runner와 동일).
+function mockBodyToString(body) {
+  if (body == null) return null;
+  if (typeof body === "object" && typeof body._raw === "string") {
+    try {
+      return decodeURIComponent(body._raw.replace(/\+/g, " "));
+    } catch (_) {
+      return body._raw;
+    }
+  }
+  if (typeof body === "object") {
+    return Object.entries(body)
+      .map(([k, v]) => `${k}=${v}`)
+      .join("&");
+  }
+  return String(body);
 }
 
 function assertByAxis(scenario, { toolCall, mockUrl }) {
@@ -437,12 +510,15 @@ async function runScenarioOnce(scenario, iteration, configMap, mockLogPath) {
   const { toolCall, finalText, eventCount } = parseSSE(body);
 
   const mockEntries = readMockLogTail(mockLogPath, startedAt);
-  const relevantMock = mockEntries.filter((m) =>
-    /^\/api\/v1\//.test(m.path || "")
-  );
+  // 현행 kiwibox(*.do)만 대조 대상 (구세대 REST /api/v1/* 잔재 제거 — specs/013)
+  const relevantMock = mockEntries.filter((m) => /\.do$/.test(m.path || ""));
   const mockUrl =
     relevantMock.length > 0
       ? relevantMock[relevantMock.length - 1].fullUrl
+      : null;
+  const mockBody =
+    relevantMock.length > 0
+      ? mockBodyToString(relevantMock[relevantMock.length - 1].body)
       : null;
 
   // Embed tool calling path does not emit "Assembling Tool Call" SSE events
@@ -465,6 +541,54 @@ async function runScenarioOnce(scenario, iteration, configMap, mockLogPath) {
     pass = verdict.pass;
     reason = verdict.reason;
   }
+  // kiwibox body 검증 (허용측 시나리오 — 축 판정 통과 후)
+  if (pass && scenario._mockBodyRegexes) {
+    if (mockBody == null) {
+      pass = false;
+      reason = `[${scenario.axis}] no mock body captured`;
+    } else {
+      const missed = scenario.expect.mock_body_pattern.filter(
+        (p, i) => !scenario._mockBodyRegexes[i].test(mockBody)
+      );
+      if (missed.length > 0) {
+        pass = false;
+        reason = `[${scenario.axis}] mock body missing pattern(s): ${missed.join(" | ")}`;
+      }
+    }
+  }
+  // 최종 답변·호출 건수 검증 — specs/012 contracts/e2e-assertion-schema.md 판정 4~7
+  if (pass && (scenario._answerRegexes || scenario._answerNotRegexes)) {
+    if (!finalText) {
+      pass = false;
+      reason = "no final answer captured";
+    }
+  }
+  if (pass && scenario._answerRegexes) {
+    const missed = scenario.expect.answer_pattern.filter(
+      (p, i) => !scenario._answerRegexes[i].test(finalText)
+    );
+    if (missed.length > 0) {
+      pass = false;
+      reason = `answer missing pattern(s): ${missed.join(" | ")}`;
+    }
+  }
+  if (pass && scenario._answerNotRegexes) {
+    const hit = scenario.expect.answer_not_pattern.filter((p, i) =>
+      scenario._answerNotRegexes[i].test(finalText)
+    );
+    if (hit.length > 0) {
+      pass = false;
+      reason = `answer contains forbidden pattern(s): ${hit.join(" | ")}`;
+    }
+  }
+  if (
+    pass &&
+    scenario.expect.max_hr_calls != null &&
+    relevantMock.length > scenario.expect.max_hr_calls
+  ) {
+    pass = false;
+    reason = `hr calls ${relevantMock.length} exceeded max ${scenario.expect.max_hr_calls}`;
+  }
 
   return {
     scenario: scenario.id,
@@ -481,6 +605,8 @@ async function runScenarioOnce(scenario, iteration, configMap, mockLogPath) {
         : null,
     finalText,
     mockUrl,
+    mockBody,
+    hrCallCount: relevantMock.length,
     eventCount,
     pass,
     reason,
