@@ -315,7 +315,8 @@ async function embedStreamChat(embedUuid, body) {
       // Redirect HR skill HTTP target to the mock server spawned by this runner.
       // Server must be in NODE_ENV=development (or ALLOW_TOOL_RUNTIME_OVERRIDE=true) for this to take effect.
       // In production the header is silently ignored.
-      "x-tool-runtime-override-hr_api_base_url": `http://localhost:${MOCK_PORT}`,
+      // 현행 kiwibox skill이 읽는 runtimeArgs 키(HR_BASE_URL) — 구 REST 키(hr_api_base_url)는 무효 잔재라 교체.
+      "x-tool-runtime-override-HR_BASE_URL": `http://localhost:${MOCK_PORT}`,
     },
     body: json,
   });
@@ -446,7 +447,7 @@ async function runScenarioOnce(scenario, iteration, configMap, mockLogPath) {
 
   // Embed tool calling path does not emit "Assembling Tool Call" SSE events
   // (those are agent-mode specific, see server/utils/agents/aibitat/providers/*).
-  // Mock API hit is the ground truth of tool execution — if the mock logged a /api/v1/*
+  // Mock API hit is the ground truth of tool execution — if the mock logged an HR
   // request for this scenario window, a tool was actually invoked regardless of SSE shape.
   const effectiveToolCall =
     toolCall || (mockUrl ? `[mock-hit:${mockUrl.split("?")[0]}]` : null);

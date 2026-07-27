@@ -37,6 +37,11 @@ class EphemeralAgentHandler extends AgentHandler {
   #prompt = null;
   /** @type {string[]} the functions to load into the agent (Aibitat plugins) */
   #funcsToLoad = [];
+  /** @type {Object<string,string>|null} call-site별 imported skill runtimeArgs 덮어쓰기
+   * (e.g., E2E에서 HR_BASE_URL을 mock으로 override — executor.js와 동일 계약,
+   * plugin.json setup_args.value는 불변). endpoint 게이트(dev/ALLOW_TOOL_RUNTIME_OVERRIDE)
+   * 통과분만 전달된다. */
+  #toolRuntimeOverrides = null;
 
   /** @type {AIbitat|null} */
   aibitat = null;
@@ -64,6 +69,7 @@ class EphemeralAgentHandler extends AgentHandler {
     userId = null,
     threadId = null,
     sessionId = null,
+    toolRuntimeOverrides = null,
   }) {
     super({ uuid });
     this.#invocationUUID = uuid;
@@ -76,6 +82,10 @@ class EphemeralAgentHandler extends AgentHandler {
     this.#userId = userId;
     this.#threadId = threadId;
     this.#sessionId = sessionId;
+    this.#toolRuntimeOverrides =
+      toolRuntimeOverrides && typeof toolRuntimeOverrides === "object"
+        ? toolRuntimeOverrides
+        : null;
   }
 
   log(text, ...args) {
@@ -295,6 +305,12 @@ class EphemeralAgentHandler extends AgentHandler {
 
         const plugin = ImportedPlugin.loadPluginByHubId(hubId);
         const callOpts = plugin.parseCallOptions();
+        // call-site override 병합 (null/undefined 값은 무시 — executor.js 계약과 동일)
+        if (this.#toolRuntimeOverrides) {
+          for (const [k, v] of Object.entries(this.#toolRuntimeOverrides)) {
+            if (v !== null && v !== undefined) callOpts[k] = v;
+          }
+        }
         this.aibitat.use(plugin.plugin(callOpts));
         this.log(
           `Attached ${plugin.name} (${hubId}) imported plugin to Agent cluster`

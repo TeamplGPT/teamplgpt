@@ -73,7 +73,7 @@ Schema (see [design §3.1](../../../docs/02-design/features/embed-tool-calling-e
   "message": "natural language query (no @agent prefix)",
   "expect": {
     "tool_call": true,
-    "mock_url_pattern": "^/api/v1/...(\\?.*)?$"
+    "mock_url_pattern": "^/TAADclzVcatnList\\.do"
   },
   "repeat": 1
 }

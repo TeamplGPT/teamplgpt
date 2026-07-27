@@ -170,6 +170,9 @@ async function chatSync({
       userId: user?.id || null,
       threadId: thread?.id || null,
       sessionId,
+      // chatSync(비스트림)는 response 객체가 스코프에 없음 — override 미지원 (null 고정).
+      // override 배선은 streamChat 분기에만 존재 (E2E runner가 쓰는 경로).
+      toolRuntimeOverrides: null,
     });
 
     // Establish event listener that emulates websocket calls
@@ -586,6 +589,9 @@ async function streamChat({
       userId: user?.id || null,
       threadId: thread?.id || null,
       sessionId,
+      // E2E 등 call-site override — endpoint 게이트(dev/ALLOW_TOOL_RUNTIME_OVERRIDE)
+      // 통과분만 존재. imported skill runtimeArgs에 병합된다 (ephemeral.js).
+      toolRuntimeOverrides: response.locals?.toolRuntimeOverrides || null,
     });
 
     // Establish event listener that emulates websocket calls
