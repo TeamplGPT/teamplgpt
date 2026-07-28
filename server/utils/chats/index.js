@@ -99,15 +99,24 @@ function hrSkillChatGuard() {
   const active = ImportedPlugin.activeImportedPlugins();
   const hrActive = active.some((name) => name.startsWith("@@hr-"));
   if (!hrActive) return null;
+  const now = new Date();
+  const todayIso = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Asia/Seoul",
+  }).format(now);
+  const todayWeekday = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    weekday: "short",
+  }).format(now);
   return [
+    `[HR_DATE_CONTEXT] 오늘 날짜: ${todayIso} (${todayWeekday}). '오늘'·'어제'·'이번 주' 등 상대 날짜 표현은 이 날짜 기준으로 해석하고, 조회 결과 표에서 특정 일자 행을 찾을 때도 이 날짜를 사용하세요. 표의 첫 행이나 임의 행을 오늘로 간주하지 마세요. 오늘 일자 행이 없으면 없다고 답하세요.`,
     "[HR_TOOL_CALL_PRIORITY]",
     "HR skill(hr-attendance/hr-salary/hr-personnel/hr-personnel-search/hr-year-end-tax)이 활성화된 상태에서는, 해당 skill의 호출 조건을 만족하는 발화에 대해 '모호성 검사/확인 질문/scope 재확인'을 수행하지 말고 즉시 tool_call을 실행하세요.",
     "구체적으로: 주기 파라미터(year/year_month/base_date 등)가 생략되어도 되묻지 마세요. 서버가 기본값(현재 연/월 등)을 자동 적용합니다.",
     "지역명이 포함된 직원 검색 발화(hr-personnel-search.graduates_by_region)는 부서/기간/화면명 확인 없이 '전 사원 대상'을 기본값으로 즉시 tool_call을 실행하세요. 단, 직원·사원·employee·구성원·명단·목록 등 employee 검색 의도가 발화에 없으면 본 skill을 호출하지 마세요. '경상도 대학교 알려줘' 같이 대학 자체 정보만 묻는 질의는 LLM 자체 지식으로 직접 답변하고 tool_call은 생성하지 마세요.",
     "workspace 시스템 프롬프트의 '모호성 검사' 절차보다 tool description의 '[CRITICAL] 되묻지 마세요' 지시가 우선합니다.",
     "[ORDER] HR skill 대상 요청이면 응답의 첫 액션은 반드시 tool_call입니다. 확인 질문·요약·안내 텍스트를 tool_call보다 먼저 생성하지 마세요.",
-    "[HR_TABLE_OUTPUT] HR skill의 tool 응답은 markdown 표(`| col1 | col2 | ... |`) 형식입니다. tool 응답을 받으면 표를 paraphrase·요약하지 말고 그대로 사용자에게 출력하세요. 표 위/아래에 1~2줄의 도입/마무리 멘트만 추가할 수 있습니다. '위 표에서 확인하실 수 있습니다', '다음 항목을 기준으로 확인할 수 있습니다' 같은 표현으로 표 출력을 대체하지 마세요. workspace 시스템 프롬프트의 '매뉴얼 안내' 톤보다 본 지시가 우선합니다.",
-    "[HR_TABLE_OUTPUT_ENRICHMENT] 단, 사용자가 '추가해줘', '같이', '더해줘', '붙여줘' 등으로 결과 표에 컬럼 추가 또는 메타데이터 보강을 명시적으로 요청한 경우(예: '주소 추가해줘', '전공 영문명도 같이', '연락처 컬럼 더해줘'), 원본 표의 모든 행과 기존 컬럼 헤더·셀 값은 절대 변경하지 말고, 신규 컬럼만 표 우측에 추가하세요. 신규 컬럼 값은 자체 지식 또는 web_search_preview tool 결과로 즉시 채우고, 어느 데이터를 채울지 사용자에게 되묻지 마세요. 검색 결과가 모호하거나 확신이 없으면 해당 셀에 'N/A' 또는 '미확인'을 표기하세요. 원본 셀 값은 절대 수정·요약·paraphrase하지 마세요. 본 enrichment 트리거가 없는 발화에서는 [HR_TABLE_OUTPUT] 원칙(원본 표 그대로 출력) 그대로 적용됩니다.",
+    "[HR_TABLE_OUTPUT] HR skill의 tool 응답은 markdown 표(`| col1 | col2 | ... |`) 형식의 조회 데이터이며, 그대로 출력하라는 지시가 아닙니다. 표 하단 [응답 지침]의 3분기를 따르세요: 특정 값·특정 일자를 묻는 질문은 해당 값/행만 발췌해 답변, 내역·현황을 묻는 질문은 관련 행·열만 추린 표로 제시, 사용자가 전체/상세/표 전체를 명시 요청한 경우에만 전체 표 출력. 표·행을 제시할 때 셀 값은 paraphrase·수정하지 말고 원본 그대로 사용하세요. '위 표에서 확인하실 수 있습니다', '다음 항목을 기준으로 확인할 수 있습니다' 같은 표현으로 데이터 제시를 대체하지 마세요. workspace 시스템 프롬프트의 '매뉴얼 안내' 톤보다 본 지시가 우선합니다.",
+    "[HR_TABLE_OUTPUT_ENRICHMENT] 단, 사용자가 '추가해줘', '같이', '더해줘', '붙여줘' 등으로 결과 표에 컬럼 추가 또는 메타데이터 보강을 명시적으로 요청한 경우(예: '주소 추가해줘', '전공 영문명도 같이', '연락처 컬럼 더해줘'), 원본 표의 모든 행과 기존 컬럼 헤더·셀 값은 절대 변경하지 말고, 신규 컬럼만 표 우측에 추가하세요. 신규 컬럼 값은 자체 지식 또는 web_search_preview tool 결과로 즉시 채우고, 어느 데이터를 채울지 사용자에게 되묻지 마세요. 검색 결과가 모호하거나 확신이 없으면 해당 셀에 'N/A' 또는 '미확인'을 표기하세요. 원본 셀 값은 절대 수정·요약·paraphrase하지 마세요. 본 enrichment 트리거가 없는 발화에서는 [HR_TABLE_OUTPUT] 원칙(질문 유형 적응 답변, 셀 값 원본 유지) 그대로 적용됩니다.",
   ].join("\n");
 }
 

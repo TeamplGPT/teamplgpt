@@ -301,6 +301,24 @@
         ]
       },
       "repeat": 1
+    },
+    {
+      "id": "EC-ALLOW-11",
+      "axis": "ALLOW",
+      "label": "근태 오늘 출근정보 — 월 전체 표 echo 금지 + 오늘 오인 금지",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "오늘 출근정보 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "answer_not_pattern": [
+          "0701[\\s\\S]*0703[\\s\\S]*0706|07-01[\\s\\S]*07-03[\\s\\S]*07-06",
+          "오늘[^\\n]{0,20}(2024|07-?01|7월\\s*1일)",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "note": "[HR_TABLE_OUTPUT](hrSkillChatGuard) echo 강제 vs specs/012 footer 충돌 + 오늘 날짜 미인지 검증. 수정 전 FAIL(월 전체 통짜 echo) 기대"
     }
   ]
 }

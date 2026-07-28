@@ -771,6 +771,46 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "specs/012 US3/AS1. footer 공유로 FAIL-first 불가 — 과요약 회귀 가드(tasks T012)"
+    },
+    {
+      "id": "Q5",
+      "label": "답변품질 — 오늘 출근정보: 월 전체 표 echo 금지",
+      "message": "@agent 오늘 출근정보 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "answer_not_pattern": [
+          "0701[\\s\\S]*0703[\\s\\S]*0706|07-01[\\s\\S]*07-03[\\s\\S]*07-06",
+          "오늘[^\\n]{0,20}(2024|07-?01|7월\\s*1일)",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "오늘 날짜 인지 + 월 전체 echo 금지. fixture에 오늘(run date) 행 없음 — 3행(0701/0703/0706) 통짜 echo 또는 '오늘=07-01' 오인 시 FAIL. [HR_DATE_CONTEXT] 구현 전 FAIL(오늘을 첫 행 07-01로 오인) 실측"
+    },
+    {
+      "id": "Q6",
+      "label": "답변품질 — 특정일(7월 3일) 질문: 해당 행만 발췌",
+      "message": "@agent 7월 3일 출근 정보만 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "answer_pattern": [
+          "0703|07-03|7월 3일",
+          "0910|09:10|9시\\s*10분"
+        ],
+        "answer_not_pattern": [
+          "0701|07-01|7월 1일",
+          "0706|07-06|7월 6일",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "특정일 발췌 결정론 검증 — year_month는 월 단위(7)로 호출되고 LLM이 07-03 행만 추려 답변해야 함. 수정 전 FAIL(0701/0706 포함 통짜 echo) 기대"
     }
   ]
 }

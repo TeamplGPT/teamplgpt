@@ -69,12 +69,15 @@ const FIXTURES_BY_CMD = {
       { ymd: "20260721", week: "화", leavNm: "반차", useDd: "0.5", reason: "병원" },
     ],
   },
-  // 근무현황 (TAA-1410) — Q3: 지각 1건(07-03, 10분) 포함 3행
+  // 근무현황/출퇴근기록 (TAA-1410) — Q3: 지각 1건(07-03, 10분) / Q6: 특정일 발췌.
+  // 실측 42필드 superset: timesheet 화이트리스트(staTime/endTime/lateYn 등)와
+  // work_status 화이트리스트(inTime/outTime/lateTime 등) 키를 모두 포함해야
+  // 두 query_type 렌더가 모두 채워진다 (kiwibox-endpoint-test-guide §3.2).
   getTAAWrkTimeStatusMgrList: {
     result: [
-      { workYmd: "20260701", week: "수", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", inTime: "0855", outTime: "1810", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
-      { workYmd: "20260703", week: "금", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", inTime: "0910", outTime: "1805", lateTime: "10", earlyTime: "0", goOutTime: "0", otTime: "0" },
-      { workYmd: "20260706", week: "월", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", inTime: "0850", outTime: "1800", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
+      { workYmd: "20260701", week: "수", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0855", endTime: "1810", inTime: "0855", outTime: "1810", lateYn: "N", earlyYn: "N", absentYn: "N", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
+      { workYmd: "20260703", week: "금", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0910", endTime: "1805", inTime: "0910", outTime: "1805", lateYn: "Y", earlyYn: "N", absentYn: "N", lateTime: "10", earlyTime: "0", goOutTime: "0", otTime: "0" },
+      { workYmd: "20260706", week: "월", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0850", endTime: "1800", inTime: "0850", outTime: "1800", lateYn: "N", earlyYn: "N", absentYn: "N", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
     ],
   },
 };

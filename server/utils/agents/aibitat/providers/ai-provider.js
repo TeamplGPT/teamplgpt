@@ -375,7 +375,16 @@ class Provider {
     const active = ImportedPlugin.activeImportedPlugins();
     const hrActive = active.some((name) => name.startsWith("@@hr-"));
     if (!hrActive) return null;
+    const now = new Date();
+    const todayIso = new Intl.DateTimeFormat("sv-SE", {
+      timeZone: "Asia/Seoul",
+    }).format(now);
+    const todayWeekday = new Intl.DateTimeFormat("ko-KR", {
+      timeZone: "Asia/Seoul",
+      weekday: "short",
+    }).format(now);
     return [
+      `[HR_DATE_CONTEXT] 오늘 날짜: ${todayIso} (${todayWeekday}). '오늘'·'어제'·'이번 주' 등 상대 날짜 표현은 이 날짜 기준으로 해석하고, 조회 결과 표에서 특정 일자 행을 찾을 때도 이 날짜를 사용하세요. 표의 첫 행이나 임의 행을 오늘로 간주하지 마세요. 오늘 일자 행이 없으면 없다고 답하세요.`,
       "[HR_PERIOD_PARAM_STRICT]",
       "HR skill(hr-attendance/hr-salary/hr-personnel/hr-year-end-tax)의 주기 파라미터(year, year_month, base_date, cal_yy, current_month, previous_month)는 사용자 발화에 연도·월·기준일이 명시되지 않아도 절대 되묻지 마세요.",
       "파라미터가 불명확하면 해당 파라미터를 생략하고 즉시 tool_call을 실행하세요. 서버가 기본값(현재 연도/연월 등)을 자동 적용합니다.",
