@@ -811,6 +811,50 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "특정일 발췌 결정론 검증 — year_month는 월 단위(7)로 호출되고 LLM이 07-03 행만 추려 답변해야 함. 수정 전 FAIL(0701/0706 포함 통짜 echo) 기대"
+    },
+    {
+      "id": "Q7",
+      "label": "답변품질 — 인사정보: 내부 식별자·raw 컬럼명 비노출",
+      "message": "@agent 내 인사정보 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLPrtEmpCard\\.do",
+        "answer_pattern": [
+          "오사공",
+          "개발팀|소속"
+        ],
+        "answer_not_pattern": [
+          "servareaId|corpId|empTypeCd|wkareaCd|wktypeCd|lunTypeCd|officeStatCd|sexCd",
+          "staffId|loginId|2026000001|osagong@example\\.com의 loginId",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "profile 화이트리스트 렌더 검증 — 내부 식별자(servareaId/corpId/*Cd/staffId/loginId)와 raw 영문 컬럼명 헤더 비노출. 화이트리스트(columns) 구현 전 FAIL(raw 통짜 표) 기대"
+    },
+    {
+      "id": "Q8",
+      "label": "답변품질 — 일용직 급여 전체 표: 계좌번호·내부 식별자 비노출",
+      "message": "@agent 이번 달 일용직 급여 내역 전체 표로 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/SALDaylabMgr\\.do",
+        "answer_pattern": [
+          "109,?703|실지급"
+        ],
+        "answer_not_pattern": [
+          "110-123-456789",
+          "ENC:AbCdEf012345",
+          "servareaId|staffId|accNo|bankCd|chgStaffId",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "daylabor 화이트리스트 검증 — 계좌번호(암호문 ENC:·복호화 평문)와 내부 식별자·raw 키 비노출. 전체 표 명시 요청이라 footer 3분기 중 전체 표 branch로 echo 유도. 화이트리스트 구현 전 FAIL(accNoDecrypt 평문 노출) 기대"
     }
   ]
 }

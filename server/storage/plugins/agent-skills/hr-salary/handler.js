@@ -21,18 +21,44 @@ const PAY_PERIODS = {
 };
 
 // 2단계: pay_item(=searchItem 복합키) 필요한 명세 endpoint
+// 컬럼 화이트리스트 근거: docs/03-analysis/hr-column-whitelist-audit.analysis.md
+// (kiwibox SALPayslipNewMgr_SQL.xml·SALDaylabMgr_SQL.xml 대조)
 const ENDPOINT_MAP = {
   payslip: {
     path: "/SALPayslipNewMgr.do", cmd: "getSALPayslipNewMgrList",
     needsPayItem: true, staffParam: "cmmSearchStaffId", gate: true,
+    columns: {
+      salItemNm: "지급항목",
+      salTypeNm: "지급구분",
+      salYm: "급여연월",
+      salAmt: "지급금액",
+      resalAmt: "소급금액",
+    },
   },
   deductions: {
     path: "/SALPayslipNewMgr.do", cmd: "getSALPayslipNewMgrList2",
     needsPayItem: true, staffParam: "cmmSearchStaffId", gate: true,
+    columns: {
+      salItemNm: "공제항목",
+      salYm: "급여연월",
+      salAmt: "공제금액",
+    },
   },
   payslip_summary: {
     path: "/SALPayslipNewMgr.do", cmd: "getSALPayslipNewMgrMap",
     needsPayItem: true, staffParam: "cmmSearchStaffId", gate: true,
+    // staffId/staffNo/salTypeCd/salKindCd/notice(CLOB HTML) 차단
+    columns: {
+      staffNm: "성명",
+      orgNm: "소속",
+      posNm: "직위",
+      resNm: "직책",
+      empYmd: "입사일",
+      salYmd: "급여일자",
+      jtotAmt: "지급총액",
+      gtotAmt: "공제총액",
+      ctotAmt: "실지급액",
+    },
   },
   salary_statement: {
     // SAL-0050 월별지급내역(§1.2) — SAL-0220 급여명세서(빈 응답·폐기)의 대체 (specs/011 D5)
@@ -50,6 +76,36 @@ const ENDPOINT_MAP = {
   daylabor: {
     path: "/SALDaylabMgr.do", cmd: "getSALDaylabMgrList",
     needsPayItem: false, period: "range", staffParam: "cmmSearchStaffId", gate: true,
+    // ★계좌번호(accNo 암호문·accNoDecrypt 복호화 평문)·bankCd 절대 미노출.
+    // salClassNm은 SQL alias 중복(호봉명↔은행명 덮어쓰기)으로 값 신뢰 불가 — 제외.
+    columns: {
+      workYmd: "근무일자",
+      salYmd: "급여일자",
+      staffNm: "성명",
+      corpNm: "회사",
+      orgNm: "소속",
+      posNm: "직위",
+      clsNm: "직급",
+      empTypeNm: "직원구분",
+      wktypeNm: "근무유형",
+      staTime: "출근시간",
+      endTime: "퇴근시간",
+      workTime: "정상근무시간",
+      overTime: "연장시간",
+      hourlyAmt: "시급",
+      dailyAmt: "일급",
+      otAmt: "연장수당",
+      etcAmt: "추가금액",
+      payAmt: "지급액",
+      taxEarnAmt: "과세금액",
+      ntaxEarnAmt: "비과세금액",
+      itaxAmt: "소득세",
+      rtaxAmt: "지방소득세",
+      insuranceAmt: "고용보험",
+      deducAmt: "공제액",
+      rpayAmt: "실지급액",
+      memo: "특이사항",
+    },
   },
 };
 

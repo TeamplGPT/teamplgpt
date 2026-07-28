@@ -16,27 +16,93 @@ const {
 const ENDPOINT_MAP = {
   profile: {
     path: "/getMBLPrtEmpCard.do", staffParam: "searchStaffId", gate: false,
+    // 내부 식별자(SERVAREA_ID/CORP_ID/STAFF_ID/*_CD/LOGIN_ID) 비노출 — 화이트리스트 렌더.
+    // 반환 컬럼 정본: kiwibox MBLPrtEmpCard_SQL.xml getMBLPrtEmpCard select 절.
+    columns: {
+      NAME: "성명",
+      ENAME: "영문명",
+      CNAME: "한자명",
+      STAFF_NO: "사번",
+      CORP_NM: "회사",
+      ORG_NM: "소속",
+      POS_NM: "직위",
+      CLS_NM: "직급",
+      RES_NM: "직책",
+      STAFF_TYPE_NM: "사원유형",
+      WKTYPE_NM: "근무유형",
+      STATUS_NM: "재직상태",
+      CORP_TEL: "회사전화",
+      HAND_PHONE: "휴대전화",
+      MAIL_ID: "이메일",
+    },
   },
   profile_detail: {
     path: "/getMBLPrtEmpCardPop.do", staffParam: "searchStaffId", gate: true,
+    // STAFF_ID/MENU_CD/SEQ 내부 식별자 제외 (MBLPrtEmpCard_SQL.xml getMBLPrtEmpCardPop)
+    columns: {
+      MENU_NM: "항목",
+      CONTENTS: "내용",
+    },
   },
+  // 이하 columns 근거: docs/03-analysis/hr-column-whitelist-audit.analysis.md
+  // (MBLHrBassiemList_SQL·Main_SQL 대조)
   org_tree: {
     path: "/getMBLHrBassiemOrgList.do", staffParam: null, gate: false,
     dateParam: "today", orgParam: { name: "cmmSearchOrgCd", required: false },
+    // ORG_CD·PRIOR_ORG_CD는 org_members 체이닝·트리 계층에 필수 — 의도적 노출 유지.
+    // level(_LEVEL)/seqNo/staYmd/endYmd 차단.
+    columns: {
+      ORG_NM: "조직명",
+      ORG_FNM: "조직전체명",
+      CHIEF_INFO: "조직장",
+      STAFF_CNT: "인원수",
+      ORG_CD: "조직코드",
+      PRIOR_ORG_CD: "상위조직코드",
+    },
   },
   org_members: {
     path: "/getMBLHrBassiemMemberList.do", staffParam: null, gate: false,
     dateParam: "today", orgParam: { name: "searchOrgCd", required: true },
+    // detail/seqNo/empOrder/staffId/orgCd(3종)/posSeqNo/name(중복)/imgExYn 차단
+    columns: {
+      STAFF_NM: "성명",
+      STAFF_NO: "사번",
+      ORG_NM: "소속",
+      POS_NM: "직위",
+      RES_NM: "직책",
+      CORP_NM: "회사",
+      WORK_TYPE: "근무정보",
+      WORK_INFO: "근무상황",
+    },
   },
   todo_count: {
     path: "/getTodoIconCnt.do", staffParam: null, gate: false, // 범위 a — 세션 신원
+    columns: {
+      CNT1: "미확인 할일",
+      CNT2: "미확인 쪽지",
+      CNT3: "미결 결재",
+    },
   },
   schedule_day: {
     path: "/getScheduleDay.do", staffParam: null, gate: false, // 범위 a
     dateParam: "month-range",
+    columns: {
+      MD: "날짜(월일)",
+      HOLIDAY_YN: "공휴일여부",
+      RESULT: "건수",
+    },
   },
   contact_directory: {
     path: "/getContactList.do", staffParam: null, gate: false, // 공개 디렉터리
+    // staffId/orgCd/staffNo/seq 차단. corpTel은 회사 대표번호(공개 성격) 노출.
+    columns: {
+      STAFF_NM: "성명",
+      ORG_NM: "소속",
+      POS_NM: "직위",
+      RES_NM: "직책",
+      POSITION_NM: "담당업무",
+      CORP_TEL: "전화",
+    },
   },
   education: {
     // 인사카드 교육이력 탭 (EDUT_HST2, kiwibox AI self SQL과 동일 테이블 — specs/007)

@@ -82,6 +82,49 @@ const FIXTURES_BY_CMD = {
   },
 };
 
+// cmd 없는 경로형 endpoint fixture — 사원증(getMBLPrtEmpCard)은 body에 cmd가 없어
+// 경로로 매칭한다. 실측 SQL(MBLPrtEmpCard_SQL.xml) 반환 컬럼 재현: 내부 식별자
+// (servareaId/corpId/staffId/*Cd/loginId) 포함 — 화이트리스트 미노출 검증용(Q7).
+// 일용직 급여 (SALDaylabMgr) — Q8: 계좌번호(암호문·복호화 평문)·내부 식별자 비노출 검증.
+// 실측 SQL(SALDaylabMgr_SQL.xml) 68컬럼 중 대표 필드 재현.
+FIXTURES_BY_CMD.getSALDaylabMgrList = {
+  DATA: [
+    {
+      servareaId: "100", staffId: "2026000001", staffNo: "20260001",
+      staffNm: "오사공", workYmd: "20260715", salYmd: "20260725",
+      statYm: "202607", fixYn: "Y", closeYn: "Y", corpId: "1000",
+      corpNm: "오이사공", orgCd: "0303", orgNm: "개발팀", posCd: "40",
+      posNm: "책임", clsCd: "40", clsNm: "4급", empTypeCd: "20",
+      empTypeNm: "일용직", wktypeCd: "10", wktypeNm: "통상근무",
+      bankCd: "088", salClassNm: "신한은행", accNo: "ENC:AbCdEf012345",
+      accNoDecrypt: "110-123-456789", cryptAuthYn: "Y",
+      staTime: "0900", endTime: "1800", workTime: "8", overTime: "1",
+      hourlyAmt: "12000", dailyAmt: "96000", otAmt: "18000", etcAmt: "0",
+      payAmt: "114000", taxEarnAmt: "114000", ntaxEarnAmt: "0",
+      itaxAmt: "3078", rtaxAmt: "307", insuranceAmt: "912",
+      deducAmt: "4297", rpayAmt: "109703", memo: "", note: "",
+      chgStaffId: "9000000001", chgDate: "2026-07-25 10:00:00",
+    },
+  ],
+};
+
+const FIXTURES_BY_PATH = {
+  "/getMBLPrtEmpCard.do": {
+    DATA: [
+      {
+        servareaId: "100", corpId: "1000", corpNm: "오이사공", name: "오사공",
+        ename: "Oh Sa Gong", cname: "오사공", empTypeCd: "10", staffTypeNm: "일반직",
+        wkareaCd: "1000", wktypeCd: "10", lunTypeCd: "1", orgCd: "0303",
+        orgNm: "개발팀", retYmd: "", staffId: "2026000001", staffNo: "20260001",
+        sexCd: "M", officeStatCd: "10", posNm: "책임", clsNm: "4급", resNm: "팀원",
+        statusNm: "재직", wktypeNm: "통상근무", corpTel: "02-1234-5678",
+        homeTel: "", faxNo: "", handPhone: "010-1234-5678", connectTel: "",
+        mailId: "osagong@example.com", outMailId: "", loginId: "osagong",
+      },
+    ],
+  },
+};
+
 const server = http.createServer((req, res) => {
   const parsed = url.parse(req.url, false);
   const baseEntry = {
@@ -111,6 +154,9 @@ const server = http.createServer((req, res) => {
     } else if (parsedBody && parsedBody.cmd && FIXTURES_BY_CMD[parsedBody.cmd]) {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify(FIXTURES_BY_CMD[parsedBody.cmd]));
+    } else if (FIXTURES_BY_PATH[parsed.pathname]) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(FIXTURES_BY_PATH[parsed.pathname]));
     } else {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ success: true, data: [], message: "mock" }));

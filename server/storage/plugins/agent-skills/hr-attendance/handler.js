@@ -125,7 +125,56 @@ const COLUMNS_BY_QT = {
     education: "교육",
     leaveAbsence: "휴직",
   },
+  // 이하 4종 근거: docs/03-analysis/hr-column-whitelist-audit.analysis.md
+  // (TAADclzWorkOtSchdul_SQL·TAADclzWorkSearchCldr_SQL·TAADclzVcatnCldrMgr_SQL 대조)
+  overtime: {
+    // getTAADclzWorkOtSchdulList2 — staffId/workStaffId/orgCd/empOrder/staffNo 차단
+    staffNm: "성명",
+    orgNm: "소속",
+    posNm: "직위",
+    otWeek01: "1주",
+    otWeek02: "2주",
+    otWeek03: "3주",
+    otWeek04: "4주",
+    otWeek05: "5주",
+    otWeek06: "6주",
+    otWeekSum: "합계",
+  },
+  work_calendar: {
+    // getTAADclzWorkSearchCldr — kind/wktypeCd/reqNo 차단
+    ymd: "일자",
+    workTypeNm: "근무유형",
+    holidayNm: "공휴일",
+    mark: "상태",
+  },
+  vacation_calendar: {
+    // getTAADclzVcatnCldrMgr — leavCd/reqStatusCd/endYmdAdd/allDay/hideLeavCds/*Cd 차단
+    title: "내용",
+    leavNm: "휴가종류",
+    personInfo: "직원정보",
+    orgNm: "소속",
+    posNm: "직위",
+    resNm: "직책",
+    wktypeNm: "근무유형",
+    staYmd: "시작일",
+    endYmd: "종료일",
+    staHm: "시작시각",
+    endHm: "종료시각",
+    agentName: "대결자",
+    reason: "사유",
+    note: "비고",
+  },
 };
+
+// overtime_limit(getTAADclzWorkOtSchdulList) — 일별 매트릭스 ot01~ot31 전개
+COLUMNS_BY_QT.overtime_limit = (() => {
+  const cols = { staffNm: "성명", orgNm: "소속", posNm: "직위" };
+  for (let d = 1; d <= 31; d++) {
+    cols[`ot${String(d).padStart(2, "0")}`] = `${d}일`;
+  }
+  cols.sumOt = "합계";
+  return cols;
+})();
 
 module.exports.runtime = {
   handler: async function ({ query_type, year_month }) {

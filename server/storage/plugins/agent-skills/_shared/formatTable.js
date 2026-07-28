@@ -104,14 +104,29 @@ function renderTable(rows, options = {}) {
   return md ? md + ANSWER_GUIDE : md;
 }
 
+// 내부 식별자 공통 차단 목록 — 화이트리스트 미정의 query_type의 raw 렌더 폴백에서도
+// 시스템 내부 PK·세션 식별자가 노출되지 않도록 항상 제외한다 (L2 코드 가드).
+// 컬럼 화이트리스트(renderWhitelisted 등)가 정본이며, 이 목록은 최후 방어선.
+const INTERNAL_KEYS = [
+  "code",
+  "message",
+  "servareaId",
+  "staffId",
+  "staffNo",
+  "corpId",
+  "loginId",
+  "oid",
+];
+
 // footer 미부착 내부 렌더 — renderWhitelisted가 "총 N건" 줄 뒤에 footer를 한 번만
 // 붙일 수 있도록 분리 (specs/012-hr-answer-quality contracts/footer-contract.md).
 function renderTableRaw(rows, options = {}) {
-  const { boldNumbers = false, excludeKeys = ["code", "message"] } = options;
+  const { boldNumbers = false, excludeKeys = [] } = options;
+  const exclude = new Set([...INTERNAL_KEYS, ...excludeKeys]);
 
   if (!rows || rows.length === 0) return "";
 
-  const keys = Object.keys(rows[0]).filter((k) => !excludeKeys.includes(k));
+  const keys = Object.keys(rows[0]).filter((k) => !exclude.has(k));
   if (keys.length === 0) return "";
 
   let md = `| ${keys.join(" | ")} |\n`;
@@ -146,9 +161,10 @@ const ANSWER_GUIDE = `
 function renderSummary(summary) {
   if (!summary || Object.keys(summary).length === 0) return "";
 
-  const parts = Object.entries(summary).map(
-    ([k, v]) => `**${k}**: ${formatCellValue(v, true)}`
-  );
+  const parts = Object.entries(summary)
+    .filter(([k]) => !INTERNAL_KEYS.includes(k))
+    .map(([k, v]) => `**${k}**: ${formatCellValue(v, true)}`);
+  if (parts.length === 0) return "";
   return `> ${parts.join(" | ")}`;
 }
 
