@@ -380,6 +380,24 @@
       "note": "specs/011 US4 D9. 구현 전 FAIL(staffId 단독)"
     },
     {
+      "id": "K18",
+      "label": "출퇴근 기록 — 오늘(특정일) 단일일자 BODY",
+      "message": "@agent 오늘 출근정보 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList",
+          "searchBaseSYmd=(\\d{8})&searchBaseEYmd=\\1&searchSYmd=\\1&searchEYmd=\\1",
+          "cmmSearchStaffId="
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "work_ymd 신규 파라미터 — '오늘'처럼 특정 하루 질문 시 월 전체가 아닌 단일일자 range(4개 필드 동일값)를 보내는지 검증. 구현 전 FAIL(월 range 전송, searchBaseSYmd가 매월 1일 고정이라 searchBaseEYmd와 불일치)"
+    },
+    {
       "id": "KB22",
       "label": "연차 되묻기 금지 (E14~16 승계)",
       "message": "@agent 연차 얼마나 남았어?",
@@ -855,6 +873,48 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "daylabor 화이트리스트 검증 — 계좌번호(암호문 ENC:·복호화 평문)와 내부 식별자·raw 키 비노출. 전체 표 명시 요청이라 footer 3분기 중 전체 표 branch로 echo 유도. 화이트리스트 구현 전 FAIL(accNoDecrypt 평문 노출) 기대"
+    },
+    {
+      "id": "Q9",
+      "label": "답변품질 — 미결 몇 건: 할일(CNT1)과 혼동 금지",
+      "message": "@agent 미결 몇 건이야?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getTodoIconCnt\\.do",
+        "answer_pattern": [
+          "미결[\\s\\S]{0,15}7|7[\\s\\S]{0,15}미결"
+        ],
+        "answer_not_pattern": [
+          "미결[\\s\\S]{0,15}5건|5건[\\s\\S]{0,15}미결",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "todo_count 응답은 미확인 할일(CNT1=5)/미확인 쪽지(CNT2=2)/미결 결재(CNT3=7)를 한 표로 반환. '미결'만 물었으면 CNT3(7)을 답해야 하며 CNT1(5)을 미결로 오인하면 FAIL. plugin.json에 컬럼별 추출 지시 추가 전 FAIL 실측(할일 건수로 오답)"
+    },
+    {
+      "id": "Q10",
+      "label": "답변품질 — 증명서 발급내역: 4건 전건 포함(과압축 방지)",
+      "message": "@agent 재직증명서 발급내역 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/CTIMcrtfReqstRefromMgr\\.do",
+        "answer_pattern": [
+          "0115|01-15|1월 15일",
+          "0320|03-20|3월 20일",
+          "0601|06-01|6월 1일",
+          "0710|07-10|7월 10일"
+        ],
+        "answer_not_pattern": [
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/012 footer '내역·현황 → 관련 행만 추려 제시' 문구가 목록형 질문에서 과압축(4건→1건)을 유발한 실사고 재현. footer-contract 문구를 '행은 전부 포함, 열만 추려'로 보강하기 전 FAIL 실측(1건만 답변) 기대. Q4와 동일하게 footer 공유라 FAIL-first 이후에도 회귀 가드로 유지"
     }
   ]
 }

@@ -22,10 +22,12 @@ const ENDPOINT_MAP = {
   timesheet: {
     path: "/TAAWrkTimeStatusMgr.do", cmd: "getTAAWrkTimeStatusMgrList", // TAA-1410 정본(§2.1)
     period: "range-both", staffParam: "cmmSearchStaffId", gate: true,
+    daySupported: true, // work_ymd 지정 시 월 range 대신 단일일자 range 전송
   },
   work_status: {
     path: "/TAAWrkTimeStatusMgr.do", cmd: "getTAAWrkTimeStatusMgrList",
     period: "range-both", staffParam: "cmmSearchStaffId", gate: true,
+    daySupported: true,
   },
   work_calendar: {
     path: "/TAADclzWorkSearchCldr.do", cmd: "getTAADclzWorkSearchCldr",
@@ -177,7 +179,7 @@ COLUMNS_BY_QT.overtime_limit = (() => {
 })();
 
 module.exports.runtime = {
-  handler: async function ({ query_type, year_month }) {
+  handler: async function ({ query_type, year_month, work_ymd }) {
     try {
       if (!query_type || !ENDPOINT_MAP[query_type]) {
         const types = Object.keys(ENDPOINT_MAP).join(", ");
@@ -190,24 +192,37 @@ module.exports.runtime = {
       const form = {};
       if (spec.cmd) form.cmd = spec.cmd;
 
-      const ym =
-        resolveDateParam(year_month, "year_month") ||
-        resolveDateParam("이번달", "year_month");
-      if (spec.period === "ym") {
-        form.searchYm = ym;
-      } else if (
-        spec.period === "range" ||
-        spec.period === "range-alt" ||
-        spec.period === "range-both"
-      ) {
-        const [sYmd, eYmd] = monthRange(ym);
-        if (spec.period === "range" || spec.period === "range-both") {
-          form.searchBaseSYmd = sYmd;
-          form.searchBaseEYmd = eYmd;
-        }
-        if (spec.period === "range-alt" || spec.period === "range-both") {
-          form.searchSYmd = sYmd;
-          form.searchEYmd = eYmd;
+      // '오늘'/'어제'/특정일자처럼 하루만 묻는 질문은 월 range 대신 단일일자 range를 전송
+      // (월 range만 있으면 LLM이 표에서 해당 행을 발췌해야 해서 프로덕션 규모 데이터에서 누락되기 쉬움).
+      const resolvedDay = spec.daySupported
+        ? resolveDateParam(work_ymd, "base_date")
+        : undefined;
+
+      if (resolvedDay) {
+        form.searchBaseSYmd = resolvedDay;
+        form.searchBaseEYmd = resolvedDay;
+        form.searchSYmd = resolvedDay;
+        form.searchEYmd = resolvedDay;
+      } else {
+        const ym =
+          resolveDateParam(year_month, "year_month") ||
+          resolveDateParam("이번달", "year_month");
+        if (spec.period === "ym") {
+          form.searchYm = ym;
+        } else if (
+          spec.period === "range" ||
+          spec.period === "range-alt" ||
+          spec.period === "range-both"
+        ) {
+          const [sYmd, eYmd] = monthRange(ym);
+          if (spec.period === "range" || spec.period === "range-both") {
+            form.searchBaseSYmd = sYmd;
+            form.searchBaseEYmd = eYmd;
+          }
+          if (spec.period === "range-alt" || spec.period === "range-both") {
+            form.searchSYmd = sYmd;
+            form.searchEYmd = eYmd;
+          }
         }
       }
 

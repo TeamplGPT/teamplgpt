@@ -108,6 +108,23 @@ FIXTURES_BY_CMD.getSALDaylabMgrList = {
   ],
 };
 
+// 할일/미결 건수 (getTodoIconCnt) — Q9: '미결'만 물었을 때 미확인 할일(CNT1)이 아닌
+// 미결 결재(CNT3)를 답하는지 검증. 세 값을 서로 다르게 둬서 혼동 시 FAIL이 드러나게 함.
+FIXTURES_BY_CMD.getTodoIconCnt = {
+  result: [{ CNT1: "5", CNT2: "2", CNT3: "7" }],
+};
+
+// 증명서 신청내역 (getCTIMcrtfReqstRefromMgrList) — Q10: '발급내역' 같은 목록형 질문에서
+// footer의 "내역·현황 → 추려 제시" 지침을 과잉 적용해 4건 중 1건으로 축소하지 않는지 검증.
+FIXTURES_BY_CMD.getCTIMcrtfReqstRefromMgrList = {
+  DATA: [
+    { TYPE_NM: "재직증명서", USE_NM: "제출용", ISSUE_YMD: "20260115", REQ_DATE: "20260114" },
+    { TYPE_NM: "재직증명서", USE_NM: "제출용", ISSUE_YMD: "20260320", REQ_DATE: "20260319" },
+    { TYPE_NM: "경력증명서", USE_NM: "이직용", ISSUE_YMD: "20260601", REQ_DATE: "20260531" },
+    { TYPE_NM: "재직증명서", USE_NM: "대출용", ISSUE_YMD: "20260710", REQ_DATE: "20260709" },
+  ],
+};
+
 const FIXTURES_BY_PATH = {
   "/getMBLPrtEmpCard.do": {
     DATA: [
