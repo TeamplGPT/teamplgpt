@@ -34,3 +34,6 @@ frontend/test-login.cjs
 frontend/test-login.js
 server/__tests__/integration/
 server/test-login-redirect.js
+
+# humanize-korean 윤문 작업 사본 (커밋 대상 아님)
+_workspace/
