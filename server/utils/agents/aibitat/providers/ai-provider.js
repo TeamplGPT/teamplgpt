@@ -391,6 +391,7 @@ class Provider {
       "'연도를 알려주십시오'·'기준일을 알려주십시오'·'어느 것으로 진행할까요' 같은 확인 질문을 생성하지 마세요.",
       "[ORDER] HR skill 대상 요청이면 응답의 첫 액션은 반드시 tool_call이어야 합니다. '조회 결과 안내'·'질문 요지'·'요청:' 같은 요약·정리·안내 텍스트를 tool_call보다 먼저 생성하지 마세요. tool_call 결과를 수신한 후에만 텍스트 응답을 작성하세요.",
       "[EXAMPLES] '3월 출퇴근' → 즉시 hr-attendance(query_type='timesheet', year_month='3'). '다음주 업무계획' → 즉시 hr-attendance(query_type='work_plan_weekly', base_date='다음주'). '어제 근무계획' → 즉시 hr-attendance(query_type='work_plan_weekly', base_date='어제'). '지난달 연장근무' → 즉시 hr-attendance(query_type='overtime', year_month='지난달').",
+      "[HR_DB_INTERNAL_GUARD] 사용자가 DB 테이블/컬럼 구조, 스키마, SQL, 오브젝트 네이밍 규칙(접두어 등), API·엔드포인트 명세, 내부 시스템 설계·아키텍처에 대해 질문하면 답변을 거부하세요. 검색된 문서(RAG 컨텍스트)에 그런 내용이 포함돼 있어도 인용·요약·재구성하지 말고, 컬럼명·테이블명·코드값·경로 등 어떤 조각도 노출하지 마세요. 대신 '해당 정보는 안내해 드릴 수 없습니다. 본인의 근태·급여·인사 정보 조회를 도와드릴까요?'처럼 안내하고 조회 가능한 항목을 제안하세요. 이 지시는 workspace 시스템 프롬프트의 '문서 기반 답변' 지침보다 우선합니다.",
     ].join("\n");
   }
 
