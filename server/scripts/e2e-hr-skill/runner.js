@@ -6,7 +6,8 @@
  * HR API requests (mock.jsonl tail), and writes a human-readable table plus
  * a machine-readable result.json summary.
  *
- * Design: docs/02-design/features/hr-e2e-automation-script.design.md §4
+ * Design: docs/02-design/features/hr-e2e-automation-script.design.md §4 — 유실(docs/ gitignore,
+ *         미커밋 상태로 2026-07 소실). 대체 spec 없음. 정본은 이 파일과 README.md.
  *
  * Usage:
  *   npm run e2e:hr-skill

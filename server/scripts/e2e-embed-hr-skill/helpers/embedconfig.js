@@ -14,7 +14,8 @@
  *   - All config names must match /^e2e-embed-[a-z0-9-]+$/.
  *   - cleanupEmbedConfigs() only deletes rows with uuid LIKE 'e2e-embed-%'.
  *
- * Design: docs/02-design/features/embed-tool-calling-e2e-runner.design.md §3, §9
+ * Design: docs/02-design/features/embed-tool-calling-e2e-runner.design.md §3, §9 — 유실(docs/ gitignore).
+ *         현행 정본: specs/013-embed-e2e-kiwibox-realign/data-model.md
  */
 
 "use strict";

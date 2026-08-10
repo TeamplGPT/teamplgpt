@@ -35,9 +35,13 @@ AI Agent(Claude Code 등)와 작업할 때는 걸리는 대목이 있다. 에이
    ```
 3. 경로를 모르면 에이전트가 직접 실행할 수 있는 탐색 명령을 시킨다:
    ```bash
-   find ~ -maxdepth 4 -name "cmmAiAssistantToolEndpoints.md" -path "*spec-docs*" 2>/dev/null  # → $KIWIBOX
-   find ~ -maxdepth 4 -name "teamplgpt-hr-client-tools-workorder.md" 2>/dev/null              # → $OKRSERVICE/docs
+   # $KIWIBOX — 출력 경로에서 /spec-docs/... 앞부분이 $KIWIBOX
+   find ~ -maxdepth 7 -path "*spec-docs/SYS/CMM/cmmAiAssistantToolEndpoints.md" 2>/dev/null
+   # $OKRSERVICE — 출력 경로에서 /docs/... 앞부분이 $OKRSERVICE
+   find ~ -maxdepth 7 -name "teamplgpt-hr-client-tools-workorder.md" 2>/dev/null
    ```
+   `maxdepth`는 7로 둔다. clone 위치가 `~/work/`보다 한 단계만 깊어도(`~/5240/kiwibox_eGov4.2/spec-docs/SYS/CMM/`은 홈 기준 6단계) 얕은 값으로는 못 찾는다.
+   그래도 안 나오면 해당 리포가 로컬에 없는 것이다. 추측해서 진행하지 말고 **사용자에게 경로를 물어본다.**
 
 주의: 팀에 공유되는 에이전트 작업 결과물(spec·analysis·작업지시서·이 가이드 등)에는 `/home/<username>/...` 절대경로를 쓰지 말 것. 리포 내부는 상대경로로, 타 리포는 `$KIWIBOX/...` 식 변수로 쓴다. 기존 문서에서 절대경로를 발견하면 그때그때 고쳐 둔다.
 
@@ -250,7 +254,8 @@ LLM 프롬프트(L1·가드)는 확률적으로 동작한다. 그래서 민감�
 - `specs/001~013-*` — 피처별 spec/plan/tasks/contracts (특히 003 세션 인증, 011 endpoint 재정렬, 012 답변 품질, 013 embed E2E)
 - `specs/kiwibox-endpoint-test-guide.md` — 실호출 검증
 - `docs/03-analysis/hr-column-whitelist-audit.analysis.md` — 13종 컬럼 노출/차단 판정
-- `docs/rag-search-flow-chat-vs-react.md` — 3-Mode 채팅 구조
+- ~~`docs/rag-search-flow-chat-vs-react.md` — 3-Mode 채팅 구조~~ — **유실**(`docs/` gitignore, 미커밋 소실).
+  대신 경로 실물을 본다: `server/utils/chats/{index.js,stream.js,react/,embed.js}` · `server/utils/agents/aibitat/`
 - `server/scripts/e2e-hr-skill/README.md`, `server/scripts/e2e-embed-hr-skill/README.md`
 
 ### okrservice (`$OKRSERVICE/`)

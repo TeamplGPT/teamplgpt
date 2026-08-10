@@ -149,7 +149,11 @@ Exit code: 전원 PASS면 `0`, 하나라도 FAIL이면 `1`.
 
 ## 관련 문서
 
-- Plan: `docs/01-plan/features/hr-e2e-automation-script.plan.md`
-- Design: `docs/02-design/features/hr-e2e-automation-script.design.md`
-- 직전 피처 (E2E 자동화 최초 구성): `docs/archive/2026-04/hr-year-month-past-year-fix/`
-- 직전 피처 (패턴 재사용): `docs/archive/2026-04/hr-month-only-silent-pass/`
+> **아래 `docs/` 산출물은 전부 유실됐다.** `docs/`가 `.gitignore` 대상이라 커밋된 적이 없고 2026-07 워킹트리 정리 때 사라졌다. 복구 사본은 없다.
+> **현재 정본은 이 README와 `runner.js`·`scenarios.json` 자체다.**
+
+- ~~Plan: `docs/01-plan/features/hr-e2e-automation-script.plan.md`~~ — 유실, 대체 spec 없음
+- ~~Design: `docs/02-design/features/hr-e2e-automation-script.design.md`~~ — 유실, 대체 spec 없음
+- ~~직전 피처 (E2E 자동화 최초 구성): `docs/archive/2026-04/hr-year-month-past-year-fix/`~~ — 유실
+- ~~직전 피처 (패턴 재사용): `docs/archive/2026-04/hr-month-only-silent-pass/`~~ — 유실
+- description 작성 표준: `docs/conventions/hr-skill-description-pattern.md` §6.2 회귀 검증 절차

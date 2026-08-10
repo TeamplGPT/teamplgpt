@@ -34,7 +34,8 @@ AGENTS.md는 이 파일과 동일 내용(멀티-agent tool 표준 준수).
 
 ## HR Agent Skills — 필수 참조 Convention
 
-HR agent-skill(`hr-attendance`, `hr-salary`, `hr-personnel`, `hr-year-end-tax`) 관련 피처를
+HR agent-skill 7종(`hr-attendance`, `hr-salary`, `hr-personnel`, `hr-year-end-tax`,
+`hr-approval`, `hr-certificate`, `hr-welfare`) 관련 피처를
 **시작·수정·확장**할 때는 반드시 먼저 참조:
 
 - **`docs/conventions/hr-skill-description-pattern.md`** — `plugin.json` description 작성 표준
@@ -42,10 +43,10 @@ HR agent-skill(`hr-attendance`, `hr-salary`, `hr-personnel`, `hr-year-end-tax`) 
 | 작업 종류 | 참조 필요 섹션 |
 |----------|---------------|
 | 신규 HR skill 생성 | §3 T-B / §4 T-A Template + §7 3-Location 패턴 |
-| 신규 주기 파라미터 추가 (`*_date`, `*_month`, `*_year`, `from_*`, `to_*` 등) | §6.1 신규 파라미터 체크리스트 |
+| 신규 주기 파라미터 추가 (`*_date`, `*_month`, `*_year`, `cal_*`, `from_*`, `to_*` 등) | §6.1 신규 파라미터 체크리스트 |
 | 주기 파라미터 description 수정 | §6.2 회귀 검증 절차 |
 | 신규 `query_type` 추가 + 자연어 매핑 | §7 Location A/B/C 3-Location 패턴 |
-| 경계 키워드(2+ skill 동일 단어) 추가 | §5 적용 현황 매트릭스 + Report `hr-all-skills-query-type-hint` §4 R-1/R-2/R-3 |
+| 경계 키워드(2+ skill 동일 단어) 추가 | §5 적용 현황 매트릭스 + §5 경계 키워드 표 |
 
 핵심: Period Parameter는 `[CRITICAL]` 3단 + `[재강조]` 필수 (Template T-A/T-B).
 스펙 경로 진입 시 spec.md/plan.md에 Convention doc 경로와 T-A/T-B 적용 여부를 명시한다.
@@ -76,7 +77,9 @@ HR agent-skill(`hr-attendance`, `hr-salary`, `hr-personnel`, `hr-year-end-tax`) 
 
 - **chat/query** 모드 · **react** 모드 · **@agent** 모드
 
-자세한 내용은 `docs/rag-search-flow-chat-vs-react.md` 참조.
+경로 실물: chat/query=`server/utils/chats/index.js`·`stream.js`, react=`server/utils/chats/react/`,
+@agent=`server/utils/agents/aibitat/`, embed=`server/utils/chats/embed.js`.
+(`docs/rag-search-flow-chat-vs-react.md`는 유실 — `docs/`가 gitignore라 미커밋 상태로 소실)
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,

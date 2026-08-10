@@ -1,6 +1,9 @@
 // hr-attendance/handler.js
 // 5240 HR(kiwibox) 조회 — R1 클라이언트 위임 정본 + 서버 폴백 (specs/001·003·011).
-// 근거 카탈로그: kiwibox_eGov4.2/spec-docs/SYS/CMM/cmmAiAssistantToolEndpoints.md (신판)
+// 근거 카탈로그: $KIWIBOX/spec-docs/SYS/CMM/cmmAiAssistantToolEndpoints.md (신판)
+//   $KIWIBOX 경로를 모르면 사용자에게 묻거나 아래로 찾는다. 절대경로를 코드에 박지 말 것.
+//   find ~ -maxdepth 7 -path "*spec-docs/SYS/CMM/cmmAiAssistantToolEndpoints.md" 2>/dev/null
+//   (절차 원본: HR-SKILL-GUIDE.md "0. 사전 준비")
 //  - 일일 근태 정본 = TAA-1410 근태현황(§2.1). 휴가/연차 정본 = TAADclzVcatnList
 //    List1/List2(§3, 모바일 getMBL* 미사용 판정). BODY는 실측 성공 본문 전량(임의 축약 금지).
 //  - 대상 식별자는 LLM 미노출: $SELF_STAFF_ID 마커 → 브리지(ssnStaffId) 또는

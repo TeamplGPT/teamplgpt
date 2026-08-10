@@ -7,7 +7,8 @@
  *   3. 3-axis scenarios: scenarios.json adds `axis` and `embed_config` fields,
  *      assertions branch per axis (ALLOW / DENY / FILTER).
  *
- * Design: docs/02-design/features/embed-tool-calling-e2e-runner.design.md
+ * Design: docs/02-design/features/embed-tool-calling-e2e-runner.design.md — 유실(docs/ gitignore).
+ *         현행 정본: specs/013-embed-e2e-kiwibox-realign/
  *
  * Usage:
  *   npm run e2e:embed-hr-skill

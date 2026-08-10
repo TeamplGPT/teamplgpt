@@ -53,7 +53,9 @@ spec-kit 경로(specify → plan → tasks → implement)를 통과해야 한다
 ### V. 3-Mode 일관성 (3-Mode Chat Architecture)
 
 채팅 경로 수정 시 **chat/query · react · @agent** 3개 모드 영향을 모두 확인한다.
-(`docs/rag-search-flow-chat-vs-react.md` 참조) embed 위젯이 관련되면 embed 경로까지 4면 확인.
+경로 실물은 `server/utils/chats/{index.js,stream.js,react/,embed.js}`와 `server/utils/agents/aibitat/`.
+embed 위젯이 관련되면 embed 경로까지 4면 확인.
+(`docs/rag-search-flow-chat-vs-react.md`는 유실 — `docs/`가 gitignore라 미커밋 상태로 소실)
 
 ### VI. Conventional Commits — 한국어 본문
 

@@ -62,7 +62,7 @@ Scenario IDs follow `EC-<AXIS>-<NN>` — see [`scenarios.json`](./scenarios.json
 
 ## Adding Scenarios
 
-Schema (see [design §3.1](../../../docs/02-design/features/embed-tool-calling-e2e-runner.design.md#31-entity-definition)):
+Schema (design 문서는 유실 — 현행 정본은 [`specs/013-embed-e2e-kiwibox-realign/data-model.md`](../../../specs/013-embed-e2e-kiwibox-realign/data-model.md)):
 
 ```json
 {
@@ -128,7 +128,11 @@ The initial 2026-04-20 Do-phase run predated `tool_choice="required"` injection 
 
 ## References
 
-- **Plan**: `docs/01-plan/features/embed-tool-calling-e2e-runner.plan.md`
-- **Design**: `docs/02-design/features/embed-tool-calling-e2e-runner.design.md`
-- **Phase 1-2 (archived)**: `docs/archive/2026-04/embed-tool-calling-support/`
+> **`docs/` 산출물은 유실됐다** — `docs/`가 `.gitignore` 대상이라 미커밋 상태로 2026-07에 사라졌다.
+> **대체 정본은 `specs/013-embed-e2e-kiwibox-realign/`이다.**
+
+- **Spec/Plan (현행 정본)**: `specs/013-embed-e2e-kiwibox-realign/`
+- ~~**Plan**: `docs/01-plan/features/embed-tool-calling-e2e-runner.plan.md`~~ — 유실
+- ~~**Design**: `docs/02-design/features/embed-tool-calling-e2e-runner.design.md`~~ — 유실
+- ~~**Phase 1-2 (archived)**: `docs/archive/2026-04/embed-tool-calling-support/`~~ — 유실
 - **Parent runner**: `server/scripts/e2e-hr-skill/README.md`

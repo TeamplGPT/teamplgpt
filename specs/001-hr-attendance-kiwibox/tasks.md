@@ -21,3 +21,4 @@
   - `getMBLHomeLeaveDetail` 응답 키 케이스(egovMap: creDd 추정) 확인 → formatTable 매핑 조정
 - [ ] **T6** 응답 컬럼 한글 라벨 매핑: 실측 응답 키 기준 formatTable 컬럼명 정리 (실측 후)
 - [ ] **T7** 완료 시 `docs/04-report/features/hr-attendance-kiwibox.report.md` 작성, 헌장 PDCA 매핑 준수
+  - 2026-08-10 확인: 이 리포트는 작성 여부와 무관하게 현재 리포에 없다. `docs/`가 `.gitignore` 대상이라 커밋된 적이 없다. 기록 보존을 위해 원문은 남긴다.

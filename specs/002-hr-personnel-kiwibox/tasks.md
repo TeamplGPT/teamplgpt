@@ -23,3 +23,4 @@
   - 데스크탑 정본(PRCPrtEmpidCard) 컬럼 parity 확인 — parity 있으면 b 정본으로 교체 검토
 - [ ] **T6** 응답 컬럼 한글 라벨 매핑 (실측 후)
 - [ ] **T7** 완료 시 `docs/04-report/features/hr-personnel-kiwibox.report.md` 작성
+  - 2026-08-10 확인: 이 리포트는 작성 여부와 무관하게 현재 리포에 없다. `docs/`가 `.gitignore` 대상이라 커밋된 적이 없다. 기록 보존을 위해 원문은 남긴다.
