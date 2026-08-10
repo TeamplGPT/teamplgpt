@@ -19,7 +19,10 @@ CLAUDE*.md
 
 .analysis
 .bkit
-docs/
+# docs/ 전체 추적 제외 — conventions/(영구 규율 문서)만 예외.
+# `docs/`로 쓰면 git이 하위로 내려가지 않아 예외가 먹지 않는다. `docs/*`여야 한다.
+docs/*
+!docs/conventions/
 
 # Test results
 test-results/
