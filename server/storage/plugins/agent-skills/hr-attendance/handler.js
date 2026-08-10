@@ -21,14 +21,17 @@ const {
 // staffParam: 문자열 또는 배열(다중 사번 파라미터 동시 마커 주입)
 // leaveBody: §3 휴가 공통 BODY(wkareaCd·휴가/회계연도 범위·searchBaseYmd·chkAppYn) 주입
 // baseYmdDashed: searchBaseYmd={오늘 YYYY-MM-DD} 주입 (§2.2)
+// daySupported: work_ymd 지정 시 월 range 대신 단일일자 range 전송 (일 단위 조회 지원)
 const ENDPOINT_MAP = {
   timesheet: {
     path: "/TAAWrkTimeStatusMgr.do", cmd: "getTAAWrkTimeStatusMgrList", // TAA-1410 정본(§2.1)
     period: "range-both", staffParam: "cmmSearchStaffId", gate: true,
+    daySupported: true,
   },
   work_status: {
     path: "/TAAWrkTimeStatusMgr.do", cmd: "getTAAWrkTimeStatusMgrList",
     period: "range-both", staffParam: "cmmSearchStaffId", gate: true,
+    daySupported: true,
   },
   work_calendar: {
     path: "/TAADclzWorkSearchCldr.do", cmd: "getTAADclzWorkSearchCldr",
@@ -180,7 +183,7 @@ COLUMNS_BY_QT.overtime_limit = (() => {
 })();
 
 module.exports.runtime = {
-  handler: async function ({ query_type, year_month }) {
+  handler: async function ({ query_type, year_month, work_ymd }) {
     try {
       if (!query_type || !ENDPOINT_MAP[query_type]) {
         const types = Object.keys(ENDPOINT_MAP).join(", ");
@@ -193,10 +196,24 @@ module.exports.runtime = {
       const form = {};
       if (spec.cmd) form.cmd = spec.cmd;
 
+      // 하루만 묻는 질문('오늘'·'어제'·'2월 27일')은 단일일자 range로 보낸다.
+      // 월 range로 보내면 표 전체가 돌아와 LLM이 해당 행을 발췌해야 하고,
+      // 프로덕션 규모에서는 그 발췌가 누락·오인된다. work_ymd 미지정 시에는
+      // 아래 기존 월-range 경로를 그대로 타므로 월 단위 조회는 영향 없음.
+      // ym은 아래 §3 휴가 공통 BODY(searchSymdLv 등)도 참조하므로 함수 스코프 유지.
       const ym =
         resolveDateParam(year_month, "year_month") ||
         resolveDateParam("이번달", "year_month");
-      if (spec.period === "ym") {
+      const resolvedDay = spec.daySupported
+        ? resolveDateParam(work_ymd, "base_date")
+        : undefined;
+
+      if (resolvedDay) {
+        form.searchBaseSYmd = resolvedDay;
+        form.searchBaseEYmd = resolvedDay;
+        form.searchSYmd = resolvedDay;
+        form.searchEYmd = resolvedDay;
+      } else if (spec.period === "ym") {
         form.searchYm = ym;
       } else if (
         spec.period === "range" ||
