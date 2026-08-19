@@ -44,14 +44,19 @@ const ENDPOINT_MAP = {
     period: "ym-range-alt", staffParam: ["searchId", "cmmSearchStaffId"], gate: false,
     baseYmdDashed: true, // §2.2 — searchId 무게이트, self 강제 필수
   },
+  // OT 2종: 정본 SQL(TAADclzWorkOtSchdul_SQL.xml)이 기간을 #{searchYm}으로만 거른다
+  // (List2는 23회, List는 6회 참조. searchBaseSYmd/EYmd는 어느 쪽도 참조하지 않음).
+  // 실측(2026-08-19 ntest): 현행 BODY 0행 / searchYm 추가 시 202605~202607 각 1행.
   overtime: {
     path: "/TAADclzWorkOtSchdul.do", cmd: "getTAADclzWorkOtSchdulList2",
     period: "range", staffParam: "cmmSearchStaffId", gate: true,
+    alsoSearchYm: true,
     fixed: { searchType: "2" }, // §2.6 실측
   },
   overtime_limit: {
     path: "/TAADclzWorkOtSchdul.do", cmd: "getTAADclzWorkOtSchdulList",
     period: "range", staffParam: "cmmSearchStaffId", gate: true,
+    alsoSearchYm: true,
     fixed: { searchType: "2" },
   },
   leave_requests: {
@@ -258,6 +263,8 @@ module.exports.runtime = {
           form.searchSYmd = sYmd;
           form.searchEYmd = eYmd;
         }
+        // OT 2종은 range 계열 BODY를 쓰면서도 실제 필터는 searchYm이다(alsoSearchYm).
+        if (spec.alsoSearchYm) form.searchYm = ym;
       }
 
       if (spec.baseYmdDashed) form.searchBaseYmd = todayDashed();

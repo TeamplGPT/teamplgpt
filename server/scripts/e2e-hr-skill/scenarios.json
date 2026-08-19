@@ -157,13 +157,14 @@
         "mock_body_pattern": [
           "cmd=getTAADclzWorkOtSchdulList2",
           "searchType=2",
-          "searchBaseSYmd=\\d{8}"
+          "searchBaseSYmd=\\d{8}",
+          "searchYm=\\d{6}"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US2 D3. 구현 전 FAIL(searchType=3)"
+      "note": "specs/011 US2 D3. 구현 전 FAIL(searchType=3). searchYm은 2026-08-19 실호출로 추가 — 정본 SQL(TAADclzWorkOtSchdul_SQL.xml)이 #{searchYm}(23회 참조)으로 거르고 searchBaseSYmd는 참조하지 않는다. 실측: 현행 0행 / searchYm 추가 시 202605~202607 각 1행. overtime_limit(getTAADclzWorkOtSchdulList)도 동일 규약."
     },
     {
       "id": "K7",
@@ -174,13 +175,14 @@
         "mock_url_pattern": "^/TAADclzWorkOtSchdul\\.do",
         "mock_body_pattern": [
           "cmd=getTAADclzWorkOtSchdulList(&|$)",
-          "searchType=2"
+          "searchType=2",
+          "searchYm=\\d{6}"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US2 D3. List(한도) cmd — List2 오매칭 방지 경계 포함"
+      "note": "specs/011 US2 D3. List(한도) cmd — List2 오매칭 방지 경계 포함. searchYm은 2026-08-19 실호출로 추가(K6와 동일 규약, 실측 202607 1행)."
     },
     {
       "id": "K8",
