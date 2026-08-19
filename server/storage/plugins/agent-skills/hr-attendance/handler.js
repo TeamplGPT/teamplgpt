@@ -290,13 +290,40 @@ module.exports.runtime = {
       }
 
       this.introspect(`${label} 조회 완료.`);
-      return formatAttendance(records, label, COLUMNS_BY_QT[query_type]);
+      // 표시 보정은 TAA-1410(timesheet·work_status)에만 적용한다. 다른 endpoint의
+      // ymd·week는 형식이 달라(예: leave_requests) 같은 규칙을 적용하면 안 된다.
+      const rows = spec.daySupported ? normalizeTaa1410Rows(records) : records;
+      return formatAttendance(rows, label, COLUMNS_BY_QT[query_type]);
     } catch (e) {
       this.logger("Error in hr-attendance", e.message);
       return `> ⚠️ 근태 조회 중 오류가 발생했습니다: ${e.message}`;
     }
   },
 };
+
+// TAA-1410 표시 보정 — ntest.5240.kr self 79행 실호출로 확인(2026-08-18).
+// 실응답은 44필드로, 카탈로그(§2.1)에 42로 적힌 것과 다르다(inTimeOver·outTimeOver 미기재).
+//  · workYmd는 연도 없는 MM-DD("07-01")다. 연도를 가진 건 ymd("20260701")뿐인데
+//    양쪽 화이트리스트 모두 ymd를 쓰지 않아, LLM이 표만으로는 연도를 알 수 없고
+//    시스템 프롬프트의 [HR_DATE_CONTEXT] 날짜에 의존하게 된다. ymd로 채워 넣는다.
+//  · week는 영문 3자("MON")다. '요일' 한글 열에 영문이 그대로 노출된다.
+// 응답 키는 egovMap camelCase 실측 확인(ymd·week). 원본은 변경하지 않고 새 객체를 만든다.
+const WEEK_KO = { MON: "월", TUE: "화", WED: "수", THU: "목", FRI: "금", SAT: "토", SUN: "일" };
+
+function normalizeTaa1410Rows(records) {
+  const list = Array.isArray(records) ? records : records ? [records] : [];
+  return list.map((row) => {
+    const ymd = String(row?.ymd ?? "").trim();
+    const week = String(row?.week ?? "").trim().toUpperCase();
+    return {
+      ...row,
+      ...(/^\d{8}$/.test(ymd)
+        ? { workYmd: `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}` }
+        : {}),
+      ...(WEEK_KO[week] ? { week: WEEK_KO[week] } : {}),
+    };
+  });
+}
 
 function formatAttendance(data, label, columns) {
   const {
