@@ -145,13 +145,41 @@ const FIXTURES_BY_CMD = {
       { salYmd: "20260525", orgNm: "인사팀", posNm: "급여", jtotAmt: 2900000, gtotAmt: 290000, ctotAmt: 2610000, salTypeCd: "P" },
     ],
   },
+  // 급여명세 3종 (SAL-0527) — ntest.5240.kr 실호출로 키 확정(2026-08-19,
+  // pay_item=20260725P → 지급 3행 / 공제 6행 / 요약 1행). 금액은 합성값.
+  // 2단계 호출: pay_periods로 pay_item을 얻은 뒤 searchItem으로 조회한다.
+  getSALPayslipNewMgrList: {
+    DATA: [
+      { salItemNm: "기본급", salTypeNm: "급여", salYm: "2026-07", salAmt: 2600000, resalAmt: 0 },
+      { salItemNm: "직책수당", salTypeNm: "급여", salYm: "2026-07", salAmt: 300000, resalAmt: 0 },
+      { salItemNm: "식대", salTypeNm: "급여", salYm: "2026-07", salAmt: 100000, resalAmt: 0 },
+    ],
+  },
+  getSALPayslipNewMgrList2: {
+    DATA: [
+      { salItemNm: "국민연금", salYm: "2026-07", salAmt: 135000 },
+      { salItemNm: "건강보험", salYm: "2026-07", salAmt: 106000 },
+      { salItemNm: "장기요양보험", salYm: "2026-07", salAmt: 13700 },
+      { salItemNm: "고용보험", salYm: "2026-07", salAmt: 27000 },
+      { salItemNm: "소득세", salYm: "2026-07", salAmt: 52000 },
+      { salItemNm: "지방소득세", salYm: "2026-07", salAmt: 5200 },
+    ],
+  },
+  // 단건 요약 — 실측 래퍼 키가 Map(배열 아님). hrSession이 Map을 언랩한다.
+  getSALPayslipNewMgrMap: {
+    Map: {
+      staffNm: "홍길동", orgNm: "인사팀", posNm: "과장", resNm: "직책과장",
+      empYmd: "20070830", salYmd: "20260725",
+      jtotAmt: 3000000, gtotAmt: 338900, ctotAmt: 2661100,
+    },
+  },
   // 대출 신청내역 (LON) — 실응답에 accNo(계좌번호)·bankCd가 있으나 화이트리스트
   // 7컬럼에 없어 차단된다(§8 사례집 "계좌번호 평문 노출" 방어). fixture에도 넣지 않는다.
   // 주의: 화이트리스트의 LONF_BAL_AMT(잔액)는 실응답 키에 없어 항상 공란이다 — 별건 확인 대상.
   getLONLoanReqstListMgrList1: {
     DATA: [
-      { loaTypeCdNm: "주택자금대출", lonAmt: 10000000, lonRate: 3.5, loaRepayCdNm: "원금균등상환", reqDate: "2025-10-26 21:11:30", applForm: "0" },
-      { loaTypeCdNm: "생활안정자금", lonAmt: 4000000, lonRate: 2.5, loaRepayCdNm: "원금균등상환", reqDate: "2025-09-29 11:29:00", applForm: "0" },
+      { loaTypeCdNm: "주택자금대출", lonAmt: 10000000, lonRate: 3.5, loaRepayCdNm: "원금균등상환", reqDate: "2025-10-26 21:11:30", applForm: "0", amt: 8500000 },
+      { loaTypeCdNm: "생활안정자금", lonAmt: 4000000, lonRate: 2.5, loaRepayCdNm: "원금균등상환", reqDate: "2025-09-29 11:29:00", applForm: "0", amt: 0 },
     ],
   },
   // 교육이력 (PRC-0220)

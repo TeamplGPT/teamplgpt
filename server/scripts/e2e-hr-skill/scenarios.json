@@ -118,6 +118,21 @@
       "note": "specs/011 US2. 구현 전 FAIL(cmmSearchStaffId·searchBaseYmd 누락). searchSYmd/searchEYmd는 2026-08-19 실호출로 추가 — 정본 SQL(TAADclzWorkSearchCldr_SQL.xml) WHERE가 searchYm이 아니라 이 둘로 거른다(searchYm은 BASE_YM으로 SELECT만 되고 WHERE 미참조). 빠지면 A.YMD BETWEEN NULL AND NULL → 0행. 실측: 미포함 0행 / 포함 31행."
     },
     {
+      "id": "K28",
+      "label": "대출 — 잔액 컬럼이 렌더돼야 함 (화이트리스트 키 오류)",
+      "message": "@agent 내 대출 잔액 얼마 남았어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/LONLoanReqstListMgr\\.do",
+        "answer_pattern": ["8,?500,?000|850만"],
+        "answer_not_pattern": ["\\[응답 지침\\]"]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "화이트리스트가 LONF_BAL_AMT를 키로 잡고 있었으나, 정본 SQL(LONLoanReqstListMgr_SQL.xml:42-46)에서 LONF_BAL_AMT(...)는 함수이고 그 결과의 별칭은 AMT다. 실응답 키도 amt(실측 2026-08-19: 1행 잔액 있음, 2행 0=상환완료). 키가 존재하지 않아 잔액 열이 항상 공란이었다. 구현 전 FAIL."
+    },
+    {
       "id": "K27",
       "label": "인사카드 상세 — 가족·장애·보훈 섹션 차단 (개인정보)",
       "message": "@agent 내 인사카드 상세 조회해줘",

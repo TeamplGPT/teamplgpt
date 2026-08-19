@@ -24,7 +24,11 @@ const COLUMN_LABELS = {
   LOA_TYPE_CD_NM: "대출종류",
   LON_AMT: "대출금액",
   LON_RATE: "이율",
-  LONF_BAL_AMT: "잔액",
+  // 잔액 컬럼의 실제 별칭은 AMT다. 정본 SQL(LONLoanReqstListMgr_SQL.xml:42-46)에서
+  // LONF_BAL_AMT(...)는 함수명이고, 그 서브쿼리 결과가 "AS AMT"로 별칭된다.
+  // LONF_BAL_AMT를 키로 잡고 있던 동안 잔액은 응답에 없는 키라 항상 공란이었다
+  // (실측 2026-08-19: amt = 잔액, 상환완료 건은 0).
+  AMT: "잔액",
   LOA_REPAY_CD_NM: "상환방식",
   REQ_DATE: "신청일",
   APPL_FORM: "신청구분",
