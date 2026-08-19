@@ -144,9 +144,18 @@ async function hrFetch(ctx, { path, form, gate = false }) {
     }
   }
 
+  // Referer는 kiwibox 접근 게이트다. Interceptor가 referer 없는 요청을 "URL 직접입력"으로
+  // 보고 튕기며(Error.do?code=905 → 로그인 HTML), hrSession은 그걸 "세션 만료"로 표시한다.
+  // 유효한 세션으로도 게이트 있는 endpoint가 전부 실패하므로 서버 폴백이 사실상 못 쓰인다
+  // (2026-08-19 ntest 실측: 헤더 없이 timesheet·work_calendar·overtime 모두 905,
+  //  Referer 주입 시 정상 응답). 절차 원본: specs/kiwibox-endpoint-test-guide.md §1.1.
+  // R1 클라이언트 위임 경로는 위에서 early return하므로 이 블록은 서버 폴백 전용이다
+  // — 브라우저 위임 시에는 페이지가 Referer를 자동으로 붙인다.
   const headers = {
     "Content-Type": "application/x-www-form-urlencoded",
     Cookie: cookie,
+    Referer: `${baseUrl}${contextPath}/Main.do`,
+    "X-Requested-With": "XMLHttpRequest",
   };
 
   const activeMenuCd = String(ctx.runtimeArgs["HR_ACTIVE_MENU_CD"] || "").trim();
