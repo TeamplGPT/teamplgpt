@@ -415,6 +415,50 @@
       "note": "work_status도 timesheet와 같은 TAA-1410을 쓰므로 일 단위 지원 범위가 같아야 한다. 구현 전 FAIL(월 range). 월단위 회귀 가드는 K4."
     },
     {
+      "id": "K20",
+      "label": "근무현황 — 결근·승인OT가 답변에 나와야 함 (화이트리스트 누락 회귀)",
+      "message": "@agent 이번 달 근무현황 요약해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "answer_pattern": ["결근"],
+        "answer_not_pattern": ["\\[응답 지침\\]"]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "plugin.json이 work_status를 '시업/종업·지각/조퇴/결근·승인OT'로 광고하는데 COLUMNS_BY_QT.work_status에 absentYn이 없어 tool 결과에서 원천 제거됐다. 구현 전 FAIL — fixture에 결근일(07-08)이 있어도 LLM이 볼 수 없음. 승인OT는 K22가 담당한다(요약 질문에서는 LLM이 otTime만 골라 쓰고 승인OT 열을 버리는 게 정상 요약 행태라 판정 불가). 정본: $KIWIBOX sqlmap TAAWrkTimeStatusMgr_SQL.xml + taaWrkTimeStatusMgr.jsp 판정 로직."
+    },
+    {
+      "id": "K22",
+      "label": "근무현황 — 승인OT를 직접 물으면 승인 시간이 나와야 함",
+      "message": "@agent 이번 달 근무현황에서 승인된 연장근무가 있는 날 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "answer_pattern": ["1\\.5|평일연장|평일야간"],
+        "answer_not_pattern": ["\\[응답 지침\\]"]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "승인OT 5종(otWorkOver·otWorkNight·otHoliWork·otHoliOver·otHoliNight) 화이트리스트 누락 감시. K20('요약해줘')처럼 포괄 질문으로는 LLM이 otTime 130분만 쓰고 승인OT를 버려 판정이 흔들리므로, 질문이 승인OT를 직접 요구하도록 좁혔다. 구현 전 FAIL — 컬럼 자체가 tool 결과에 없어 LLM이 답할 근거가 없음."
+    },
+    {
+      "id": "K21",
+      "label": "출퇴근 기록 — 근무현황 전용 컬럼이 timesheet에 새지 않아야 함",
+      "message": "@agent 이번 달 출퇴근 기록 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "answer_not_pattern": ["승인OT|평일야간|휴일연장", "\\[응답 지침\\]"]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "K20 수정이 timesheet 화이트리스트로 번지지 않는지 감시. timesheet는 출퇴근 시각 중심을 유지해야 한다(두 query_type이 같은 endpoint를 공유하므로 컬럼 설계가 유일한 구분자)."
+    },
+    {
       "id": "KB22",
       "label": "연차 되묻기 금지 (E14~16 승계)",
       "message": "@agent 연차 얼마나 남았어?",

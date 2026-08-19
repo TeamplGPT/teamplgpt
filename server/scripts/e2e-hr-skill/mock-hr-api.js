@@ -73,11 +73,29 @@ const FIXTURES_BY_CMD = {
   // 실측 42필드 superset: timesheet 화이트리스트(staTime/endTime/lateYn 등)와
   // work_status 화이트리스트(inTime/outTime/lateTime 등) 키를 모두 포함해야
   // 두 query_type 렌더가 모두 채워진다 (kiwibox-endpoint-test-guide §3.2).
+  // 일일 근태 (TAA-1410) — timesheet/work_status 공용 endpoint.
+  // 값 규약은 ntest.5240.kr 실호출로 확정(2026-08-18, self 79행 / 실응답 44필드):
+  //   · 플래그(lateYn·earlyYn·earlyOtYn·absentYn·annualLeave·etcLeave·bizTrip·
+  //     education·leaveAbsence·goOut·ot70·otWeekday·otHoliday)는 Y/N이 아니라
+  //     **해당 없으면 빈 값**이고, 있을 때는 서술 텍스트가 온다
+  //     (실측 예: bizTrip="국내(천안, 09:00-16:00)", education="기본교육1(빅데이터 전문가과정)").
+  //     화면 판정 함수 has(v)=null/공백 아님과 일치. "N"을 넣으면 실측과 어긋난다.
+  //   · 분 단위(lateTime·earlyTime·goOutTime·otTime)는 해당 없어도 "0"이 항상 온다.
+  //   · mark는 실측 전 행 "NORMAL"(카탈로그상 ABNORMAL도 존재).
+  //   · workYmd는 **연도 없는 MM-DD**("06-01"), 연도를 가진 건 ymd("20260601").
+  //   · week는 **영문 3자**("MON"/"TUE"), weekNm은 요일이 아니라 주차("2026-22").
+  //   · 승인OT 5종은 실측 계정에 이력이 0건이라 숫자 형태 미확정 — JSP otHas(v)=숫자>0
+  //     근거로 시간(NUMBER)을 넣어 둔다. 이력 있는 계정 확보 시 재확인 대상.
+  // 커버리지: 07-01 정상 / 07-03 지각 / 07-06 승인OT / 07-08 결근.
+  // 07-06·07-08은 workComment를 비워 둔다 — 거기에 "연장근무"/"결근" 문구를 넣으면
+  // 이미 화이트리스트에 있는 workComment 경유로 신호가 새서, K20이 absentYn·승인OT
+  // 누락을 잡지 못하고 잘못된 이유로 통과한다(되돌리지 말 것).
   getTAAWrkTimeStatusMgrList: {
     result: [
-      { workYmd: "20260701", week: "수", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0855", endTime: "1810", inTime: "0855", outTime: "1810", lateYn: "N", earlyYn: "N", absentYn: "N", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
-      { workYmd: "20260703", week: "금", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0910", endTime: "1805", inTime: "0910", outTime: "1805", lateYn: "Y", earlyYn: "N", absentYn: "N", lateTime: "10", earlyTime: "0", goOutTime: "0", otTime: "0" },
-      { workYmd: "20260706", week: "월", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0850", endTime: "1800", inTime: "0850", outTime: "1800", lateYn: "N", earlyYn: "N", absentYn: "N", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
+      { ymd: "20260701", workYmd: "07-01", week: "WED", weekNm: "2026-27", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0855", endTime: "1810", inTime: "0855", outTime: "1810", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
+      { ymd: "20260703", workYmd: "07-03", week: "FRI", weekNm: "2026-27", workComment: "지각", mark: "ABNORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0910", endTime: "1805", inTime: "0910", outTime: "1805", lateYn: "지각", lateTime: "10", earlyTime: "0", goOutTime: "0", otTime: "0" },
+      { ymd: "20260706", workYmd: "07-06", week: "MON", weekNm: "2026-28", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0850", endTime: "2010", inTime: "0850", outTime: "2010", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "130", otWeekday: "평일연장근무", otWorkOver: "1.5", otWorkNight: "0.5" },
+      { ymd: "20260708", workYmd: "07-08", week: "WED", weekNm: "2026-28", mark: "ABNORMAL", baseStaTime: "0900", baseEndTime: "1800", absentYn: "결근", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
     ],
   },
 };

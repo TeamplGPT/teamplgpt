@@ -113,23 +113,40 @@ const COLUMNS_BY_QT = {
     absentYn: "결근",
   },
   work_status: {
+    // 라벨 정본 = 화면 grid 헤더($KIWIBOX .../taaWrkTimeStatusMgr.jsp IBSheet):
+    //   inTime=출근 · baseStaTime=시업 · outTime=퇴근 · baseEndTime=종업 ·
+    //   mark=근무상태 · workComment=근무특이사항.
+    // 구성 축도 같은 화면의 판정 로직을 따른다 — 출퇴근 특이자(지각/조퇴/결근) ·
+    // 근무예외자(휴가/출장/교육) · 연장근로(평일연장/평일야간/휴일근무/휴일연장/휴일야간).
+    // 플래그 계열은 값이 없으면 비어 오고 renderWhitelisted가 공백 열을 떨어뜨리므로,
+    // 폭이 넓어도 정상근무일 표는 좁게 렌더된다.
     workYmd: "일자",
     week: "요일",
-    workComment: "근무내용",
-    mark: "상태",
-    baseStaTime: "기준출근",
-    baseEndTime: "기준퇴근",
+    baseStaTime: "시업",
+    baseEndTime: "종업",
     inTime: "출근",
     outTime: "퇴근",
+    mark: "근무상태",
+    lateYn: "지각",
+    earlyYn: "조퇴",
+    earlyOtYn: "조퇴(연장)",
+    absentYn: "결근",
     lateTime: "지각(분)",
     earlyTime: "조퇴(분)",
+    goOut: "외출",
     goOutTime: "외출(분)",
     otTime: "연장(분)",
+    otWorkOver: "평일연장(승인)",
+    otWorkNight: "평일야간(승인)",
+    otHoliWork: "휴일근무(승인)",
+    otHoliOver: "휴일연장(승인)",
+    otHoliNight: "휴일야간(승인)",
     annualLeave: "연차",
     etcLeave: "기타휴가",
     bizTrip: "출장",
     education: "교육",
     leaveAbsence: "휴직",
+    workComment: "근무특이사항",
   },
   // 이하 4종 근거: docs/03-analysis/hr-column-whitelist-audit.analysis.md
   // (TAADclzWorkOtSchdul_SQL·TAADclzWorkSearchCldr_SQL·TAADclzVcatnCldrMgr_SQL 대조)
