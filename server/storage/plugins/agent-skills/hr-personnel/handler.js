@@ -46,6 +46,15 @@ const ENDPOINT_MAP = {
       MENU_NM: "항목",
       CONTENTS: "내용",
     },
+    // 이 endpoint는 민감정보가 컬럼이 아니라 **행**에 담긴다. 컬럼 화이트리스트만으로는
+    // 막을 수 없어(MENU_NM/CONTENTS 2컬럼에 17개 섹션이 실려 온다) 행 단위로 차단한다.
+    // 실측(2026-08-19 ntest): '◎ 가족' 행에 배우자·부모의 성명과 나이가 담겨 있었고,
+    // plugin.json은 "가족정보/부양가족은 제공하지 않습니다(개인정보 보호)"라고 선언 중이었다.
+    // MENU_NM 값에 아래 키워드가 포함된 행은 tool 결과에서 원천 제거한다(가이드 §4 L2 원칙).
+    blockRowsByLabel: {
+      key: "MENU_NM",
+      keywords: ["가족", "장애", "보훈"],
+    },
   },
   // 이하 columns 근거: docs/03-analysis/hr-column-whitelist-audit.analysis.md
   // (MBLHrBassiemList_SQL·Main_SQL 대조)
@@ -187,15 +196,33 @@ module.exports.runtime = {
       }
 
       this.introspect(`${label} 조회 완료.`);
+      // 민감 섹션은 렌더 이전에 제거 — LLM에 도달하지 않게 한다(L2 원천 차단).
+      const safe = spec.blockRowsByLabel
+        ? dropSensitiveRows(records, spec.blockRowsByLabel)
+        : records;
       // 화이트리스트 컬럼 정의가 있으면 선별 렌더(코드값·내부 식별자 제외)
-      if (spec.columns) return formatWhitelisted(records, label, spec.columns);
-      return formatPersonnel(records, label);
+      if (spec.columns) return formatWhitelisted(safe, label, spec.columns);
+      return formatPersonnel(safe, label);
     } catch (e) {
       this.logger("Error in hr-personnel", e.message);
       return `> ⚠️ 인사기록 조회 중 오류가 발생했습니다: ${e.message}`;
     }
   },
 };
+
+/**
+ * 라벨 컬럼 값에 차단 키워드가 포함된 행을 제거한다. 원본은 변경하지 않는다.
+ * 응답 키 대소문자·camelCase 변형을 renderWhitelisted와 같은 규칙으로 대응한다
+ * (egovMap이 MENU_NM을 menuNm으로 내려주는 경우가 있어 한쪽만 보면 필터가 새어 나간다).
+ */
+function dropSensitiveRows(records, { key, keywords }) {
+  const list = Array.isArray(records) ? records : records ? [records] : [];
+  const pick = (row) => row[key] ?? row[key.toLowerCase()] ?? row[camel(key)];
+  return list.filter((row) => {
+    const label = String(pick(row) ?? "");
+    return !keywords.some((w) => label.includes(w));
+  });
+}
 
 function formatPersonnel(data, label) {
   const { normalizeData, renderTable, renderSummary } = require("../_shared/formatTable");

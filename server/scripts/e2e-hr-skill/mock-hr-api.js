@@ -162,6 +162,22 @@ FIXTURES_BY_CMD.getSALDaylabMgrList = {
 };
 
 const FIXTURES_BY_PATH = {
+  // 인사카드 상세 (profile_detail) — ntest.5240.kr 실호출로 확정(2026-08-19, 17행).
+  // 실측 섹션명 그대로: 기본/가족/학력/자격/어학/언어능력/경력/발령/포상/징계/교육/
+  // 보훈/장애/병역/신체·취미/기타사항/메모. 내용은 개인정보라 합성값으로 교체.
+  // 민감 섹션(가족·장애·보훈)이 fixture에 있어야 K27이 차단을 검증할 수 있다 — 지우지 말 것.
+  "/getMBLPrtEmpCardPop.do": {
+    result: [
+      { menuNm: "◎ 기본", contents: "홍길동 과장 / Hong Gil Dong<BR>인사팀", seq: "10" },
+      { menuNm: "◎ 가족", contents: "∙김서연, 39세 여자 배우자<BR>∙홍판서, 71세 남자 부", seq: "20" },
+      { menuNm: "◎ 학력", contents: "○○대학교 경영학과 졸업(2007)", seq: "30" },
+      { menuNm: "◎ 자격", contents: "정보처리기사(2010)<BR>사회조사분석사 2급(2012)", seq: "40" },
+      { menuNm: "◎ 경력", contents: "△△기업 인사팀 대리(2005~2007)", seq: "50" },
+      { menuNm: "◎ 장애", contents: "해당 없음", seq: "60" },
+      { menuNm: "◎ 보훈", contents: "해당 없음", seq: "70" },
+      { menuNm: "◎ 교육", contents: "기본교육1(빅데이터 전문가과정) 2026", seq: "80" },
+    ],
+  },
   // 할일/미결 건수 — ntest.5240.kr 실호출로 확정(2026-08-19). 래퍼 키가 todoCnt이고
   // 값은 소문자 cnt1~cnt3다(화이트리스트는 CNT1~CNT3, renderWhitelisted가 대소문자 대응).
   // hrSession 언랩 목록에 todoCnt가 없어 이 응답이 통째로 passthrough되던 버그의 회귀 fixture.

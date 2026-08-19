@@ -118,6 +118,26 @@
       "note": "specs/011 US2. 구현 전 FAIL(cmmSearchStaffId·searchBaseYmd 누락). searchSYmd/searchEYmd는 2026-08-19 실호출로 추가 — 정본 SQL(TAADclzWorkSearchCldr_SQL.xml) WHERE가 searchYm이 아니라 이 둘로 거른다(searchYm은 BASE_YM으로 SELECT만 되고 WHERE 미참조). 빠지면 A.YMD BETWEEN NULL AND NULL → 0행. 실측: 미포함 0행 / 포함 31행."
     },
     {
+      "id": "K27",
+      "label": "인사카드 상세 — 가족·장애·보훈 섹션 차단 (개인정보)",
+      "message": "@agent 내 인사카드 상세 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLPrtEmpCardPop\\.do",
+        "answer_pattern": ["학력|경력|자격"],
+        "answer_not_pattern": [
+          "배우자|가족",
+          "장애",
+          "보훈|국가유공",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "profile_detail 화이트리스트가 {MENU_NM, CONTENTS} 2컬럼이라 민감정보가 행(row)으로 통과했다. 실측(2026-08-19): 17개 섹션 전량 반환 — 기본/가족/학력/자격/어학/언어능력/경력/발령/포상/징계/교육/보훈/장애/병역/신체·취미/기타사항/메모. '◎ 가족' 행에 배우자·부모 성명과 나이가 담겨 있는데 plugin.json은 '가족정보/부양가족은 제공하지 않습니다(개인정보 보호)'라고 선언하고 있었다. 컬럼 필터로는 막을 수 없어 행 단위 차단이 필요하다. 구현 전 FAIL."
+    },
+    {
       "id": "K23",
       "label": "근무캘린더 — 실제 캘린더 내용이 답변에 나와야 함 (빈 응답 회귀)",
       "message": "@agent 이번 달 근무캘린더 보여줘",
