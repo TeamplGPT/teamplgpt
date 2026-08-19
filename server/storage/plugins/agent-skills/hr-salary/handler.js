@@ -182,7 +182,16 @@ module.exports.runtime = {
         form.searchDateSYmd = sYmd;
         form.searchDateEYmd = eYmd;
       } else if (spec.period === "month") {
-        // SAL-0050 §1.2: searchSYmd/EYmd(월 범위) + searchBaseYmd(오늘, 하이픈)
+        // SAL-0050은 월 범위가 아니라 **연도** 단위다. 정본 SQL(SALSalaryBassMgr_SQL.xml)이
+        //   AND D.SAL_YMD  LIKE x.sal_yyyy || '%'   -- x.sal_yyyy = #{findText}
+        //   AND D.STAFF_ID = x.staff_id             -- x.staff_id  = #{staffId}
+        // 로 거르기 때문에, findText/staffId가 없으면 조건이 NULL이 되어 항상 0행이다.
+        // 실측(2026-08-19 ntest): 현행 파라미터로는 2025·2026 전 범위 0행,
+        // findText+staffId로는 2026년 6행·2025년 14행. CLOSE_YN='Y'라 마감분만 나온다.
+        form.findText = ym.slice(0, 4);
+        form.staffId = SELF_STAFF_ID_MARKER;
+        // 아래 3개는 SQL이 참조하지 않아 무시되지만 카탈로그 §1.2 기재 본문이라 유지
+        // (§5.2-3 "실측 성공 본문 전량, 임의 축약 금지").
         const [sYmd, eYmd] = monthRange(ym);
         form.searchSYmd = sYmd;
         form.searchEYmd = eYmd;

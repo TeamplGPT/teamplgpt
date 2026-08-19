@@ -104,6 +104,17 @@ const FIXTURES_BY_CMD = {
   // workTypeNm은 여러 근무유형이 콤마로 이어진다("육아단축근무,기본교육1(...)").
   // 이 fixture가 없던 동안 work_calendar는 빈 응답만 받아 "답변 불가"가 나왔고,
   // K5가 BODY만 검증해 전건 PASS 상태로 가려져 있었다. 지우지 말 것.
+  // 월별 지급내역 (SAL-0050) — ntest.5240.kr 실호출로 확정(2026-08-19, findText=2026 = 6행).
+  // 실응답 13필드 중 화이트리스트가 쓰는 키만. 금액은 실제 급여라 합성값으로 교체하고
+  // 구조(salYmd=YYYYMMDD, 금액은 number, salTypeCd="P")는 실측 그대로 둔다.
+  // 이 endpoint는 월 범위가 아니라 연도(findText)로 거른다 — SQL: SAL_YMD LIKE 연도||'%'.
+  getSALSalaryBassMgrTab110List: {
+    DATA: [
+      { salYmd: "20260725", orgNm: "인사팀", posNm: "급여", jtotAmt: 3000000, gtotAmt: 300000, ctotAmt: 2700000, salTypeCd: "P" },
+      { salYmd: "20260625", orgNm: "인사팀", posNm: "급여", jtotAmt: 3000000, gtotAmt: 300000, ctotAmt: 2700000, salTypeCd: "P" },
+      { salYmd: "20260525", orgNm: "인사팀", posNm: "급여", jtotAmt: 2900000, gtotAmt: 290000, ctotAmt: 2610000, salTypeCd: "P" },
+    ],
+  },
   // 결재문서함 (EAP-0070) — ntest.5240.kr 실호출로 확정(2026-08-19, gubun=2 202606).
   // 응답 33필드 중 화이트리스트(COLUMN_LABELS)가 쓰는 키만. egovMap camelCase.
   // 성명은 합성값으로 교체(구조는 실측 그대로: signLine은 "이름(O)▶이름(X)▶..." 연결).

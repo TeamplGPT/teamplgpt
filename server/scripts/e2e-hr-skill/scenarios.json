@@ -321,13 +321,30 @@
           "searchSYmd=\\d{8}",
           "searchEYmd=\\d{8}",
           "searchBaseYmd=\\d{4}-\\d{2}-\\d{2}",
-          "cmmSearchStaffId="
+          "cmmSearchStaffId=",
+          "findText=\\d{4}",
+          "staffId="
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US3 D5. 구현 전 FAIL(SALSalaryDtstmnMgr 폐기 endpoint 호출)"
+      "note": "specs/011 US3 D5. 구현 전 FAIL(SALSalaryDtstmnMgr 폐기 endpoint 호출). findText/staffId는 2026-08-19 실호출로 추가 — 정본 SQL(SALSalaryBassMgr_SQL.xml)이 'SAL_YMD LIKE #{findText}||%' + 'STAFF_ID = #{staffId}'로 거른다. searchSYmd·cmmSearchStaffId 계열은 SQL이 참조하지 않아 무시된다. 이 endpoint는 월 범위가 아니라 연도 단위다."
+    },
+    {
+      "id": "K26",
+      "label": "월별 지급내역 — 실제 지급 이력이 답변에 나와야 함",
+      "message": "@agent 올해 월별 급여 지급 이력 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/SALSalaryBassMgr\\.do",
+        "answer_pattern": ["지급|실수령|급여"],
+        "answer_not_pattern": ["조회 결과가 존재하지 않|내역이 없습니다", "\\[응답 지침\\]"]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "실측(2026-08-19): 현행 파라미터로는 2025·2026 전 범위 0행인데, findText+staffId로 바꾸면 2026년 6행·2025년 14행. 급여가 실재하는데 월별지급내역만 늘 비어 있었다. mock fixture도 없어 응답 경로 미검증. 주의: mock은 BODY 무관하게 cmd로 fixture를 주므로 BODY 판별자는 K13이고 이 시나리오는 fixture·화이트리스트 소실 회귀를 잡는다."
     },
     {
       "id": "K14",
