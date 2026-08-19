@@ -118,43 +118,6 @@
       "note": "specs/011 US2. 구현 전 FAIL(cmmSearchStaffId·searchBaseYmd 누락). searchSYmd/searchEYmd는 2026-08-19 실호출로 추가 — 정본 SQL(TAADclzWorkSearchCldr_SQL.xml) WHERE가 searchYm이 아니라 이 둘로 거른다(searchYm은 BASE_YM으로 SELECT만 되고 WHERE 미참조). 빠지면 A.YMD BETWEEN NULL AND NULL → 0행. 실측: 미포함 0행 / 포함 31행."
     },
     {
-      "id": "K29",
-      "label": "휴가 사용내역 — '전체'는 다년 범위여야 함 (올해로 축소 금지)",
-      "message": "@agent 내 전체 휴가내역 알려줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
-        "mock_body_pattern": [
-          "cmd=getTAADclzVcatnList2",
-          "searchSymdLv=(\\d{4})0101",
-          "searchEymdLv=\\d{4}1231"
-        ],
-        "answer_not_pattern": ["\\[응답 지침\\]"]
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary",
-      "note": "'전체'를 물어도 year_month 미지정 → '이번달' 기본값 → 올해 1년으로 축소됐다. 실측(2026-08-19 ntest): 올해 1건 / 2025년 9건 / 2024년 13건 / 2020~2026 54건. 사용자는 '휴가를 1일만 썼다'고 오해하게 되는 조용히 틀린 답이었다. 이 시나리오의 BODY 패턴은 searchSymdLv/searchEymdLv 연도가 서로 다른지(=다년)까지는 보지 못한다 — 판별은 K30이 맡는다."
-    },
-    {
-      "id": "K30",
-      "label": "휴가 사용내역 — all_years 지정 시 시작연도가 종료연도보다 앞서야 함",
-      "message": "@agent 지금까지 쓴 휴가 전부 보여줘",
-      "expect": {
-        "tool_call": true,
-        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
-        "mock_body_pattern": [
-          "cmd=getTAADclzVcatnList2",
-          "searchSymdLv=(\\d{4})0101&searchEymdLv=(?!\\1)\\d{4}1231"
-        ],
-        "answer_not_pattern": ["\\[응답 지침\\]"]
-      },
-      "repeat": 1,
-      "pre_reset": true,
-      "tier": "primary",
-      "note": "다년 범위 판별자. 구현 전 FAIL — searchSymdLv가 올해 1월 1일로 고정된다. 정본은 다년 범위를 지원한다(실측 2020~2026 = 54건)."
-    },
-    {
       "id": "K28",
       "label": "대출 — 잔액 컬럼이 렌더돼야 함 (화이트리스트 키 오류)",
       "message": "@agent 내 대출 잔액 얼마 남았어?",

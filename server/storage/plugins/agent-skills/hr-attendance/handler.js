@@ -63,9 +63,6 @@ const ENDPOINT_MAP = {
     path: "/TAADclzVcatnList.do", cmd: "getTAADclzVcatnList2", // TAA-0490 정본(§3.2)
     period: "none", staffParam: ["staffId", "cmmSearchStaffId"], gate: false,
     leaveBody: true,
-    // 사용내역은 누적 이력이라 "전체" 질문이 자연스럽다. 잔여연차(annual_leave_balance)는
-    // 연도별 발생/사용/잔여라 다년 합산이 의미가 없으므로 이 플래그를 주지 않는다.
-    allYearsSupported: true,
   },
   annual_leave_balance: {
     path: "/TAADclzVcatnList.do", cmd: "getTAADclzVcatnList1", // TAA-1310 정본(§3.1)
@@ -91,15 +88,6 @@ const QUERY_LABELS = {
 
 // 게이트 스킵 파라미터 주입 금지 (§4.5 searchType=mobile 사례 방어)
 const FORBIDDEN_FIXED_VALUES = { searchType: ["mobile"] };
-
-// all_years 지정 시 조회할 최대 연수(당해 포함). 무제한으로 열면 응답이 커지고
-// LLM 발췌 품질이 떨어진다. 실측상 7년치가 54건 수준이라 10년이면 충분하다.
-const LEAVE_ALL_YEARS_SPAN = 10;
-
-// LLM이 문자열로 넘기는 불리언("true"/"Y"/"1")을 허용 — 타입 강제 시 되묻기가 늘어난다.
-function truthy(v) {
-  return /^(true|y|yes|1)$/i.test(String(v ?? "").trim());
-}
 
 // query_type별 응답 컬럼 화이트리스트 (실측 — 내부 PK·사번·코드 제외, 한글 라벨).
 // 정의 없는 query_type은 통짜 렌더(하위호환) — 실측 후 순차 추가.
@@ -223,7 +211,7 @@ COLUMNS_BY_QT.overtime_limit = (() => {
 })();
 
 module.exports.runtime = {
-  handler: async function ({ query_type, year_month, work_ymd, all_years }) {
+  handler: async function ({ query_type, year_month, work_ymd }) {
     try {
       if (!query_type || !ENDPOINT_MAP[query_type]) {
         const types = Object.keys(ENDPOINT_MAP).join(", ");
@@ -283,23 +271,15 @@ module.exports.runtime = {
 
       // §3 휴가 공통 BODY (카탈로그 실측 본문 전량 — 임의 축약 금지)
       if (spec.leaveBody) {
-        const endY = ym.slice(0, 4);
-        // "전체/지금까지/누적" 질문은 올해로 축소하면 안 된다. year_month가 없으면
-        // '이번달' 기본값이 적용돼 올해 1년만 조회되는데, 그러면 "휴가를 1일만 썼다"는
-        // 조용히 틀린 답이 나간다(실측 2026-08-19 ntest: 올해 1건 / 2025년 9건 /
-        // 2024년 13건 / 2020~2026 54건). 정본은 다년 범위를 지원한다.
-        // 상한은 LEAVE_ALL_YEARS_SPAN년 — 무제한 조회로 응답이 커지는 것을 막는다.
-        const startY = spec.allYearsSupported && truthy(all_years)
-          ? String(Number(endY) - LEAVE_ALL_YEARS_SPAN + 1)
-          : endY;
+        const y = ym.slice(0, 4);
         form.wkareaCd = String(this.runtimeArgs["HR_WKAREA_CD"] || "1000").trim();
         form.searchLeavCd = "";
         form.gubun = "A";
         form.activeTab = "0";
-        form.searchSymdLv = `${startY}0101`; // 휴가연도
-        form.searchEymdLv = `${endY}1231`;
-        form.searchSymdFy = `${startY}0101`; // 회계연도
-        form.searchEymdFy = `${endY}1231`;
+        form.searchSymdLv = `${y}0101`; // 휴가연도
+        form.searchEymdLv = `${y}1231`;
+        form.searchSymdFy = `${y}0101`; // 회계연도
+        form.searchEymdFy = `${y}1231`;
         form.searchBaseYmd = todayDashed();
         form.chkAppYn = "Y";
       }
