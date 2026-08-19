@@ -98,6 +98,36 @@ const FIXTURES_BY_CMD = {
       { ymd: "20260708", workYmd: "07-08", week: "WED", weekNm: "2026-28", mark: "ABNORMAL", baseStaTime: "0900", baseEndTime: "1800", absentYn: "결근", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
     ],
   },
+  // 아래 4종 — ntest.5240.kr 실호출로 키를 확정(2026-08-19). 성명·금액 등 개인정보는
+  // 합성값으로 교체하고 키 이름과 값 형식(YYYYMMDD, 숫자/문자 구분)은 실측 그대로 둔다.
+  //
+  // 연장근무 신청내역 (TAA §2.6) — 주차별 매트릭스 otWeek01~06 + 합계.
+  getTAADclzWorkOtSchdulList2: {
+    DATA: [
+      { staffNm: "홍길동", orgNm: "인사팀", posNm: "과장", otWeek01: "4", otWeek02: "2", otWeek03: "0", otWeek04: "6", otWeekSum: "12" },
+    ],
+  },
+  // 연장근무 한도/잔여 — 일별 매트릭스 ot01~ot31 + sumOt(실측 전 키 존재).
+  // fixture는 앞 5일 + 합계만 채운다(renderWhitelisted가 빈 열을 떨어뜨림).
+  getTAADclzWorkOtSchdulList: {
+    DATA: [
+      { staffNm: "홍길동", orgNm: "인사팀", posNm: "과장", ot01: "0", ot02: "2", ot03: "0", ot04: "4", ot05: "0", sumOt: "6" },
+    ],
+  },
+  // 조직 휴가캘린더 — 실측은 공휴일 행이 kind="vacation"으로 함께 내려온다.
+  getTAADclzVcatnCldrMgr: {
+    DATA: [
+      { kind: "vacation", title: " 광복절", leavNm: "광복절", personInfo: "///", staYmd: "20260815", endYmd: "20260815", allDay: "true" },
+      { kind: "vacation", title: " 연차", leavNm: "연차", personInfo: "홍길동/인사팀/과장/", orgNm: "인사팀", posNm: "과장", staYmd: "20260820", endYmd: "20260820", staHm: "0900", endHm: "1800", reason: "개인사유" },
+    ],
+  },
+  // 증명서 신청내역 (CTI) — 응답에 addr(주소)가 있으나 화이트리스트에 없어 차단된다.
+  // fixture에도 넣지 않는다(차단이 화이트리스트 소관임을 흐리지 않기 위해).
+  getCTIMcrtfReqstRefromMgrList: {
+    DATA: [
+      { typeNm: "재직증명서", useNm: "제출용", submitPlace: "○○은행", copyNum: 1, issueNo: "2026-0001", issueYmd: "20260810", reqDate: "20260810093000", prtYn: "Y", name: "홍길동", year: 18, month: 11, reqNo: 190001 },
+    ],
+  },
   // 근무캘린더 (TAA-0730) — ntest.5240.kr 실호출로 확정(2026-08-19, self 202608 = 31행).
   // 실응답 그대로의 형태: ymd는 이미 대시 포함 "2026-08-01"(SQL xTO_CHAR_YMD),
   // holidayNm은 공휴일에만 값이 있고 평소 null, reqNo="N", wktypeCd="810", mark="NORMAL".
@@ -113,6 +143,22 @@ const FIXTURES_BY_CMD = {
       { salYmd: "20260725", orgNm: "인사팀", posNm: "급여", jtotAmt: 3000000, gtotAmt: 300000, ctotAmt: 2700000, salTypeCd: "P" },
       { salYmd: "20260625", orgNm: "인사팀", posNm: "급여", jtotAmt: 3000000, gtotAmt: 300000, ctotAmt: 2700000, salTypeCd: "P" },
       { salYmd: "20260525", orgNm: "인사팀", posNm: "급여", jtotAmt: 2900000, gtotAmt: 290000, ctotAmt: 2610000, salTypeCd: "P" },
+    ],
+  },
+  // 대출 신청내역 (LON) — 실응답에 accNo(계좌번호)·bankCd가 있으나 화이트리스트
+  // 7컬럼에 없어 차단된다(§8 사례집 "계좌번호 평문 노출" 방어). fixture에도 넣지 않는다.
+  // 주의: 화이트리스트의 LONF_BAL_AMT(잔액)는 실응답 키에 없어 항상 공란이다 — 별건 확인 대상.
+  getLONLoanReqstListMgrList1: {
+    DATA: [
+      { loaTypeCdNm: "주택자금대출", lonAmt: 10000000, lonRate: 3.5, loaRepayCdNm: "원금균등상환", reqDate: "2025-10-26 21:11:30", applForm: "0" },
+      { loaTypeCdNm: "생활안정자금", lonAmt: 4000000, lonRate: 2.5, loaRepayCdNm: "원금균등상환", reqDate: "2025-09-29 11:29:00", applForm: "0" },
+    ],
+  },
+  // 교육이력 (PRC-0220)
+  getPRCHrBassiemMgrTab220List: {
+    DATA: [
+      { eduNm: "오라클 튜닝", staYmd: "20251024", endYmd: "20251024", ofcNm: "오라클", contentsNm: "튜닝", eduTime: 8 },
+      { eduNm: "빅데이터 전문가과정", staYmd: "20260601", endYmd: "20260831", ofcNm: "사내교육원", contentsNm: "기본교육1", eduTime: 12, eduPoint: 3 },
     ],
   },
   // 결재문서함 (EAP-0070) — ntest.5240.kr 실호출로 확정(2026-08-19, gubun=2 202606).
@@ -162,6 +208,21 @@ FIXTURES_BY_CMD.getSALDaylabMgrList = {
 };
 
 const FIXTURES_BY_PATH = {
+  // 조직도 — 실측 147행. Level은 대문자 L(egovMap 별칭 그대로)이며 화이트리스트 미포함.
+  "/getMBLHrBassiemOrgList.do": {
+    result: [
+      { Level: "0", orgNm: "(주)예시", orgCd: "0000", orgFnm: "(주)예시", priorOrgCd: "0", chiefInfo: "김대표 사장 대표이사", staffCnt: 3 },
+      { Level: "1", orgNm: "인사팀", orgCd: "0303", orgFnm: " 인사팀", priorOrgCd: "0000", chiefInfo: "이팀장 팀장", staffCnt: 5 },
+    ],
+  },
+  // 일정/생일/공휴일 캘린더 — 실측은 월의 일수만큼(31행) md/holidayYn/result 3필드.
+  "/getScheduleDay.do": {
+    DATA: [
+      { md: "0801", holidayYn: "N", result: 9 },
+      { md: "0815", holidayYn: "Y", result: 1 },
+      { md: "0819", holidayYn: "N", result: 4 },
+    ],
+  },
   // 인사카드 상세 (profile_detail) — ntest.5240.kr 실호출로 확정(2026-08-19, 17행).
   // 실측 섹션명 그대로: 기본/가족/학력/자격/어학/언어능력/경력/발령/포상/징계/교육/
   // 보훈/장애/병역/신체·취미/기타사항/메모. 내용은 개인정보라 합성값으로 교체.
