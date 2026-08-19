@@ -35,7 +35,13 @@ const ENDPOINT_MAP = {
   },
   work_calendar: {
     path: "/TAADclzWorkSearchCldr.do", cmd: "getTAADclzWorkSearchCldr",
-    period: "ym", staffParam: ["searchId", "cmmSearchStaffId"], gate: false,
+    // "ym-range-alt" = searchYm + searchSYmd/searchEYmd 동시 전송.
+    // 정본 SQL(TAADclzWorkSearchCldr_SQL.xml)의 WHERE는 searchYm이 아니라
+    // searchSYmd/searchEYmd로 거른다(searchYm은 BASE_YM으로 SELECT만 되고 WHERE 미참조).
+    // 둘을 빼면 A.YMD BETWEEN NULL AND NULL이 되어 항상 0행 → "답변 불가".
+    // 실측(2026-08-19 ntest.5240.kr, self 202608): 미포함 0행 / 포함 31행.
+    // 카탈로그 §2.2의 BODY 예시가 이 둘을 누락하고 있다 — kiwibox 정정 요청 대상.
+    period: "ym-range-alt", staffParam: ["searchId", "cmmSearchStaffId"], gate: false,
     baseYmdDashed: true, // §2.2 — searchId 무게이트, self 강제 필수
   },
   overtime: {
@@ -232,6 +238,12 @@ module.exports.runtime = {
         form.searchEYmd = resolvedDay;
       } else if (spec.period === "ym") {
         form.searchYm = ym;
+      } else if (spec.period === "ym-range-alt") {
+        // searchYm은 화면 계약상 유지하되, 실제 행 필터는 searchSYmd/searchEYmd가 한다.
+        const [sYmd, eYmd] = monthRange(ym);
+        form.searchYm = ym;
+        form.searchSYmd = sYmd;
+        form.searchEYmd = eYmd;
       } else if (
         spec.period === "range" ||
         spec.period === "range-alt" ||

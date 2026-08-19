@@ -98,6 +98,20 @@ const FIXTURES_BY_CMD = {
       { ymd: "20260708", workYmd: "07-08", week: "WED", weekNm: "2026-28", mark: "ABNORMAL", baseStaTime: "0900", baseEndTime: "1800", absentYn: "결근", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
     ],
   },
+  // 근무캘린더 (TAA-0730) — ntest.5240.kr 실호출로 확정(2026-08-19, self 202608 = 31행).
+  // 실응답 그대로의 형태: ymd는 이미 대시 포함 "2026-08-01"(SQL xTO_CHAR_YMD),
+  // holidayNm은 공휴일에만 값이 있고 평소 null, reqNo="N", wktypeCd="810", mark="NORMAL".
+  // workTypeNm은 여러 근무유형이 콤마로 이어진다("육아단축근무,기본교육1(...)").
+  // 이 fixture가 없던 동안 work_calendar는 빈 응답만 받아 "답변 불가"가 나왔고,
+  // K5가 BODY만 검증해 전건 PASS 상태로 가려져 있었다. 지우지 말 것.
+  getTAADclzWorkSearchCldr: {
+    DATA: [
+      { kind: "01", ymd: "2026-08-03", workTypeNm: "육아단축근무,기본교육1(빅데이터 전문가과정)", wktypeCd: "810", reqNo: "N", holidayNm: null, mark: "NORMAL" },
+      { kind: "01", ymd: "2026-08-04", workTypeNm: "육아단축근무,기본교육1(빅데이터 전문가과정)", wktypeCd: "810", reqNo: "N", holidayNm: null, mark: "NORMAL" },
+      { kind: "01", ymd: "2026-08-15", workTypeNm: "휴일", wktypeCd: "810", reqNo: "N", holidayNm: "광복절", mark: "NORMAL" },
+      { kind: "01", ymd: "2026-08-17", workTypeNm: "휴일", wktypeCd: "810", reqNo: "N", holidayNm: "광복절(대체휴일)", mark: "NORMAL" },
+    ],
+  },
 };
 
 // cmd 없는 경로형 endpoint fixture — 사원증(getMBLPrtEmpCard)은 body에 cmd가 없어

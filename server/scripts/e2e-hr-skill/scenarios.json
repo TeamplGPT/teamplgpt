@@ -107,13 +107,30 @@
           "searchId=",
           "cmmSearchStaffId=",
           "searchYm=\\d{6}",
-          "searchBaseYmd=\\d{4}-\\d{2}-\\d{2}"
+          "searchBaseYmd=\\d{4}-\\d{2}-\\d{2}",
+          "searchSYmd=\\d{6}01",
+          "searchEYmd=\\d{8}"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US2. 구현 전 FAIL(cmmSearchStaffId·searchBaseYmd 누락)"
+      "note": "specs/011 US2. 구현 전 FAIL(cmmSearchStaffId·searchBaseYmd 누락). searchSYmd/searchEYmd는 2026-08-19 실호출로 추가 — 정본 SQL(TAADclzWorkSearchCldr_SQL.xml) WHERE가 searchYm이 아니라 이 둘로 거른다(searchYm은 BASE_YM으로 SELECT만 되고 WHERE 미참조). 빠지면 A.YMD BETWEEN NULL AND NULL → 0행. 실측: 미포함 0행 / 포함 31행."
+    },
+    {
+      "id": "K23",
+      "label": "근무캘린더 — 실제 캘린더 내용이 답변에 나와야 함 (빈 응답 회귀)",
+      "message": "@agent 이번 달 근무캘린더 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzWorkSearchCldr\\.do",
+        "answer_pattern": ["휴일|근무|광복절"],
+        "answer_not_pattern": ["제공되지 않|조회 결과가 존재하지 않|확인할 수 없", "\\[응답 지침\\]"]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "응답→렌더→답변 경로 가드. mock에 이 cmd fixture가 없어 work_calendar가 늘 빈 응답을 받았고, K5는 BODY만 검증해 '답변 불가'가 E2E 전건 PASS 상태로 가려졌다. 주의: mock은 BODY와 무관하게 cmd로만 fixture를 돌려주므로 이 시나리오는 searchSYmd/searchEYmd 전송 여부를 판별하지 못한다(fixture 추가 시점부터 PASS). BODY 판별자는 K5다. 이 시나리오의 역할은 fixture나 화이트리스트가 사라져 빈 답이 되는 회귀를 잡는 것."
     },
     {
       "id": "K6",
