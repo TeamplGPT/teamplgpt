@@ -44,13 +44,15 @@ function parseKiwiboxBody(bodyText) {
   }
   // kiwibox 응답 래퍼 키는 endpoint별로 다르다: { result: [...] } / 대문자
   // { Message, DATA: [...] } / { Map: {...} }(SALPayslipNewMgrMap 등 단건 객체) /
-  // { codeList: [...] }(CommonCode 콤보) / { data: [...] }.
+  // { codeList: [...] }(CommonCode 콤보) / { data: [...] } /
+  // { todoCnt: [...] }(getTodoIconCnt — 2026-08-19 실호출 확인).
   // 우선순위대로 언랩 — 없으면 통째(passthrough). (카탈로그 §0 응답 규약)
   let records;
   if (data && "result" in data) records = data.result;
   else if (data && "DATA" in data) records = data.DATA;
   else if (data && "Map" in data) records = data.Map;
   else if (data && "codeList" in data) records = data.codeList;
+  else if (data && "todoCnt" in data) records = data.todoCnt;
   else if (data && "data" in data && typeof data.data !== "string")
     records = data.data;
   else records = data;

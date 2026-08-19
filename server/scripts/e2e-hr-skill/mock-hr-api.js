@@ -141,6 +141,10 @@ FIXTURES_BY_CMD.getSALDaylabMgrList = {
 };
 
 const FIXTURES_BY_PATH = {
+  // 할일/미결 건수 — ntest.5240.kr 실호출로 확정(2026-08-19). 래퍼 키가 todoCnt이고
+  // 값은 소문자 cnt1~cnt3다(화이트리스트는 CNT1~CNT3, renderWhitelisted가 대소문자 대응).
+  // hrSession 언랩 목록에 todoCnt가 없어 이 응답이 통째로 passthrough되던 버그의 회귀 fixture.
+  "/getTodoIconCnt.do": { todoCnt: [{ cnt1: 188, cnt2: 53, cnt3: 1 }] },
   "/getMBLPrtEmpCard.do": {
     DATA: [
       {

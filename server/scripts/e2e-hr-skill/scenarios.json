@@ -133,6 +133,21 @@
       "note": "응답→렌더→답변 경로 가드. mock에 이 cmd fixture가 없어 work_calendar가 늘 빈 응답을 받았고, K5는 BODY만 검증해 '답변 불가'가 E2E 전건 PASS 상태로 가려졌다. 주의: mock은 BODY와 무관하게 cmd로만 fixture를 돌려주므로 이 시나리오는 searchSYmd/searchEYmd 전송 여부를 판별하지 못한다(fixture 추가 시점부터 PASS). BODY 판별자는 K5다. 이 시나리오의 역할은 fixture나 화이트리스트가 사라져 빈 답이 되는 회귀를 잡는 것."
     },
     {
+      "id": "K24",
+      "label": "할일/미결 건수 — todoCnt 래퍼 언랩 (건수가 답변에 나와야 함)",
+      "message": "@agent 내 미결 결재 몇 건이야?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getTodoIconCnt\\.do",
+        "answer_pattern": ["1\\b|1건"],
+        "answer_not_pattern": ["조회된 데이터가 없습니다|없습니다\\.$", "\\[응답 지침\\]"]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "실응답은 {\"todoCnt\":[{\"cnt1\":188,\"cnt2\":53,\"cnt3\":1}]}인데 hrSession 언랩 목록(result/DATA/Map/codeList/data)에 todoCnt가 없어 래퍼 통째가 passthrough됐다. 화이트리스트 CNT1/CNT2/CNT3가 매칭되지 않아 늘 빈 표 → '조회된 데이터가 없습니다'. 데이터는 정상적으로 오고 있었다(2026-08-19 실호출 확인). 구현 전 FAIL."
+    },
+    {
       "id": "K6",
       "label": "연장근무 신청 내역 — searchType=2",
       "message": "@agent 이번 달 연장근무 내역 보여줘",

@@ -95,18 +95,11 @@ const ENDPOINT_MAP = {
       RESULT: "건수",
     },
   },
-  contact_directory: {
-    path: "/getContactList.do", staffParam: null, gate: false, // 공개 디렉터리
-    // staffId/orgCd/staffNo/seq 차단. corpTel은 회사 대표번호(공개 성격) 노출.
-    columns: {
-      STAFF_NM: "성명",
-      ORG_NM: "소속",
-      POS_NM: "직위",
-      RES_NM: "직책",
-      POSITION_NM: "담당업무",
-      CORP_TEL: "전화",
-    },
-  },
+  // contact_directory(/getContactList.do) 제거 — 2026-08-19 실호출에서 HTTP 404.
+  // 컨트롤러는 kiwibox 소스에 있으나(MainController) ntest 배포에는 매핑이 없다.
+  // 카탈로그(cmmAiAssistantToolEndpoints.md)에도 미등재라 연동 근거 자체가 없었고,
+  // 설령 200이 왔어도 응답 래퍼 키가 contactList여서 hrSession 언랩 대상이 아니었다.
+  // 배포·카탈로그 등재가 확인되면 그때 §5.2 절차대로 다시 추가한다.
   education: {
     // 인사카드 교육이력 탭 (EDUT_HST2, kiwibox AI self SQL과 동일 테이블 — specs/007)
     // 신판 카탈로그 §4 공통 BODY: 사번 3중 지정 + searchYmd (specs/011 D9)
@@ -134,7 +127,6 @@ const QUERY_LABELS = {
   org_members: "조직원 목록",
   todo_count: "할일/미결 건수",
   schedule_day: "일정/생일/공휴일 캘린더",
-  contact_directory: "운영자 연락처",
   education: "교육이력",
 };
 
