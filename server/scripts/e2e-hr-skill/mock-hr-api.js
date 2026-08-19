@@ -104,6 +104,16 @@ const FIXTURES_BY_CMD = {
   // workTypeNm은 여러 근무유형이 콤마로 이어진다("육아단축근무,기본교육1(...)").
   // 이 fixture가 없던 동안 work_calendar는 빈 응답만 받아 "답변 불가"가 나왔고,
   // K5가 BODY만 검증해 전건 PASS 상태로 가려져 있었다. 지우지 말 것.
+  // 결재문서함 (EAP-0070) — ntest.5240.kr 실호출로 확정(2026-08-19, gubun=2 202606).
+  // 응답 33필드 중 화이트리스트(COLUMN_LABELS)가 쓰는 키만. egovMap camelCase.
+  // 성명은 합성값으로 교체(구조는 실측 그대로: signLine은 "이름(O)▶이름(X)▶..." 연결).
+  // eYmd·memo는 실측에서 null이 흔하다 — renderWhitelisted가 공백 열을 떨어뜨린다.
+  getEAPRequestMgrList: {
+    DATA: [
+      { applNm: "급여예외지급신청서", title: "급여예외지급신청서", reqStatusNm: "결재완료", lapsedDd: 1, applStaffNm: "홍길동", applOrgNm: "인사팀", applYmd: "20260628", sYmd: "20260628", eYmd: null, memo: null, signLine: "홍길동(O)▶김결재*홍길동(O)", lastSignYmd: "20260629" },
+      { applNm: "⛱️휴가신청", title: "휴가신청", reqStatusNm: "반려", lapsedDd: 20, applStaffNm: "홍길동", applOrgNm: "인사팀", applYmd: "20260611", sYmd: "20260611", eYmd: null, memo: null, signLine: "홍길동(O)▶이승인(X)▶이승인▶홍길동", lastSignYmd: "20260701" },
+    ],
+  },
   getTAADclzWorkSearchCldr: {
     DATA: [
       { kind: "01", ymd: "2026-08-03", workTypeNm: "육아단축근무,기본교육1(빅데이터 전문가과정)", wktypeCd: "810", reqNo: "N", holidayNm: null, mark: "NORMAL" },

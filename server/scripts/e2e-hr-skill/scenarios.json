@@ -341,13 +341,30 @@
           "selectGubun=2",
           "searchStaDate=\\d{8}",
           "searchSYmd=\\d{8}",
-          "searchEYmd=\\d{8}"
+          "searchEYmd=\\d{8}",
+          "sdt=\\d{6}01",
+          "edt=\\d{8}"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US4 D8. 구현 전 FAIL(searchSYmd 누락)"
+      "note": "specs/011 US4 D8. 구현 전 FAIL(searchSYmd 누락). sdt/edt는 2026-08-19 실호출로 추가 — 정본 SQL(EAPRequestMgr_SQL.xml)이 기간을 #{sdt}/#{edt}로만 읽는다. searchStaDate·searchSYmd 계열은 SQL이 참조하지 않아 무시된다."
+    },
+    {
+      "id": "K25",
+      "label": "기안함 — 기간이 실제로 적용돼야 함 (오늘로 축소/전체기간 통짜 금지)",
+      "message": "@agent 이번 달 내가 상신한 결재문서 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/EAPRequestMgr\\.do",
+        "answer_pattern": ["휴가신청|급여|결재완료|반려"],
+        "answer_not_pattern": ["문서가 없습니다|조회 결과가 존재하지 않", "\\[응답 지침\\]"]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "sdt/edt 미전송 시 SQL 기본값이 gubun별로 갈린다 — 2·5(기안/참조)는 오늘로 축소돼 사실상 항상 0건, 3·4·6(미결/기결/반려)은 19000101~29991231 전체기간이라 '이번 달'을 물어도 전기간이 나온다. 실측(2026-08-19): gubun2는 2020~2026 범위에 767건이 있는데 현행 파라미터로는 0건. mock에 fixture가 없어 응답 경로도 미검증이었다. 주의: mock은 BODY와 무관하게 cmd로 fixture를 돌려주므로 이 시나리오는 sdt/edt 전송 여부를 판별하지 못한다(fixture 추가 시점부터 PASS). BODY 판별자는 K14이고, 이 시나리오는 fixture·화이트리스트 소실 회귀를 잡는다."
     },
     {
       "id": "K15",

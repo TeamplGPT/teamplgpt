@@ -78,10 +78,18 @@ module.exports.runtime = {
       const form = {
         cmd: ENDPOINT.cmd,
         selectGubun: qt.gubun,
+        // 실제 기간 필터는 sdt/edt다 — 정본 SQL(EAPRequestMgr_SQL.xml)이 이 둘만 읽는다.
+        // 미전송 시 SQL 기본값이 selectGubun 분기별로 갈려 두 방향으로 틀린다:
+        //   2·5(기안/참조)  → xNVL_C(#{sdt}, 오늘)        → 오늘 하루로 축소, 사실상 항상 0건
+        //   3·4·6(미결/기결/반려) → xNVL_C(#{sdt}, '19000101') → 19000101~29991231 전체기간
+        // 실측(2026-08-19 ntest): gubun2는 2020~2026에 767건이 있는데 현행 파라미터로는 0건,
+        // gubun4는 '이번 달'을 물어도 전체기간 98건이 나왔다.
+        sdt: sYmd,
+        edt: eYmd,
+        // 아래 2쌍은 SQL이 참조하지 않아 무시되지만, 카탈로그 §5.1 실측 본문에 포함돼
+        // 있어 그대로 둔다(§5.2-3 "실측 성공 본문 전량, 임의 축약 금지").
         searchStaDate: sYmd,
         searchEndDate: eYmd,
-        // 신판 카탈로그 §5.1 실측 기간 파라미터 병행 전송 (specs/011 D8 —
-        // selectGubun 즉시 교체는 회귀 위험이라 양쪽 유지, 실동작 확인 후 정리)
         searchSYmd: sYmd,
         searchEYmd: eYmd,
       };
