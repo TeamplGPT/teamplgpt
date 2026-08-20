@@ -177,9 +177,22 @@ function renderSummary(summary) {
  * @param {Object<string,string>} columnLabels - { 원본키: 한글라벨 } 순서대로
  * @returns {string} markdown 표 (없으면 빈 문자열)
  */
-function renderWhitelisted(records, columnLabels) {
+/**
+ * 화이트리스트 렌더. identityColumns를 주면 **신원 컬럼만 남은 결과는 빈 것으로 본다.**
+ *
+ * 빈 열을 떨어뜨리는 특성상 실질 값이 전부 null인 행은 성명·소속·직위만 남는다.
+ * 그러면 "연장근무 한도 알려줘"에 "소속: 인사팀, 직위: 과장"이 답으로 나간다 —
+ * 한도 정보가 없다는 뜻인데 남은 부스러기를 답처럼 제시하는 것이다(2026-08-20 실측).
+ * 호출부는 빈 문자열을 "조회 결과 없음"으로 이미 처리하므로 여기서 ""를 돌려주면 된다.
+ *
+ * @param identityColumns 라벨이 아니라 **컬럼 키** 목록(예: ["staffNm","orgNm","posNm"])
+ */
+function renderWhitelisted(records, columnLabels, identityColumns = []) {
   const list = Array.isArray(records) ? records : records ? [records] : [];
   if (list.length === 0) return "";
+  const identityLabels = new Set(
+    identityColumns.map((c) => columnLabels[c]).filter(Boolean)
+  );
 
   const camel = (s) =>
     s.toLowerCase().replace(/_([a-z])/g, (_, c) => c.toUpperCase());
@@ -195,6 +208,12 @@ function renderWhitelisted(records, columnLabels) {
 
   const picked = list.map(pick).filter((r) => Object.keys(r).length > 0);
   if (picked.length === 0) return "";
+  // 실질 값이 하나도 없으면(= 신원 컬럼만 남으면) 답할 내용이 없는 것이다
+  if (
+    identityLabels.size > 0 &&
+    picked.every((r) => Object.keys(r).every((k) => identityLabels.has(k)))
+  )
+    return "";
 
   // 문서별 컬럼 편차 대비 union 키(정의 순서 유지)
   const ordered = Object.values(columnLabels);

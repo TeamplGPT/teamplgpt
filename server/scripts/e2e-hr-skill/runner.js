@@ -141,11 +141,37 @@ function loadScenarios() {
     }
     if (ids.has(s.id)) fatal(`Duplicate scenario id: ${s.id}`);
     ids.add(s.id);
-    if (typeof s.message !== "string" || s.message.length === 0) {
+    // 멀티턴 시나리오: turns[]가 있으면 순차 전송하고 **마지막 턴**으로 판정한다.
+    // 후속 턴에서만 나타나는 결함(앞 턴 결과가 문맥에 쌓인 뒤 tool 호출을 건너뛰는 등)은
+    // 단일 턴으로는 관측 자체가 불가능하다 — 2026-08-19 급여 실수령액 건이 그 사례.
+    // message 단일 턴 경로는 그대로 둔다(기존 시나리오 무영향).
+    if (s.turns != null) {
+      if (
+        !Array.isArray(s.turns) ||
+        s.turns.length < 2 ||
+        s.turns.some((t) => typeof t !== "string" || t.length === 0)
+      ) {
+        fatal(`Scenario ${s.id}: turns must be string[] with 2+ non-empty items`);
+      }
+      if (s.message != null) {
+        fatal(`Scenario ${s.id}: turns and message are mutually exclusive`);
+      }
+      if (!s.pre_reset) {
+        // 앞 턴이 남아 있으면 문맥이 섞여 판정이 무의미해진다.
+        fatal(`Scenario ${s.id}: turns requires pre_reset: true`);
+      }
+    } else if (typeof s.message !== "string" || s.message.length === 0) {
       fatal(`Scenario ${s.id}: message must be a non-empty string`);
     }
-    if (!s.expect || typeof s.expect.tool_call !== "boolean") {
-      fatal(`Scenario ${s.id}: expect.tool_call (boolean) required`);
+    // tool_call: null = 단정하지 않음. 멀티턴에서 마지막 턴이 tool을 다시 부르는지는
+    // 사용자가 겪는 속성이 아니다 — 앞 턴 결과가 이미 문맥에 있으면 모델이 그걸 읽고
+    // 답해도 값만 정본과 같으면 된다(실측: 5회 중 4회 재호출, 값은 5회 모두 정본 일치).
+    // 이 경우 answer_pattern으로 값을 직접 단정한다.
+    if (
+      !s.expect ||
+      (typeof s.expect.tool_call !== "boolean" && s.expect.tool_call !== null)
+    ) {
+      fatal(`Scenario ${s.id}: expect.tool_call (boolean or null) required`);
     }
     if (
       s.expect.mock_url_pattern != null &&
@@ -487,13 +513,19 @@ async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
   const t0 = Date.now();
   let body = "";
   let errorMsg = null;
+  // 멀티턴은 앞 턴을 문맥 적재용으로만 보내고 **마지막 턴 응답으로 판정**한다.
+  // mock 로그는 startedAt 이후 전량을 보므로 앞 턴의 호출도 포함된다 — mock_url_pattern은
+  // 마지막 .do 호출을 보기 때문에 "체인 끝까지 갔는가"를 그대로 검증할 수 있다.
+  const turns = scenario.turns || [scenario.message];
   try {
-    const res = await streamChat(apiKey, {
-      message: scenario.message,
-      mode: "chat",
-      attachments: [],
-    });
-    body = res.body;
+    for (const message of turns) {
+      const res = await streamChat(apiKey, {
+        message,
+        mode: "chat",
+        attachments: [],
+      });
+      body = res.body;
+    }
   } catch (e) {
     errorMsg = e.message;
   }
@@ -519,10 +551,10 @@ async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
   if (errorMsg) {
     pass = false;
     reason = `request error: ${errorMsg}`;
-  } else if (scenario.expect.tool_call && !toolCall) {
+  } else if (scenario.expect.tool_call === true && !toolCall) {
     pass = false;
     reason = "expected tool_call but LLM did not invoke any tool";
-  } else if (!scenario.expect.tool_call && toolCall) {
+  } else if (scenario.expect.tool_call === false && toolCall) {
     pass = false;
     reason = "expected no tool_call but LLM invoked one";
   } else if (scenario._mockUrlRegex) {
@@ -587,7 +619,9 @@ async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
   return {
     scenario: scenario.id,
     iteration,
-    message: scenario.message,
+    // 멀티턴은 판정 대상인 마지막 턴을 message로 기록하고 전 턴을 turns로 남긴다
+    message: scenario.turns ? scenario.turns[scenario.turns.length - 1] : scenario.message,
+    ...(scenario.turns ? { turns: scenario.turns } : {}),
     elapsedMs,
     toolCall,
     finalText,

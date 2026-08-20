@@ -107,13 +107,207 @@
           "searchId=",
           "cmmSearchStaffId=",
           "searchYm=\\d{6}",
-          "searchBaseYmd=\\d{4}-\\d{2}-\\d{2}"
+          "searchBaseYmd=\\d{4}-\\d{2}-\\d{2}",
+          "searchSYmd=\\d{6}01",
+          "searchEYmd=\\d{8}"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US2. 구현 전 FAIL(cmmSearchStaffId·searchBaseYmd 누락)"
+      "note": "specs/011 US2. 구현 전 FAIL(cmmSearchStaffId·searchBaseYmd 누락). searchSYmd/searchEYmd는 2026-08-19 실호출로 추가 — 정본 SQL(TAADclzWorkSearchCldr_SQL.xml) WHERE가 searchYm이 아니라 이 둘로 거른다(searchYm은 BASE_YM으로 SELECT만 되고 WHERE 미참조). 빠지면 A.YMD BETWEEN NULL AND NULL → 0행. 실측: 미포함 0행 / 포함 31행."
+    },
+    {
+      "id": "K29",
+      "label": "미결함 — 기간 미지정 시 기간 파라미터를 보내지 않아야 함",
+      "message": "@agent 내 결재대기 문서 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/EAPRequestMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getEAPRequestMgrList",
+          "selectGubun=3",
+          "^(?!.*sdt=)"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "결재해야 할 문서는 언제 올라왔든 다 보여야 한다. 정본 SQL(EAPRequestMgr_SQL.xml)도 gubun 3·4·6은 기간 미지정 시 19000101~29991231을 기본값으로 두어 전체를 주도록 설계돼 있다(2·5는 오늘이 기본값이라 반드시 기간이 필요 — 대조적). 현행은 기간을 항상 이번 달로 보내 지난달 미결 문서가 숨겨졌다. 구현 전 FAIL. 기간을 명시하면(예: '이번 달 미결') 그 달로 좁히는 동작은 유지한다 — K31이 담당."
+    },
+    {
+      "id": "K31",
+      "label": "미결함 — 기간을 명시하면 그 달로 좁혀야 함",
+      "message": "@agent 이번 달 결재대기 문서 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/EAPRequestMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getEAPRequestMgrList",
+          "selectGubun=3",
+          "sdt=\\d{6}01",
+          "edt=\\d{8}"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "K29의 기간 해제가 '기간을 말해도 무시'로 번지지 않는지 감시하는 반대편 가드."
+    },
+    {
+      "id": "K33",
+      "label": "기결함 — 기간 미지정 시 기간 파라미터를 보내지 않아야 함",
+      "message": "@agent 내 기결 문서 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/EAPRequestMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getEAPRequestMgrList",
+          "selectGubun=4",
+          "^(?!.*sdt=)"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "미결함(K29)과 같은 SQL 분기(3·4·6)라 동일 규칙을 적용한다 — 기간 미지정 시 sdt/edt를 보내지 않아 정본 기본값(19000101~29991231)이 적용되게 한다. 실측 전체 98건이라 미결(1건)보다 표가 크다는 점은 감안 대상. 구현 전 FAIL."
+    },
+    {
+      "id": "K34",
+      "label": "반려함 — 기간 미지정 시 기간 파라미터를 보내지 않아야 함",
+      "message": "@agent 반려된 결재 문서 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/EAPRequestMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getEAPRequestMgrList",
+          "selectGubun=6",
+          "^(?!.*sdt=)"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "K33과 동일 규칙. 실측 전체 50건. 구현 전 FAIL."
+    },
+    {
+      "id": "K35",
+      "label": "할일 건수 — 할일을 물으면 할일 값을 답해야 함",
+      "message": "@agent 내 할일 몇 개야?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getTodoIconCnt\\.do",
+        "answer_pattern": [
+          "188"
+        ],
+        "answer_not_pattern": [
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 3,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "todo_count는 할일(cnt1=188)·쪽지(cnt2=53)·미결결재(cnt3=1) 세 값을 한 행으로 돌려준다. 세 값이 다 있는데도 '할일 몇 개야?'에 미결 1건만 답하는 사례가 실측 3회 중 2회 나왔다(2026-08-19 ntest). query_type 설명이 '미결'이라는 단어를 강하게 안고 있어 LLM이 미결 쪽으로 치우친 것으로 보인다. 구현 전 FAIL(확률적이라 repeat 3)."
+    },
+    {
+      "id": "K36",
+      "label": "미결 건수 — 미결만 물으면 미결 값 (K35 반대편 가드)",
+      "message": "@agent 미결 몇 건이야?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getTodoIconCnt\\.do",
+        "answer_pattern": [
+          "1"
+        ],
+        "answer_not_pattern": [
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "K35 수정이 '항상 세 값을 다 나열'로 번지지 않는지 감시. 미결만 물으면 미결 결재 건수가 답에 있어야 한다(실측 2/2 정상 — 이 시나리오는 회귀 방지용)."
+    },
+    {
+      "id": "K28",
+      "label": "대출 — 잔액 컬럼이 렌더돼야 함 (화이트리스트 키 오류)",
+      "message": "@agent 내 대출 잔액 얼마 남았어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/LONLoanReqstListMgr\\.do",
+        "answer_pattern": [
+          "8,?500,?000|850만"
+        ],
+        "answer_not_pattern": [
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "화이트리스트가 LONF_BAL_AMT를 키로 잡고 있었으나, 정본 SQL(LONLoanReqstListMgr_SQL.xml:42-46)에서 LONF_BAL_AMT(...)는 함수이고 그 결과의 별칭은 AMT다. 실응답 키도 amt(실측 2026-08-19: 1행 잔액 있음, 2행 0=상환완료). 키가 존재하지 않아 잔액 열이 항상 공란이었다. 구현 전 FAIL."
+    },
+    {
+      "id": "K27",
+      "label": "인사카드 상세 — 가족·장애·보훈 섹션 차단 (개인정보)",
+      "message": "@agent 내 인사카드 상세 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLPrtEmpCardPop\\.do",
+        "answer_pattern": [
+          "학력|경력|자격"
+        ],
+        "answer_not_pattern": [
+          "배우자|가족",
+          "장애",
+          "보훈|국가유공",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "profile_detail 화이트리스트가 {MENU_NM, CONTENTS} 2컬럼이라 민감정보가 행(row)으로 통과했다. 실측(2026-08-19): 17개 섹션 전량 반환 — 기본/가족/학력/자격/어학/언어능력/경력/발령/포상/징계/교육/보훈/장애/병역/신체·취미/기타사항/메모. '◎ 가족' 행에 배우자·부모 성명과 나이가 담겨 있는데 plugin.json은 '가족정보/부양가족은 제공하지 않습니다(개인정보 보호)'라고 선언하고 있었다. 컬럼 필터로는 막을 수 없어 행 단위 차단이 필요하다. 구현 전 FAIL."
+    },
+    {
+      "id": "K23",
+      "label": "근무캘린더 — 실제 캘린더 내용이 답변에 나와야 함 (빈 응답 회귀)",
+      "message": "@agent 이번 달 근무캘린더 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzWorkSearchCldr\\.do",
+        "answer_pattern": [
+          "휴일|근무|광복절"
+        ],
+        "answer_not_pattern": [
+          "제공되지 않|조회 결과가 존재하지 않|확인할 수 없",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "응답→렌더→답변 경로 가드. mock에 이 cmd fixture가 없어 work_calendar가 늘 빈 응답을 받았고, K5는 BODY만 검증해 '답변 불가'가 E2E 전건 PASS 상태로 가려졌다. 주의: mock은 BODY와 무관하게 cmd로만 fixture를 돌려주므로 이 시나리오는 searchSYmd/searchEYmd 전송 여부를 판별하지 못한다(fixture 추가 시점부터 PASS). BODY 판별자는 K5다. 이 시나리오의 역할은 fixture나 화이트리스트가 사라져 빈 답이 되는 회귀를 잡는 것."
+    },
+    {
+      "id": "K24",
+      "label": "할일/미결 건수 — todoCnt 래퍼 언랩 (건수가 답변에 나와야 함)",
+      "message": "@agent 내 미결 결재 몇 건이야?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getTodoIconCnt\\.do",
+        "answer_pattern": [
+          "1\\b|1건"
+        ],
+        "answer_not_pattern": [
+          "조회된 데이터가 없습니다|없습니다\\.$",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "실응답은 {\"todoCnt\":[{\"cnt1\":188,\"cnt2\":53,\"cnt3\":1}]}인데 hrSession 언랩 목록(result/DATA/Map/codeList/data)에 todoCnt가 없어 래퍼 통째가 passthrough됐다. 화이트리스트 CNT1/CNT2/CNT3가 매칭되지 않아 늘 빈 표 → '조회된 데이터가 없습니다'. 데이터는 정상적으로 오고 있었다(2026-08-19 실호출 확인). 구현 전 FAIL."
     },
     {
       "id": "K6",
@@ -125,13 +319,14 @@
         "mock_body_pattern": [
           "cmd=getTAADclzWorkOtSchdulList2",
           "searchType=2",
-          "searchBaseSYmd=\\d{8}"
+          "searchBaseSYmd=\\d{8}",
+          "searchYm=\\d{6}"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US2 D3. 구현 전 FAIL(searchType=3)"
+      "note": "specs/011 US2 D3. 구현 전 FAIL(searchType=3). searchYm은 2026-08-19 실호출로 추가 — 정본 SQL(TAADclzWorkOtSchdul_SQL.xml)이 #{searchYm}(23회 참조)으로 거르고 searchBaseSYmd는 참조하지 않는다. 실측: 현행 0행 / searchYm 추가 시 202605~202607 각 1행. overtime_limit(getTAADclzWorkOtSchdulList)도 동일 규약."
     },
     {
       "id": "K7",
@@ -142,13 +337,14 @@
         "mock_url_pattern": "^/TAADclzWorkOtSchdul\\.do",
         "mock_body_pattern": [
           "cmd=getTAADclzWorkOtSchdulList(&|$)",
-          "searchType=2"
+          "searchType=2",
+          "searchYm=\\d{6}"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US2 D3. List(한도) cmd — List2 오매칭 방지 경계 포함"
+      "note": "specs/011 US2 D3. List(한도) cmd — List2 오매칭 방지 경계 포함. searchYm은 2026-08-19 실호출로 추가(K6와 동일 규약, 실측 202607 1행)."
     },
     {
       "id": "K8",
@@ -289,13 +485,35 @@
           "searchSYmd=\\d{8}",
           "searchEYmd=\\d{8}",
           "searchBaseYmd=\\d{4}-\\d{2}-\\d{2}",
-          "cmmSearchStaffId="
+          "cmmSearchStaffId=",
+          "findText=\\d{4}",
+          "staffId="
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US3 D5. 구현 전 FAIL(SALSalaryDtstmnMgr 폐기 endpoint 호출)"
+      "note": "specs/011 US3 D5. 구현 전 FAIL(SALSalaryDtstmnMgr 폐기 endpoint 호출). findText/staffId는 2026-08-19 실호출로 추가 — 정본 SQL(SALSalaryBassMgr_SQL.xml)이 'SAL_YMD LIKE #{findText}||%' + 'STAFF_ID = #{staffId}'로 거른다. searchSYmd·cmmSearchStaffId 계열은 SQL이 참조하지 않아 무시된다. 이 endpoint는 월 범위가 아니라 연도 단위다."
+    },
+    {
+      "id": "K26",
+      "label": "월별 지급내역 — 실제 지급 이력이 답변에 나와야 함",
+      "message": "@agent 올해 월별 급여 지급 이력 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/SALSalaryBassMgr\\.do",
+        "answer_pattern": [
+          "지급|실수령|급여"
+        ],
+        "answer_not_pattern": [
+          "조회 결과가 존재하지 않|내역이 없습니다",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "실측(2026-08-19): 현행 파라미터로는 2025·2026 전 범위 0행인데, findText+staffId로 바꾸면 2026년 6행·2025년 14행. 급여가 실재하는데 월별지급내역만 늘 비어 있었다. mock fixture도 없어 응답 경로 미검증. 주의: mock은 BODY 무관하게 cmd로 fixture를 주므로 BODY 판별자는 K13이고 이 시나리오는 fixture·화이트리스트 소실 회귀를 잡는다."
     },
     {
       "id": "K14",
@@ -309,13 +527,35 @@
           "selectGubun=2",
           "searchStaDate=\\d{8}",
           "searchSYmd=\\d{8}",
-          "searchEYmd=\\d{8}"
+          "searchEYmd=\\d{8}",
+          "sdt=\\d{6}01",
+          "edt=\\d{8}"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US4 D8. 구현 전 FAIL(searchSYmd 누락)"
+      "note": "specs/011 US4 D8. 구현 전 FAIL(searchSYmd 누락). sdt/edt는 2026-08-19 실호출로 추가 — 정본 SQL(EAPRequestMgr_SQL.xml)이 기간을 #{sdt}/#{edt}로만 읽는다. searchStaDate·searchSYmd 계열은 SQL이 참조하지 않아 무시된다."
+    },
+    {
+      "id": "K25",
+      "label": "기안함 — 기간이 실제로 적용돼야 함 (오늘로 축소/전체기간 통짜 금지)",
+      "message": "@agent 이번 달 내가 상신한 결재문서 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/EAPRequestMgr\\.do",
+        "answer_pattern": [
+          "휴가신청|급여|결재완료|반려"
+        ],
+        "answer_not_pattern": [
+          "문서가 없습니다|조회 결과가 존재하지 않",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "sdt/edt 미전송 시 SQL 기본값이 gubun별로 갈린다 — 2·5(기안/참조)는 오늘로 축소돼 사실상 항상 0건, 3·4·6(미결/기결/반려)은 19000101~29991231 전체기간이라 '이번 달'을 물어도 전기간이 나온다. 실측(2026-08-19): gubun2는 2020~2026 범위에 767건이 있는데 현행 파라미터로는 0건. mock에 fixture가 없어 응답 경로도 미검증이었다. 주의: mock은 BODY와 무관하게 cmd로 fixture를 돌려주므로 이 시나리오는 sdt/edt 전송 여부를 판별하지 못한다(fixture 추가 시점부터 PASS). BODY 판별자는 K14이고, 이 시나리오는 fixture·화이트리스트 소실 회귀를 잡는다."
     },
     {
       "id": "K15",
@@ -378,6 +618,96 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "specs/011 US4 D9. 구현 전 FAIL(staffId 단독)"
+    },
+    {
+      "id": "K18",
+      "label": "출퇴근 기록 — '오늘' 단일일자 BODY (월 전체 range 금지)",
+      "message": "@agent 오늘 출근정보 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList",
+          "searchBaseSYmd=(\\d{8})&searchBaseEYmd=\\1&searchSYmd=\\1&searchEYmd=\\1",
+          "cmmSearchStaffId="
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "하루만 묻는 질문은 월 1일~말일이 아니라 단일일자 range(4필드 동일값)여야 한다. 구현 전 FAIL — 스키마에 일 단위 표현 수단이 없어 monthRange로 확장됨(searchBaseSYmd=월1일 ≠ searchBaseEYmd=월말). 월단위 회귀 가드는 K3/KB20이 담당."
+    },
+    {
+      "id": "K19",
+      "label": "근무현황 — '오늘' 단일일자 BODY (timesheet와 동일 endpoint)",
+      "message": "@agent 오늘 근무현황 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList",
+          "searchBaseSYmd=(\\d{8})&searchBaseEYmd=\\1&searchSYmd=\\1&searchEYmd=\\1"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "work_status도 timesheet와 같은 TAA-1410을 쓰므로 일 단위 지원 범위가 같아야 한다. 구현 전 FAIL(월 range). 월단위 회귀 가드는 K4."
+    },
+    {
+      "id": "K20",
+      "label": "근무현황 — 결근·승인OT가 답변에 나와야 함 (화이트리스트 누락 회귀)",
+      "message": "@agent 이번 달 근무현황 요약해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "answer_pattern": [
+          "결근"
+        ],
+        "answer_not_pattern": [
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "plugin.json이 work_status를 '시업/종업·지각/조퇴/결근·승인OT'로 광고하는데 COLUMNS_BY_QT.work_status에 absentYn이 없어 tool 결과에서 원천 제거됐다. 구현 전 FAIL — fixture에 결근일(07-08)이 있어도 LLM이 볼 수 없음. 승인OT는 K22가 담당한다(요약 질문에서는 LLM이 otTime만 골라 쓰고 승인OT 열을 버리는 게 정상 요약 행태라 판정 불가). 정본: $KIWIBOX sqlmap TAAWrkTimeStatusMgr_SQL.xml + taaWrkTimeStatusMgr.jsp 판정 로직."
+    },
+    {
+      "id": "K22",
+      "label": "근무현황 — 승인OT를 직접 물으면 승인 시간이 나와야 함",
+      "message": "@agent 이번 달 근무현황에서 승인된 연장근무가 있는 날 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "answer_pattern": [
+          "1\\.5|평일연장|평일야간"
+        ],
+        "answer_not_pattern": [
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "승인OT 5종(otWorkOver·otWorkNight·otHoliWork·otHoliOver·otHoliNight) 화이트리스트 누락 감시. K20('요약해줘')처럼 포괄 질문으로는 LLM이 otTime 130분만 쓰고 승인OT를 버려 판정이 흔들리므로, 질문이 승인OT를 직접 요구하도록 좁혔다. 구현 전 FAIL — 컬럼 자체가 tool 결과에 없어 LLM이 답할 근거가 없음."
+    },
+    {
+      "id": "K21",
+      "label": "출퇴근 기록 — 근무현황 전용 컬럼이 timesheet에 새지 않아야 함",
+      "message": "@agent 이번 달 출퇴근 기록 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "answer_not_pattern": [
+          "승인OT|평일야간|휴일연장",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "K20 수정이 timesheet 화이트리스트로 번지지 않는지 감시. timesheet는 출퇴근 시각 중심을 유지해야 한다(두 query_type이 같은 endpoint를 공유하므로 컬럼 설계가 유일한 구분자)."
     },
     {
       "id": "KB22",
@@ -855,6 +1185,265 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "daylabor 화이트리스트 검증 — 계좌번호(암호문 ENC:·복호화 평문)와 내부 식별자·raw 키 비노출. 전체 표 명시 요청이라 footer 3분기 중 전체 표 branch로 echo 유도. 화이트리스트 구현 전 FAIL(accNoDecrypt 평문 노출) 기대"
+    },
+    {
+      "id": "K37",
+      "label": "교육이력 — 수료여부를 근거로 답해야 함(환각 금지)",
+      "message": "@agent 내 교육이력 중에 완료한 교육은 뭐야?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/PRCHrBassiemMgrTab220\\.do",
+        "answer_pattern": [
+          "빅데이터"
+        ],
+        "answer_not_pattern": [
+          "모두 (수료|완료|이수)",
+          "전부 (수료|완료|이수)",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "실응답의 finCd(수료여부, 공통코드 EDU_FIN_CD 1=수료/2=미수료/3=기타)가 화이트리스트에 없어 tool 결과에 실리지 않았다. 그 결과 '완료한 교육은?'에 되묻지 않고 환각으로 단정했다 — 실측(2026-08-19 ntest, self 15행 중 수료 3행)에서 미수료 건까지 완료로 나열하고 '모두 완료된 교육 과정입니다'로 마무리했다. 이 시나리오는 답변 형태(전체 뭉뚱그리기 금지)를 지키는 가드이고, 수료여부가 실제로 답변에 도달하는지는 K38이 본다. 주의: '오라클·정보보안 미등장'으로 단정하면 안 된다 — 올바른 답변도 '오라클은 미입력, 정보보안은 미수료'라고 제외 사유를 밝히며 그 이름을 부른다(초판이 이 함정에 빠져 정답을 FAIL 처리했다)."
+    },
+    {
+      "id": "K38",
+      "label": "교육이력 — 수료여부가 답변에 도달해야 함",
+      "message": "@agent 내 교육이력 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/PRCHrBassiemMgrTab220\\.do",
+        "answer_not_pattern": [
+          "\\[응답 지침\\]"
+        ],
+        "answer_pattern": [
+          "미수료|Not Completed|Incomplete",
+          "미입력|Not Provided|Not Entered|미제공"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "K37이 잡지 못하는 근본을 본다: 수료여부 값이 tool 결과를 타고 답변까지 오는가. 수정 전에는 '미수료'·'미입력'이라는 문자열이 나올 수 없다 — finCd가 화이트리스트 밖이라 코드값 자체가 렌더되지 않았고, 미입력 fallback도 없었다. mock은 수료(빅데이터)·미수료(정보보안)·미입력(오라클) 세 상태를 모두 담는다. 구현 전 FAIL 실측 확인. 실측에서 한 회차가 영어로 답했다(값은 정확: Status: Not Provided). 이 시나리오의 대상은 '수료여부가 답변까지 도달하는가'이므로 영어 표현도 허용한다. 언어 이탈 자체는 별건."
+    },
+    {
+      "id": "K39",
+      "label": "급여명세서 — 월 미지정 시 최근 지급건으로 답해야 함",
+      "message": "@agent 급여명세서 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
+        "answer_pattern": [
+          "기본급|지급항목|지급"
+        ],
+        "answer_not_pattern": [
+          "지급된 급여 건이 없",
+          "급여 (건|내역)이 없",
+          "조회할 수 없",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "급여 3종(payslip/deductions/payslip_summary)은 pay_item이 필요해 pay_periods를 먼저 부르는 2단 구조인데, pay_periods가 year_month 미지정 시 '이번 달'로 가면서 막혔다. 급여는 25일 지급이라 매월 1~24일에는 이번 달이 0건이다 — 실측(2026-08-19 ntest): 2026-08 0건 / 2026-07 1건(20260725P). 그 결과 '급여명세서 보여줘'·'공제내역 알려줘'·'실수령액 얼마야' 6/6 전부 '이번 달 급여 없음'으로 끝났다(데이터가 없어서가 아니라 있는 데이터를 안 봐서). 결재함 K29(기간 미지정 시 이번 달로 좁히지 말 것)와 같은 형태의 결함. mock_url_pattern은 마지막 .do 호출을 보므로 2단 체인이 끝까지 갔는지를 검증한다. 구현 전 FAIL."
+    },
+    {
+      "id": "K40",
+      "label": "공제내역 — 월 미지정 시 최근 지급건으로 답해야 함",
+      "message": "@agent 공제내역 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
+        "answer_pattern": [
+          "국민연금|건강보험|공제"
+        ],
+        "answer_not_pattern": [
+          "지급된 급여 건이 없",
+          "급여 (건|내역)이 없",
+          "조회할 수 없",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "급여 3종(payslip/deductions/payslip_summary)은 pay_item이 필요해 pay_periods를 먼저 부르는 2단 구조인데, pay_periods가 year_month 미지정 시 '이번 달'로 가면서 막혔다. 급여는 25일 지급이라 매월 1~24일에는 이번 달이 0건이다 — 실측(2026-08-19 ntest): 2026-08 0건 / 2026-07 1건(20260725P). 그 결과 '급여명세서 보여줘'·'공제내역 알려줘'·'실수령액 얼마야' 6/6 전부 '이번 달 급여 없음'으로 끝났다(데이터가 없어서가 아니라 있는 데이터를 안 봐서). 결재함 K29(기간 미지정 시 이번 달로 좁히지 말 것)와 같은 형태의 결함. mock_url_pattern은 마지막 .do 호출을 보므로 2단 체인이 끝까지 갔는지를 검증한다. 구현 전 FAIL."
+    },
+    {
+      "id": "K41",
+      "label": "실수령액 — 월 미지정 시 최근 지급건으로 답해야 함",
+      "message": "@agent 실수령액 얼마야",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
+        "answer_pattern": [
+          "2,?661,?100|실지급|실수령"
+        ],
+        "answer_not_pattern": [
+          "지급된 급여 건이 없",
+          "급여 (건|내역)이 없",
+          "조회할 수 없",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "급여 3종(payslip/deductions/payslip_summary)은 pay_item이 필요해 pay_periods를 먼저 부르는 2단 구조인데, pay_periods가 year_month 미지정 시 '이번 달'로 가면서 막혔다. 급여는 25일 지급이라 매월 1~24일에는 이번 달이 0건이다 — 실측(2026-08-19 ntest): 2026-08 0건 / 2026-07 1건(20260725P). 그 결과 '급여명세서 보여줘'·'공제내역 알려줘'·'실수령액 얼마야' 6/6 전부 '이번 달 급여 없음'으로 끝났다(데이터가 없어서가 아니라 있는 데이터를 안 봐서). 결재함 K29(기간 미지정 시 이번 달로 좁히지 말 것)와 같은 형태의 결함. mock_url_pattern은 마지막 .do 호출을 보므로 2단 체인이 끝까지 갔는지를 검증한다. 구현 전 FAIL."
+    },
+    {
+      "id": "K42",
+      "label": "급여 후속 턴 — 실수령액이 정본 값이어야 함",
+      "turns": [
+        "@agent 6월 급여 지급건 목록 보여줘",
+        "@agent 그 건 급여명세서 보여줘",
+        "@agent 그 건 공제내역도 알려줘",
+        "@agent 그 건 실수령액은?"
+      ],
+      "expect": {
+        "tool_call": null,
+        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
+        "answer_pattern": [
+          "2,?661,?100"
+        ],
+        "answer_not_pattern": [
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 3,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "앞 턴에서 지급항목·공제항목 표를 받은 뒤 '실수령액은?'을 물으면 모델이 payslip_summary를 호출하지 않고 표를 더해 답한다 — 수정 전 실측에서 원본 SSE의 toolCallInvocation 이벤트가 0건이고 곧바로 textResponseChunk로 갔다(2026-08-19, 재현 2/2). L1(query_type [CRITICAL]) + L2(payslip·deductions 표 footer) 가드 투입 후 재호출률 4/5로 올라갔으나 결정적이지 않다. 그래서 tool_call은 단정하지 않는다(null) — 사용자가 겪는 속성은 '값이 정본과 같은가'이고 그건 가드 투입 전후 모두 5/5 일치했다. 단일 턴 경로의 tool 호출 강제는 K41이 담당한다. mock_url_pattern으로 2단 체인이 명세 endpoint까지 갔는지는 계속 본다."
+    },
+    {
+      "id": "K43",
+      "label": "연말정산 요약 — 결정세액을 답해야 함",
+      "message": "@agent 2024 연말정산 결과 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/YTASummaryMgr\\d{4}\\.do",
+        "answer_pattern": [
+          "1,?620,?000|결정소득세"
+        ],
+        "answer_not_pattern": [
+          "결과가 없습니다|내역이 없습니다|조회 결과가 없",
+          "\\[응답 지침\\]",
+          "9001011234567"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "정본 SQL의 WHERE가 <if> 없이 AND A.CAL_KIND_CD = #{searchCalKindCd}를 걸어 파라미터가 빠지면 항상 0행이다. 우리 handler는 cmd와 cmmSearchStaffId만 보내 2022~2025 전 연도가 0행이었다(2026-08-20 ntest 실측). 공통코드 YTA_CAL_KIND_CD 실조회: 1=연말정산 2=중도정산 3·4=간이신고. searchCalKindCd=1을 넣으면 1행이 나온다. 같은 함정이 YTA 조회 9종 전부에 있다 — 조회별 필수 파라미터는 mock의 YTA_REQUIRED_PARAMS 참조. 종전 mock은 YTA fixture가 없어 기본 빈 응답으로 떨어졌고 시나리오도 BODY만 봐서 결함을 못 잡았다. 구현 전 FAIL."
+    },
+    {
+      "id": "K44",
+      "label": "연말정산 신용카드 — 3파라미터 누락 가드",
+      "message": "@agent 2024 연말정산 신용카드 공제내역 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/YTAInDctMgr\\d{4}\\.do",
+        "answer_pattern": [
+          "8,?200,?000|신용카드"
+        ],
+        "answer_not_pattern": [
+          "결과가 없습니다|내역이 없습니다|조회 결과가 없",
+          "\\[응답 지침\\]",
+          "9001011234567"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "정본 SQL의 WHERE가 <if> 없이 AND A.CAL_KIND_CD = #{searchCalKindCd}를 걸어 파라미터가 빠지면 항상 0행이다. 우리 handler는 cmd와 cmmSearchStaffId만 보내 2022~2025 전 연도가 0행이었다(2026-08-20 ntest 실측). 공통코드 YTA_CAL_KIND_CD 실조회: 1=연말정산 2=중도정산 3·4=간이신고. searchCalKindCd=1을 넣으면 1행이 나온다. 같은 함정이 YTA 조회 9종 전부에 있다 — 조회별 필수 파라미터는 mock의 YTA_REQUIRED_PARAMS 참조. 종전 mock은 YTA fixture가 없어 기본 빈 응답으로 떨어졌고 시나리오도 BODY만 봐서 결함을 못 잡았다. 구현 전 FAIL."
+    },
+    {
+      "id": "K45",
+      "label": "연말정산 부양가족 — 가족 이름을 답해야 함",
+      "message": "@agent 2024 연말정산 부양가족 공제 조회해줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/YTAYtaFamilySttusMgr\\d{4}\\.do",
+        "answer_pattern": [
+          "김배우|홍자녀"
+        ],
+        "answer_not_pattern": [
+          "결과가 없습니다|내역이 없습니다|조회 결과가 없",
+          "\\[응답 지침\\]",
+          "9001011234567"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "정본 SQL의 WHERE가 <if> 없이 AND A.CAL_KIND_CD = #{searchCalKindCd}를 걸어 파라미터가 빠지면 항상 0행이다. 우리 handler는 cmd와 cmmSearchStaffId만 보내 2022~2025 전 연도가 0행이었다(2026-08-20 ntest 실측). 공통코드 YTA_CAL_KIND_CD 실조회: 1=연말정산 2=중도정산 3·4=간이신고. searchCalKindCd=1을 넣으면 1행이 나온다. 같은 함정이 YTA 조회 9종 전부에 있다 — 조회별 필수 파라미터는 mock의 YTA_REQUIRED_PARAMS 참조. 종전 mock은 YTA fixture가 없어 기본 빈 응답으로 떨어졌고 시나리오도 BODY만 봐서 결함을 못 잡았다. 구현 전 FAIL."
+    },
+    {
+      "id": "K46",
+      "label": "연말정산 — 물은 연도의 데이터를 답해야 함",
+      "message": "@agent 2023 연말정산 결과 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/YTASummaryMgr2023\\.do",
+        "answer_pattern": [
+          "1,?310,?000|33,?000,?000"
+        ],
+        "answer_not_pattern": [
+          "1,?620,?000",
+          "36,?000,?000",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "귀속연도 필터가 걸리지 않아 다른 해 수치를 물은 해의 결과라고 답했다. 정본 SQL의 CAL_YY 조건은 <if test=\"searchCalYy != null\">라 **보낼 때만** 걸리는데 handler가 안 보냈다. 경로의 연도(/YTASummaryMgr2023.do)는 컨트롤러 버전만 고를 뿐 데이터를 거르지 않는다. 실측(2026-08-20 ntest): 2023 경로 + 파라미터 없음 → 2024년 행 1건(급여과세 17,428,020) / 2023 경로 + searchCalYy=2023 → 0행. 즉 '2023 연말정산 결과'에 2024년 수치를 답하고 있었다. mock은 2024·2023 두 해를 담고 searchCalYy가 있을 때만 거른다. 구현 전 FAIL."
+    },
+    {
+      "id": "K47",
+      "label": "연장근무 — 값이 없으면 신원 컬럼을 답으로 내놓지 말 것",
+      "message": "@agent 내 연장근무 한도 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzWorkOtSchdul\\.do",
+        "answer_pattern": [
+          "없|미등록|등록되지|확인되지|조회되지|표시되지|찾지 못|제공되지"
+        ],
+        "answer_not_pattern": [
+          "소속[:：\\*\\s]+인사팀",
+          "직위[:：\\*\\s]+과장",
+          "성명[:：\\*\\s]+홍길동",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "실질 컬럼이 전부 비면 화이트리스트 렌더러가 빈 열을 떨어뜨려 **신원 컬럼만 남고**, LLM이 그걸 답으로 제시한다. 실측(2026-08-20 ntest): '내 연장근무 한도 알려줘' → '현재 연장근무 한도는 다음과 같습니다: 소속: 인사팀, 직위: 과장'. 실응답은 ot01~ot31·sumOt가 전부 null이라 한도 정보가 없는 것인데, 남은 부스러기(성명·소속·직위)를 답으로 내놓았다. BODY 문제가 아니라 렌더링 계층 결함이라 화이트리스트를 쓰는 전 skill에 잠재한다. mock은 이번 달 요청에 OT 값이 전부 null인 행을 준다(실서버와 동일). 구현 전 FAIL. 단정 주의: '인사팀'·'과장' 토큰 자체를 금지하면 '인사팀에 문의하세요' 같은 정상 안내까지 FAIL이 된다 — 신원 값을 라벨과 함께 데이터로 제시한 형태만 금지한다."
+    },
+    {
+      "id": "K48",
+      "label": "연장근무 — 값이 없으면 신원 컬럼을 답으로 내놓지 말 것",
+      "message": "@agent 이번 달 연장근무 내역 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzWorkOtSchdul\\.do",
+        "answer_pattern": [
+          "없|미등록|등록되지|확인되지|조회되지|표시되지|찾지 못|제공되지"
+        ],
+        "answer_not_pattern": [
+          "소속[:：\\*\\s]+인사팀",
+          "직위[:：\\*\\s]+과장",
+          "성명[:：\\*\\s]+홍길동",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "실질 컬럼이 전부 비면 화이트리스트 렌더러가 빈 열을 떨어뜨려 **신원 컬럼만 남고**, LLM이 그걸 답으로 제시한다. 실측(2026-08-20 ntest): '내 연장근무 한도 알려줘' → '현재 연장근무 한도는 다음과 같습니다: 소속: 인사팀, 직위: 과장'. 실응답은 ot01~ot31·sumOt가 전부 null이라 한도 정보가 없는 것인데, 남은 부스러기(성명·소속·직위)를 답으로 내놓았다. BODY 문제가 아니라 렌더링 계층 결함이라 화이트리스트를 쓰는 전 skill에 잠재한다. mock은 이번 달 요청에 OT 값이 전부 null인 행을 준다(실서버와 동일). 구현 전 FAIL. 단정 주의: '인사팀'·'과장' 토큰 자체를 금지하면 '인사팀에 문의하세요' 같은 정상 안내까지 FAIL이 된다 — 신원 값을 라벨과 함께 데이터로 제시한 형태만 금지한다."
     }
   ]
 }

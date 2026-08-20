@@ -50,9 +50,13 @@ const QUERY_MAP = {
     name: "YTAYtaFamilySttusMgr",
     cmd: "getYTAYtaFamilySttusMgrList",
     label: "부양가족 현황",
+    // STAFF_NM은 본인 이름이라 전 행에 같은 값이 찍힌다 — 가족 이름은 FAM_NM이다.
+    // 파라미터 누락으로 줄곧 0행이라 드러나지 않던 오류(2026-08-20).
+    // 주민번호(FAM_CTZ_NO)·내부 식별자(FAM_ID)는 계속 제외한다.
     columns: {
-      STAFF_NM: "성명",
+      FAM_NM: "성명",
       AGE: "나이",
+      SPOUSE_YN: "배우자여부",
     },
   },
   previous_employer: {
@@ -85,6 +89,7 @@ const QUERY_MAP = {
   },
   // 소득공제 입력 화면(YTAInDctMgr) 탭별 항목 — Tab08 신용카드 / Tab13 보험 / Tab15 교육 / Tab06 연금
   credit_card: {
+    needs: ["searchStaffId"],
     name: "YTAInDctMgr",
     cmd: "getYTAInDctMgrTab08List",
     label: "신용카드 공제내역",
@@ -97,6 +102,7 @@ const QUERY_MAP = {
     },
   },
   insurance: {
+    needs: ["searchStaffId"],
     name: "YTAInDctMgr",
     cmd: "getYTAInDctMgrTab13List",
     label: "보장성보험 공제내역",
@@ -107,6 +113,7 @@ const QUERY_MAP = {
     },
   },
   education: {
+    needs: ["searchStaffId"],
     name: "YTAInDctMgr",
     cmd: "getYTAInDctMgrTab15List",
     label: "교육비 공제내역",
@@ -117,6 +124,8 @@ const QUERY_MAP = {
     },
   },
   savings: {
+    needs: ["searchStaffId", "searchItemGroupCd"],
+    itemGroupCd: "TAB_06", // ytaInDctMgrTab06.jsp hidden 입력값
     name: "YTAInDctMgr",
     cmd: "getYTAInDctMgrTab06List",
     label: "연금저축 공제내역",
@@ -151,10 +160,27 @@ module.exports.runtime = {
         year = resolved;
       }
 
+      // 정본 SQL의 WHERE는 <if> 없이 CAL_KIND_CD 등을 걸기 때문에, 아래 파라미터가
+      // 빠지면 조건이 NULL이 되어 **항상 0행**이다. 종전에는 cmd·cmmSearchStaffId만
+      // 보내 2022~2025 전 연도·전 query_type이 0행이었다(2026-08-20 ntest 실측).
+      // 조회별 필요 목록은 각 SQL의 <if> 밖 파라미터로 확인했다 — spec.needs 참조.
       const form = {
         cmd: spec.cmd,
         cmmSearchStaffId: SELF_STAFF_ID_MARKER, // self 강제
+        // 정산구분(공통코드 YTA_CAL_KIND_CD 실조회: 1=연말정산 2=중도정산
+        // 3=간이신고(상) 4=간이신고(하)). 본인 연말정산 조회이므로 1 고정 —
+        // 2는 퇴사자 중도정산이라 이 skill의 질문 의도와 다르다.
+        searchCalKindCd: "1",
+        // 귀속연도는 **항상** 보낸다. SQL의 CAL_YY 조건은 <if searchCalYy>라 보낼 때만
+        // 걸리고, 경로의 연도(/YTA…Mgr2023.do)는 컨트롤러 버전만 고를 뿐 데이터를 거르지
+        // 않는다. 안 보내면 전 연도가 섞여 와서 "2023 연말정산 결과"에 2024년 수치를
+        // 답하게 된다 — 실측(2026-08-20 ntest)에서 실제로 그랬다.
+        searchCalYy: year,
       };
+      for (const need of spec.needs || []) {
+        if (need === "searchStaffId") form.searchStaffId = SELF_STAFF_ID_MARKER;
+        else if (need === "searchItemGroupCd") form.searchItemGroupCd = spec.itemGroupCd;
+      }
       const path = `/${spec.name}${year}.do`;
 
       this.introspect(`${spec.label} (${year}년) 조회 중...`);

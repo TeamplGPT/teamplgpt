@@ -9,6 +9,8 @@
 //  - 대상 식별자는 LLM 미노출: $SELF_STAFF_ID 마커 → 브리지(ssnStaffId) 또는
 //    HR_STAFF_ID(서버 폴백)가 kiwibox 내부 STAFF_ID로 치환. self 강제(카탈로그 §0).
 const { resolveDateParam } = require("../_shared/dateResolver");
+// 표시 보정은 _shared 공통 모듈 — handler별 사본 금지(specs/022 P0-2)
+const { normalizeDisplayRows } = require("../_shared/renderNormalize");
 const {
   hrFetch,
   monthRange,
@@ -21,34 +23,53 @@ const {
 // staffParam: 문자열 또는 배열(다중 사번 파라미터 동시 마커 주입)
 // leaveBody: §3 휴가 공통 BODY(wkareaCd·휴가/회계연도 범위·searchBaseYmd·chkAppYn) 주입
 // baseYmdDashed: searchBaseYmd={오늘 YYYY-MM-DD} 주입 (§2.2)
+// daySupported: work_ymd 지정 시 월 range 대신 단일일자 range 전송 (일 단위 조회 지원)
 const ENDPOINT_MAP = {
   timesheet: {
     path: "/TAAWrkTimeStatusMgr.do", cmd: "getTAAWrkTimeStatusMgrList", // TAA-1410 정본(§2.1)
     period: "range-both", staffParam: "cmmSearchStaffId", gate: true,
+    daySupported: true,
+    displayNormalize: { dateFrom: "ymd", dateTo: "workYmd", weekKey: "week" },
   },
   work_status: {
     path: "/TAAWrkTimeStatusMgr.do", cmd: "getTAAWrkTimeStatusMgrList",
     period: "range-both", staffParam: "cmmSearchStaffId", gate: true,
+    daySupported: true,
+    displayNormalize: { dateFrom: "ymd", dateTo: "workYmd", weekKey: "week" },
   },
   work_calendar: {
     path: "/TAADclzWorkSearchCldr.do", cmd: "getTAADclzWorkSearchCldr",
-    period: "ym", staffParam: ["searchId", "cmmSearchStaffId"], gate: false,
+    // "ym-range-alt" = searchYm + searchSYmd/searchEYmd 동시 전송.
+    // 정본 SQL(TAADclzWorkSearchCldr_SQL.xml)의 WHERE는 searchYm이 아니라
+    // searchSYmd/searchEYmd로 거른다(searchYm은 BASE_YM으로 SELECT만 되고 WHERE 미참조).
+    // 둘을 빼면 A.YMD BETWEEN NULL AND NULL이 되어 항상 0행 → "답변 불가".
+    // 실측(2026-08-19 ntest.5240.kr, self 202608): 미포함 0행 / 포함 31행.
+    // 카탈로그 §2.2의 BODY 예시가 이 둘을 누락하고 있다 — kiwibox 정정 요청 대상.
+    period: "ym-range-alt", staffParam: ["searchId", "cmmSearchStaffId"], gate: false,
     baseYmdDashed: true, // §2.2 — searchId 무게이트, self 강제 필수
   },
+  // OT 2종: 정본 SQL(TAADclzWorkOtSchdul_SQL.xml)이 기간을 #{searchYm}으로만 거른다
+  // (List2는 23회, List는 6회 참조. searchBaseSYmd/EYmd는 어느 쪽도 참조하지 않음).
+  // 실측(2026-08-19 ntest): 현행 BODY 0행 / searchYm 추가 시 202605~202607 각 1행.
   overtime: {
     path: "/TAADclzWorkOtSchdul.do", cmd: "getTAADclzWorkOtSchdulList2",
     period: "range", staffParam: "cmmSearchStaffId", gate: true,
+    alsoSearchYm: true,
     fixed: { searchType: "2" }, // §2.6 실측
   },
   overtime_limit: {
     path: "/TAADclzWorkOtSchdul.do", cmd: "getTAADclzWorkOtSchdulList",
     period: "range", staffParam: "cmmSearchStaffId", gate: true,
+    alsoSearchYm: true,
     fixed: { searchType: "2" },
   },
   leave_requests: {
     path: "/TAADclzVcatnList.do", cmd: "getTAADclzVcatnList2", // TAA-0490 정본(§3.2)
     period: "none", staffParam: ["staffId", "cmmSearchStaffId"], gate: false,
     leaveBody: true,
+    // 실측(2026-08-19): ymd="20260323" 통짜, week="MON" 영문.
+    // annual_leave_balance(List1)는 staYmd/endYmd 체계라 대상 아님.
+    displayNormalize: { dateFrom: "ymd", dateTo: "ymd", weekKey: "week" },
   },
   annual_leave_balance: {
     path: "/TAADclzVcatnList.do", cmd: "getTAADclzVcatnList1", // TAA-1310 정본(§3.1)
@@ -110,23 +131,40 @@ const COLUMNS_BY_QT = {
     absentYn: "결근",
   },
   work_status: {
+    // 라벨 정본 = 화면 grid 헤더($KIWIBOX .../taaWrkTimeStatusMgr.jsp IBSheet):
+    //   inTime=출근 · baseStaTime=시업 · outTime=퇴근 · baseEndTime=종업 ·
+    //   mark=근무상태 · workComment=근무특이사항.
+    // 구성 축도 같은 화면의 판정 로직을 따른다 — 출퇴근 특이자(지각/조퇴/결근) ·
+    // 근무예외자(휴가/출장/교육) · 연장근로(평일연장/평일야간/휴일근무/휴일연장/휴일야간).
+    // 플래그 계열은 값이 없으면 비어 오고 renderWhitelisted가 공백 열을 떨어뜨리므로,
+    // 폭이 넓어도 정상근무일 표는 좁게 렌더된다.
     workYmd: "일자",
     week: "요일",
-    workComment: "근무내용",
-    mark: "상태",
-    baseStaTime: "기준출근",
-    baseEndTime: "기준퇴근",
+    baseStaTime: "시업",
+    baseEndTime: "종업",
     inTime: "출근",
     outTime: "퇴근",
+    mark: "근무상태",
+    lateYn: "지각",
+    earlyYn: "조퇴",
+    earlyOtYn: "조퇴(연장)",
+    absentYn: "결근",
     lateTime: "지각(분)",
     earlyTime: "조퇴(분)",
+    goOut: "외출",
     goOutTime: "외출(분)",
     otTime: "연장(분)",
+    otWorkOver: "평일연장(승인)",
+    otWorkNight: "평일야간(승인)",
+    otHoliWork: "휴일근무(승인)",
+    otHoliOver: "휴일연장(승인)",
+    otHoliNight: "휴일야간(승인)",
     annualLeave: "연차",
     etcLeave: "기타휴가",
     bizTrip: "출장",
     education: "교육",
     leaveAbsence: "휴직",
+    workComment: "근무특이사항",
   },
   // 이하 4종 근거: docs/03-analysis/hr-column-whitelist-audit.analysis.md
   // (TAADclzWorkOtSchdul_SQL·TAADclzWorkSearchCldr_SQL·TAADclzVcatnCldrMgr_SQL 대조)
@@ -179,8 +217,17 @@ COLUMNS_BY_QT.overtime_limit = (() => {
   return cols;
 })();
 
+// 신원 컬럼 — 이 값들만 남은 결과는 "답할 내용 없음"으로 본다.
+// OT 매트릭스는 이력이 없는 달이면 값이 전부 null로 와서 성명·소속·직위만 남는데,
+// 그대로 렌더하면 "한도가 얼마냐"는 질문에 소속·직위가 답으로 나간다(2026-08-20 실측).
+// 실질 컬럼이 하나라도 있으면 정상 렌더되므로 데이터가 있는 달에는 영향이 없다.
+const IDENTITY_COLUMNS_BY_QT = {
+  overtime: ["staffNm", "orgNm", "posNm"],
+  overtime_limit: ["staffNm", "orgNm", "posNm"],
+};
+
 module.exports.runtime = {
-  handler: async function ({ query_type, year_month }) {
+  handler: async function ({ query_type, year_month, work_ymd }) {
     try {
       if (!query_type || !ENDPOINT_MAP[query_type]) {
         const types = Object.keys(ENDPOINT_MAP).join(", ");
@@ -193,11 +240,31 @@ module.exports.runtime = {
       const form = {};
       if (spec.cmd) form.cmd = spec.cmd;
 
+      // 하루만 묻는 질문('오늘'·'어제'·'2월 27일')은 단일일자 range로 보낸다.
+      // 월 range로 보내면 표 전체가 돌아와 LLM이 해당 행을 발췌해야 하고,
+      // 프로덕션 규모에서는 그 발췌가 누락·오인된다. work_ymd 미지정 시에는
+      // 아래 기존 월-range 경로를 그대로 타므로 월 단위 조회는 영향 없음.
+      // ym은 아래 §3 휴가 공통 BODY(searchSymdLv 등)도 참조하므로 함수 스코프 유지.
       const ym =
         resolveDateParam(year_month, "year_month") ||
         resolveDateParam("이번달", "year_month");
-      if (spec.period === "ym") {
+      const resolvedDay = spec.daySupported
+        ? resolveDateParam(work_ymd, "base_date")
+        : undefined;
+
+      if (resolvedDay) {
+        form.searchBaseSYmd = resolvedDay;
+        form.searchBaseEYmd = resolvedDay;
+        form.searchSYmd = resolvedDay;
+        form.searchEYmd = resolvedDay;
+      } else if (spec.period === "ym") {
         form.searchYm = ym;
+      } else if (spec.period === "ym-range-alt") {
+        // searchYm은 화면 계약상 유지하되, 실제 행 필터는 searchSYmd/searchEYmd가 한다.
+        const [sYmd, eYmd] = monthRange(ym);
+        form.searchYm = ym;
+        form.searchSYmd = sYmd;
+        form.searchEYmd = eYmd;
       } else if (
         spec.period === "range" ||
         spec.period === "range-alt" ||
@@ -212,6 +279,8 @@ module.exports.runtime = {
           form.searchSYmd = sYmd;
           form.searchEYmd = eYmd;
         }
+        // OT 2종은 range 계열 BODY를 쓰면서도 실제 필터는 searchYm이다(alsoSearchYm).
+        if (spec.alsoSearchYm) form.searchYm = ym;
       }
 
       if (spec.baseYmdDashed) form.searchBaseYmd = todayDashed();
@@ -256,7 +325,17 @@ module.exports.runtime = {
       }
 
       this.introspect(`${label} 조회 완료.`);
-      return formatAttendance(records, label, COLUMNS_BY_QT[query_type]);
+      // 표시 보정은 endpoint별 계약이 달라 spec에 명시된 경우에만 적용한다
+      // (같은 규칙을 일괄 적용하면 형식이 다른 endpoint에서 오히려 깨진다).
+      const rows = spec.displayNormalize
+        ? normalizeDisplayRows(records, spec.displayNormalize)
+        : records;
+      return formatAttendance(
+        rows,
+        label,
+        COLUMNS_BY_QT[query_type],
+        IDENTITY_COLUMNS_BY_QT[query_type]
+      );
     } catch (e) {
       this.logger("Error in hr-attendance", e.message);
       return `> ⚠️ 근태 조회 중 오류가 발생했습니다: ${e.message}`;
@@ -264,7 +343,16 @@ module.exports.runtime = {
   },
 };
 
-function formatAttendance(data, label, columns) {
+// 표시 보정 — ntest.5240.kr 실호출로 확인(TAA-1410 2026-08-18 / TAA-0490 2026-08-19).
+// kiwibox는 날짜·요일을 화면 렌더용 형식으로 내려주는데, 그대로 표에 실으면 LLM이
+// 연도를 모르거나 영문 요일을 그대로 노출한다.
+//  · TAA-1410: workYmd가 연도 없는 MM-DD("07-01"). 연도를 가진 건 ymd("20260701")뿐인데
+//    양쪽 화이트리스트 모두 ymd를 쓰지 않아, LLM이 표만으로는 연도를 알 수 없고
+//    시스템 프롬프트의 [HR_DATE_CONTEXT] 날짜에 의존하게 된다.
+//  · TAA-0490(휴가 사용내역): ymd가 "20260323" 통짜라 읽기 어렵다.
+//  · 양쪽 모두 week가 영문 3자("MON")다 — '요일' 한글 열에 영문이 그대로 나온다.
+// 응답 키는 egovMap camelCase 실측 확인. 원본은 변경하지 않고 새 객체를 만든다.
+function formatAttendance(data, label, columns, identityColumns) {
   const {
     normalizeData,
     renderTable,
@@ -276,7 +364,7 @@ function formatAttendance(data, label, columns) {
 
   // 화이트리스트 정의가 있으면 선별 렌더(내부 PK·사번·코드 제외).
   if (columns) {
-    const table = renderWhitelisted(data, columns);
+    const table = renderWhitelisted(data, columns, identityColumns);
     return table ? md + table : md + "> 조회된 데이터가 없습니다.";
   }
 

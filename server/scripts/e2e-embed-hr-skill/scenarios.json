@@ -62,10 +62,11 @@
         "tool_call": true,
         "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
         "mock_body_pattern": [
-          "cmd=getSALPayslipNewMgrList"
+          "cmd=getSALPayslipNewMgr"
         ]
       },
-      "repeat": 1
+      "repeat": 1,
+      "note": "mock_body_pattern은 **마지막 .do 호출**의 body를 본다. 이 시나리오의 취지는 'pay 체인 완주'인데, hr-salary L1이 '실수령액은 반드시 payslip_summary를 호출해 얻은 값을 써라'고 지시하므로(fix: 실수령액 후속 턴) 모델이 payslip→deductions→payslip_summary까지 부르고 끝나는 것이 정상이다. 그러면 마지막 호출이 getSALPayslipNewMgrMap이라 'cmd=getSALPayslipNewMgrList' 단정이 어긋난다(2026-08-20 실측: .do 호출이 3회→5~6회로 늘며 2연속 FAIL. 답변 내용은 지급항목·공제내역·실수령까지 모두 정확했다). 체인 완주 여부는 SALPayslipNewMgr 계열 호출이면 충족되므로 접두사로 단정한다 — List/List2/Map 중 무엇이 마지막이든 통과하고, 다른 endpoint로 샜다면 여전히 FAIL한다."
     },
     {
       "id": "EC-ALLOW-05",
@@ -282,10 +283,11 @@
         "tool_call": true,
         "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
         "mock_body_pattern": [
-          "cmd=getSALPayslipNewMgrList"
+          "cmd=getSALPayslipNewMgr"
         ]
       },
-      "repeat": 1
+      "repeat": 1,
+      "note": "mock_body_pattern은 **마지막 .do 호출**의 body를 본다. 이 시나리오의 취지는 'pay 체인 완주'인데, hr-salary L1이 '실수령액은 반드시 payslip_summary를 호출해 얻은 값을 써라'고 지시하므로(fix: 실수령액 후속 턴) 모델이 payslip→deductions→payslip_summary까지 부르고 끝나는 것이 정상이다. 그러면 마지막 호출이 getSALPayslipNewMgrMap이라 'cmd=getSALPayslipNewMgrList' 단정이 어긋난다(2026-08-20 실측: .do 호출이 3회→5~6회로 늘며 2연속 FAIL. 답변 내용은 지급항목·공제내역·실수령까지 모두 정확했다). 체인 완주 여부는 SALPayslipNewMgr 계열 호출이면 충족되므로 접두사로 단정한다 — List/List2/Map 중 무엇이 마지막이든 통과하고, 다른 endpoint로 샜다면 여전히 FAIL한다."
     },
     {
       "id": "EC-FILTER-07",
