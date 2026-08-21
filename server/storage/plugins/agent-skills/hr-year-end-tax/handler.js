@@ -7,6 +7,8 @@
 //  - result(결정세액)는 summary에 통합(YndList/YndCal은 조회 부적합 — 실측).
 const { resolveDateParam } = require("../_shared/dateResolver");
 const { hrFetch, SELF_STAFF_ID_MARKER } = require("../_shared/hrSession");
+// 미지정 값은 서버가 해석 — 최신 연도가 비면 자료가 있는 연도로(specs/022 P-SELF)
+const { firstNonEmpty } = require("../_shared/selfContext");
 
 // 지원 귀속연도 (최신이 기본). 신규 연도 배포 시 배열에 추가.
 const SUPPORTED_YEARS = ["2025", "2024", "2023", "2022"];
@@ -151,20 +153,22 @@ module.exports.runtime = {
       const spec = QUERY_MAP[query_type];
 
       // cal_yy → 지원 연도. 미지정 시 최신. 지원 목록 밖이면 안내.
-      let year = DEFAULT_YEAR;
       const resolved = resolveDateParam(cal_yy, "year"); // 'YYYY' or '작년' 등
-      if (resolved) {
-        if (!SUPPORTED_YEARS.includes(resolved)) {
-          return `> ⚠️ ${resolved}년 연말정산은 지원하지 않습니다. 지원 연도: ${SUPPORTED_YEARS.join(", ")}.`;
-        }
-        year = resolved;
+      if (resolved && !SUPPORTED_YEARS.includes(resolved)) {
+        return `> ⚠️ ${resolved}년 연말정산은 지원하지 않습니다. 지원 연도: ${SUPPORTED_YEARS.join(", ")}.`;
       }
+      const yearGiven = resolved || null;
+      // 연도를 말하지 않았다면 "최신 연도를 원한다"가 아니다. 최신에 자료가 없으면
+      // "2025년 내역이 없습니다"로 끝나 사용자는 자료가 있는 해를 알 수 없다
+      // (실측 2026-08-21: 의료비·신용카드가 2024년에만 있는데 2025로 조회해 빈손).
+      // 급여 pay_periods와 같은 판단 — 자료가 있는 시점을 찾아 답하고 어느 해인지 밝힌다.
+      const candidates = yearGiven ? [yearGiven] : SUPPORTED_YEARS;
 
       // 정본 SQL의 WHERE는 <if> 없이 CAL_KIND_CD 등을 걸기 때문에, 아래 파라미터가
       // 빠지면 조건이 NULL이 되어 **항상 0행**이다. 종전에는 cmd·cmmSearchStaffId만
       // 보내 2022~2025 전 연도·전 query_type이 0행이었다(2026-08-20 ntest 실측).
       // 조회별 필요 목록은 각 SQL의 <if> 밖 파라미터로 확인했다 — spec.needs 참조.
-      const form = {
+      const buildForm = (year) => ({
         cmd: spec.cmd,
         cmmSearchStaffId: SELF_STAFF_ID_MARKER, // self 강제
         // 정산구분(공통코드 YTA_CAL_KIND_CD 실조회: 1=연말정산 2=중도정산
@@ -176,26 +180,33 @@ module.exports.runtime = {
         // 않는다. 안 보내면 전 연도가 섞여 와서 "2023 연말정산 결과"에 2024년 수치를
         // 답하게 된다 — 실측(2026-08-20 ntest)에서 실제로 그랬다.
         searchCalYy: year,
-      };
-      for (const need of spec.needs || []) {
-        if (need === "searchStaffId") form.searchStaffId = SELF_STAFF_ID_MARKER;
-        else if (need === "searchItemGroupCd") form.searchItemGroupCd = spec.itemGroupCd;
-      }
-      const path = `/${spec.name}${year}.do`;
-
-      this.introspect(`${spec.label} (${year}년) 조회 중...`);
-      const { errorMessage, records, isEmpty } = await hrFetch(this, {
-        path,
-        form,
-        gate: false,
+        ...Object.fromEntries(
+          (spec.needs || []).map((need) =>
+            need === "searchStaffId"
+              ? ["searchStaffId", SELF_STAFF_ID_MARKER]
+              : ["searchItemGroupCd", spec.itemGroupCd]
+          )
+        ),
       });
-      if (errorMessage) return errorMessage;
-      if (isEmpty) {
-        return `> ⚠️ **${spec.label}** (${year}년) 조회 결과가 없습니다.`;
+
+      this.introspect(`${spec.label} 조회 중...`);
+      const { picked, result } = await firstNonEmpty(candidates, (year) =>
+        hrFetch(this, {
+          path: `/${spec.name}${year}.do`,
+          form: buildForm(year),
+          gate: false,
+        })
+      );
+      if (result && result.errorMessage) return result.errorMessage;
+      if (!picked) {
+        const scope = yearGiven
+          ? `${yearGiven}년`
+          : `지원 연도(${SUPPORTED_YEARS.join("·")}) 전체`;
+        return `> ⚠️ **${spec.label}** — ${scope} 조회 결과가 없습니다.`;
       }
 
       this.introspect(`${spec.label} 조회 완료.`);
-      return formatYta(records, `${spec.label} (${year}년)`, spec.columns);
+      return formatYta(result.records, `${spec.label} (${picked}년)`, spec.columns);
     } catch (e) {
       this.logger("Error in hr-year-end-tax", e.message);
       return `> ⚠️ 연말정산 조회 중 오류가 발생했습니다: ${e.message}`;

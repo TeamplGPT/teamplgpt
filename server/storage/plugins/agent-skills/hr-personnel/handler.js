@@ -9,6 +9,8 @@
 const { resolveDateParam } = require("../_shared/dateResolver");
 // 표시 보정은 _shared 공통 모듈 — handler별 사본 금지(specs/022 P0-2)
 const { stripHtmlBreaks, applyCodeLabel } = require("../_shared/renderNormalize");
+// 미지정 값은 LLM에게 추측시키지 않고 서버가 본인 컨텍스트에서 해석(specs/022 P-SELF)
+const { resolveSelfOrgCd } = require("../_shared/selfContext");
 const {
   hrFetch,
   monthRange,
@@ -76,7 +78,13 @@ const ENDPOINT_MAP = {
   },
   org_members: {
     path: "/getMBLHrBassiemMemberList.do", staffParam: null, gate: false,
-    dateParam: "today", orgParam: { name: "searchOrgCd", required: true },
+    dateParam: "today", orgParam: { name: "searchOrgCd", required: true, selfDefault: true },
+    // 정본 SQL(MBLHrBassiemList_SQL)이 <if> 없이 sub_org_yn = #{searchTypeVal}을 요구한다.
+    // 빠지면 조건이 NULL이 되어 **항상 0행**이었다(2026-08-21 실측: 인사팀 0행 →
+    // searchTypeVal=N을 넣으면 36행). "우리 팀원 누구야?"가 조회 실패로 끝나던 원인.
+    // N=하위조직 미포함. 물은 팀만 답하는 것이 질문 의도에 맞다 — Y로 두면 부문을
+    // 물었을 때 하위 팀원까지 딸려 와 "그 팀 팀원"이 흐려진다.
+    fixed: { searchTypeVal: "N" },
     // detail/seqNo/empOrder/staffId/orgCd(3종)/posSeqNo/name(중복)/imgExYn 차단
     columns: {
       STAFF_NM: "성명",
@@ -179,7 +187,14 @@ module.exports.runtime = {
 
       // 조직코드: 계층3 체이닝 — org_tree 결과값만 (plugin.json description에서 강제)
       if (spec.orgParam) {
-        const org = String(org_cd || "").trim();
+        let org = String(org_cd || "").trim();
+        // 조직코드를 안 줬으면 되묻지 말고 **본인 소속**으로 해석한다.
+        // "우리 팀원 누구야?"에 모델이 코드를 지어내 엉뚱한 팀을 조회한 사례가 있었다
+        // (본인은 인사팀 0303인데 0111 조립설계팀을 조회 — 성공한 것처럼 보이는 오답).
+        if (!org && spec.orgParam.selfDefault) {
+          org = (await resolveSelfOrgCd(this)) || "";
+          if (org) this.introspect(`본인 소속 조직(${org}) 기준으로 조회합니다.`);
+        }
         if (spec.orgParam.required && !org) {
           return "> ⚠️ 조직코드(org_cd)가 필요합니다. 먼저 org_tree(조직도)로 조직코드를 조회하세요.";
         }

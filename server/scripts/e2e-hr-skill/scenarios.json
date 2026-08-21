@@ -1444,6 +1444,93 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "실질 컬럼이 전부 비면 화이트리스트 렌더러가 빈 열을 떨어뜨려 **신원 컬럼만 남고**, LLM이 그걸 답으로 제시한다. 실측(2026-08-20 ntest): '내 연장근무 한도 알려줘' → '현재 연장근무 한도는 다음과 같습니다: 소속: 인사팀, 직위: 과장'. 실응답은 ot01~ot31·sumOt가 전부 null이라 한도 정보가 없는 것인데, 남은 부스러기(성명·소속·직위)를 답으로 내놓았다. BODY 문제가 아니라 렌더링 계층 결함이라 화이트리스트를 쓰는 전 skill에 잠재한다. mock은 이번 달 요청에 OT 값이 전부 null인 행을 준다(실서버와 동일). 구현 전 FAIL. 단정 주의: '인사팀'·'과장' 토큰 자체를 금지하면 '인사팀에 문의하세요' 같은 정상 안내까지 FAIL이 된다 — 신원 값을 라벨과 함께 데이터로 제시한 형태만 금지한다."
+    },
+    {
+      "id": "K49",
+      "label": "조직원 목록 — searchTypeVal(하위조직포함) 필수",
+      "message": "@agent 인사팀 팀원 목록 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLHrBassiemMemberList\\.do",
+        "mock_body_pattern": [
+          "searchOrgCd=",
+          "searchSymd=\\d{8}",
+          "searchTypeVal=[YN]"
+        ],
+        "answer_pattern": [
+          "김영지|조성애|팀원"
+        ],
+        "answer_not_pattern": [
+          "조회에 어려움|조회할 수 없|결과가 없|\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "정본 SQL(MBLHrBassiemList_SQL)이 <if> 없이 sub_org_yn = #{searchTypeVal}(Y:하위포함/N:미포함)을 요구하는데 handler가 보내지 않아 조건이 NULL이 되어 **항상 0행**이었다. 실측(2026-08-21 ntest, searchOrgCd=0303 인사팀): 현행 0행 / searchTypeVal=N 36행. 조직코드는 문제가 없었다 — org_tree가 같은 코드로 인원 36명을 정확히 보고하고 있었다. '우리 팀원 누구야?'가 '팀원 정보 조회에 어려움이 있습니다'로 끝나던 원인. 조직원은 fixture도 시나리오도 없어 한 번도 검증된 적이 없었다. 구현 전 FAIL."
+    },
+    {
+      "id": "K50",
+      "label": "조직원 — 조직코드 미지정 시 본인 소속으로",
+      "message": "@agent 우리 팀원 누구야?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLHrBassiemMemberList\\.do",
+        "answer_pattern": [
+          "김영지|조성애|홍길동"
+        ],
+        "answer_not_pattern": [
+          "없습니다|조회에 어려움|확인할 수 없",
+          "\\[응답 지침\\]"
+        ],
+        "mock_body_pattern": [
+          "searchOrgCd=0303",
+          "searchTypeVal=[YN]"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "사용자가 말하지 않은 값을 LLM에게 추측시키던 결함군(specs/022 P-SELF). 미지정 파라미터는 되묻지도 추측시키지도 말고 **서버가 본인 컨텍스트/자료 있는 시점**으로 해석한다 — 급여 pay_periods에서 먼저 적용한 판단을 _shared/selfContext.js로 구조화했다. '우리 팀원 누구야?'에 모델이 org_cd를 지어내 본인(인사팀 0303)이 아닌 0111 조립설계팀을 조회했다(2026-08-21 실측). 조회가 성공해 사용자가 오답을 알아채기 어렵다. 이제 org_cd 미지정 시 서버가 사원증의 orgCd를 쓴다. 단정 보강: 모델이 org_cd를 **채워 보내면** 서버 기본값이 동작하지 않는다 — 실측(2026-08-21 실서버)에서 조직 147개 중 0111을 골라 넣어 조립설계팀이 조회됐다. 그래서 answer만 보지 말고 **BODY의 searchOrgCd가 본인 소속(0303)인지**를 단정한다."
+    },
+    {
+      "id": "K51",
+      "label": "연말정산 — 연도 미지정 시 자료 있는 해로",
+      "message": "@agent 의료비 공제 내역 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/YTAYndMedDtlMgr\\d{4}\\.do",
+        "answer_pattern": [
+          "620,?000|의료|병원"
+        ],
+        "answer_not_pattern": [
+          "없습니다|조회에 어려움|확인할 수 없",
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "사용자가 말하지 않은 값을 LLM에게 추측시키던 결함군(specs/022 P-SELF). 미지정 파라미터는 되묻지도 추측시키지도 말고 **서버가 본인 컨텍스트/자료 있는 시점**으로 해석한다 — 급여 pay_periods에서 먼저 적용한 판단을 _shared/selfContext.js로 구조화했다. 연도 미지정 시 최신(2025)으로만 조회해 '2025년 내역이 없습니다'로 끝났다(2026-08-21 실측: 의료비·신용카드 자료는 2024년에만 존재). 이제 지원 연도를 순회해 자료가 있는 해를 답하고 그 해를 밝힌다."
+    },
+    {
+      "id": "K52",
+      "label": "조직원 — 다른 조직을 지목하면 그 조직으로",
+      "message": "@agent 조직코드 0111 조직원 목록 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLHrBassiemMemberList\\.do",
+        "mock_body_pattern": [
+          "searchOrgCd=0111"
+        ],
+        "answer_not_pattern": [
+          "\\[응답 지침\\]"
+        ]
+      },
+      "repeat": 2,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "K50의 반대편 가드. org_cd 기본값을 본인 소속으로 바꾸면서 '특정 조직 지목' 경로가 깨지지 않는지 본다. 사용자가 조직을 지목하면 그 코드가 그대로 전달돼야 한다 — 기본값이 지목을 덮어쓰면 안 된다."
     }
   ]
 }

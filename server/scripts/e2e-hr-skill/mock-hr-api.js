@@ -303,9 +303,22 @@ const REQUIRED_PARAMS_BY_CMD = {
   ],
 };
 
+// 경로형(cmd 없는 *.do) endpoint의 필수 파라미터. cmd 기반 표와 같은 취지다 —
+// 종전에는 cmd가 있는 endpoint만 게이트를 걸어 경로형 결함이 새어 나갔다.
+// 실제로 조직원 목록이 searchTypeVal 누락으로 항상 0행이었는데 mock은 fixture를 돌려줘
+// E2E가 통과했다(2026-08-21 발견 — BODY 계약 불일치 8번째).
+const REQUIRED_PARAMS_BY_PATH = {
+  // MBLHrBassiemList_SQL: sub_org_yn = #{searchTypeVal} (Y:하위포함 / N:미포함)
+  "/getMBLHrBassiemMemberList.do": ["searchOrgCd", "searchSymd", "searchTypeVal"],
+  "/getMBLHrBassiemOrgList.do": ["searchSymd"],
+};
+
 /** 필수 파라미터 중 비어 있는 것들 (없으면 빈 배열) */
-function missingRequiredParams(parsedBody) {
-  const need = REQUIRED_PARAMS_BY_CMD[parsedBody && parsedBody.cmd] || [];
+function missingRequiredParams(parsedBody, pathname) {
+  const need = [
+    ...(REQUIRED_PARAMS_BY_CMD[parsedBody && parsedBody.cmd] || []),
+    ...(REQUIRED_PARAMS_BY_PATH[pathname] || []),
+  ];
   return need.filter(
     (k) => !parsedBody[k] || String(parsedBody[k]).trim() === ""
   );
@@ -423,6 +436,15 @@ const FIXTURES_BY_PATH = {
   // 값은 소문자 cnt1~cnt3다(화이트리스트는 CNT1~CNT3, renderWhitelisted가 대소문자 대응).
   // hrSession 언랩 목록에 todoCnt가 없어 이 응답이 통째로 passthrough되던 버그의 회귀 fixture.
   "/getTodoIconCnt.do": { todoCnt: [{ cnt1: 188, cnt2: 53, cnt3: 1 }] },
+  // 조직원 목록 — ntest 실호출로 확정(2026-08-21, searchOrgCd=0303 인사팀 36행).
+  // 성명은 합성값이고 구조만 실측 그대로다. detail/seqNo/staffId 등 내부키는 화이트리스트가 막는다.
+  "/getMBLHrBassiemMemberList.do": {
+    DATA: [
+      { staffNm: "김영지", staffNo: "20050101", orgNm: "인사팀", posNm: "부장 🏅", resNm: "팀장", corpNm: "(주)예시", workType: "통상근무", workInfo: "근무" },
+      { staffNm: "홍길동", staffNo: "20070133", orgNm: "인사팀", posNm: "과장", resNm: "팀원", corpNm: "(주)예시", workType: "육아단축근무", workInfo: "근무" },
+      { staffNm: "조성애", staffNo: "20100715", orgNm: "인사팀", posNm: "차장", resNm: "팀원", corpNm: "(주)예시", workType: "통상근무", workInfo: "휴가" },
+    ],
+  },
   "/getMBLPrtEmpCard.do": {
     DATA: [
       {
@@ -479,7 +501,10 @@ const server = http.createServer((req, res) => {
           ? [{ codeNm: "2026-06-19 급여", code: "20260619P", colorCode: null }]
           : [];
       res.end(JSON.stringify({ codeList }));
-    } else if (parsedBody && missingRequiredParams(parsedBody).length) {
+    } else if (
+      parsedBody &&
+      missingRequiredParams(parsedBody, parsed.pathname).length
+    ) {
       // 필수 파라미터 누락 — 실서버와 같이 0행. 어떤 cmd든 동일하게 적용된다.
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ Message: "", DATA: [] }));
