@@ -23,6 +23,8 @@ CLAUDE*.md
 # `docs/`로 쓰면 git이 하위로 내려가지 않아 예외가 먹지 않는다. `docs/*`여야 한다.
 docs/*
 !docs/conventions/
+# HR 로컬 연동 테스트 가이드 — handler 계약 검증 절차의 정본이라 추적(2026-09-08).
+!docs/hr-local-kiwibox-test-guide.md
 
 # Test results
 test-results/

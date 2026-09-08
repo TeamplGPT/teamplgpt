@@ -17,6 +17,8 @@
 
 제거: `/TAAWrkTimeListMgrByDate.do`, `/getMBLLeavDetailStaff.do`, `/getMBLHomeLeaveDetail.do` 호출 코드 0건 (SC-004).
 
+> [2026-09-04 후속] kiwibox SQL 실독으로 위 표 일부가 교정됨(본문은 2026-07 계약으로 보존). work_calendar는 `searchSYmd={월초}&searchEYmd={월말}` 추가(SQL이 A.YMD BETWEEN으로 읽어 누락 시 항상 0건). overtime/overtime_limit는 `searchBaseSYmd/EYmd` 대신 `searchYm={YYYYMM}`(SQL 정본, base 계열은 읽지 않음). 현행: `docs/hr-local-kiwibox-test-guide.md` §1.4·1.5.
+
 ## hr-salary
 
 | query_type | path?cmd | BODY |
@@ -30,17 +32,23 @@
 
 제거: `/SALSalaryDtstmnMgr.do` (SAL-0220 폐기).
 
+> [2026-09-04 후속] 위 "제거" 판정과 payslip 행의 `/SALPayslipNewMgr.do`는 2026-07 시점 기록으로 보존하되 현행 handler와 상충한다. kiwibox 소스 실독 결과 `/SALPayslipNewMgr.do`는 컨트롤러 매핑이 없는 유령 경로(뷰 cmd만 존재)이고 급여명세 JSP도 `SALSalaryDtstmnMgr`를 호출함 → handler는 payslip/deductions/payslip_summary를 `/SALSalaryDtstmnMgr.do?cmd=getSALSalaryDtstmnMgrList / List2 / Map`으로 재정렬(BODY는 위 행과 동일: cmmSearchStaffId=$SELF & searchYm={pay_item 유도 YYYY-MM} & searchItem={pay_item} & searchType=web). 당시 "빈 응답"은 파라미터(searchItem/cmmSearchStaffId/AUTF 게이트) 문제였을 **가능성**이 있으나 확정 아님 — 스테이징 재실측 필요. salary_statement 행도 SQL 정본 파라미터 `findText={YYYY}&staffId=$SELF`로 교정됨(cmmSearchStaffId/searchSYmd/searchBaseYmd는 SQL이 읽지 않아 staffId 누락 시 항상 0건). 현행: `docs/hr-local-kiwibox-test-guide.md` §1.2·1.3, 정본 코드 `hr-salary/handler.js`.
+
 ## hr-approval
 
 | query_type | BODY |
 |---|---|
 | pending/drafted/completed/rejected/referenced | cmd=getEAPRequestMgrList & selectGubun={2~6 유지} & searchStaDate/EndDate={월범위 유지} & **searchSYmd={월초} & searchEYmd={월말}** (D8 병행) |
 
+> [2026-09-04 후속] 기간 파라미터 정본은 `sdt/edt`(EAPRequestMgr_SQL·eapRequestMgr.jsp 실독). searchStaDate/EndDate·searchSYmd/EYmd는 SQL이 읽지 않아 D8 병행 전송으로도 기안함(2)·참조(5)는 '오늘 하루', 미결/기결/반려(3·4·6)는 전체기간이 되었음. 현행 BODY: `cmd=getEAPRequestMgrList & selectGubun={2~6} & sdt={월초 또는 최근 3개월 초일} & edt={월말 또는 오늘}`. 현행: `docs/hr-local-kiwibox-test-guide.md` §1.1.
+
 ## hr-certificate
 
 | query_type | BODY |
 |---|---|
 | requests | cmd=getCTIMcrtfReqstRefromMgrList & **cmmSearchStaffId=$SELF &** staffId=$SELF & **searchStaffId=$SELF** & reqNoExist=N & **searchSYmd={18개월 전 초일} & searchEYmd={오늘 YYYYMMDD}** |
+
+> [2026-09-04 후속] `getCTIMcrtfReqstRefromMgrList`는 신청화면 초기조회용으로 `B.REQ_NO(+)=#{reqNo}` 단건 외부조인이라 reqNo 없이 호출하면 목록이 구조적으로 1건만 반환됨(운영 증상 "4건 발급했는데 1건만 조회"). handler는 발급내역 화면의 `/CTIMcrtfIssuMgr.do?cmd=getCTIMcrtfIssuMgrList`로 재정렬 — BODY: `staffIdNm=$SELF & searchSymd={18개월 전 초일} & searchEymd={오늘 YYYYMMDD}`(파라미터명 소문자 ymd). AUTF_SRCH_STAFF_YN(activeMenuCd) 게이트가 일반 사용자 self 조회를 허용하는지는 스테이징 실측 필요. 현행: `docs/hr-local-kiwibox-test-guide.md` §1.8.
 
 ## hr-welfare
 
@@ -54,6 +62,8 @@
 |---|---|
 | education | cmd=getPRCHrBassiemMgrTab220List & staffId=$SELF & **cmmSearchStaffId=$SELF & searchStaffId=$SELF & searchYmd={오늘 YYYY-MM-DD}** & checkHst=N(유지) |
 | profile / profile_detail / org_* / todo_count / schedule_day / contact_directory | 현행 유지 (D6 보류·D7 유지) |
+
+> [2026-09-04 후속] org_members(`/getMBLHrBassiemMemberList.do`)는 SQL의 sub_org_yn(`searchTypeVal`)이 'Y'/'N' 양자 분기라 미전송 시 항상 0건 → handler는 `searchTypeVal=N` 고정 추가. 현행: `docs/hr-local-kiwibox-test-guide.md` §1.6.
 
 ## LLM 노출 계약 (불변)
 

@@ -13,7 +13,7 @@ message는 전건 본인 기준(D4 — "사번 NNNNN" 금지). embed는 `@agent`
 | EC-ALLOW-01 | 지난달 내 출퇴근 기록 조회해줘 | hr-attendance/timesheet | `^/TAAWrkTimeStatusMgr\.do` | `cmd=getTAAWrkTimeStatusMgrList` |
 | EC-ALLOW-02 | 이번 달 내 근무일정 알려줘 | hr-attendance/work_calendar | `^/TAADclzWorkSearchCldr\.do` | `cmd=getTAADclzWorkSearchCldr` |
 | EC-ALLOW-03 | 내 연차 잔여일 알려줘 | hr-attendance/annual_leave_balance | `^/TAADclzVcatnList\.do` | `cmd=getTAADclzVcatnList1` + `answer_pattern:["22"]` (fixture 스모크 — R4) |
-| EC-ALLOW-04 | 6월 급여명세서 보여줘 | hr-salary/payslip (체인 완주 — KB43 기준) | `^/SALPayslipNewMgr\.do` | `cmd=getSALPayslipNewMgrList` |
+| EC-ALLOW-04 | 6월 급여명세서 보여줘 | hr-salary/payslip (체인 완주 — KB43 기준) | `^/SALSalaryDtstmnMgr\.do (2026-09-04 handler 정본 재정렬 반영 — 구 ^/SALPayslipNewMgr\.do)` | `cmd=getSALSalaryDtstmnMgrList` |
 | EC-ALLOW-05 | 6월 급여 지급 건 목록 알려줘 | hr-salary/pay_periods | `^/CommonCode\.do` | `queryId=getSalYmdTypeCdList2` (K9 계열) |
 | EC-ALLOW-06 ※교체(보너스→) | 내 월별지급내역 조회해줘 | hr-salary/salary_statement | `^/SALSalaryBassMgr\.do` | `cmd=getSALSalaryBassMgrTab110List` |
 | EC-ALLOW-07 | 내 사원카드 정보 보여줘 | hr-personnel/profile | `^/getMBLPrtEmpCard\.do` | (body 검증 없음 — KB48 동일) |
@@ -42,7 +42,7 @@ filter-attendance = `hr-attendance`만 허용 / filter-salary-personnel = `hr-sa
 | EC-FILTER-03 | 6월 급여명세서 보여줘 | tool_call:false (salary 차단) |
 | EC-FILTER-04 | 내 사원카드 정보 보여줘 | tool_call:false (personnel 차단) |
 | EC-FILTER-05 | 연말정산 의료비 공제 내역 알려줘 | tool_call:false (year-end-tax 차단) |
-| EC-FILTER-06 | 6월 급여명세서 보여줘 | tool_call:true, `^/SALPayslipNewMgr\.do`, `cmd=getSALPayslipNewMgrList` (salary 허용측) |
+| EC-FILTER-06 | 6월 급여명세서 보여줘 | tool_call:true, `^/SALSalaryDtstmnMgr\.do (2026-09-04 handler 정본 재정렬 반영 — 구 ^/SALPayslipNewMgr\.do)`, `cmd=getSALSalaryDtstmnMgrList` (salary 허용측) |
 | EC-FILTER-07 ※교체(자격증→) | 내 교육이력 조회해줘 | tool_call:true, `^/PRCHrBassiemMgrTab220\.do`, `cmd=getPRCHrBassiemMgrTab220List` (personnel 허용측) |
 
 ## 불변 규약

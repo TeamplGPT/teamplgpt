@@ -92,13 +92,16 @@ call sal_combo "/CommonCode.do?cmd=getCommonNSCodeList" \
 # 기대: {"codeList":[{"codeNm":"2026-06-19 급여","code":"20260619P"}]}  → code 를 searchItem 으로
 ITEM=$(jq -r '.codeList[0].code' /tmp/kb_sal_combo.json)
 
-# ② 급여명세 합계/지급/공제
-call sal_map  "/SALPayslipNewMgr.do?cmd=getSALPayslipNewMgrMap"  "cmmSearchStaffId=$OID&searchYm=2026-06&searchItem=$ITEM&searchType=web"
-call sal_pay  "/SALPayslipNewMgr.do?cmd=getSALPayslipNewMgrList" "cmmSearchStaffId=$OID&searchYm=2026-06&searchItem=$ITEM&searchType=web"
-call sal_dedu "/SALPayslipNewMgr.do?cmd=getSALPayslipNewMgrList2" "cmmSearchStaffId=$OID&searchYm=2026-06&searchItem=$ITEM&searchType=web"
+# ② 급여명세 합계/지급/공제 (2026-09-04 handler 정본 재정렬 반영)
+#    /SALPayslipNewMgr.do는 kiwibox에 컨트롤러 매핑이 없는 유령 경로(뷰 cmd만 존재)이며
+#    급여명세 JSP도 SALSalaryDtstmnMgr를 호출한다 → 정본은 /SALSalaryDtstmnMgr.do (BODY 동일)
+call sal_map  "/SALSalaryDtstmnMgr.do?cmd=getSALSalaryDtstmnMgrMap"   "cmmSearchStaffId=$OID&searchYm=2026-06&searchItem=$ITEM&searchType=web"
+call sal_pay  "/SALSalaryDtstmnMgr.do?cmd=getSALSalaryDtstmnMgrList"  "cmmSearchStaffId=$OID&searchYm=2026-06&searchItem=$ITEM&searchType=web"
+call sal_dedu "/SALSalaryDtstmnMgr.do?cmd=getSALSalaryDtstmnMgrList2" "cmmSearchStaffId=$OID&searchYm=2026-06&searchItem=$ITEM&searchType=web"
 ```
 - 기대: `sal_map.Map` = jtotAmt(지급합)·gtotAmt(공제합)·ctotAmt(실수령). `sal_pay.DATA` = salItemNm·salAmt(지급 항목). `sal_dedu.DATA` = 공제 항목.
 - 검증: `jq '.Map.ctotAmt' /tmp/kb_sal_map.json` → "2,829,306" 형. `searchType=mobile` 절대 금지.
+- (2026-09-04 handler 정본 재정렬 반영) 지급 건은 급여 마감(`closeChk=Y`) 후에만 콤보에 나오므로 마감 전 월은 ①이 빈 결과가 정상 — 마감된 월로 바꿔 재시도. handler는 월 미지정 시 최대 2개월 소급 폴백한다.
 
 ### 3.2 근태현황 (일일 근태 대표)
 ```bash
@@ -110,8 +113,10 @@ assert_rows taa_status DATA
 
 ### 3.3 근무일정 달력
 ```bash
+# (2026-09-04 handler 정본 재정렬 반영) SQL이 A.YMD BETWEEN searchSYmd AND searchEYmd 로 읽으므로
+# searchSYmd/EYmd(월초~말일) 누락 시 항상 0건 — 반드시 포함
 call taa_cldr "/TAADclzWorkSearchCldr.do?cmd=getTAADclzWorkSearchCldr" \
-  "searchId=$OID&cmmSearchStaffId=$OID&searchYm=202607&searchBaseYmd=2026-07-24"
+  "searchId=$OID&cmmSearchStaffId=$OID&searchYm=202607&searchSYmd=20260701&searchEYmd=20260731&searchBaseYmd=2026-07-24"
 assert_rows taa_cldr DATA   # kind·ymd·workTypeNm·holidayNm·mark
 ```
 
@@ -127,8 +132,10 @@ assert_rows vac_use DATA   # ymd·leavNm·reason·useDd
 
 ### 3.5 월별 지급내역
 ```bash
+# (2026-09-04 handler 정본 재정렬 반영) SQL(getSALSalaryBassMgrTab110List) 정본 파라미터 = findText(급여년도 YYYY) + staffId.
+# cmmSearchStaffId/searchSYmd 계열은 SQL이 읽지 않으며 staffId 누락 시 STAFF_ID=null 로 항상 0건.
 call sal_month "/SALSalaryBassMgr.do?cmd=getSALSalaryBassMgrTab110List" \
-  "cmmSearchStaffId=$OID&searchSYmd=20260101&searchEYmd=20260722&searchBaseYmd=2026-07-24&orgCd=0303"
+  "findText=2026&staffId=$OID"
 assert_rows sal_month DATA   # salYmd·jtotAmt·gtotAmt·ctotAmt
 ```
 
@@ -148,8 +155,11 @@ for l in card_base card_family card_career card_edu card_school card_cert; do as
 
 ### 3.7 결재함(내 신청 전체) + 본문
 ```bash
+# (2026-09-04 handler 정본 재정렬 반영) 기간 파라미터 정본 = sdt/edt (EAPRequestMgr_SQL·eapRequestMgr.jsp).
+# searchSYmd/EYmd 계열은 SQL이 읽지 않아 미전송 시 기안/참조(selectGubun 2·5)는 '오늘 하루',
+# 미결/기결/반려(3·4·6)는 전체기간(1900~2999)이 된다. selectGubun: 2=기안함 3=미결함 4=기결함 5=참조 6=반려함.
 call eap_inbox "/EAPRequestMgr.do?cmd=getEAPRequestMgrList" \
-  "searchGubun=&searchStatusCd=&searchSYmd=20260101&searchEYmd=20260722"
+  "selectGubun=2&sdt=20260101&edt=20260722"
 assert_rows eap_inbox DATA   # reqNo·docTypeNm(기안/기결/반려)·title·applNm·reqStatusNm
 # 본문(reqNo 는 위 목록 결과만 화이트리스트)
 REQ=$(jq -r '.DATA[0].reqNo' /tmp/kb_eap_inbox.json)
@@ -160,9 +170,13 @@ call eap_detail "/getApprovalDetailJson.do" "reqNo=$REQ"
 ```bash
 call pfm  "/PFMResCurrState.do?cmd=getPFMResCurrStateList" "cmmSearchStaffId=$OID&searchSYmd=20260101&searchEYmd=20260722"
 call lon  "/LONLoanReqstListMgr.do?cmd=getLONLoanReqstListMgrList1" "cmmSearchStaffId=$OID&searchBaseSYmd=20250101&searchBaseEYmd=20260722"
-call cti  "/CTIMcrtfReqstRefromMgr.do?cmd=getCTIMcrtfReqstRefromMgrList" "cmmSearchStaffId=$OID&staffId=$OID&searchStaffId=$OID&reqNoExist=N&searchSYmd=20250101&searchEYmd=20260722"
+# (2026-09-04 handler 정본 재정렬 반영) 종전 getCTIMcrtfReqstRefromMgrList는 신청화면 초기조회용(reqNo 단건 외부조인)이라
+# 목록이 구조적으로 1건만 나온다 → 정본은 발급내역 화면의 getCTIMcrtfIssuMgrList (파라미터명 소문자 ymd 주의: searchSymd/searchEymd).
+call cti  "/CTIMcrtfIssuMgr.do?cmd=getCTIMcrtfIssuMgrList" "staffIdNm=$OID&searchSymd=20250101&searchEymd=20260722"
 for l in pfm lon cti; do assert_rows $l DATA; done
 # ⚠ lon: cmmSearchStaffId 누락 시 전사 노출 → self 강제 필수. lon/cti = 금액·계좌·주소 민감.
+# ⚠ cti 0건이면 AUTF_SRCH_STAFF_YN(activeMenuCd) 게이트 의심 — `call gate "/setSessionActiveTabMenuCd.do?tabMenuCd=<발급내역 메뉴CD>" ""` 선호출 후 재시도
+#   (절차: docs/hr-local-kiwibox-test-guide.md §1.8).
 ```
 
 ### 3.9 접근 가능한 메뉴 (좌측 네비 + 모바일)
@@ -206,7 +220,7 @@ jq -e '.loginInfo=="Login!"' <(curl -sS -b "$CK" "$HOST/chkLoginSession.do") >/d
 
 check taa_status "/TAAWrkTimeStatusMgr.do?cmd=getTAAWrkTimeStatusMgrList" "cmmSearchStaffId=$OID&searchBaseSYmd=20260101&searchBaseEYmd=20260722&searchSYmd=20260101&searchEYmd=20260722" DATA
 check vac_bal    "/TAADclzVcatnList.do?cmd=getTAADclzVcatnList1" "staffId=$OID&cmmSearchStaffId=$OID&wkareaCd=1000&searchLeavCd=&gubun=A&activeTab=0&searchSymdLv=20260101&searchEymdLv=20261231&searchSymdFy=20260101&searchEymdFy=20261231&searchBaseYmd=2026-07-24&chkAppYn=Y" DATA
-check eap_inbox  "/EAPRequestMgr.do?cmd=getEAPRequestMgrList" "searchSYmd=20260101&searchEYmd=20260722" DATA
+check eap_inbox  "/EAPRequestMgr.do?cmd=getEAPRequestMgrList" "selectGubun=2&sdt=20260101&edt=20260722" DATA   # (2026-09-04 handler 정본 재정렬 반영)
 check card_base  "/PRCHrBassiemMgrTab100.do?cmd=getPRCHrBassiemMgrTab100List" "cmmSearchStaffId=$OID&staffId=$OID&searchYmd=2026-07-24" DATA
 check nav_emp    "/getSubLowMenuList.do" "menuKind=menu01" result
 echo "== PASS $pass / FAIL $fail =="
@@ -219,7 +233,7 @@ echo "== PASS $pass / FAIL $fail =="
 - [ ] `chkLoginSession.do` → `loginInfo:"Login!"` (세션 유효)
 - [ ] 각 호출 HTTP 200 + 최상위 키(`DATA`/`Map`/`result`) 존재
 - [ ] 데이터 있는 계정에서 `rows>0`, 응답 필드가 카탈로그와 일치
-- [ ] 급여: 콤보(`searchItem`) 선조회 후 명세 호출, `searchType=web`
+- [ ] 급여: 콤보(`searchItem`) 선조회 후 명세 호출(`/SALSalaryDtstmnMgr.do` — 2026-09-04 handler 정본 재정렬 반영), `searchType=web`
 - [ ] 휴가: `searchSymdLv/Fy`·`chkAppYn=Y`·`wkareaCd` 포함
 - [ ] 결재 본문: `reqNo`는 결재함 목록 결과만 사용(임의 생성 금지)
 - [ ] 민감필드(주민번호 `ctzNoDecrypt`/`famresDecrypt`, 계좌 `accNo`, 급여 금액) 마스킹

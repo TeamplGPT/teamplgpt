@@ -27,6 +27,8 @@
 | hr-welfare | loan | LONLoanReqstListMgr, cmmSearchStaffId만 | §6.3 — searchBaseSYmd/EYmd 누락 |
 | hr-year-end-tax | — | — | §8 별도 취급 — 범위 외 |
 
+> [2026-09-04 후속] 위 표의 hr-salary 두 행(18·19행 `SALPayslipNewMgr` 정본 / `SALSalaryDtstmnMgr(SAL-0220)` "폐기 — 빈 응답")은 2026-07 시점 카탈로그 판정 기록으로 보존하되, 이후 kiwibox 소스 실독 결과와 상충한다. `/SALPayslipNewMgr.do`는 컨트롤러 매핑이 없는 유령 경로(뷰 cmd만 존재)이고 급여명세 JSP도 `SALSalaryDtstmnMgr`를 호출함 → handler(payslip/deductions/payslip_summary)는 `/SALSalaryDtstmnMgr.do` getSALSalaryDtstmnMgrList/List2/Map으로 재정렬(BODY는 searchItem·searchYm(YYYY-MM)·searchType=web·cmmSearchStaffId 그대로). 당시 "빈 응답"은 파라미터(searchItem/cmmSearchStaffId/AUTF 게이트) 문제였을 **가능성**이 있으나 확정된 원인은 아님 — 스테이징 재실측 필요. 같은 시점에 salary_statement(SAL-0050 Tab110List)는 SQL 정본 파라미터 `findText`(급여년도)+`staffId`로, 26행 hr-certificate는 `/CTIMcrtfIssuMgr.do getCTIMcrtfIssuMgrList`(staffIdNm·searchSymd/Eymd — 종전 ReqstRefrom은 reqNo 단건 외부조인이라 목록 불가)로, 25행 hr-approval은 `sdt/edt`로 각각 교정됨. 현행 계약은 `docs/hr-local-kiwibox-test-guide.md`, 정본 코드는 `server/storage/plugins/agent-skills/hr-*/handler.js`.
+
 ## R-2. E2E 인프라 갭 (핵심 발견)
 
 - **Decision**: mock-hr-api.js와 runner.js를 kiwibox 시대로 확장한다.
