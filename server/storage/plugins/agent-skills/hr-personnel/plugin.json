@@ -5,12 +5,12 @@
   "version": "2.2.0",
   "hubId": "hr-personnel",
   "author": "teamplgpt",
-  "description": "본인 인사정보(사원증 기본정보, 인사카드 상세, 조직도, 조직원, 할일/미결 건수, 일정 캘린더, 운영자 연락처)를 5240 HR 시스템에서 조회합니다. 항상 대화 중인 본인 기준으로 조회되며 사번은 필요 없습니다. 사용자가 직위/직급/소속/재직상태/연락처/인사카드/직원카드/사원카드/인사정보/프로필/조직도/팀원/부서원/할일/미결/일정/생일/교육이력 등을 물으면 이 skill을 사용하세요. query_type 종류: profile(사원증 기본정보: 성명/소속/직위/직책/근무유형/재직상태/연락처), profile_detail(인사카드 상세: 학력/경력/자격증 등 인사카드 항목), org_tree(조직도/부서 목록), org_members(특정 조직의 조직원 목록—org_cd 필요), todo_count(할일/미결 결재/알림 건수), schedule_day(일자별 일정/생일자/공휴일), contact_directory(운영자/담당자 연락처), education(본인 교육이력: 교육명/기간/기관/시간/포인트). 종류가 불분명하면 profile을 사용하세요. 가족정보/부양가족은 이 skill에서 제공하지 않습니다(개인정보 보호).",
+  "description": "본인의 인사정보와 회사 공통 정보를 5240 HR 시스템에서 조회하는 skill입니다 — 사원증 기본정보, 인사카드 상세, 조직도/조직원, 할일·미결 건수, 일자별 일정/생일, 운영자 연락처, 교육이력. '내 직급이 뭐로 돼있지?', '그 팀엔 누구누구 있어?', '내일 회사에 무슨 일정 있어?'처럼 인사 용어 없이 묻는 경우도 포함됩니다. 경계: 가족정보/부양가족은 이 skill에서 제공하지 않습니다(개인정보 보호 — 부양가족 '공제'는 hr-year-end-tax). 결재 문서의 목록·내용은 hr-approval을 사용하세요(이 skill의 todo_count는 건수만 제공).",
   "entrypoint": {
     "file": "handler.js",
     "params": {
       "query_type": {
-        "description": "조회 종류 (필수). [CRITICAL] query_type을 선택했으면 반드시 이 tool을 호출하세요. 텍스트로만 답변을 생성하거나 결과를 추측하지 마세요. 매핑표에 있는 키워드가 사용자 발화에 나타나면 되묻지 말고 즉시 해당 query_type으로 매핑하세요. 매핑표: profile=사원증(직위/직급/직책/소속/재직상태/근무유형/내 연락처/내 정보/내 프로필/사원증/직원카드/사원카드/인사기본)—파라미터 불필요, 즉시 tool-call, profile_detail=인사카드상세(인사카드/인사정보/직원프로파일/학력/경력/자격증/포상/징계 등 인사기록 상세)—즉시 tool-call, org_tree=조직도(조직도/부서 목록/조직 구조/팀 목록)—즉시 tool-call, org_members=조직원(팀원/부서원/조직원/구성원—org_cd 필요, 없으면 org_tree 먼저), todo_count=할일건수(할일/미결/미확인 알림/결재 대기 건수 — 건수만 조회. 미결 문서 목록은 hr-approval pending)—즉시 tool-call, schedule_day=일정캘린더(일정/생일/생일자/공휴일), contact_directory=운영자연락처(운영자/담당자/관리자 연락처)—즉시 tool-call, education=교육이력(교육이력/교육수료/수강내역/이수한 교육/받은 교육/교육받은거/교육신청 이력)—즉시 tool-call.",
+        "description": "조회 종류 (필수). 키워드가 아니라 사용자의 의도로 판단하세요: profile=사원증 기본정보 — 내 성명/소속/직위/직책/근무유형/재직상태/연락처가 관심사일 때, profile_detail=인사카드 상세 — 학력/경력/자격증 등 인사카드 등재 내용이 관심사일 때, org_tree=조직도/부서 구성, org_members=특정 조직의 구성원 목록(org_cd 필요 — 모르면 먼저 org_tree로 확인), todo_count=할일/미결 결재/알림 '건수' — 몇 건인지 숫자가 관심사일 때(문서 목록·내용은 hr-approval), schedule_day=일자별 일정/생일자/공휴일, contact_directory=운영자/담당자 연락처, education=본인 교육이력(교육명/기간/기관/시간/포인트). 종류가 불분명하면 profile을 사용하세요.",
         "type": "string",
         "enum": [
           "profile",
@@ -24,11 +24,11 @@
         ]
       },
       "year_month": {
-        "description": "조회 연월 (선택). [CRITICAL] 절대로 사용자에게 연도나 기간을 되묻지 마세요. 기간 없이도 즉시 tool-call을 실행하세요. 연도를 추론해 추가하지도 마세요. 전달 규칙: 연도 명시 시 'YYYYMM'(예: '202503') / 'YYYY-MM' / 'YYYY년 M월' 중 하나. 연도 미명시 시 월만 '3', '11', '2월', '지난달' 등으로 그대로 전달—현재 연도가 자동으로 적용됩니다. 미지정 시 생략—이번 달이 자동 적용됩니다. [재강조] 기간이 사용자 발화에 없으면 되묻지 말고 year_month를 생략하고 즉시 tool-call하세요. schedule_day에서만 사용.",
+        "description": "조회 연월 (선택). 사용자가 기간을 언급한 경우에만 전달하고, 없으면 생략하세요(이번 달 자동 적용). 형식·되묻기 금지 규칙은 시스템 지시 [HR_SKILL_COMMON]을 따르세요. schedule_day에서만 사용.",
         "type": "string"
       },
       "org_cd": {
-        "description": "조직코드 (org_members에서 필수, org_tree에서 선택). [CRITICAL] 조직코드를 사용자에게 되묻거나 임의로 추측해 만들지 마세요. 반드시 org_tree(조직도) 조회 결과에 포함된 조직코드 값만 사용하세요. 조직코드를 모르면 먼저 query_type=org_tree로 조회한 뒤, 그 결과의 조직코드로 org_members를 호출하세요.",
+        "description": "조직코드 (org_members에서 필수, org_tree에서 선택). 반드시 org_tree(조직도) 조회 결과에 포함된 조직코드 값만 사용하세요. 모르면 먼저 query_type=org_tree로 조회한 뒤 그 결과의 조직코드로 org_members를 호출하세요.",
         "type": "string"
       }
     },

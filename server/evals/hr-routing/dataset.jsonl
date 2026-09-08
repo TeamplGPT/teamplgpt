@@ -1,0 +1,137 @@
+{"id":"att-alb-01","tags":["normalized"],"utterance":"연차 잔여일 알려줘","expect":[[{"skill":"hr-attendance","query_type":"annual_leave_balance"}]]}
+{"id":"att-alb-02","tags":["colloquial"],"utterance":"나 올해 휴가 며칠이나 남았지?","expect":[[{"skill":"hr-attendance","query_type":"annual_leave_balance"}]]}
+{"id":"att-alb-03","tags":["indirect"],"utterance":"다음 주에 3일 쉬고 싶은데 그만큼 연차가 있나?","expect":[[{"skill":"hr-attendance","query_type":"annual_leave_balance"}]]}
+{"id":"att-alb-04","tags":["colloquial"],"utterance":"며칠 더 놀 수 있는지 봐줘","expect":[[{"skill":"hr-attendance","query_type":"annual_leave_balance"}]]}
+{"id":"att-alb-05","tags":["colloquial"],"utterance":"보상휴가 받은 거 있어?","expect":[[{"skill":"hr-attendance","query_type":"annual_leave_balance"}]]}
+{"id":"att-alb-06","tags":["typo"],"utterance":"연차 잔여 몇일이야","expect":[[{"skill":"hr-attendance","query_type":"annual_leave_balance"}]]}
+{"id":"att-alb-07","tags":["slang"],"utterance":"연차몇개남음?","expect":[[{"skill":"hr-attendance","query_type":"annual_leave_balance"}]]}
+{"id":"att-ts-01","tags":["normalized"],"utterance":"출퇴근 기록 조회해줘","expect":[[{"skill":"hr-attendance","query_type":"timesheet"}]]}
+{"id":"att-ts-02","tags":["colloquial"],"utterance":"어제 내가 몇 시에 퇴근했지?","expect":[[{"skill":"hr-attendance","query_type":"timesheet"}]]}
+{"id":"att-ts-03","tags":["colloquial"],"utterance":"오늘 출근 몇 시에 찍혔어?","expect":[[{"skill":"hr-attendance","query_type":"timesheet"}]]}
+{"id":"att-ts-04","tags":["colloquial"],"utterance":"이번 주 출근 시간들 쭉 보여줘","expect":[[{"skill":"hr-attendance","query_type":"timesheet"}]]}
+{"id":"att-ts-05","tags":["slang"],"utterance":"출퇴근기록좀","expect":[[{"skill":"hr-attendance","query_type":"timesheet"}]]}
+{"id":"att-ts-06","tags":["formal"],"utterance":"퇴근 시간 확인 부탁드립니다","expect":[[{"skill":"hr-attendance","query_type":"timesheet"}]]}
+{"id":"att-ts-date-01","tags":["normalized","date"],"utterance":"2025년 1월 출퇴근 기록 보여줘","expect":[[{"skill":"hr-attendance","query_type":"timesheet","params_regex":{"year_month":"2025[-년]?\\s*0?1(월|$)"}}]]}
+{"id":"att-ts-date-02","tags":["colloquial","date"],"utterance":"지난달 출퇴근 기록 보여줘","expect":[[{"skill":"hr-attendance","query_type":"timesheet","params_regex":{"year_month":"지난\\s*달|지난달"}}]]}
+{"id":"att-ws-01","tags":["normalized"],"utterance":"이번 달 근무현황 요약해줘","expect":[[{"skill":"hr-attendance","query_type":"work_status"}]]}
+{"id":"att-ws-02","tags":["colloquial"],"utterance":"나 이번 달에 지각한 적 있어?","expect":[[{"skill":"hr-attendance","query_type":"work_status"}]]}
+{"id":"att-ws-03","tags":["colloquial"],"utterance":"결근 처리된 날 있는지 봐줘","expect":[[{"skill":"hr-attendance","query_type":"work_status"}]]}
+{"id":"att-wc-01","tags":["normalized"],"utterance":"이번 달 근무캘린더 보여줘","expect":[[{"skill":"hr-attendance","query_type":"work_calendar"}]]}
+{"id":"att-wc-02","tags":["colloquial"],"utterance":"다음 달 근무 일정 어떻게 돼?","expect":[[{"skill":"hr-attendance","query_type":"work_calendar"}]]}
+{"id":"att-wc-03","tags":["slang"],"utterance":"내 근무표 좀","expect":[[{"skill":"hr-attendance","query_type":"work_calendar"}]]}
+{"id":"att-lr-01","tags":["normalized"],"utterance":"내 휴가 신청 내역 알려줘","expect":[[{"skill":"hr-attendance","query_type":"leave_requests"}]]}
+{"id":"att-lr-02","tags":["colloquial"],"utterance":"내가 마지막으로 연차 쓴 게 언제였지?","expect":[[{"skill":"hr-attendance","query_type":"leave_requests"}]]}
+{"id":"att-lr-03","tags":["colloquial"],"utterance":"지난번에 휴가 왜 냈는지 사유 좀 확인해줘","expect":[[{"skill":"hr-attendance","query_type":"leave_requests"}]]}
+{"id":"att-lr-04","tags":["typo"],"utterance":"휴가쓴날짜 알려조","expect":[[{"skill":"hr-attendance","query_type":"leave_requests"}]]}
+{"id":"att-vc-01","tags":["normalized"],"utterance":"우리 팀 휴가자 현황 보여줘","expect":[[{"skill":"hr-attendance","query_type":"vacation_calendar"}]]}
+{"id":"att-vc-02","tags":["colloquial"],"utterance":"오늘 우리 부서에 쉬는 사람 누구야?","expect":[[{"skill":"hr-attendance","query_type":"vacation_calendar"}]]}
+{"id":"att-vc-03","tags":["colloquial"],"utterance":"이번 주에 팀에서 누가 휴가야?","expect":[[{"skill":"hr-attendance","query_type":"vacation_calendar"}]]}
+{"id":"att-ot-01","tags":["normalized"],"utterance":"연장근무 내역 보여줘","expect":[[{"skill":"hr-attendance","query_type":"overtime"}]]}
+{"id":"att-ot-02","tags":["colloquial"],"utterance":"이번 달 야근 얼마나 했지?","expect":[[{"skill":"hr-attendance","query_type":"overtime"}]]}
+{"id":"att-ot-03","tags":["colloquial","date"],"utterance":"저번 달에 초과근무 몇 번 했더라","expect":[[{"skill":"hr-attendance","query_type":"overtime"}]]}
+{"id":"att-otl-01","tags":["normalized"],"utterance":"이번 달 남은 OT 시간 알려줘","expect":[[{"skill":"hr-attendance","query_type":"overtime_limit"}]]}
+{"id":"att-otl-02","tags":["colloquial"],"utterance":"야근 더 해도 되나? 한도 얼마나 남았어?","expect":[[{"skill":"hr-attendance","query_type":"overtime_limit"}]]}
+{"id":"sal-pp-01","tags":["normalized"],"utterance":"이번 달 급여명세서 보여줘","expect":[[{"skill":"hr-salary","query_type":"pay_periods"}]]}
+{"id":"sal-pp-02","tags":["colloquial"],"utterance":"이번 달 월급 얼마 들어왔어?","expect":[[{"skill":"hr-salary","query_type":"pay_periods"}]]}
+{"id":"sal-pp-03","tags":["indirect"],"utterance":"월급에서 뭐가 이렇게 많이 빠져나갔어?","expect":[[{"skill":"hr-salary","query_type":"pay_periods"}]]}
+{"id":"sal-pp-04","tags":["colloquial"],"utterance":"4대보험 얼마나 떼였는지 궁금해","expect":[[{"skill":"hr-salary","query_type":"pay_periods"}]]}
+{"id":"sal-pp-05","tags":["colloquial","date"],"utterance":"지난달 실수령액 알려줘","expect":[[{"skill":"hr-salary","query_type":"pay_periods"}]]}
+{"id":"sal-pp-06","tags":["slang"],"utterance":"월급 명세서 ㄱㄱ","expect":[[{"skill":"hr-salary","query_type":"pay_periods"}]]}
+{"id":"sal-ss-01","tags":["normalized"],"utterance":"올해 월별 지급내역 보여줘","expect":[[{"skill":"hr-salary","query_type":"salary_statement"}]]}
+{"id":"sal-ss-02","tags":["colloquial"],"utterance":"월마다 얼마씩 받았는지 쭉 보여줘","expect":[[{"skill":"hr-salary","query_type":"salary_statement"}]]}
+{"id":"sal-dl-01","tags":["normalized"],"utterance":"일용직 급여 내역 조회해줘","expect":[[{"skill":"hr-salary","query_type":"daylabor"}]]}
+{"id":"per-pf-01","tags":["normalized"],"utterance":"내 인사정보 보여줘","expect":[[{"skill":"hr-personnel","query_type":"profile"}]]}
+{"id":"per-pf-02","tags":["colloquial"],"utterance":"내 직급이 뭐로 돼있지?","expect":[[{"skill":"hr-personnel","query_type":"profile"}]]}
+{"id":"per-pf-03","tags":["colloquial"],"utterance":"회사에 등록된 내 연락처 확인해줘","expect":[[{"skill":"hr-personnel","query_type":"profile"}]]}
+{"id":"per-pd-01","tags":["colloquial"],"utterance":"인사카드에 내 학력 어떻게 올라가 있어?","expect":[[{"skill":"hr-personnel","query_type":"profile_detail"}]]}
+{"id":"per-pd-02","tags":["colloquial"],"utterance":"내 경력사항 등록된 거 보여줘","expect":[[{"skill":"hr-personnel","query_type":"profile_detail"}]]}
+{"id":"per-org-01","tags":["normalized"],"utterance":"조직도 보여줘","expect":[[{"skill":"hr-personnel","query_type":"org_tree"}]]}
+{"id":"per-org-02","tags":["colloquial"],"utterance":"우리 회사 부서가 어떻게 나뉘어 있어?","expect":[[{"skill":"hr-personnel","query_type":"org_tree"}]]}
+{"id":"per-om-01","tags":["colloquial"],"utterance":"개발팀에 누가 있는지 알려줘","expect":[[{"skill":"hr-personnel","query_type":"org_members"}],[{"skill":"hr-personnel","query_type":"org_tree"}]]}
+{"id":"per-td-01","tags":["colloquial"],"utterance":"나 지금 처리해야 할 일 몇 건이야?","expect":[[{"skill":"hr-personnel","query_type":"todo_count"}],[{"skill":"hr-approval","query_type":"pending"}]]}
+{"id":"per-sd-01","tags":["colloquial"],"utterance":"오늘 생일인 사람 있어?","expect":[[{"skill":"hr-personnel","query_type":"schedule_day"}]]}
+{"id":"per-sd-02","tags":["colloquial"],"utterance":"내일 회사 일정 뭐 있어?","expect":[[{"skill":"hr-personnel","query_type":"schedule_day"}]]}
+{"id":"per-cd-01","tags":["colloquial"],"utterance":"인사 담당자 연락처 좀 알려줘","expect":[[{"skill":"hr-personnel","query_type":"contact_directory"}]]}
+{"id":"per-edu-01","tags":["normalized"],"utterance":"내 교육 이력 보여줘","expect":[[{"skill":"hr-personnel","query_type":"education"}]]}
+{"id":"per-edu-02","tags":["colloquial"],"utterance":"작년에 내가 무슨 교육 들었더라?","expect":[[{"skill":"hr-personnel","query_type":"education"}]]}
+{"id":"tax-sum-01","tags":["normalized"],"utterance":"연말정산 결과 요약해줘","expect":[[{"skill":"hr-year-end-tax","query_type":"summary"}]]}
+{"id":"tax-sum-02","tags":["colloquial"],"utterance":"나 세금 환급받아, 아니면 더 내?","expect":[[{"skill":"hr-year-end-tax","query_type":"summary"}]]}
+{"id":"tax-sum-03","tags":["indirect"],"utterance":"13월의 월급 얼마나 되는지 봐줘","expect":[[{"skill":"hr-year-end-tax","query_type":"summary"}]]}
+{"id":"tax-sum-04","tags":["normalized","date"],"utterance":"2023년 연말정산 요약 보여줘","expect":[[{"skill":"hr-year-end-tax","query_type":"summary","params_regex":{"cal_yy":"2023"}}]]}
+{"id":"tax-med-01","tags":["colloquial"],"utterance":"의료비 공제 얼마나 받았어?","expect":[[{"skill":"hr-year-end-tax","query_type":"medical"}]]}
+{"id":"tax-med-02","tags":["indirect"],"utterance":"작년에 병원비 많이 썼는데 그거 공제에 반영됐어?","expect":[[{"skill":"hr-year-end-tax","query_type":"medical"}]]}
+{"id":"tax-fam-01","tags":["colloquial"],"utterance":"부양가족으로 누가 등록돼 있지?","expect":[[{"skill":"hr-year-end-tax","query_type":"family"}]]}
+{"id":"tax-pe-01","tags":["indirect"],"utterance":"이직 전 회사 급여도 연말정산에 들어갔어?","expect":[[{"skill":"hr-year-end-tax","query_type":"previous_employer"}]]}
+{"id":"tax-don-01","tags":["normalized"],"utterance":"기부금 공제 내역 보여줘","expect":[[{"skill":"hr-year-end-tax","query_type":"donation"}]]}
+{"id":"tax-cc-01","tags":["colloquial"],"utterance":"카드 쓴 거 공제 얼마나 돼?","expect":[[{"skill":"hr-year-end-tax","query_type":"credit_card"}]]}
+{"id":"tax-ins-01","tags":["colloquial"],"utterance":"보험료 공제된 거 확인해줘","expect":[[{"skill":"hr-year-end-tax","query_type":"insurance"}]]}
+{"id":"tax-edu-01","tags":["boundary"],"utterance":"교육비 공제 얼마 받았어?","expect":[[{"skill":"hr-year-end-tax","query_type":"education"}]]}
+{"id":"tax-sav-01","tags":["colloquial"],"utterance":"연금저축으로 공제받은 거 있어?","expect":[[{"skill":"hr-year-end-tax","query_type":"savings"}]]}
+{"id":"apr-pen-01","tags":["normalized"],"utterance":"미결함 보여줘","expect":[[{"skill":"hr-approval","query_type":"pending"}]]}
+{"id":"apr-pen-02","tags":["colloquial"],"utterance":"내가 결재해야 할 문서 뭐 있어?","expect":[[{"skill":"hr-approval","query_type":"pending"}]]}
+{"id":"apr-dft-01","tags":["colloquial"],"utterance":"내가 올린 기안 지금 어떻게 됐어?","expect":[[{"skill":"hr-approval","query_type":"drafted"}]]}
+{"id":"apr-dft-02","tags":["indirect"],"utterance":"어제 상신한 휴가 신청서 결재 어디까지 갔어?","expect":[[{"skill":"hr-approval","query_type":"drafted"}]]}
+{"id":"apr-cmp-01","tags":["colloquial"],"utterance":"결재 완료된 문서 목록 보여줘","expect":[[{"skill":"hr-approval","query_type":"completed"}]]}
+{"id":"apr-rej-01","tags":["colloquial"],"utterance":"반려된 문서 있는지 확인해줘","expect":[[{"skill":"hr-approval","query_type":"rejected"}]]}
+{"id":"apr-ref-01","tags":["normalized"],"utterance":"참조로 온 문서 보여줘","expect":[[{"skill":"hr-approval","query_type":"referenced"}]]}
+{"id":"cer-req-01","tags":["normalized"],"utterance":"증명서 신청내역 보여줘","expect":[[{"skill":"hr-certificate","query_type":"requests"}]]}
+{"id":"cer-req-02","tags":["colloquial"],"utterance":"재직증명서 신청한 거 발급됐어?","expect":[[{"skill":"hr-certificate","query_type":"requests"}]]}
+{"id":"cer-req-03","tags":["boundary","indirect"],"utterance":"대출 받으려고 신청한 재직증명서 지금 출력 가능해?","expect":[[{"skill":"hr-certificate","query_type":"requests"}]]}
+{"id":"wel-loan-01","tags":["normalized"],"utterance":"대출 신청내역 조회해줘","expect":[[{"skill":"hr-welfare","query_type":"loan"}]]}
+{"id":"wel-loan-02","tags":["colloquial"],"utterance":"사내대출 잔액 얼마 남았어?","expect":[[{"skill":"hr-welfare","query_type":"loan"}]]}
+{"id":"wel-loan-03","tags":["indirect"],"utterance":"회사에서 빌린 돈 상환 어떻게 돼가?","expect":[[{"skill":"hr-welfare","query_type":"loan"}]]}
+{"id":"bnd-ded-01","tags":["boundary"],"utterance":"이번 달 공제 내역 보여줘","expect":[[{"skill":"hr-salary","query_type":"pay_periods"}]]}
+{"id":"bnd-ded-02","tags":["boundary"],"utterance":"연말정산 공제 내역 보여줘","expect":[[{"skill":"hr-year-end-tax","query_type":"summary"}]]}
+{"id":"bnd-vac-01","tags":["boundary"],"utterance":"휴가 며칠 남았어?","expect":[[{"skill":"hr-attendance","query_type":"annual_leave_balance"}]]}
+{"id":"bnd-edu-01","tags":["boundary"],"utterance":"교육 이력 보여줘","expect":[[{"skill":"hr-personnel","query_type":"education"}]]}
+{"id":"bnd-fam-01","tags":["boundary"],"utterance":"회사에 등록된 가족 정보 보여줘","expect":[[],[{"skill":"hr-year-end-tax","query_type":"family"}]]}
+{"id":"multi-01","tags":["multi"],"utterance":"연차 얼마 남았고 이번 달 야근 몇 시간 했어?","expect":[[{"skill":"hr-attendance","query_type":"annual_leave_balance"},{"skill":"hr-attendance","query_type":"overtime"}]]}
+{"id":"multi-02","tags":["multi"],"utterance":"이번 달 급여명세서랑 내 결재 대기 문서 보여줘","expect":[[{"skill":"hr-salary","query_type":"pay_periods"},{"skill":"hr-approval","query_type":"pending"}]]}
+{"id":"neg-01","tags":["negative"],"utterance":"안녕하세요","expect":[[]]}
+{"id":"neg-02","tags":["negative"],"utterance":"오늘 점심 메뉴 추천해줘","expect":[[]]}
+{"id":"neg-03","tags":["negative","knowledge"],"utterance":"근로기준법상 연차는 어떻게 발생해?","expect":[[]]}
+{"id":"neg-04","tags":["negative"],"utterance":"경상도에 있는 대학교 목록 알려줘","expect":[[]]}
+{"id":"neg-05","tags":["negative","knowledge"],"utterance":"회사 취업규칙에서 경조휴가 규정 알려줘","expect":[[]]}
+{"id":"neg-06","tags":["negative","boundary"],"utterance":"경조사 지원금 신청 내역 보여줘","expect":[[]]}
+{"id":"neg-07","tags":["negative","boundary"],"utterance":"내 월급 들어오는 통장 계좌번호 알려줘","expect":[[]]}
+{"id":"amb-ded-01","tags":["ambiguous","colloquial"],"utterance":"국민연금 얼마나 나갔어?","expect":[[{"skill":"hr-salary","query_type":"pay_periods"}]]}
+{"id":"amb-ded-02","tags":["ambiguous","colloquial"],"utterance":"건강보험료 이번 달에 얼마 냈지?","expect":[[{"skill":"hr-salary","query_type":"pay_periods"}]]}
+{"id":"amb-ded-03","tags":["ambiguous","colloquial"],"utterance":"연금저축 넣은 거 공제됐어?","expect":[[{"skill":"hr-year-end-tax","query_type":"savings"}]]}
+{"id":"amb-vac-01","tags":["ambiguous","colloquial"],"utterance":"지난주에 올린 휴가 신청서 결재 아직이야?","expect":[[{"skill":"hr-approval","query_type":"drafted"}]]}
+{"id":"amb-vac-02","tags":["ambiguous","colloquial"],"utterance":"올해 휴가 쓴 내역 좀 정리해줘","expect":[[{"skill":"hr-attendance","query_type":"leave_requests"}]]}
+{"id":"amb-vac-03","tags":["ambiguous","colloquial"],"utterance":"다음 주에 휴가 가는 사람 누구 있어?","expect":[[{"skill":"hr-attendance","query_type":"vacation_calendar"}]]}
+{"id":"amb-pend-01","tags":["ambiguous","colloquial"],"utterance":"처리 안 한 결재 몇 건 쌓였어?","expect":[[{"skill":"hr-personnel","query_type":"todo_count"}]]}
+{"id":"amb-pend-02","tags":["ambiguous","colloquial"],"utterance":"결재 기다리는 문서들 보여줘","expect":[[{"skill":"hr-approval","query_type":"pending"}]]}
+{"id":"amb-edu-01","tags":["ambiguous","colloquial"],"utterance":"회사에서 받은 교육 이수 시간 알려줘","expect":[[{"skill":"hr-personnel","query_type":"education"}]]}
+{"id":"amb-edu-02","tags":["ambiguous","colloquial"],"utterance":"자녀 교육비 공제 들어갔어?","expect":[[{"skill":"hr-year-end-tax","query_type":"education"}]]}
+{"id":"amb-ins-01","tags":["ambiguous","colloquial"],"utterance":"올해 보험료 공제액 얼마야?","expect":[[{"skill":"hr-year-end-tax","query_type":"insurance"}]]}
+{"id":"amb-fam-01","tags":["ambiguous","colloquial"],"utterance":"부양가족 공제 대상에 누가 올라가 있어?","expect":[[{"skill":"hr-year-end-tax","query_type":"family"}]]}
+{"id":"amb-loan-01","tags":["ambiguous","indirect"],"utterance":"은행 대출용 재직증명서 발급됐는지 봐줘","expect":[[{"skill":"hr-certificate","query_type":"requests"}]]}
+{"id":"amb-loan-02","tags":["ambiguous","colloquial"],"utterance":"사내대출 이자율 몇 퍼센트야?","expect":[[{"skill":"hr-welfare","query_type":"loan"}]]}
+{"id":"amb-sch-01","tags":["ambiguous","colloquial"],"utterance":"다음 주 내 근무 스케줄 어떻게 돼?","expect":[[{"skill":"hr-attendance","query_type":"work_calendar"}]]}
+{"id":"amb-sch-02","tags":["ambiguous","colloquial"],"utterance":"금요일에 회사 일정 뭐 있어?","expect":[[{"skill":"hr-personnel","query_type":"schedule_day"}]]}
+{"id":"prod-att-01","tags":["production","colloquial"],"utterance":"내 연차 현황 알려줘","expect":[[{"skill":"hr-attendance","query_type":"annual_leave_balance"}]]}
+{"id":"prod-att-02","tags":["production","colloquial"],"utterance":"오늘 출근정보 알려줘","expect":[[{"skill":"hr-attendance","query_type":"timesheet"}]]}
+{"id":"prod-att-03","tags":["production","slang"],"utterance":"이번 달 출퇴근 기록","expect":[[{"skill":"hr-attendance","query_type":"timesheet"}]]}
+{"id":"prod-att-04","tags":["production","colloquial"],"utterance":"내 시업-종업 알려줘","expect":[[{"skill":"hr-attendance","query_type":"work_status"}],[{"skill":"hr-attendance","query_type":"timesheet"}]]}
+{"id":"prod-att-05","tags":["production","slang"],"utterance":"지난달 근무현황","expect":[[{"skill":"hr-attendance","query_type":"work_status"}]]}
+{"id":"prod-att-06","tags":["production","normalized"],"utterance":"내 전체 휴가내역 알려줘","expect":[[{"skill":"hr-attendance","query_type":"leave_requests"}]]}
+{"id":"prod-att-07","tags":["production","slang"],"utterance":"이번 달 연장근무 내역","expect":[[{"skill":"hr-attendance","query_type":"overtime"}]]}
+{"id":"prod-att-08","tags":["production","normalized"],"utterance":"OT 한도 알려줘","expect":[[{"skill":"hr-attendance","query_type":"overtime_limit"}]]}
+{"id":"prod-apr-01","tags":["production","normalized"],"utterance":"내 결재대기 문서 보여줘","expect":[[{"skill":"hr-approval","query_type":"pending"}]]}
+{"id":"prod-apr-02","tags":["production","slang"],"utterance":"내가 올린 결재 문서","expect":[[{"skill":"hr-approval","query_type":"drafted"}]]}
+{"id":"prod-apr-03","tags":["production","slang"],"utterance":"완료된 결재","expect":[[{"skill":"hr-approval","query_type":"completed"}]]}
+{"id":"prod-apr-04","tags":["production","slang"],"utterance":"참조문서함","expect":[[{"skill":"hr-approval","query_type":"referenced"}]]}
+{"id":"prod-per-01","tags":["production","normalized"],"utterance":"내 인사카드 상세 보여줘","expect":[[{"skill":"hr-personnel","query_type":"profile_detail"}]]}
+{"id":"prod-per-02","tags":["production","colloquial"],"utterance":"우리 팀원 누구야?","expect":[[{"skill":"hr-personnel","query_type":"org_members"}],[{"skill":"hr-personnel","query_type":"org_tree"}]]}
+{"id":"prod-per-03","tags":["production","ambiguous"],"utterance":"미결 몇 건이야?","expect":[[{"skill":"hr-personnel","query_type":"todo_count"}]]}
+{"id":"prod-per-04","tags":["production","date"],"utterance":"7월 15일 일정 알려줘","expect":[[{"skill":"hr-personnel","query_type":"schedule_day"}]]}
+{"id":"prod-per-05","tags":["production","normalized"],"utterance":"5240 담당자 연락처 알려줘","expect":[[{"skill":"hr-personnel","query_type":"contact_directory"}]]}
+{"id":"prod-sal-01","tags":["production","normalized"],"utterance":"월별 급여 내역 보여줘","expect":[[{"skill":"hr-salary","query_type":"salary_statement"}]]}
+{"id":"prod-sal-02","tags":["production","normalized"],"utterance":"급여명세서 보여줘","expect":[[{"skill":"hr-salary","query_type":"pay_periods"}]]}
+{"id":"prod-sal-03","tags":["production","ambiguous"],"utterance":"공제내역 알려줘","expect":[[{"skill":"hr-salary","query_type":"pay_periods"}]]}
+{"id":"prod-sal-04","tags":["production","colloquial"],"utterance":"실수령액 얼마야","expect":[[{"skill":"hr-salary","query_type":"pay_periods"}]]}
+{"id":"prod-tax-01","tags":["production","date"],"utterance":"2024 연말정산 결과 알려줘","expect":[[{"skill":"hr-year-end-tax","query_type":"summary","params_regex":{"cal_yy":"2024"}}]]}
+{"id":"prod-tax-02","tags":["production","slang"],"utterance":"의료비 공제 내역","expect":[[{"skill":"hr-year-end-tax","query_type":"medical"}]]}
+{"id":"prod-tax-03","tags":["production","slang"],"utterance":"신용카드 공제","expect":[[{"skill":"hr-year-end-tax","query_type":"credit_card"}]]}
+{"id":"prod-cer-01","tags":["production","normalized"],"utterance":"재직증명서 발급내역 알려줘","expect":[[{"skill":"hr-certificate","query_type":"requests"}]]}
