@@ -396,6 +396,10 @@ async function executeAndAppend({
   const durationMs = Date.now() - tcStart;
   const isError =
     typeof toolResult === "string" && toolResult.startsWith("Error");
+  // "> ⚠️"는 HR handler 가드레일 메시지의 확정 시그니처 — 결과 본문 대신
+  // 이 불리언만 영속화해 개인정보 노출 없이 인자 실패를 식별한다.
+  const resultIsGuardrail =
+    typeof toolResult === "string" && toolResult.startsWith("> ⚠️");
   logger.toolCallEnd?.({ name: tc.name, durationMs, isError });
   toolTrace.push({
     round,
@@ -404,6 +408,7 @@ async function executeAndAppend({
     resultLength: toolResult?.length || 0,
     durationMs,
     isError,
+    resultIsGuardrail,
   });
   return appendToolResult(
     currentMessages,

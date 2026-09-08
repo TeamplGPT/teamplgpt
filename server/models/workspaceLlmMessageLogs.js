@@ -10,6 +10,7 @@ const WorkspaceLlmMessageLogs = {
     ragContext = [],
     chatHistory = [],
     compressedMessages = [],
+    toolTrace = null,
   }) {
     try {
       const log = await prisma.workspace_llm_message_logs.create({
@@ -22,6 +23,9 @@ const WorkspaceLlmMessageLogs = {
           chat_history: chatHistory?.length > 0 ? safeJSONStringify(chatHistory) : null,
           compressed_messages:
             compressedMessages?.length > 0 ? safeJSONStringify(compressedMessages) : null,
+          // 빈 배열도 "[]"로 저장 — "tool 루프 실행했으나 호출 0회"(미라우팅 신호)와
+          // "추적 불가 경로/과거 로그"(null)를 harvest에서 구분하기 위함.
+          tool_trace: Array.isArray(toolTrace) ? safeJSONStringify(toolTrace) : null,
         },
       });
       console.log(

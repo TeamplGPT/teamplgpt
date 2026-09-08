@@ -688,6 +688,7 @@ async function streamChat({
   // 2. Chatting in "query" mode and has at least 1 embedding
   let completeText;
   let metrics = {};
+  let toolTrace = null;
   let contextTexts = [];
   let sources = [];
   let pinnedDocIdentifiers = [];
@@ -925,8 +926,11 @@ async function streamChat({
       providerFormat,
       message,
     });
-    const { completeText: finalText, metrics: finalMetrics } =
-      await toolCallingLoop({
+    const {
+      completeText: finalText,
+      metrics: finalMetrics,
+      toolTrace: finalToolTrace,
+    } = await toolCallingLoop({
         response,
         LLMConnector,
         messages,
@@ -959,6 +963,7 @@ async function streamChat({
       });
     completeText = finalText;
     metrics = finalMetrics;
+    toolTrace = finalToolTrace;
   }
 
   if (completeText?.length > 0) {
@@ -989,6 +994,7 @@ async function streamChat({
         chatHistory: rawHistory,
         compressedMessages: messages,
         llmResponse: completeText,
+        toolTrace,
       });
     } catch (error) {
       console.error("[LLM Log] Failed to save log:", error.message);

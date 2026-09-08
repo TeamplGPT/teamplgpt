@@ -374,8 +374,11 @@ async function streamChatWithWorkspace(
     message: updatedMessage,
   });
 
-  const { completeText: finalText, metrics: finalMetrics } =
-    await toolCallingLoop({
+  const {
+    completeText: finalText,
+    metrics: finalMetrics,
+    toolTrace,
+  } = await toolCallingLoop({
       response,
       LLMConnector,
       messages,
@@ -423,6 +426,7 @@ async function streamChatWithWorkspace(
       await WorkspaceChats.createLlmMessageLog(chat.id, {
         ...llmLogData,
         llmResponse: completeText,
+        toolTrace,
       });
     } catch (error) {
       console.error("[LLM Log] Failed to save log:", error.message);

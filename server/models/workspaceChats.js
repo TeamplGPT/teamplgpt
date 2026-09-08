@@ -332,6 +332,7 @@ const WorkspaceChats = {
         ragContext: llmData.contextTexts,
         chatHistory: llmData.chatHistory,
         compressedMessages: llmData.compressedMessages,
+        toolTrace: llmData.toolTrace,
       });
       if (message) {
         console.error(

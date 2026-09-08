@@ -413,6 +413,7 @@ model workspace_llm_message_logs {
   rag_context          String?          @db.Text  // JSON array: contextTexts
   chat_history         String?          @db.Text  // JSON array: rawHistory
   compressed_messages  String?          @db.Text  // JSON array: final messages sent to LLM
+  tool_trace           String?          @db.Text  // JSON array: {round, name, arguments, resultLength, durationMs, isError, resultIsGuardrail} — tool 결과 본문은 저장하지 않음(개인정보)
 
   createdAt            DateTime         @default(now())
   lastUpdatedAt        DateTime         @default(now())

@@ -30,3 +30,7 @@ yarn-error.log
 
 # Local SSL Certs for HTTPS
 sslcert
+
+# HR 라우팅 평가 산출물 (리포트·수확 후보 — 원문 발화 포함이라 커밋 금지)
+evals/hr-routing/reports/
+evals/hr-routing/harvest/
