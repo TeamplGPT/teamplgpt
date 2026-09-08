@@ -145,6 +145,10 @@ async function hrFetch(ctx, { path, form, gate = false }) {
   const headers = {
     "Content-Type": "application/x-www-form-urlencoded",
     Cookie: cookie,
+    // kiwibox 인터셉터는 Referer 없는 업무 .do 직접 호출을 302→/Main.do로 바운스한다
+    // (specs/kiwibox-endpoint-test-guide.md §1 필수 헤더 — activeMenuCd 인가와는 무관).
+    Referer: `${baseUrl}${contextPath}/Main.do`,
+    "X-Requested-With": "XMLHttpRequest",
   };
 
   const activeMenuCd = String(ctx.runtimeArgs["HR_ACTIVE_MENU_CD"] || "").trim();

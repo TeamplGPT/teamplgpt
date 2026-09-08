@@ -107,13 +107,15 @@
           "searchId=",
           "cmmSearchStaffId=",
           "searchYm=\\d{6}",
+          "searchSYmd=\\d{8}",
+          "searchEYmd=\\d{8}",
           "searchBaseYmd=\\d{4}-\\d{2}-\\d{2}"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US2. 구현 전 FAIL(cmmSearchStaffId·searchBaseYmd 누락)"
+      "note": "specs/011 US2. 구현 전 FAIL(cmmSearchStaffId·searchBaseYmd 누락) [2026-09-04 handler 정본 재정렬: kiwibox SQL 실측 대조로 파라미터/경로 교정]"
     },
     {
       "id": "K6",
@@ -125,13 +127,13 @@
         "mock_body_pattern": [
           "cmd=getTAADclzWorkOtSchdulList2",
           "searchType=2",
-          "searchBaseSYmd=\\d{8}"
+          "searchYm=\\d{6}"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US2 D3. 구현 전 FAIL(searchType=3)"
+      "note": "specs/011 US2 D3. 구현 전 FAIL(searchType=3) [2026-09-04 handler 정본 재정렬: kiwibox SQL 실측 대조로 파라미터/경로 교정]"
     },
     {
       "id": "K7",
@@ -192,13 +194,13 @@
         "tool_call": true,
         "mock_url_pattern": "^/TAADclzWorkOtSchdul\\.do",
         "mock_body_pattern": [
-          "searchBaseSYmd=\\d{6}01"
+          "searchYm=\\d{6}"
         ]
       },
       "repeat": 10,
       "pre_reset": true,
       "tier": "primary",
-      "note": "legacy E3b 승계"
+      "note": "legacy E3b 승계 [2026-09-04 handler 정본 재정렬: kiwibox SQL 실측 대조로 파라미터/경로 교정]"
     },
     {
       "id": "K9",
@@ -227,9 +229,9 @@
       "message": "@agent 2026년 6월 급여명세서 상세 항목 조회해줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
+        "mock_url_pattern": "^/SALSalaryDtstmnMgr\\.do",
         "mock_body_pattern": [
-          "cmd=getSALPayslipNewMgrList",
+          "cmd=getSALSalaryDtstmnMgrList",
           "searchItem=20260619P",
           "searchYm=2026-06",
           "searchType=web",
@@ -239,7 +241,7 @@
       "repeat": 2,
       "pre_reset": true,
       "tier": "secondary",
-      "note": "specs/011 US3. mock /CommonCode.do fixture(20260619P) 경유 2단 체인. LLM 비결정성 감안 2회 중 1회 이상 PASS 허용"
+      "note": "specs/011 US3. mock /CommonCode.do fixture(20260619P) 경유 2단 체인. LLM 비결정성 감안 2회 중 1회 이상 PASS 허용 [2026-09-04 handler 정본 재정렬: kiwibox SQL 실측 대조로 파라미터/경로 교정]"
     },
     {
       "id": "K11",
@@ -247,9 +249,9 @@
       "message": "@agent 2026년 6월 급여 공제항목 알려줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
+        "mock_url_pattern": "^/SALSalaryDtstmnMgr\\.do",
         "mock_body_pattern": [
-          "cmd=getSALPayslipNewMgrList2",
+          "cmd=getSALSalaryDtstmnMgrList2",
           "searchYm=\\d{4}-\\d{2}",
           "searchType=web"
         ]
@@ -257,7 +259,7 @@
       "repeat": 2,
       "pre_reset": true,
       "tier": "secondary",
-      "note": "specs/011 US3. 2단 체인 — pay_item 유도 searchYm 검증"
+      "note": "specs/011 US3. 2단 체인 — pay_item 유도 searchYm 검증 [2026-09-04 handler 정본 재정렬: kiwibox SQL 실측 대조로 파라미터/경로 교정]"
     },
     {
       "id": "K12",
@@ -265,9 +267,9 @@
       "message": "@agent 2026년 6월 실수령액 알려줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
+        "mock_url_pattern": "^/SALSalaryDtstmnMgr\\.do",
         "mock_body_pattern": [
-          "cmd=getSALPayslipNewMgrMap",
+          "cmd=getSALSalaryDtstmnMgrMap",
           "searchYm=\\d{4}-\\d{2}",
           "searchType=web"
         ]
@@ -275,7 +277,7 @@
       "repeat": 2,
       "pre_reset": true,
       "tier": "secondary",
-      "note": "specs/011 US3. 요약(Map) — hrSession Map 언랩 경로"
+      "note": "specs/011 US3. 요약(Map) — hrSession Map 언랩 경로 [2026-09-04 handler 정본 재정렬: kiwibox SQL 실측 대조로 파라미터/경로 교정]"
     },
     {
       "id": "K13",
@@ -286,16 +288,14 @@
         "mock_url_pattern": "^/SALSalaryBassMgr\\.do",
         "mock_body_pattern": [
           "cmd=getSALSalaryBassMgrTab110List",
-          "searchSYmd=\\d{8}",
-          "searchEYmd=\\d{8}",
-          "searchBaseYmd=\\d{4}-\\d{2}-\\d{2}",
-          "cmmSearchStaffId="
+          "findText=\\d{4}",
+          "staffId="
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US3 D5. 구현 전 FAIL(SALSalaryDtstmnMgr 폐기 endpoint 호출)"
+      "note": "specs/011 US3 D5. 구현 전 FAIL(당시 SALSalaryDtstmnMgr를 '폐기'로 기록했으나 2026-09-04 kiwibox 소스 실독으로 정본 확인 — 명세 3종이 이 endpoint를 사용) [2026-09-04 handler 정본 재정렬: kiwibox SQL 실측 대조로 파라미터/경로 교정]"
     },
     {
       "id": "K14",
@@ -307,15 +307,14 @@
         "mock_body_pattern": [
           "cmd=getEAPRequestMgrList",
           "selectGubun=2",
-          "searchStaDate=\\d{8}",
-          "searchSYmd=\\d{8}",
-          "searchEYmd=\\d{8}"
+          "sdt=\\d{8}",
+          "edt=\\d{8}"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US4 D8. 구현 전 FAIL(searchSYmd 누락)"
+      "note": "specs/011 US4 D8. 구현 전 FAIL(searchSYmd 누락) [2026-09-04 handler 정본 재정렬: kiwibox SQL 실측 대조로 파라미터/경로 교정]"
     },
     {
       "id": "K15",
@@ -323,21 +322,18 @@
       "message": "@agent 내 증명서 신청내역 조회해줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/CTIMcrtfReqstRefromMgr\\.do",
+        "mock_url_pattern": "^/CTIMcrtfIssuMgr\\.do",
         "mock_body_pattern": [
-          "cmd=getCTIMcrtfReqstRefromMgrList",
-          "reqNoExist=N",
-          "cmmSearchStaffId=",
-          "staffId=",
-          "searchStaffId=",
-          "searchSYmd=\\d{8}",
-          "searchEYmd=\\d{8}"
+          "cmd=getCTIMcrtfIssuMgrList",
+          "staffIdNm=",
+          "searchSymd=\\d{8}",
+          "searchEymd=\\d{8}"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US4 D9. 구현 전 FAIL(3중 사번·기간 누락)"
+      "note": "specs/011 US4 D9. 구현 전 FAIL(3중 사번·기간 누락) [2026-09-04 handler 정본 재정렬: kiwibox SQL 실측 대조로 파라미터/경로 교정]"
     },
     {
       "id": "K16",
@@ -404,13 +400,15 @@
         "mock_url_pattern": "^/YTASummaryMgr\\d{4}\\.do",
         "mock_body_pattern": [
           "cmd=getYTASummaryMgrList",
-          "cmmSearchStaffId="
+          "cmmSearchStaffId=",
+          "searchCalKindCd=1",
+          "searchCalYy=\\d{4}"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "secondary",
-      "note": "legacy E47/E45(result→summary 통합) 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+      "note": "legacy E47/E45(result→summary 통합) 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증 [2026-09-04 handler 정본 재정렬: kiwibox SQL 실측 대조로 파라미터/경로 교정] [2026-09-08 YTA 파라미터 보강: searchCalYy 전 항목 + InDct 4종 searchStaffId(+Tab06 searchItemGroupCd)]"
     },
     {
       "id": "KB24",
@@ -421,13 +419,15 @@
         "mock_url_pattern": "^/YTAYndMedDtlMgr\\d{4}\\.do",
         "mock_body_pattern": [
           "cmd=getYTAYndMedDtlMgrList",
-          "cmmSearchStaffId="
+          "cmmSearchStaffId=",
+          "searchCalKindCd=1",
+          "searchCalYy=\\d{4}"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "secondary",
-      "note": "legacy E12 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+      "note": "legacy E12 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증 [2026-09-04 handler 정본 재정렬: kiwibox SQL 실측 대조로 파라미터/경로 교정] [2026-09-08 YTA 파라미터 보강: searchCalYy 전 항목 + InDct 4종 searchStaffId(+Tab06 searchItemGroupCd)]"
     },
     {
       "id": "KB25",
@@ -438,13 +438,15 @@
         "mock_url_pattern": "^/YTAYtaFamilySttusMgr\\d{4}\\.do",
         "mock_body_pattern": [
           "cmd=getYTAYtaFamilySttusMgrList",
-          "cmmSearchStaffId="
+          "cmmSearchStaffId=",
+          "searchCalYy=\\d{4}",
+          "searchCalKindCd=1"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "secondary",
-      "note": "legacy E13 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+      "note": "legacy E13 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증 [2026-09-08 YTA 파라미터 보강: searchCalYy 전 항목 + InDct 4종 searchStaffId(+Tab06 searchItemGroupCd)]"
     },
     {
       "id": "KB26",
@@ -455,13 +457,15 @@
         "mock_url_pattern": "^/YTAYndBefWrkDtlMgr\\d{4}\\.do",
         "mock_body_pattern": [
           "cmd=getYTAYndBefWrkDtlMgrList",
-          "cmmSearchStaffId="
+          "cmmSearchStaffId=",
+          "searchCalYy=\\d{4}",
+          "searchCalKindCd=1"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "secondary",
-      "note": "legacy E44 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+      "note": "legacy E44 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증 [2026-09-08 YTA 파라미터 보강: searchCalYy 전 항목 + InDct 4종 searchStaffId(+Tab06 searchItemGroupCd)]"
     },
     {
       "id": "KB27",
@@ -472,13 +476,15 @@
         "mock_url_pattern": "^/YTAYndGivPayDtlMgr\\d{4}\\.do",
         "mock_body_pattern": [
           "cmd=getYTAYndGivPayDtlMgrList",
-          "cmmSearchStaffId="
+          "cmmSearchStaffId=",
+          "searchCalYy=\\d{4}",
+          "searchCalKindCd=1"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "secondary",
-      "note": "legacy E41 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+      "note": "legacy E41 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증 [2026-09-08 YTA 파라미터 보강: searchCalYy 전 항목 + InDct 4종 searchStaffId(+Tab06 searchItemGroupCd)]"
     },
     {
       "id": "KB28",
@@ -489,13 +495,15 @@
         "mock_url_pattern": "^/YTAInDctMgr\\d{4}\\.do",
         "mock_body_pattern": [
           "cmd=getYTAInDctMgrTab08List",
-          "cmmSearchStaffId="
+          "searchStaffId=",
+          "searchCalYy=\\d{4}",
+          "searchCalKindCd=1"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "secondary",
-      "note": "legacy E40 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+      "note": "legacy E40 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증 [2026-09-08 YTA 파라미터 보강: searchCalYy 전 항목 + InDct 4종 searchStaffId(+Tab06 searchItemGroupCd)]"
     },
     {
       "id": "KB29",
@@ -506,13 +514,15 @@
         "mock_url_pattern": "^/YTAInDctMgr\\d{4}\\.do",
         "mock_body_pattern": [
           "cmd=getYTAInDctMgrTab13List",
-          "cmmSearchStaffId="
+          "searchStaffId=",
+          "searchCalYy=\\d{4}",
+          "searchCalKindCd=1"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "secondary",
-      "note": "legacy E43 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+      "note": "legacy E43 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증 [2026-09-08 YTA 파라미터 보강: searchCalYy 전 항목 + InDct 4종 searchStaffId(+Tab06 searchItemGroupCd)]"
     },
     {
       "id": "KB30",
@@ -523,13 +533,15 @@
         "mock_url_pattern": "^/YTAInDctMgr\\d{4}\\.do",
         "mock_body_pattern": [
           "cmd=getYTAInDctMgrTab15List",
-          "cmmSearchStaffId="
+          "searchStaffId=",
+          "searchCalYy=\\d{4}",
+          "searchCalKindCd=1"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "secondary",
-      "note": "legacy E42 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+      "note": "legacy E42 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증 [2026-09-08 YTA 파라미터 보강: searchCalYy 전 항목 + InDct 4종 searchStaffId(+Tab06 searchItemGroupCd)]"
     },
     {
       "id": "KB31",
@@ -540,13 +552,16 @@
         "mock_url_pattern": "^/YTAInDctMgr\\d{4}\\.do",
         "mock_body_pattern": [
           "cmd=getYTAInDctMgrTab06List",
-          "cmmSearchStaffId="
+          "searchStaffId=",
+          "searchCalYy=\\d{4}",
+          "searchCalKindCd=1",
+          "searchItemGroupCd=TAB_06"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "secondary",
-      "note": "legacy E46 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증"
+      "note": "legacy E46 승계 — hr-year-end-tax 코드 무변경, 현행 계약(연도별 경로) 검증 [2026-09-08 YTA 파라미터 보강: searchCalYy 전 항목 + InDct 4종 searchStaffId(+Tab06 searchItemGroupCd)]"
     },
     {
       "id": "KB40",
@@ -602,16 +617,16 @@
       "message": "@agent 6월 페이슬립 보여줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
+        "mock_url_pattern": "^/SALSalaryDtstmnMgr\\.do",
         "mock_body_pattern": [
-          "cmd=getSALPayslipNewMgrList",
+          "cmd=getSALSalaryDtstmnMgrList",
           "searchItem=20260619P"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "SAL-0527 별칭(페이슬립) → pay_periods 진입 후 CommonCode fixture 코드(20260619P)로 payslip까지 체인 완주 검증. (구기대 'CommonCode 1단계'는 runner가 마지막 URL만 대조해 체인 완주 시 구조적 FAIL — specs/012 T015 live 전수 실행에서 판명, 기대를 완주 기준으로 상향)"
+      "note": "SAL-0527 별칭(페이슬립) → pay_periods 진입 후 CommonCode fixture 코드(20260619P)로 payslip까지 체인 완주 검증. (구기대 'CommonCode 1단계'는 runner가 마지막 URL만 대조해 체인 완주 시 구조적 FAIL — specs/012 T015 live 전수 실행에서 판명, 기대를 완주 기준으로 상향) [2026-09-04 handler 정본 재정렬: kiwibox SQL 실측 대조로 파라미터/경로 교정]"
     },
     {
       "id": "KB44",

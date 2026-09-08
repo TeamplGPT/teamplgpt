@@ -66,6 +66,9 @@ const ENDPOINT_MAP = {
   org_members: {
     path: "/getMBLHrBassiemMemberList.do", staffParam: null, gate: false,
     dateParam: "today", orgParam: { name: "searchOrgCd", required: true },
+    // SQL(getMBLHrBassiemMemberList)의 sub_org_yn(searchTypeVal)은 'Y'/'N' 양자 분기라
+    // 미전송(null) 시 OR 양쪽 모두 거짓 → 항상 0건. 직접 조직만 조회(N) 고정.
+    fixed: { searchTypeVal: "N" },
     // detail/seqNo/empOrder/staffId/orgCd(3종)/posSeqNo/name(중복)/imgExYn 차단
     columns: {
       STAFF_NM: "성명",

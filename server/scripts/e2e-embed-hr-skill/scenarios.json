@@ -60,9 +60,9 @@
       "message": "6월 급여명세서 보여줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
+        "mock_url_pattern": "^/SALSalaryDtstmnMgr\\.do",
         "mock_body_pattern": [
-          "cmd=getSALPayslipNewMgrList"
+          "cmd=getSALSalaryDtstmnMgrList"
         ]
       },
       "repeat": 1
@@ -280,9 +280,9 @@
       "message": "6월 급여명세서 보여줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/SALPayslipNewMgr\\.do",
+        "mock_url_pattern": "^/SALSalaryDtstmnMgr\\.do",
         "mock_body_pattern": [
-          "cmd=getSALPayslipNewMgrList"
+          "cmd=getSALSalaryDtstmnMgrList"
         ]
       },
       "repeat": 1

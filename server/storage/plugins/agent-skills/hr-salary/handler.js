@@ -9,7 +9,6 @@ const { resolveDateParam } = require("../_shared/dateResolver");
 const {
   hrFetch,
   monthRange,
-  todayDashed,
   SELF_STAFF_ID_MARKER,
 } = require("../_shared/hrSession");
 
@@ -22,10 +21,12 @@ const PAY_PERIODS = {
 
 // 2단계: pay_item(=searchItem 복합키) 필요한 명세 endpoint
 // 컬럼 화이트리스트 근거: docs/03-analysis/hr-column-whitelist-audit.analysis.md
-// (kiwibox SALPayslipNewMgr_SQL.xml·SALDaylabMgr_SQL.xml 대조)
+// (kiwibox SALSalaryDtstmnMgr_SQL.xml·SALDaylabMgr_SQL.xml 대조)
 const ENDPOINT_MAP = {
   payslip: {
-    path: "/SALPayslipNewMgr.do", cmd: "getSALPayslipNewMgrList",
+    // SALPayslipNewMgr.do는 kiwibox에 컨트롤러 매핑이 없다(뷰 JSP만 존재) —
+    // 실제 데이터 cmd는 SALSalaryDtstmnMgr.do의 getSALSalaryDtstmnMgrList 계열(실측).
+    path: "/SALSalaryDtstmnMgr.do", cmd: "getSALSalaryDtstmnMgrList",
     needsPayItem: true, staffParam: "cmmSearchStaffId", gate: true,
     columns: {
       salItemNm: "지급항목",
@@ -36,7 +37,7 @@ const ENDPOINT_MAP = {
     },
   },
   deductions: {
-    path: "/SALPayslipNewMgr.do", cmd: "getSALPayslipNewMgrList2",
+    path: "/SALSalaryDtstmnMgr.do", cmd: "getSALSalaryDtstmnMgrList2",
     needsPayItem: true, staffParam: "cmmSearchStaffId", gate: true,
     columns: {
       salItemNm: "공제항목",
@@ -45,7 +46,7 @@ const ENDPOINT_MAP = {
     },
   },
   payslip_summary: {
-    path: "/SALPayslipNewMgr.do", cmd: "getSALPayslipNewMgrMap",
+    path: "/SALSalaryDtstmnMgr.do", cmd: "getSALSalaryDtstmnMgrMap",
     needsPayItem: true, staffParam: "cmmSearchStaffId", gate: true,
     // staffId/staffNo/salTypeCd/salKindCd/notice(CLOB HTML) 차단
     columns: {
@@ -62,8 +63,10 @@ const ENDPOINT_MAP = {
   },
   salary_statement: {
     // SAL-0050 월별지급내역(§1.2) — SAL-0220 급여명세서(빈 응답·폐기)의 대체 (specs/011 D5)
+    // SQL(getSALSalaryBassMgrTab110List) 정본 파라미터 = findText(급여년도 YYYY) + staffId.
+    // cmmSearchStaffId/searchSYmd 계열은 읽지 않으며 staffId 누락 시 STAFF_ID=null로 항상 0건.
     path: "/SALSalaryBassMgr.do", cmd: "getSALSalaryBassMgrTab110List",
-    needsPayItem: false, period: "month", staffParam: "cmmSearchStaffId", gate: true,
+    needsPayItem: false, period: "year", staffParam: "staffId", gate: true,
     columns: {
       salYmd: "지급일",
       orgNm: "소속",
@@ -120,6 +123,14 @@ const QUERY_LABELS = {
 
 const FORBIDDEN_FIXED_VALUES = { searchType: ["mobile"] };
 
+// "YYYYMM" → 전월 "YYYYMM"
+function prevYm(ym) {
+  const y = Number(ym.slice(0, 4));
+  const m = Number(ym.slice(4, 6));
+  const d = new Date(y, m - 2, 1);
+  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
 module.exports.runtime = {
   handler: async function ({ query_type, year_month, pay_item }) {
     try {
@@ -136,26 +147,35 @@ module.exports.runtime = {
       // --- 1단계: 지급 건 목록 ---
       if (query_type === "pay_periods") {
         const applCd = String(this.runtimeArgs["HR_SAL_APPL_CD"] || "").trim();
-        const form = {
-          cmd: PAY_PERIODS.cmd,
-          queryId: "getSalYmdTypeCdList2",
-          closeChk: "Y",
-          searchYm: `${ym.slice(0, 4)}-${ym.slice(4, 6)}`, // §1.4 실측 형식 YYYY-MM(하이픈)
-          applCd, // §1.4 실측 본문 — 빈 값이라도 항상 전송(임의 축약 금지)
-          staffId: SELF_STAFF_ID_MARKER,
-        };
+        // 지급 건은 급여 마감(CLOSE_YN='Y') 후에만 조회된다(NsCode_SQL 실측) —
+        // 월 미지정 시 이번달이 마감 전이면 항상 빈 결과가 되므로 최대 2개월 소급 폴백.
+        // 사용자가 월을 명시한 경우에는 그 달만 조회한다(의도 존중).
+        const explicitYm = resolveDateParam(year_month, "year_month");
+        const tryYms = explicitYm
+          ? [explicitYm]
+          : [ym, prevYm(ym), prevYm(prevYm(ym))];
 
         this.introspect(`${label} 조회 중...`);
-        const { errorMessage, records, isEmpty } = await hrFetch(this, {
-          path: PAY_PERIODS.path,
-          form,
-          gate: PAY_PERIODS.gate,
-        });
-        if (errorMessage) return errorMessage;
-        if (isEmpty) {
-          return `> ⚠️ **${label}**: 해당 월에 지급된 급여 건이 없습니다.`;
+        for (const tryYm of tryYms) {
+          const form = {
+            cmd: PAY_PERIODS.cmd,
+            queryId: "getSalYmdTypeCdList2",
+            closeChk: "Y",
+            searchYm: `${tryYm.slice(0, 4)}-${tryYm.slice(4, 6)}`, // §1.4 실측 형식 YYYY-MM(하이픈)
+            applCd, // §1.4 실측 본문 — 빈 값이라도 항상 전송(임의 축약 금지)
+            staffId: SELF_STAFF_ID_MARKER,
+          };
+          const { errorMessage, records, isEmpty } = await hrFetch(this, {
+            path: PAY_PERIODS.path,
+            form,
+            gate: PAY_PERIODS.gate,
+          });
+          if (errorMessage) return errorMessage;
+          if (!isEmpty) return formatPayPeriods(records, tryYm);
         }
-        return formatPayPeriods(records);
+        return explicitYm
+          ? `> ⚠️ **${label}**: 해당 월에 지급된(마감된) 급여 건이 없습니다.`
+          : `> ⚠️ **${label}**: 최근 3개월 내 지급된(마감된) 급여 건이 없습니다.`;
       }
 
       // --- 2단계: 명세 조회 ---
@@ -181,12 +201,9 @@ module.exports.runtime = {
         const [sYmd, eYmd] = monthRange(ym);
         form.searchDateSYmd = sYmd;
         form.searchDateEYmd = eYmd;
-      } else if (spec.period === "month") {
-        // SAL-0050 §1.2: searchSYmd/EYmd(월 범위) + searchBaseYmd(오늘, 하이픈)
-        const [sYmd, eYmd] = monthRange(ym);
-        form.searchSYmd = sYmd;
-        form.searchEYmd = eYmd;
-        form.searchBaseYmd = todayDashed();
+      } else if (spec.period === "year") {
+        // SAL-0050 Tab110: findText = 급여년도(YYYY). 연 단위 이력 조회.
+        form.findText = ym.slice(0, 4);
       }
 
       if (spec.staffParam) form[spec.staffParam] = SELF_STAFF_ID_MARKER;
@@ -216,10 +233,11 @@ module.exports.runtime = {
   },
 };
 
-function formatPayPeriods(data) {
+function formatPayPeriods(data, ym) {
   // 콤보 응답: [{ CODE_NM: "2026-06-25 정기급여", CODE: "20260625NN", ... }]
   const list = Array.isArray(data) ? data : data ? [data] : [];
-  let md = `## HR 급여 - 지급 건 목록\n\n`;
+  const ymLabel = ym ? ` (${ym.slice(0, 4)}-${ym.slice(4, 6)})` : "";
+  let md = `## HR 급여 - 지급 건 목록${ymLabel}\n\n`;
   if (list.length === 0) return md + "> 지급된 급여 건이 없습니다.";
   md += "아래 급여 건 중 하나를 선택해 상세를 조회할 수 있습니다.\n\n";
   md += "| 급여 건 | 코드(pay_item) |\n|---|---|\n";
@@ -228,7 +246,7 @@ function formatPayPeriods(data) {
     const code = it.CODE ?? it.code ?? "";
     md += `| ${nm} | \`${code}\` |\n`;
   }
-  md += `\n> 총 **${list.length}건**. 특정 건 상세는 query_type=payslip/deductions/payslip_summary/salary_statement + pay_item=코드값.`;
+  md += `\n> 총 **${list.length}건**. 특정 건 상세는 query_type=payslip/deductions/payslip_summary + pay_item=코드값.`;
   return md;
 }
 

@@ -31,18 +31,23 @@ const ENDPOINT_MAP = {
     period: "range-both", staffParam: "cmmSearchStaffId", gate: true,
   },
   work_calendar: {
+    // SQL(getTAADclzWorkSearchCldr) 필수 파라미터 = searchYm + searchId + searchSYmd/EYmd.
+    // searchSYmd/EYmd 미전송 시 A.YMD BETWEEN null로 항상 0건이 된다(실측 SQL 대조).
     path: "/TAADclzWorkSearchCldr.do", cmd: "getTAADclzWorkSearchCldr",
-    period: "ym", staffParam: ["searchId", "cmmSearchStaffId"], gate: false,
+    period: "ym", rangeAltToo: true,
+    staffParam: ["searchId", "cmmSearchStaffId"], gate: false,
     baseYmdDashed: true, // §2.2 — searchId 무게이트, self 강제 필수
   },
   overtime: {
+    // SQL(getTAADclzWorkOtSchdulList2) 정본 기간 파라미터 = searchYm(YYYYMM).
+    // searchBaseSYmd/EYmd는 읽지 않아 미전송 시 base_ym=null로 항상 0건이 된다.
     path: "/TAADclzWorkOtSchdul.do", cmd: "getTAADclzWorkOtSchdulList2",
-    period: "range", staffParam: "cmmSearchStaffId", gate: true,
+    period: "ym", staffParam: "cmmSearchStaffId", gate: true,
     fixed: { searchType: "2" }, // §2.6 실측
   },
   overtime_limit: {
     path: "/TAADclzWorkOtSchdul.do", cmd: "getTAADclzWorkOtSchdulList",
-    period: "range", staffParam: "cmmSearchStaffId", gate: true,
+    period: "ym", staffParam: "cmmSearchStaffId", gate: true,
     fixed: { searchType: "2" },
   },
   leave_requests: {
@@ -212,6 +217,12 @@ module.exports.runtime = {
           form.searchSYmd = sYmd;
           form.searchEYmd = eYmd;
         }
+      }
+
+      if (spec.rangeAltToo) {
+        const [sYmd, eYmd] = monthRange(ym);
+        form.searchSYmd = sYmd;
+        form.searchEYmd = eYmd;
       }
 
       if (spec.baseYmdDashed) form.searchBaseYmd = todayDashed();

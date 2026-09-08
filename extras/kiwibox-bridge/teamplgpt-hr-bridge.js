@@ -26,6 +26,7 @@
     "/LONLoanReqstListMgr.do",
     "/PRCHrBassiemMgrTab220.do",
     "/CTIMcrtfReqstRefromMgr.do",
+    "/CTIMcrtfIssuMgr.do", // 증명서 발급내역 목록 정본 (Refrom은 단건/초기조회용)
     "/EAPRequestMgr.do",
     "/CommonCode.do",
     "/SALPayslipNewMgr.do",
@@ -33,6 +34,8 @@
     "/SALDaylabMgr.do",
     "/TAAWrkTimeListMgrByDate.do",
     "/TAAWrkTimeStatusMgr.do",
+    "/TAADclzVcatnList.do", // 연차 잔여/휴가 사용내역 정본 (getTAADclzVcatnList1/2)
+    "/SALSalaryBassMgr.do", // 월별 지급내역 (getSALSalaryBassMgrTab110List)
     "/TAADclzWorkSearchCldr.do",
     "/TAADclzWorkOtSchdul.do",
     "/TAADclzVcatnCldrMgr.do",

@@ -5,7 +5,12 @@
 //    → 대상 사번 파라미터 없음, LLM이 타인 지정 불가.
 //  - detail(본문 CONTENTS CLOB, reqNo 무검증)은 §7 최고 위험 — 미채택(specs/005 승인 결정).
 const { resolveDateParam } = require("../_shared/dateResolver");
-const { hrFetch, monthRange } = require("../_shared/hrSession");
+const {
+  hrFetch,
+  monthRange,
+  monthsAgoFirstYmd,
+  todayYmd,
+} = require("../_shared/hrSession");
 
 // selectGubun: 2=기안함 / 3=미결함 / 4=기결함 / 5=참조 / 6=반려함 (EAPRequestMgr_SQL.xml:185)
 const ENDPOINT = {
@@ -70,20 +75,24 @@ module.exports.runtime = {
       }
       const qt = QUERY_TYPES[query_type];
 
-      const ym =
-        resolveDateParam(year_month, "year_month") ||
-        resolveDateParam("이번달", "year_month");
-      const [sYmd, eYmd] = monthRange(ym);
+      // 기간 파라미터 정본 = sdt/edt (EAPRequestMgr_SQL·eapRequestMgr.jsp 실측).
+      // searchStaDate/searchSYmd 계열은 SQL이 읽지 않는다 — 미전송 시 서버 기본이
+      // 기안/참조(gubun 2·5)는 '오늘 하루', 미결/기결/반려(3·4·6)는 전체기간(1900~2999)이라
+      // "기안함 빈 결과 / 기결함 전체기간 과다 조회"가 된다. 월 미지정 시 최근 3개월.
+      const ymResolved = resolveDateParam(year_month, "year_month");
+      let sYmd, eYmd;
+      if (ymResolved) {
+        [sYmd, eYmd] = monthRange(ymResolved);
+      } else {
+        sYmd = monthsAgoFirstYmd(2);
+        eYmd = todayYmd();
+      }
 
       const form = {
         cmd: ENDPOINT.cmd,
         selectGubun: qt.gubun,
-        searchStaDate: sYmd,
-        searchEndDate: eYmd,
-        // 신판 카탈로그 §5.1 실측 기간 파라미터 병행 전송 (specs/011 D8 —
-        // selectGubun 즉시 교체는 회귀 위험이라 양쪽 유지, 실동작 확인 후 정리)
-        searchSYmd: sYmd,
-        searchEYmd: eYmd,
+        sdt: sYmd,
+        edt: eYmd,
       };
 
       this.introspect(`${qt.label} 조회 중...`);

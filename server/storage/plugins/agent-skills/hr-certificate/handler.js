@@ -1,8 +1,9 @@
 // hr-certificate/handler.js
-// 5240 HR(kiwibox) 증명서 신청내역 조회 — R1 클라이언트 위임 정본 + 서버 폴백 (specs/006·003).
+// 5240 HR(kiwibox) 증명서 발급내역 조회 — R1 클라이언트 위임 정본 + 서버 폴백 (specs/006·003).
 // 근거 카탈로그: cmmAiAssistantToolEndpoints.md §4.6 + kiwibox 소스 실측.
-//  - 정본: CTIMcrtfReqstRefromMgr getCTIMcrtfReqstRefromMgrList (웹).
-//  - self 강제: reqNoExist='N' + staffId=$SELF_STAFF_ID → 본인 신청내역만 (SQL:64).
+//  - 정본(2026-09-04 재정렬): /CTIMcrtfIssuMgr.do getCTIMcrtfIssuMgrList (발급내역 목록).
+//  - self 강제: staffIdNm=$SELF_STAFF_ID + searchSymd/Eymd(최근 18개월). AUTF_SRCH_STAFF_YN 게이트는 SQL 내장.
+//  - 구 정본 getCTIMcrtfReqstRefromMgrList는 신청화면 초기조회용(단건 구조)이라 폐기 — 아래 [수정 근거] 참조.
 //  - reqNo 단건 상세(§4.4식 무검증 위험)·주소(§4.6 민감)는 미채택(specs/006 승인).
 const {
   hrFetch,
@@ -11,26 +12,34 @@ const {
   SELF_STAFF_ID_MARKER,
 } = require("../_shared/hrSession");
 
+// [수정 근거] 기존 getCTIMcrtfReqstRefromMgrList는 "신청 화면 초기조회"용 —
+// 직원 기본 1행 + reqNo로 지정한 단건만 반환하며(B.REQ_NO(+)=#{reqNo} 외부조인),
+// reqNo 없이 호출하면 신청내역이 전부 조인 탈락해 목록 조회가 구조적으로 불가하다
+// (운영 증상 "4건 발급했는데 1건만 조회"의 원인). 목록 정본은 발급내역 화면의
+// getCTIMcrtfIssuMgrList (기간 searchSymd/Eymd + staffIdNm 필터, AUTF 게이트).
+// 주의: AUTF_SRCH_STAFF_YN(activeMenuCd) 게이트가 일반 사용자 self 조회를 허용하는지
+// 스테이징 실측 필요. staffIdNm은 LIKE prefix 매칭이라 self 마커 치환값 전체 사번 사용.
 const ENDPOINT = {
-  path: "/CTIMcrtfReqstRefromMgr.do",
-  cmd: "getCTIMcrtfReqstRefromMgrList",
-  gate: false, // self 강제(staffId)로 방어. 서버 게이트 유무는 specs/006 T5 확인
+  path: "/CTIMcrtfIssuMgr.do",
+  cmd: "getCTIMcrtfIssuMgrList",
+  gate: true,
 };
 
 // 목록 반환 컬럼 화이트리스트 (specs/006 실측 — 주소·내부 PK·코드값 제외).
 // 키: kiwibox 컬럼(대/소문자 대응), 값: 한글 라벨.
+// getCTIMcrtfIssuMgrList 반환 컬럼 기준(실측 SQL 대조 — 주소 ADDR·내부 PK 제외).
+// TYPE_CD/USE_CD는 코드값만 제공됨(명칭 컬럼 없음) — 명칭 매핑은 CommonCode 후속 개선.
 const COLUMN_LABELS = {
-  TYPE_NM: "증명서종류",
-  USE_NM: "용도",
+  TYPE_CD: "증명서종류코드",
+  USE_CD: "용도코드",
   SUBMIT_PLACE: "제출처",
   COPY_NUM: "부수",
   ISSUE_NO: "발급번호",
   ISSUE_YMD: "발급일",
-  REQ_DATE: "신청일시",
+  REQ_DATE2: "신청일시",
   PRT_YN: "출력가능",
-  NAME: "성명",
-  YEAR: "근속연수",
-  MONTH: "근속개월",
+  STAFF_NM: "성명",
+  REQ_STATUS_CD: "상태코드",
   REQ_NO: "신청번호",
 };
 
@@ -59,13 +68,10 @@ module.exports.runtime = {
 
       const form = {
         cmd: ENDPOINT.cmd,
-        reqNoExist: "N", // 목록 분기 (self staffId 필터 활성)
-        // 신판 카탈로그 §6.4 실측 BODY: 사번 3중 지정 + 기간 (specs/011 D9)
-        staffId: SELF_STAFF_ID_MARKER,
-        cmmSearchStaffId: SELF_STAFF_ID_MARKER,
-        searchStaffId: SELF_STAFF_ID_MARKER,
-        searchSYmd: monthsAgoFirstYmd(18),
-        searchEYmd: todayYmd(),
+        // self 강제: staffIdNm(사번/성명 검색 필터)에 본인 사번 주입 + AUTF 게이트가 2차 방어
+        staffIdNm: SELF_STAFF_ID_MARKER,
+        searchSymd: monthsAgoFirstYmd(18), // SQL 파라미터명은 소문자 ymd(searchSymd/Eymd)
+        searchEymd: todayYmd(),
       };
 
       this.introspect("증명서 신청내역 조회 중...");

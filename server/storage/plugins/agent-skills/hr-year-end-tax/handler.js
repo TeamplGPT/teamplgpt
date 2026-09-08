@@ -2,7 +2,7 @@
 // 5240 HR(kiwibox) 연말정산(YTA) 직접 조회 — R1 클라이언트 위임 정본 + 서버 폴백 (specs/008·003).
 // 근거: 카탈로그 §7 원칙제외 해제(사용자 지시) + kiwibox REW/YTA{연도} 소스 실측.
 //  - 컨트롤러 연도별 분리: 경로 = /YTA{Name}Mgr{YYYY}.do (cal_yy는 경로 연도).
-//  - self 강제: cmmSearchStaffId=$SELF_STAFF_ID.
+//  - self 강제: cmmSearchStaffId=$SELF_STAFF_ID (InDct 4종은 searchStaffId — SQL이 그 이름으로만 읽음).
 //  - 주민번호(CTZ_NO 등)·계좌·내부 PK·코드값은 화이트리스트에서 전면 제외 (사용자 지시).
 //  - result(결정세액)는 summary에 통합(YndList/YndCal은 조회 부적합 — 실측).
 const { resolveDateParam } = require("../_shared/dateResolver");
@@ -84,10 +84,12 @@ const QUERY_MAP = {
     },
   },
   // 소득공제 입력 화면(YTAInDctMgr) 탭별 항목 — Tab08 신용카드 / Tab13 보험 / Tab15 교육 / Tab06 연금
+  // InDct 계열 SQL은 사번을 cmmSearchStaffId가 아닌 searchStaffId로 읽는다(무조건 필터).
   credit_card: {
     name: "YTAInDctMgr",
     cmd: "getYTAInDctMgrTab08List",
     label: "신용카드 공제내역",
+    staffParam: "searchStaffId",
     columns: {
       FAM_NM: "사용자",
       CARD_AMT: "신용카드",
@@ -100,6 +102,7 @@ const QUERY_MAP = {
     name: "YTAInDctMgr",
     cmd: "getYTAInDctMgrTab13List",
     label: "보장성보험 공제내역",
+    staffParam: "searchStaffId",
     columns: {
       FAM_NM: "대상",
       INSU_AMT: "보험료",
@@ -110,6 +113,7 @@ const QUERY_MAP = {
     name: "YTAInDctMgr",
     cmd: "getYTAInDctMgrTab15List",
     label: "교육비 공제내역",
+    staffParam: "searchStaffId",
     columns: {
       FAM_NM: "대상",
       EDU_AMT: "교육비",
@@ -120,6 +124,9 @@ const QUERY_MAP = {
     name: "YTAInDctMgr",
     cmd: "getYTAInDctMgrTab06List",
     label: "연금저축 공제내역",
+    staffParam: "searchStaffId",
+    // Tab06 SQL은 ITEM_GROUP_CD = #{searchItemGroupCd}도 무조건 필터 — 화면 hidden 값 TAB_06(2022~2025 동일).
+    fixed: { searchItemGroupCd: "TAB_06" },
     columns: {
       // 계좌(BANK_CD/ACC_NO)·코드값 제외 — 납입 정보만
       PAY_CNT: "납입횟수",
@@ -151,9 +158,18 @@ module.exports.runtime = {
         year = resolved;
       }
 
+      // 파라미터 근거(kiwibox REW/YTA{연도} SQL 실독, 2022~2025 동일 구조):
+      //  - searchCalKindCd: 전 쿼리 CAL_KIND_CD 무조건 필터. '1'=연말정산/'2'=중도정산(schema 주석 YTA_CAL_KIND_CD).
+      //  - searchCalYy: family/previous_employer/InDct 4종은 CAL_YY 무조건 필터(미전송 시 0건),
+      //    summary/medical/donation은 <if>라 미전송 시 전 연도 행이 섞임 → 항상 경로 연도와 동일하게 전송.
+      //  - 사번: Summary/Med/Family/BefWrk/GivPay는 cmmSearchStaffId, InDct 4종은 searchStaffId(spec.staffParam).
+      const staffParam = spec.staffParam || "cmmSearchStaffId";
       const form = {
         cmd: spec.cmd,
-        cmmSearchStaffId: SELF_STAFF_ID_MARKER, // self 강제
+        [staffParam]: SELF_STAFF_ID_MARKER, // self 강제
+        searchCalYy: year,
+        searchCalKindCd: "1",
+        ...(spec.fixed || {}),
       };
       const path = `/${spec.name}${year}.do`;
 
