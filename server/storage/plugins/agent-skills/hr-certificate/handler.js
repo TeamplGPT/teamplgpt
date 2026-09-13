@@ -3,6 +3,7 @@
 // 근거 카탈로그: cmmAiAssistantToolEndpoints.md §4.6 + kiwibox 소스 실측.
 //  - 정본(2026-09-04 재정렬): /CTIMcrtfIssuMgr.do getCTIMcrtfIssuMgrList (발급내역 목록).
 //  - self 강제: staffIdNm=$SELF_STAFF_ID + searchSymd/Eymd(최근 18개월). AUTF_SRCH_STAFF_YN 게이트는 SQL 내장.
+//    staffIdNm은 LIKE prefix라 결과 행을 본인 STAFF_ID 정확 일치로 재필터 — 아래 [본인 정확 일치] 참조.
 //  - 구 정본 getCTIMcrtfReqstRefromMgrList는 신청화면 초기조회용(단건 구조)이라 폐기 — 아래 [수정 근거] 참조.
 //  - reqNo 단건 상세(§4.4식 무검증 위험)·주소(§4.6 민감)는 미채택(specs/006 승인).
 const {
@@ -58,6 +59,32 @@ function pick(row) {
   return out;
 }
 
+// [본인 정확 일치] staffIdNm은 SQL에서 STAFF_ID LIKE '본인ID%'라서 본인 ID가 123이면
+// 1234·12345 직원 행도 걸린다(조회 권한이 넓은 계정). SQL에는 정확 일치 파라미터가 없고,
+// 클라이언트 위임 모드에선 마커가 브라우저에서 치환돼 handler가 실제 ID를 모른다.
+// → 본인 1행만 반환하는 인사카드(SRCH_STAFF_ID = ssnStaffId 또는 searchStaffId=self)로
+//   본인 STAFF_ID를 확보해 결과 행을 정확 일치로 거른다. 확보 실패 시 fail-closed.
+const SELF_ID_ENDPOINT = { path: "/getMBLPrtEmpCard.do", gate: false };
+const SELF_ID_UNRESOLVED =
+  "> ⚠️ 본인 식별 정보를 확인하지 못해 증명서 신청내역을 표시하지 않습니다. 잠시 후 다시 시도하세요.";
+
+function rowStaffId(row) {
+  const v = row && (row.STAFF_ID ?? row.staff_id ?? row.staffId);
+  return v === undefined || v === null ? "" : String(v).trim();
+}
+
+function resolveSelfStaffId({ errorMessage, records, isEmpty }) {
+  if (errorMessage || isEmpty) return null;
+  const rows = Array.isArray(records) ? records : [records];
+  const ids = new Set(rows.map(rowStaffId).filter(Boolean));
+  return ids.size === 1 ? [...ids][0] : null; // 0개·복수면 본인 특정 불가
+}
+
+function filterSelfRows(records, selfStaffId) {
+  const rows = Array.isArray(records) ? records : records ? [records] : [];
+  return rows.filter((row) => rowStaffId(row) === selfStaffId);
+}
+
 module.exports.runtime = {
   handler: async function ({ query_type }) {
     try {
@@ -75,18 +102,26 @@ module.exports.runtime = {
       };
 
       this.introspect("증명서 신청내역 조회 중...");
-      const { errorMessage, records, isEmpty } = await hrFetch(this, {
-        path: ENDPOINT.path,
-        form,
-        gate: ENDPOINT.gate,
-      });
-      if (errorMessage) return errorMessage;
-      if (isEmpty) {
+      const [self, list] = await Promise.all([
+        hrFetch(this, {
+          path: SELF_ID_ENDPOINT.path,
+          form: { searchStaffId: SELF_STAFF_ID_MARKER },
+          gate: SELF_ID_ENDPOINT.gate,
+        }),
+        hrFetch(this, { path: ENDPOINT.path, form, gate: ENDPOINT.gate }),
+      ]);
+      if (list.errorMessage) return list.errorMessage;
+      if (list.isEmpty) {
         return "> ⚠️ **증명서 신청내역**이 없습니다.";
       }
 
+      const selfStaffId = resolveSelfStaffId(self);
+      if (!selfStaffId) {
+        return self.errorMessage || SELF_ID_UNRESOLVED;
+      }
+
       this.introspect("증명서 신청내역 조회 완료.");
-      return formatCertificate(records);
+      return formatCertificate(filterSelfRows(list.records, selfStaffId));
     } catch (e) {
       this.logger("Error in hr-certificate", e.message);
       return `> ⚠️ 증명서 조회 중 오류가 발생했습니다: ${e.message}`;
