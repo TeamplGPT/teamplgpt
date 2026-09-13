@@ -185,11 +185,19 @@ function evaluateChat(chat, trace, responseText) {
   return hits;
 }
 
-// H6 유사 재시도: 스레드 단위로 시간순 인접 쌍 비교. 후보는 "앞" 발화.
+// H6 유사 재시도: 대화 단위로 시간순 인접 쌍 비교. 후보는 "앞" 발화.
+// 대화 키 = workspace + user + thread + api_session — user_id·thread_id가 빈
+// dev API 호출은 api_session_id로만 구분되므로 빠지면 다른 세션이 한 재시도로 묶인다.
 function markReasks(rows) {
   const byThread = new Map();
   for (const row of rows) {
-    const key = `${row.chat.workspaceId}|${row.chat.user_id ?? ""}|${row.chat.thread_id ?? ""}`;
+    const { workspaceId, user_id, thread_id, api_session_id } = row.chat;
+    const key = JSON.stringify([
+      workspaceId,
+      user_id ?? null,
+      thread_id ?? null,
+      api_session_id ?? null,
+    ]);
     if (!byThread.has(key)) byThread.set(key, []);
     byThread.get(key).push(row);
   }
