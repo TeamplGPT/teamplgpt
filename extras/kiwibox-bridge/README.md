@@ -62,4 +62,5 @@ specs/003 R1(클라이언트 실행 위임) 배포 가이드. kiwibox(5240 HR) �
 | "HR 조회 응답이 시간 내에 도착하지 않았습니다" | 브리지 미삽입 / widgetOrigin 불일치 / iframe 셀렉터 불일치 |
 | "bridge: staffId not configured" | JSP staffId 미렌더 |
 | "bridge: path not allowed" | 스킬이 쓰는 경로가 allowlist에 없음 (스킬-브리지 버전 불일치) |
+| "bridge: cmd not allowed" | 경로의 `CMD_ALLOWLIST`에 없는 cmd(저장·삭제 등) 또는 cmd 분기 없는 경로에 cmd 전달 (스킬-브리지 버전 불일치 포함) |
 | "HR 세션이 만료되었거나..." | kiwibox 로그아웃 상태 — 재로그인 |

@@ -92,7 +92,7 @@ AI Agent(Claude Code 등)와 작업할 때는 걸리는 대목이 있다. 에이
 | footer(응답 지침) 문구 | teamplgpt `specs/012-hr-answer-quality/contracts/footer-contract.md` | `_shared/formatTable.js` ANSWER_GUIDE |
 | 렌더 컬럼 노출/차단 판정 | teamplgpt `docs/03-analysis/hr-column-whitelist-audit.analysis.md` | 각 handler `columns` |
 
-teamplgpt에서 endpoint 경로나 cmd를 바꿔도 okrservice hrBridge의 `ALLOWED_PATHS`(정적 allowlist)는 자동으로 바뀌지 않는다. 그러면 브리지가 `"bridge: path not allowed"`로 즉시 차단한다. 동기화 규칙은 반드시 이 순서로 밟는다:
+teamplgpt에서 endpoint 경로나 cmd를 바꿔도 okrservice hrBridge의 `ALLOWED_PATHS`(정적 allowlist)·`CMD_ALLOWLIST`(path+cmd 조합)는 자동으로 바뀌지 않는다. 그러면 브리지가 `"bridge: path not allowed"` / `"bridge: cmd not allowed"`로 즉시 차단한다. 동기화 규칙은 반드시 이 순서로 밟는다:
 
 1. teamplgpt spec/커밋 확정 →
 2. okrservice `docs/teamplgpt-hr-*-workorder.md` 형식으로 작업지시서 발주(변경 endpoint 표 + 근거 커밋) →
@@ -223,7 +223,7 @@ LLM 프롬프트(L1·가드)는 확률적으로 동작한다. 그래서 민감�
 | Origin | 서버-사이드 fetch는 Origin 자동 미부착 → `TEAMPLGPT_WIDGET_ORIGIN` env를 명시 헤더로. teamplgpt embed `allowlist_domains`에 **동일 문자열** 등록. 미설정 시 401 |
 | embed 식별 | `TEAMPLGPT_EMBED_ID` = embed **uuid** (숫자 PK 넣으면 404) |
 | sessionId | **uuid 강제**(canRespond가 validate) — customerId별 UUID 발급·저장 |
-| hrBridge | `widgets/client/messenger/widget/hrBridge.ts` — 정적 path allowlist + YTA 정규식 + CommonCode queryId 화이트리스트. `$SELF_STAFF_ID` 치환. `BRIDGE_TIMEOUT_MS=25000`(teamplgpt 타임아웃과 중첩 계약) |
+| hrBridge | `widgets/client/messenger/widget/hrBridge.ts` — 정적 path allowlist + path별 조회 cmd allowlist(`CMD_ALLOWLIST`·`YTA_CMD_ALLOWLIST`, save*/delete* 차단) + YTA 정규식 + CommonCode queryId 화이트리스트. `$SELF_STAFF_ID` 치환. `BRIDGE_TIMEOUT_MS=25000`(teamplgpt 타임아웃과 중첩 계약) |
 | teamplgpt embed 설정 | `allow_tool_calling=true` + `client_tool_execution=true`(R1) + `allowed_skill_hashes`(스킬 제한 시) |
 
 ---
@@ -242,7 +242,7 @@ LLM 프롬프트(L1·가드)는 확률적으로 동작한다. 그래서 민감�
 | 빈 응답 | 필수 BODY 파라미터 축약(`searchSymdLv` 등 누락), `searchType=mobile` | 실측 본문 전량 원칙. `FORBIDDEN_FIXED_VALUES` 참고 |
 | 세션 만료가 JSON 파싱 에러로 보임 | kiwibox가 로그인 HTML 반환 | `hrSession.parseKiwiboxBody`가 처리 — 신규 호출 계층 만들지 말고 hrSession 경유 |
 | 응답 언랩 실패 | 래퍼 키가 endpoint별 상이(`result`/`DATA`/`Map`/`codeList`/`data`) | hrSession 언랩 계층 사용 |
-| 신규 endpoint가 embed에서만 실패 | okrservice hrBridge ALLOWED_PATHS 미갱신 | §2 동기화 규칙 — 작업지시서 발주 |
+| 신규 endpoint·cmd가 embed에서만 실패 | okrservice hrBridge ALLOWED_PATHS/CMD_ALLOWLIST 미갱신 | §2 동기화 규칙 — 작업지시서 발주 |
 
 ---
 

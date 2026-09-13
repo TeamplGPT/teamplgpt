@@ -8,6 +8,7 @@
  * 보안 장치:
  *  - postMessage origin 검증: 등록된 위젯 origin에서 온 요청만 처리
  *  - endpoint allowlist: 등록된 kiwibox 경로 외 실행 거부 (임의 URL 실행 차단)
+ *  - path + cmd 조합 allowlist: 허용 경로라도 조회 cmd 외(save*·delete* 등) 거부
  *  - self 강제: "$SELF_STAFF_ID" 마커를 페이지 컨텍스트의 본인 사번으로만 치환
  *  - 게이트 스킵 값 차단: searchType=mobile 등 금지 조합 거부
  *
@@ -62,6 +63,67 @@
   // 연말정산(hr-year-end-tax): 5 endpoint × 지원연도(2022~2025)만 허용.
   var YTA_PATH_RE =
     /^\/YTA(SummaryMgr|YndMedDtlMgr|YtaFamilySttusMgr|YndBefWrkDtlMgr|YndGivPayDtlMgr|InDctMgr)(2022|2023|2024|2025)\.do$/;
+
+  // path + cmd 조합 allowlist — kiwibox 컨트롤러는 cmd로 조회/저장/삭제를 분기하므로
+  // 경로만 검사하면 같은 경로의 save*/delete* 명령이 사용자 세션으로 실행될 수 있다.
+  // 등록 경로는 목록의 조회 cmd만 허용(cmd 부재도 거부), 미등록 경로(cmd 분기 없는
+  // 모바일 경로, config.allowedPaths로 추가한 경로)는 cmd 파라미터 자체를 거부.
+  // 스킬 handler의 cmd 추가·변경 시 이 목록과 okrservice hrBridge.ts 양쪽 갱신.
+  var CMD_ALLOWLIST = {
+    "/TAAWrkTimeStatusMgr.do": ["getTAAWrkTimeStatusMgrList"],
+    "/TAADclzWorkSearchCldr.do": ["getTAADclzWorkSearchCldr"],
+    "/TAADclzWorkOtSchdul.do": [
+      "getTAADclzWorkOtSchdulList",
+      "getTAADclzWorkOtSchdulList2",
+    ],
+    "/TAADclzVcatnCldrMgr.do": ["getTAADclzVcatnCldrMgr"],
+    "/TAADclzVcatnList.do": ["getTAADclzVcatnList1", "getTAADclzVcatnList2"],
+    "/PRCHrBassiemMgrTab220.do": ["getPRCHrBassiemMgrTab220List"],
+    "/SALPayslipNewMgr.do": [
+      "getSALPayslipNewMgrList",
+      "getSALPayslipNewMgrList2",
+      "getSALPayslipNewMgrMap",
+    ],
+    "/SALSalaryDtstmnMgr.do": [
+      "getSALSalaryDtstmnMgrList",
+      "getSALSalaryDtstmnMgrList2",
+      "getSALSalaryDtstmnMgrMap",
+    ],
+    "/SALSalaryBassMgr.do": ["getSALSalaryBassMgrTab110List"],
+    "/SALDaylabMgr.do": ["getSALDaylabMgrList"],
+    "/CommonCode.do": ["getCommonNSCodeList"],
+    "/EAPRequestMgr.do": ["getEAPRequestMgrList"],
+    "/CTIMcrtfReqstRefromMgr.do": ["getCTIMcrtfReqstRefromMgrList"],
+    "/CTIMcrtfIssuMgr.do": ["getCTIMcrtfIssuMgrList"],
+    "/LONLoanReqstListMgr.do": ["getLONLoanReqstListMgrList1"],
+  };
+
+  // YTA 경로는 연도를 뗀 컨트롤러명 기준 cmd allowlist
+  var YTA_CMD_ALLOWLIST = {
+    YTASummaryMgr: ["getYTASummaryMgrList"],
+    YTAYndMedDtlMgr: ["getYTAYndMedDtlMgrList"],
+    YTAYtaFamilySttusMgr: ["getYTAYtaFamilySttusMgrList"],
+    YTAYndBefWrkDtlMgr: ["getYTAYndBefWrkDtlMgrList"],
+    YTAYndGivPayDtlMgr: ["getYTAYndGivPayDtlMgrList"],
+    YTAInDctMgr: [
+      "getYTAInDctMgrTab06List",
+      "getYTAInDctMgrTab08List",
+      "getYTAInDctMgrTab13List",
+      "getYTAInDctMgrTab15List",
+    ],
+  };
+
+  function isCmdAllowed(path, formObj) {
+    var hasCmd = Object.prototype.hasOwnProperty.call(formObj, "cmd");
+    var yta = YTA_PATH_RE.exec(path);
+    var allowed = yta
+      ? YTA_CMD_ALLOWLIST["YTA" + yta[1]]
+      : Object.prototype.hasOwnProperty.call(CMD_ALLOWLIST, path)
+      ? CMD_ALLOWLIST[path]
+      : null;
+    if (!allowed) return !hasCmd;
+    return hasCmd && allowed.indexOf(String(formObj.cmd)) !== -1;
+  }
 
   function TeamplGPTHRBridge(config) {
     if (!config || !config.widgetOrigin) {
@@ -119,6 +181,15 @@
         ok: false,
         status: 0,
         body: "bridge: path not allowed",
+      });
+      return;
+    }
+
+    if (!isCmdAllowed(spec.path, spec.form || {})) {
+      this._reply(callId, {
+        ok: false,
+        status: 0,
+        body: "bridge: cmd not allowed",
       });
       return;
     }
