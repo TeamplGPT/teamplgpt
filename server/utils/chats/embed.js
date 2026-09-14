@@ -176,12 +176,26 @@ async function streamChatWithForEmbed(
       : null;
   const allTools =
     format != null ? ChatToolsManager.getToolDefinitions(format) : [];
+
+  // Tool calling setup — embed-specific: opt-in via allow_tool_calling + provider support.
+  // 이 값이 먼저 나와야 한다: allow_tool_calling=false면 allowed_skill_hashes가
+  // null(=무제한)이어도 실제로는 tool을 하나도 못 쓴다. 이 순서를 지키지 않으면
+  // allowedToolNames가 "전부 허용"으로 계산돼 HR 가드가 "즉시 tool_call하라"고
+  // 지시하는데 실제 tool은 하나도 전달 안 되는 모순이 생긴다(specs/022 G-4 —
+  // 실측: allow_tool_calling=false인 위젯에서 tool_call 형식 텍스트가 그대로 누출됨).
+  const toolsEnabled =
+    embed.allow_tool_calling === true &&
+    typeof LLMConnector.supportsToolCalling === "function" &&
+    LLMConnector.supportsToolCalling();
+
   const allowedToolNames =
-    format != null ? extractAllowedToolNames(allTools, embed.allowed_skill_hashes, format) : [];
+    toolsEnabled && format != null
+      ? extractAllowedToolNames(allTools, embed.allowed_skill_hashes, format)
+      : [];
   const messages = await LLMConnector.compressMessages(
     {
       systemPrompt: buildEmbedSystemPrompt(
-        await chatPrompt(embed.workspace, username),
+        await chatPrompt(embed.workspace, username, allowedToolNames),
         allowedToolNames
       ),
       userPrompt: message,
@@ -190,12 +204,6 @@ async function streamChatWithForEmbed(
     },
     rawHistory
   );
-
-  // Tool calling setup — embed-specific: opt-in via allow_tool_calling + provider support
-  const toolsEnabled =
-    embed.allow_tool_calling === true &&
-    typeof LLMConnector.supportsToolCalling === "function" &&
-    LLMConnector.supportsToolCalling();
 
   let tools = null;
   if (toolsEnabled) {
@@ -335,8 +343,18 @@ function shouldForceToolChoice(rawAllowedSkillHashes) {
 }
 
 function buildEmbedSystemPrompt(basePrompt, allowedToolNames = []) {
+  // 빈 배열은 "제한 없음"이 아니라 "전부 차단"이다(allowed_skill_hashes가 0개로
+  // 귀결된 경우). 이때 아무 말도 안 하면 모델이 발화만 보고 "출퇴근 기록 조회해줘"
+  // 같은 지극히 평범한 요청에도 tool 스키마 없이 tool_call 형식 텍스트를 지어낸다
+  // (specs/022 G-4 — 실측: HR skill이 하나도 안 붙은 위젯에서도 발생, DENY만의
+  // 특수 상황이 아니라 이런 위젯이 실제로 받는 흔한 질문 패턴이다).
   if (!Array.isArray(allowedToolNames) || allowedToolNames.length === 0) {
-    return basePrompt;
+    return `${basePrompt}
+
+Tool usage policy for this embed:
+- No tools are available in this conversation.
+- Never output text that looks like a tool call, function name, or internal parameters (e.g. "tool: ...", "query_type: ...", a fenced code block naming a tool) — answer only in plain natural language.
+- If the request needs a tool you don't have, say so plainly instead of describing what you would call.`;
   }
 
   const allowedList = allowedToolNames.join(", ");

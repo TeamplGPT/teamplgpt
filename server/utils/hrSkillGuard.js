@@ -8,8 +8,20 @@
 const DATE_LINE_TEMPLATE = (todayIso, todayWeekday) =>
   `[HR_DATE_CONTEXT] 오늘 날짜: ${todayIso} (${todayWeekday}). '오늘'·'어제'·'이번 주' 등 상대 날짜 표현은 이 날짜 기준으로 해석하고, 조회 결과 표에서 특정 일자 행을 찾을 때도 이 날짜를 사용하세요. 표의 첫 행이나 임의 행을 오늘로 간주하지 마세요. 오늘 일자 행이 없으면 없다고 답하세요.`;
 
-/** HR 스킬이 하나라도 활성화돼 있는지 (plugin hubId가 hr- 프리픽스). */
-function hrSkillActive() {
+/**
+ * HR 스킬이 하나라도 활성화돼 있는지 (plugin hubId가 hr- 프리픽스).
+ *
+ * @param {string[]} [allowedToolNames] embed 대화 단위 허용 도구 목록(hubId 그대로).
+ *   `ChatToolsManager.getToolDefinitions()`(활성 플러그인만 변환) →
+ *   `applyAllowedHashes()`(embed 허용 목록으로 필터) 두 단계를 이미 거친 배열이라
+ *   "활성 + 허용됨" 교집합이 이미 계산돼 있다 — 별도로 activeImportedPlugins()를
+ *   다시 조회할 필요가 없다. 안 주어지면(chat/query·@agent — 대화 단위 제한 개념이
+ *   없음) 기존처럼 워크스페이스 전역으로 판단한다.
+ */
+function hrSkillActive(allowedToolNames) {
+  if (Array.isArray(allowedToolNames)) {
+    return allowedToolNames.some((n) => String(n).startsWith("hr-"));
+  }
   const ImportedPlugin = require("./agents/imported");
   const active = ImportedPlugin.activeImportedPlugins();
   return active.some((name) => name.startsWith("@@hr-"));

@@ -91,17 +91,21 @@ async function recentChatHistory({
  * prevent tool-calls when user speech lacks scope (department / period) but has the
  * domain key (e.g., region name for hr-personnel-search).
  *
- * Trigger: at least one active plugin name starts with `@@hr-`.
+ * Trigger: at least one active plugin name starts with `@@hr-` (or, when
+ * `allowedToolNames` is given, at least one allowed tool name starts with `hr-`).
  *
+ * @param {string[]} [allowedToolNames] embed 대화 단위 허용 도구 목록 — 주어지면
+ *   워크스페이스 전역 대신 이 목록 기준으로 판단한다(임베드에서 HR skill이 전부
+ *   차단됐는데도 tool_call 지시가 들어가 내부 형식이 노출되던 문제 방지).
  * @returns {string|null} guard text to append, or null if no HR skill active.
  */
-function hrSkillChatGuard() {
+function hrSkillChatGuard(allowedToolNames) {
   const {
     hrSkillActive,
     hrDateContextLine,
     hrSkillCommonLines,
   } = require("../hrSkillGuard");
-  if (!hrSkillActive()) return null;
+  if (!hrSkillActive(allowedToolNames)) return null;
   return [
     hrDateContextLine(),
     ...hrSkillCommonLines(),
@@ -116,9 +120,10 @@ function hrSkillChatGuard() {
  * When HR skills are active, appends `hrSkillChatGuard()` (L2 layer).
  * @param {Object|null} workspace - the workspace object
  * @param {Object|null} user - the user object
+ * @param {string[]} [allowedToolNames] - embed 대화 단위 허용 도구 목록(있으면 전달)
  * @returns {Promise<string>} - the base prompt (+ optional HR guard)
  */
-async function chatPrompt(workspace, user = null) {
+async function chatPrompt(workspace, user = null, allowedToolNames) {
   const { SystemSettings } = require("../../models/systemSettings");
   const basePrompt =
     workspace?.openAiPrompt ?? SystemSettings.saneDefaultSystemPrompt;
@@ -127,7 +132,7 @@ async function chatPrompt(workspace, user = null) {
     user?.id,
     workspace?.id
   );
-  const hrGuard = hrSkillChatGuard();
+  const hrGuard = hrSkillChatGuard(allowedToolNames);
   return hrGuard ? `${expanded}\n\n${hrGuard}` : expanded;
 }
 
