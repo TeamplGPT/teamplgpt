@@ -73,11 +73,14 @@ const FIXTURES_BY_CMD = {
   // 실측 42필드 superset: timesheet 화이트리스트(staTime/endTime/lateYn 등)와
   // work_status 화이트리스트(inTime/outTime/lateTime 등) 키를 모두 포함해야
   // 두 query_type 렌더가 모두 채워진다 (kiwibox-endpoint-test-guide §3.2).
+  // 플래그 계열(lateYn·earlyYn·absentYn 등)은 Y/N이 아니다 — 실측(2026-09-14 ntest):
+  // 해당 없으면 공란, 있을 때만 서술 텍스트/코드가 온다(specs/014 §4.1, gaps.md 부록B).
+  // "N" 문자열을 넣으면 존재-기반 판정(has())이 전부 계상해버려 집계가 깨진다 — K4 실측 중 발견.
   getTAAWrkTimeStatusMgrList: {
     result: [
-      { workYmd: "20260701", week: "수", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0855", endTime: "1810", inTime: "0855", outTime: "1810", lateYn: "N", earlyYn: "N", absentYn: "N", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
-      { workYmd: "20260703", week: "금", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0910", endTime: "1805", inTime: "0910", outTime: "1805", lateYn: "Y", earlyYn: "N", absentYn: "N", lateTime: "10", earlyTime: "0", goOutTime: "0", otTime: "0" },
-      { workYmd: "20260706", week: "월", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0850", endTime: "1800", inTime: "0850", outTime: "1800", lateYn: "N", earlyYn: "N", absentYn: "N", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
+      { workYmd: "20260701", week: "수", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0855", endTime: "1810", inTime: "0855", outTime: "1810", lateYn: "", earlyYn: "", absentYn: "", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
+      { workYmd: "20260703", week: "금", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0910", endTime: "1805", inTime: "0910", outTime: "1805", lateYn: "지각", earlyYn: "", absentYn: "", lateTime: "10", earlyTime: "0", goOutTime: "0", otTime: "0" },
+      { workYmd: "20260706", week: "월", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0850", endTime: "1800", inTime: "0850", outTime: "1800", lateYn: "", earlyYn: "", absentYn: "", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
     ],
   },
 };

@@ -267,7 +267,7 @@ module.exports.runtime = {
       }
 
       this.introspect(`${label} 조회 완료.`);
-      return formatAttendance(records, label, COLUMNS_BY_QT[query_type]);
+      return formatAttendance(records, label, COLUMNS_BY_QT[query_type], query_type);
     } catch (e) {
       this.logger("Error in hr-attendance", e.message);
       return `> ⚠️ 근태 조회 중 오류가 발생했습니다: ${e.message}`;
@@ -275,7 +275,7 @@ module.exports.runtime = {
   },
 };
 
-function formatAttendance(data, label, columns) {
+function formatAttendance(data, label, columns, query_type) {
   const {
     normalizeData,
     renderTable,
@@ -288,7 +288,12 @@ function formatAttendance(data, label, columns) {
   // 화이트리스트 정의가 있으면 선별 렌더(내부 PK·사번·코드 제외).
   if (columns) {
     const table = renderWhitelisted(data, columns);
-    return table ? md + table : md + "> 조회된 데이터가 없습니다.";
+    if (!table) return md + "> 조회된 데이터가 없습니다.";
+    // 근무현황 요약만 표 위에 집계 한 줄을 붙인다. 실패해도 표 렌더는 살려야 한다
+    // (집계는 부가 정보, 표가 본체 — specs/014).
+    const summaryLine =
+      query_type === "work_status" ? safeSummarizeWorkStatus(data) : "";
+    return md + summaryLine + table;
   }
 
   // 정의 없는 query_type은 통짜 렌더(하위호환) — 단 공통 내부 식별자만 제외.
@@ -304,4 +309,90 @@ function formatAttendance(data, label, columns) {
     md += `\n${renderSummary(summary)}`;
   }
   return md;
+}
+
+// row[col] ?? row[col.toLowerCase()] ?? row[camel(col)] — renderWhitelisted와 동일 규칙.
+// 집계기가 다른 키 조회 규칙을 쓰면 "표엔 결근이 찍히는데 집계는 결근 0일"처럼
+// 모순된 두 정보를 LLM에 동시에 주게 된다(specs/014 §5, "조용한 0").
+function camel(snake) {
+  return snake.toLowerCase().replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+}
+function field(row, col) {
+  return row[col] ?? row[col.toLowerCase()] ?? row[camel(col)];
+}
+
+// 플래그: 존재 여부. kiwibox는 해당 없을 때 NULL/공백을 주지 "N"을 주지 않는다 —
+// "N"이 들어오면 계상되는 것이 화면(taaWrkTimeStatusMgr.jsp) 판정과 같은 동작이다.
+function has(v) {
+  return v != null && String(v).replace(/\s/g, "") !== "";
+}
+// 승인OT: 숫자 > 0. "1.5시간"처럼 단위가 붙어 와도 숫자만 추출해 판정한다.
+function otHas(v) {
+  return parseFloat(String(v).replace(/[^0-9.-]/g, "")) > 0;
+}
+
+const OT_FIELDS = ["otWorkOver", "otWorkNight", "otHoliWork", "otHoliOver", "otHoliNight"];
+
+/**
+ * 근무현황 표 위에 붙일 집계 한 줄. 실패하면 빈 문자열 — 집계 실패가 표 렌더를
+ * 죽이면 안 된다(specs/014 §5). 화이트리스트 적용 **전** raw 레코드를 받아야
+ * absentYn·승인OT 5종처럼 표에는 안 나오는 필드까지 판정할 수 있다.
+ */
+function safeSummarizeWorkStatus(data) {
+  try {
+    return summarizeWorkStatus(data);
+  } catch (_) {
+    return "";
+  }
+}
+
+function summarizeWorkStatus(data) {
+  const rows = Array.isArray(data) ? data : data ? [data] : [];
+  if (rows.length === 0) return "";
+
+  let normal = 0, late = 0, early = 0, absent = 0, missing = 0;
+  let leave = 0, bizTrip = 0, education = 0, otDays = 0, otHours = 0;
+
+  for (const row of rows) {
+    const isLate = has(field(row, "lateYn"));
+    const isEarly = has(field(row, "earlyYn")) || has(field(row, "earlyOtYn"));
+    const isAbsent = has(field(row, "absentYn"));
+    const isMissing = has(field(row, "inTime")) !== has(field(row, "outTime")); // XOR
+    const otAmounts = OT_FIELDS.map((k) => field(row, k));
+    const isOt = otAmounts.some(otHas);
+
+    if (isLate) late++;
+    if (isEarly) early++;
+    if (isAbsent) absent++;
+    if (isMissing) missing++;
+    if (has(field(row, "annualLeave")) || has(field(row, "etcLeave"))) leave++;
+    if (has(field(row, "bizTrip"))) bizTrip++;
+    if (has(field(row, "education"))) education++;
+    if (isOt) {
+      otDays++;
+      otHours += otAmounts
+        .map((v) => parseFloat(String(v).replace(/[^0-9.-]/g, "")))
+        .filter((n) => Number.isFinite(n) && n > 0)
+        .reduce((a, b) => a + b, 0);
+    }
+    // mark === "NORMAL"만 정상 판단 기준 — 화면과 동일하게 이 문자열로만 비교.
+    if ((field(row, "mark") === "NORMAL" || isOt) && !isLate && !isEarly && !isAbsent && !isMissing) {
+      normal++;
+    }
+  }
+
+  const parts = [`집계(${rows.length}일)`];
+  if (normal) parts.push(`정상 ${normal}일`);
+  if (late) parts.push(`지각 ${late}회`);
+  if (early) parts.push(`조퇴 ${early}회`);
+  if (absent) parts.push(`결근 ${absent}일`);
+  if (missing) parts.push(`출퇴근누락 ${missing}일`);
+  if (leave) parts.push(`휴가 ${leave}일`);
+  if (bizTrip) parts.push(`출장 ${bizTrip}일`);
+  if (education) parts.push(`교육 ${education}일`);
+  // OT 5종 합산은 TAAF_OT_TIME이 배수(1.5/0.5/2.0)로 계산한 값이라 단순 시간이 아니다
+  // — "총 연장시간"이라 단정하지 않고 "승인 N.Nh"로만 적는다. 종류별 상세는 표에 있다.
+  if (otDays) parts.push(`연장근로 ${otDays}일(승인 ${otHours.toFixed(1)}h)`);
+
+  return `> ${parts.join(" · ")}\n\n`;
 }
