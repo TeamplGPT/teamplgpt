@@ -5,12 +5,12 @@
   "version": "2.2.0",
   "hubId": "hr-personnel",
   "author": "teamplgpt",
-  "description": "본인의 인사정보와 회사 공통 정보를 5240 HR 시스템에서 조회하는 skill입니다 — 사원증 기본정보, 인사카드 상세, 조직도/조직원, 할일·미결 건수, 일자별 일정/생일, 운영자 연락처, 교육이력. '내 직급이 뭐로 돼있지?', '그 팀엔 누구누구 있어?', '내일 회사에 무슨 일정 있어?'처럼 인사 용어 없이 묻는 경우도 포함됩니다. 경계: 가족정보/부양가족은 이 skill에서 제공하지 않습니다(개인정보 보호 — 부양가족 '공제'는 hr-year-end-tax). 결재 문서의 목록·내용은 hr-approval을 사용하세요(이 skill의 todo_count는 건수만 제공).",
+  "description": "본인의 인사정보와 회사 공통 정보를 5240 HR 시스템에서 조회하는 skill입니다 — 사원증 기본정보, 인사카드 상세, 조직도/조직원, 할일·미결 건수, 일자별 일정 건수, 생일자 명단, 일정/공휴일 제목, 교육이력. '내 직급이 뭐로 돼있지?', '그 팀엔 누구누구 있어?', '내일 회사에 무슨 일정 있어?'처럼 인사 용어 없이 묻는 경우도 포함됩니다. 경계: 가족정보/부양가족은 이 skill에서 제공하지 않습니다(개인정보 보호 — 부양가족 '공제'는 hr-year-end-tax). 결재 문서의 목록·내용은 hr-approval을 사용하세요(이 skill의 todo_count는 건수만 제공). 운영자/담당자 연락처는 현재 제공하지 않습니다(연동 endpoint 미배포).",
   "entrypoint": {
     "file": "handler.js",
     "params": {
       "query_type": {
-        "description": "조회 종류 (필수). 키워드가 아니라 사용자의 의도로 판단하세요: profile=사원증 기본정보 — 내 성명/소속/직위/직책/근무유형/재직상태/연락처가 관심사일 때, profile_detail=인사카드 상세 — 학력/경력/자격증 등 인사카드 등재 내용이 관심사일 때, org_tree=조직도/부서 구성, org_members=특정 조직의 구성원 목록(org_cd 필요 — 모르면 먼저 org_tree로 확인), todo_count=할일/미결 결재/알림 '건수' — 몇 건인지 숫자가 관심사일 때(문서 목록·내용은 hr-approval), schedule_day=일자별 일정/생일자/공휴일, contact_directory=운영자/담당자 연락처, education=본인 교육이력(교육명/기간/기관/시간/포인트). 종류가 불분명하면 profile을 사용하세요.",
+        "description": "조회 종류 (필수). 키워드가 아니라 사용자의 의도로 판단하세요: profile=사원증 기본정보 — 내 성명/소속/직위/직책/근무유형/재직상태/연락처가 관심사일 때, profile_detail=인사카드 상세 — 학력/경력/자격증 등 인사카드 등재 내용이 관심사일 때, org_tree=조직도/부서 구성, org_members=특정 조직의 구성원 목록(본인 팀이면 org_cd 생략 — 서버가 본인 소속으로 조회), todo_count=할일/미결 결재/알림 '건수' — 몇 건인지 숫자가 관심사일 때(문서 목록·내용은 hr-approval), schedule_day=일자별 일정·생일 '건수'만(몇 건인지), birthday=**생일자가 누구인지**(이름/소속/직위 명단 — '생일자 알려줘'처럼 누구인지가 관심사면 이걸 쓰세요, schedule_day 아님), schedule_titles=일정·공휴일 '제목'(무슨 일정인지가 관심사일 때. 날짜별로 구분되진 않습니다), education=본인 교육이력(교육명/기간/기관/시간/학점/수료여부). [CRITICAL] education의 '수료여부' 값(수료/미수료/기타/미입력)이 완료 여부의 유일한 근거입니다 — 종료일이 지났다는 이유로 수료로 단정하지 마세요. '미입력'은 수료도 미수료도 아니니 그대로 밝히세요. 종류가 불분명하면 profile을 사용하세요.",
         "type": "string",
         "enum": [
           "profile",
@@ -19,16 +19,17 @@
           "org_members",
           "todo_count",
           "schedule_day",
-          "contact_directory",
+          "birthday",
+          "schedule_titles",
           "education"
         ]
       },
       "year_month": {
-        "description": "조회 연월 (선택). 사용자가 기간을 언급한 경우에만 전달하고, 없으면 생략하세요(이번 달 자동 적용). 형식·되묻기 금지 규칙은 시스템 지시 [HR_SKILL_COMMON]을 따르세요. schedule_day에서만 사용.",
+        "description": "조회 연월 (선택). 사용자가 기간을 언급한 경우에만 전달하고, 없으면 생략하세요(이번 달 자동 적용). 형식·되묻기 금지 규칙은 시스템 지시 [HR_SKILL_COMMON]을 따르세요. schedule_day·birthday·schedule_titles에서만 사용.",
         "type": "string"
       },
       "org_cd": {
-        "description": "조직코드 (org_members에서 필수, org_tree에서 선택). 반드시 org_tree(조직도) 조회 결과에 포함된 조직코드 값만 사용하세요. 모르면 먼저 query_type=org_tree로 조회한 뒤 그 결과의 조직코드로 org_members를 호출하세요.",
+        "description": "조직코드 (선택). [CRITICAL] 생략하면 본인 소속 조직이 자동 적용됩니다 — '우리 팀', '내 부서', '팀원 누구야'처럼 본인 기준 질문에는 org_cd를 넣지 마세요. 사용자가 특정 조직을 지목했을 때만(예: '영업팀 팀원') 그 조직의 코드를 query_type=org_tree 결과에서 얻어 전달하세요. 조직코드를 추측해 만들지 마세요 — 임의로 고르면 엉뚱한 팀이 조회되고, 조회가 성공해 보여 오답을 알아채기 어렵습니다.",
         "type": "string"
       }
     },
@@ -115,24 +116,28 @@
       "call": "{\"query_type\": \"org_tree\"}"
     },
     {
-      "prompt": "그 팀 팀원 목록 알려줘",
-      "call": "{\"query_type\": \"org_members\", \"org_cd\": \"ORG123\"}"
+      "prompt": "우리 팀 팀원 목록 알려줘",
+      "call": "{\"query_type\": \"org_members\"}"
     },
     {
       "prompt": "내 할일이랑 미결 결재 몇 건이야?",
       "call": "{\"query_type\": \"todo_count\"}"
     },
     {
-      "prompt": "이번 달 생일자 알려줘",
+      "prompt": "이번 달 생일인 사람 몇 명이야?",
       "call": "{\"query_type\": \"schedule_day\"}"
     },
     {
-      "prompt": "3월 공휴일 일정 보여줘",
-      "call": "{\"query_type\": \"schedule_day\", \"year_month\": \"3\"}"
+      "prompt": "이번 달 생일자 누구누구야?",
+      "call": "{\"query_type\": \"birthday\"}"
     },
     {
-      "prompt": "시스템 운영자 연락처 알려줘",
-      "call": "{\"query_type\": \"contact_directory\"}"
+      "prompt": "3월 공휴일 일정 보여줘",
+      "call": "{\"query_type\": \"schedule_titles\", \"year_month\": \"3\"}"
+    },
+    {
+      "prompt": "이번 달 무슨 일정 있어?",
+      "call": "{\"query_type\": \"schedule_titles\"}"
     },
     {
       "prompt": "내 교육이력 보여줘",

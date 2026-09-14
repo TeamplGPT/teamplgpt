@@ -108,6 +108,21 @@ FIXTURES_BY_CMD.getSALDaylabMgrList = {
   ],
 };
 
+// 교육이력(PRCHrBassiemMgrTab220) — K56: FIN_CD 수료여부 코드값 매핑 검증.
+// 1건은 수료(finCd=1), 1건은 미입력(finCd 없음) — 둘 다 화이트리스트 라벨로 렌더돼야 한다.
+FIXTURES_BY_CMD.getPRCHrBassiemMgrTab220List = {
+  DATA: [
+    {
+      eduNm: "오라클 튜닝", staYmd: "20260501", endYmd: "20260501",
+      ofcNm: "오라클", contentsNm: "튜닝", eduTime: "8", eduPoint: "1", finCd: "1",
+    },
+    {
+      eduNm: "영업관리", staYmd: "20260601", endYmd: "20260603",
+      ofcNm: "사내교육팀", contentsNm: "영업관리", eduTime: "16", eduPoint: "", finCd: "",
+    },
+  ],
+};
+
 const FIXTURES_BY_PATH = {
   "/getMBLPrtEmpCard.do": {
     DATA: [
@@ -121,6 +136,30 @@ const FIXTURES_BY_PATH = {
         homeTel: "", faxNo: "", handPhone: "010-1234-5678", connectTel: "",
         mailId: "osagong@example.com", outMailId: "", loginId: "osagong",
       },
+    ],
+  },
+  // 인사카드 상세(getMBLPrtEmpCardPop) — K57: '◎ 가족' 행이 렌더 전에 차단되는지 검증.
+  // 실측 형태 재현: MENU_NM/CONTENTS 2컬럼에 여러 섹션이 행으로 실려 온다.
+  "/getMBLPrtEmpCardPop.do": {
+    DATA: [
+      { menuNm: "◎ 기본", contents: "오사공 책임<BR>개발팀 책임, 재직" },
+      { menuNm: "◎ 가족", contents: "·김미선, 39세 여자 배우자<BR>·오준영, 5세 남자 부" },
+    ],
+  },
+  // 생일자 명단(getBirthDetailList) — K58: ymd(생년월일) 연도가 MM-DD로 마스킹되는지 검증.
+  "/getBirthDetailList.do": {
+    DATA: [
+      { ymd: "19900915", staffId: "100:2016:00552:iCTB", staffNm: "박광재", orgNm: "인사팀", einfo5: "사원", title: "인사팀 박광재 사원" },
+    ],
+  },
+  // 일정/공휴일 제목(getHRDetailList) — K59: title 목록 렌더 + 중복 제거 검증.
+  // 실측(2026-09-14 ntest): 연휴는 날짜 필드가 없어 하루=1행, 같은 제목이 일수만큼 반복된다.
+  "/getHRDetailList.do": {
+    DATA: [
+      { title: "추석" },
+      { title: "추석" },
+      { title: "추석" },
+      { title: "전사 워크숍" },
     ],
   },
 };
