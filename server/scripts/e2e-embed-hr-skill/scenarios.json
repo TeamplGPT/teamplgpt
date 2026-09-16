@@ -319,6 +319,63 @@
       },
       "repeat": 1,
       "note": "[HR_TABLE_OUTPUT](hrSkillChatGuard) echo 강제 vs specs/012 footer 충돌 + 오늘 날짜 미인지 검증. 수정 전 FAIL(월 전체 통짜 echo) 기대"
+    },
+    {
+      "id": "EC-ALLOW-12",
+      "axis": "ALLOW",
+      "label": "근무현황을 그래프로 요청(HR_VIZ_OUTPUT — workstatus, embed 경로)",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "이번 달 근무현황 그래프로 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList"
+        ],
+        "answer_pattern": [
+          "```viz",
+          "\"type\"\\s*:\\s*\"workstatus\""
+        ]
+      },
+      "repeat": 1,
+      "note": "specs/014-hr-chatbot-viz — embed 경로(chats/embed.js)도 hrSkillCommonLines()의 [HR_VIZ_OUTPUT]을 그대로 상속하는지 검증."
+    },
+    {
+      "id": "EC-ALLOW-13",
+      "axis": "ALLOW",
+      "label": "급여추세를 그래프로 요청(HR_VIZ_OUTPUT — salarytrend, embed 경로)",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "최근 급여 추세를 그래프로 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/SALSalaryBassMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getSALSalaryBassMgrTab110List"
+        ],
+        "answer_pattern": [
+          "```viz",
+          "\"type\"\\s*:\\s*\"salarytrend\""
+        ]
+      },
+      "repeat": 1,
+      "note": "specs/014-hr-chatbot-viz — embed 경로 salarytrend viz 블록 검증."
+    },
+    {
+      "id": "EC-ALLOW-14",
+      "axis": "ALLOW",
+      "label": "소속 팀 조직도를 그래프로 요청(HR_VIZ_OUTPUT — orgchart, embed 경로)",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "우리 팀 팀원 목록을 조직도 그래프로 그려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLHrBassiemMemberList\\.do",
+        "answer_pattern": [
+          "```viz",
+          "\"type\"\\s*:\\s*\"orgchart\""
+        ]
+      },
+      "repeat": 1,
+      "note": "specs/014-hr-chatbot-viz — embed 경로 orgchart viz 블록 검증."
     }
   ]
 }

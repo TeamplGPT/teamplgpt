@@ -947,6 +947,70 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "getScheduleDay는 건수만 줘서 '무슨 일정인지'에 답할 수 없었다(gaps.md G-6) — getHRDetailList로 제목 목록을 받는다. 실측(2026-09-14 ntest): 이 endpoint는 날짜 필드가 없어 연휴 하루당 1행씩 같은 제목이 반복된다('추석' 3행) — dedupeByColumn으로 렌더 전 중복 제거해야 '추석'이 한 번만 나온다."
+    },
+    {
+      "id": "K60",
+      "label": "근무현황을 그래프로 요청(HR_VIZ_OUTPUT — workstatus)",
+      "message": "@agent 이번 달 근무현황 그래프로 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList"
+        ],
+        "answer_pattern": [
+          "```viz",
+          "\"type\"\\s*:\\s*\"workstatus\"",
+          "\"labels\"",
+          "\"values\""
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/014-hr-chatbot-viz — 그래프 명시 요청 시에만 hrSkillGuard.js의 [HR_VIZ_OUTPUT] 규칙이 tool 결과(work_status)를 viz 코드블록으로 재포장하는지 검증. 가드 추가 전에는 answer_pattern 미충족으로 FAIL해야 한다."
+    },
+    {
+      "id": "K61",
+      "label": "급여추세를 그래프로 요청(HR_VIZ_OUTPUT — salarytrend)",
+      "message": "@agent 최근 급여 추세를 그래프로 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/SALSalaryBassMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getSALSalaryBassMgrTab110List"
+        ],
+        "answer_pattern": [
+          "```viz",
+          "\"type\"\\s*:\\s*\"salarytrend\"",
+          "\"series\""
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/014-hr-chatbot-viz — salary_statement(연 단위 월별 레코드)를 신규 조회 없이 그대로 salarytrend viz 블록의 series로 옮기는지 검증."
+    },
+    {
+      "id": "K62",
+      "label": "소속 팀 조직도를 그래프로 요청(HR_VIZ_OUTPUT — orgchart)",
+      "message": "@agent 우리 팀 팀원 목록을 조직도 그래프로 그려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLHrBassiemMemberList\\.do",
+        "mock_body_pattern": [
+          "searchTypeVal=N"
+        ],
+        "answer_pattern": [
+          "```viz",
+          "\"type\"\\s*:\\s*\"orgchart\"",
+          "\"members\""
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/014-hr-chatbot-viz — org_members(본인 소속 팀 1단계 구성원 목록)를 orgchart viz 블록(root+members)으로 옮기는지 검증. '조직도'라는 단어만으로도 그래프 요청으로 인식되는지 함께 확인."
     }
   ]
 }

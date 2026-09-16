@@ -111,6 +111,16 @@ FIXTURES_BY_CMD.getSALDaylabMgrList = {
   ],
 };
 
+// 월별지급내역(SALSalaryBassMgr) — K61: salary_statement를 그래프로 요청 시
+// 여러 달치 레코드가 salarytrend viz 블록의 series로 옮겨지는지 검증.
+FIXTURES_BY_CMD.getSALSalaryBassMgrTab110List = {
+  DATA: [
+    { salYmd: "20260125", orgNm: "개발1팀", posNm: "책임", jtotAmt: "3500000", gtotAmt: "300000", ctotAmt: "3200000" },
+    { salYmd: "20260225", orgNm: "개발1팀", posNm: "책임", jtotAmt: "3500000", gtotAmt: "300000", ctotAmt: "3200000" },
+    { salYmd: "20260325", orgNm: "개발1팀", posNm: "책임", jtotAmt: "3600000", gtotAmt: "310000", ctotAmt: "3290000" },
+  ],
+};
+
 // 교육이력(PRCHrBassiemMgrTab220) — K56: FIN_CD 수료여부 코드값 매핑 검증.
 // 1건은 수료(finCd=1), 1건은 미입력(finCd 없음) — 둘 다 화이트리스트 라벨로 렌더돼야 한다.
 FIXTURES_BY_CMD.getPRCHrBassiemMgrTab220List = {
@@ -127,6 +137,14 @@ FIXTURES_BY_CMD.getPRCHrBassiemMgrTab220List = {
 };
 
 const FIXTURES_BY_PATH = {
+  // 조직원 목록(getMBLHrBassiemMemberList) — K62: 소속 팀 구성원을 orgchart viz의
+  // members(1단 트리)로 옮기는지 검증. cmd 없이 경로로만 매칭되는 endpoint.
+  "/getMBLHrBassiemMemberList.do": {
+    DATA: [
+      { STAFF_NM: "홍길동", STAFF_NO: "20260002", ORG_NM: "개발1팀", POS_NM: "팀장", RES_NM: "팀장", CORP_NM: "오이사공", WORK_TYPE: "통상근무", WORK_INFO: "" },
+      { STAFF_NM: "오사공", STAFF_NO: "20260001", ORG_NM: "개발1팀", POS_NM: "책임", RES_NM: "팀원", CORP_NM: "오이사공", WORK_TYPE: "통상근무", WORK_INFO: "" },
+    ],
+  },
   "/getMBLPrtEmpCard.do": {
     DATA: [
       {

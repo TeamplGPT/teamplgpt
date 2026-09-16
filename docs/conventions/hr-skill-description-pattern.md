@@ -48,6 +48,7 @@ description 규율은 한 곳에 있지 않다. 바꿀 때는 아래를 함께 �
 | `[HR_TOOL_CALL_PRIORITY]` | workspace 프롬프트의 "모호성 검사 → 되묻기" 절차보다 HR 지시와 tool description이 우선 |
 | `[ORDER]` | HR 요청의 첫 액션은 tool_call |
 | `[HR_SALARY_TWO_STEP]` | hr-salary는 pay_item 미확보 시 무조건 `pay_periods` 선행 |
+| `[HR_VIZ_OUTPUT]` | 명시적 시각화 요청(그래프/차트/도표) 시에만 tool 결과를 ```viz JSON 블록(orgchart/workstatus/salarytrend)으로 추가 출력. 신규 조회 없음(specs/014-hr-chatbot-viz) |
 | `[HR_TABLE_OUTPUT]` / `[HR_TABLE_OUTPUT_ENRICHMENT]` | tool 결과 표 소비 방식 (footer 계약과 짝) |
 
 **중복 금지 규칙** — `[HR_SKILL_COMMON]`에 있는 문장을 description에 다시 쓰지 않는다. "사번은 필요 없습니다", "되묻지 마세요", "즉시 tool-call하세요", year_month 형식 나열은 전부 L2 소관이다. description에서는 필요할 때 `[HR_SKILL_COMMON]을 따르세요`로 **참조**만 한다(§5.2). 두 곳에 같은 규칙을 쓰면 한쪽만 고쳐지는 드리프트가 생기고, description 길이만 늘어 고유 정보가 희석된다. 유일한 허용 예외는 hr-salary 2단계 규칙이다(§4.3).

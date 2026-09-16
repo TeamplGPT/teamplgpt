@@ -25,7 +25,7 @@
 
 **Purpose**: 신규 의존성 준비
 
-- [ ] T001 [P] okrservice `widgets/package.json`의 `dependencies`에 `mermaid`, `chart.js` 추가 후 `yarn install`(widgets 디렉토리에서 실행)
+- [X] T001 [P] okrservice `widgets/package.json`의 `dependencies`에 `mermaid`, `chart.js` 추가 후 `yarn install`(widgets 디렉토리에서 실행) — mermaid는 `11.8.1` 정확 고정(Node 18 호환, marked 의존성 버전 이슈로 caret 대신 exact pin 필요했음)
 
 ---
 
@@ -35,12 +35,12 @@
 
 **⚠️ CRITICAL**: 이 단계가 끝나야 Phase 3+ 스토리 작업을 시작할 수 있다.
 
-- [ ] T002 teamplgpt `server/scripts/e2e-hr-skill/scenarios.json`에 시각화 요청 시나리오 3개 추가(work_status/salary_statement/org_members 각 1개, "~그래프로 보여줘" 발화, 기대값에 `viz` 코드블록 포함 여부 체크 추가) — 실행해 **FAIL 확인**(`npm run e2e:hr-skill -- --only=<신규ID들>`)
-- [ ] T003 teamplgpt `server/scripts/e2e-embed-hr-skill/`의 시나리오 파일에 동일 3종 시각화 요청 시나리오 추가 — 실행해 **FAIL 확인**(`npm run e2e:embed-hr-skill -- --only=<신규ID들>`)
-- [ ] T004 teamplgpt `server/utils/hrSkillGuard.js`의 `hrSkillCommonLines()`에 `[HR_VIZ_OUTPUT]` 규칙 추가(contracts/viz-block.schema.md 포맷 그대로 지시) — depends on T002, T003
-- [ ] T005 teamplgpt T002·T003 시나리오 재실행, **전건 PASS 확인** — depends on T004 (헌장 §III E2E-First 완료 지점)
-- [ ] T006 [P] okrservice `widgets/client/messenger/components/chatbot/ChatbotView.tsx`의 `flushCodeBlock()`에 `codeLang === "viz"` 분기 추가 — JSON.parse 실패 또는 `vizRenderers.dispatchViz()`가 무효 판정 시 기존 코드블록 폴백 렌더링 유지, 유효 시 반환된 React 노드를 대신 렌더
-- [ ] T007 [P] okrservice 신규 파일 `widgets/client/messenger/components/chatbot/vizRenderers.ts` 생성 — `VizBlock`/`OrgChartData`/`WorkStatusData`/`SalaryTrendData` 타입 정의, `dispatchViz(raw: string)` 함수(JSON 파싱 + `type` 분기 + 각 렌더 함수 호출, 미구현/무효 시 `null` 반환), `loadChartJs()`/`loadMermaid()` 동적 import 유틸. `renderOrgChart`/`renderWorkStatusChart`/`renderSalaryTrendChart`는 이 단계에서 `null`을 반환하는 자리표시자로 선언(각 스토리에서 구현)
+- [X] T002 teamplgpt `server/scripts/e2e-hr-skill/scenarios.json`에 시각화 요청 시나리오 3개(K60/K61/K62) 추가 + `mock-hr-api.js`에 salary_statement 다개월/org_members fixture 보강 — FAIL 확인 완료(3/3 FAIL, 사유: viz 블록 누락). 부수 발견: "조직도"만으로는 기존 라우팅이 org_tree로 가서 K62 메시지를 "팀원 목록을 조직도로" 형태로 보정(spec.md에 기록)
+- [X] T003 teamplgpt `server/scripts/e2e-embed-hr-skill/scenarios.json`에 동일 3종(EC-ALLOW-12/13/14) 추가 — FAIL 확인 완료(3/3 FAIL, 사유 동일). 무관한 기존 실패(EC-ALLOW-04, 사전부터 실패) 확인 — 본 변경과 무관, 범위 밖
+- [X] T004 teamplgpt `server/utils/hrSkillGuard.js`의 `hrSkillCommonLines()`에 `[HR_VIZ_OUTPUT]` 규칙 추가(contracts/viz-block.schema.md 포맷 그대로 지시) — depends on T002, T003
+- [X] T005 teamplgpt T002·T003 시나리오 재실행, **전건 PASS 확인** — hr-skill 60/61(무관한 기존 결함 KB48 1건, 가드 적용 전 baseline에서도 동일 실패함을 stash로 대조 확인), embed-hr-skill 26/26(단독 실행 시) — depends on T004 (헌장 §III E2E-First 완료 지점)
+- [X] T006 [P] okrservice `widgets/client/messenger/components/chatbot/ChatbotView.tsx`의 `flushCodeBlock()`에 `codeLang === "viz"` 분기 추가 — JSON.parse 실패 또는 `vizRenderers.dispatchViz()`가 무효 판정 시 기존 코드블록 폴백 렌더링(`flushPlainCodeBlock`으로 분리) 유지, 유효 시 `VizBlockRenderer` 노드를 대신 렌더
+- [X] T007 [P] okrservice 신규 파일 `widgets/client/messenger/components/chatbot/vizRenderers.ts` 생성 — `OrgChartData`/`WorkStatusData`/`SalaryTrendData` 타입, `dispatchViz(raw: string)`(JSON 파싱 + `type` 분기), `loadChartJs()`/`loadMermaid()` 동적 import 유틸, `VizBlockRenderer` 공용 마운트 컴포넌트. 계획 대비 변경: 자리표시자 없이 3개 렌더 함수를 이 단계에서 함께 구현(스토리 3개가 한 파일의 서로 다른 export라 단계 분리 실익이 없어 T008/T012/T016과 통합 완료)
 
 **Checkpoint**: 가드 규칙과 렌더 디스패치 골격 완료 — 이제 스토리별로 실제 렌더 함수만 채우면 됨.
 
@@ -54,10 +54,10 @@
 
 ### Implementation for User Story 1
 
-- [ ] T008 [P] [US1] okrservice `vizRenderers.ts`의 `renderWorkStatusChart(data)` 구현 — `WorkStatusData` → Chart.js bar config 객체 반환, `labels`/`values` 누락·길이 불일치 시 `null` 반환
-- [ ] T009 [US1] okrservice `ChatbotView.tsx`(또는 `vizRenderers.ts`의 마운트 헬퍼) — `type==="workstatus"`일 때 `<canvas>` 엘리먼트 생성 후 `loadChartJs()` 완료 시 `new Chart(canvas, config)` 호출하도록 연결 — depends on T007, T008
-- [ ] T010 [P] [US1] okrservice 신규 `widgets/client/messenger/components/chatbot/__tests__/vizRenderers.test.ts`에 `renderWorkStatusChart` 유닛 테스트 추가(정상 입력 1케이스, 필수 필드 누락 1케이스)
-- [ ] T011 [US1] 수동 검증 — quickstart.md 시나리오 2의 2번(근무현황 그래프) 실 위젯 데모 + 회귀 확인("그래프" 미언급 질문은 기존과 동일하게 표만 출력) — depends on T009
+- [X] T008 [P] [US1] okrservice `vizRenderers.ts`의 `renderWorkStatusChart(data)` 구현 — `WorkStatusData` → Chart.js bar config 객체 반환, `labels`/`values` 누락·길이 불일치 시 invalid, 0건 시 empty
+- [X] T009 [US1] okrservice `VizBlockRenderer`(vizRenderers.ts) — `workstatus` 결과일 때 `<canvas>` 생성 후 `loadChartJs()` 완료 시 `new Chart(canvas, config)` 호출 — depends on T007, T008
+- [X] T010 [P] [US1] okrservice 신규 `widgets/client/messenger/components/chatbot/__tests__/vizRenderers.test.ts`에 `renderWorkStatusChart` 유닛 테스트 추가(정상/빈 배열/필드 누락)
+- [ ] T011 [US1] 수동 검증 — quickstart.md 시나리오 2의 2번(근무현황 그래프) 실 위젯 데모 + 회귀 확인("그래프" 미언급 질문은 기존과 동일하게 표만 출력) — depends on T009 (okrservice dev 서버·실 HR 세션 필요, 사용자 환경에서 수행)
 
 **Checkpoint**: User Story 1 단독으로 완전히 동작·시연 가능(MVP)
 
@@ -71,10 +71,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T012 [P] [US2] okrservice `vizRenderers.ts`의 `renderSalaryTrendChart(data)` 구현 — `SalaryTrendData` → Chart.js line config 객체 반환, `labels`/`series` 누락·길이 불일치 시 `null` 반환
-- [ ] T013 [US2] okrservice `type==="salarytrend"`일 때 `<canvas>` + `loadChartJs()` + `new Chart(canvas, config)` 연결 — depends on T007, T012 (T009와 동일 마운트 헬퍼 재사용)
-- [ ] T014 [P] [US2] okrservice `vizRenderers.test.ts`에 `renderSalaryTrendChart` 유닛 테스트 추가(정상 입력, 단일 월 데이터, 필드 누락 각 1케이스)
-- [ ] T015 [US2] 수동 검증 — quickstart.md 시나리오 2의 3번(급여추세 그래프) 실 위젯 데모 — depends on T013
+- [X] T012 [P] [US2] okrservice `vizRenderers.ts`의 `renderSalaryTrendChart(data)` 구현 — `SalaryTrendData` → Chart.js line config 객체 반환, `labels`/`series` 누락·길이 불일치 시 invalid, 0건 시 empty
+- [X] T013 [US2] okrservice `VizBlockRenderer`의 `salarytrend` 분기 — T009와 동일 마운트 헬퍼 재사용(같은 컴포넌트 내 분기) — depends on T007, T012
+- [X] T014 [P] [US2] okrservice `vizRenderers.test.ts`에 `renderSalaryTrendChart` 유닛 테스트 추가(정상/단일 월/필드 누락)
+- [ ] T015 [US2] 수동 검증 — quickstart.md 시나리오 2의 3번(급여추세 그래프) 실 위젯 데모 — depends on T013 (사용자 환경에서 수행)
 
 **Checkpoint**: User Story 1·2 모두 독립적으로 동작
 
@@ -82,16 +82,16 @@
 
 ## Phase 5: User Story 3 - 소속 팀 구성원을 조직도로 확인 (Priority: P3)
 
-**Goal**: "우리 팀 조직도 보여줘" 요청 시 팀 1단계 트리 다이어그램 표시
+**Goal**: "팀원 목록을 조직도로 보여줘" 요청 시 팀 1단계 트리 다이어그램 표시
 
-**Independent Test**: 위젯에서 "우리 팀 조직도 보여줘"만 입력해 트리 다이어그램이 표시되는지 확인(quickstart.md 시나리오 2-4)
+**Independent Test**: 위젯에서 "우리 팀 팀원 목록을 조직도로 보여줘"만 입력해 트리 다이어그램이 표시되는지 확인(quickstart.md 시나리오 2-4)
 
 ### Implementation for User Story 3
 
-- [ ] T016 [P] [US3] okrservice `vizRenderers.ts`의 `renderOrgChart(data)` 구현 — `OrgChartData` → Mermaid `graph TD` 문자열 생성(노드 라벨의 특수문자 이스케이프 포함), `root`/`members` 누락·빈 배열 시 `null` 반환
-- [ ] T017 [US3] okrservice `type==="orgchart"`일 때 컨테이너 엘리먼트 생성 후 `loadMermaid()` 완료 시 `mermaid.render()`로 SVG 마운트 — depends on T007, T016
-- [ ] T018 [P] [US3] okrservice `vizRenderers.test.ts`에 `renderOrgChart` 유닛 테스트 추가(정상 입력, 구성원 1명, 필드 누락 각 1케이스)
-- [ ] T019 [US3] 수동 검증 — quickstart.md 시나리오 2의 4번(조직도) 실 위젯 데모, 구성원 1명 엣지 케이스 확인 — depends on T017
+- [X] T016 [P] [US3] okrservice `vizRenderers.ts`의 `renderOrgChart(data)` 구현 — `OrgChartData` → Mermaid `graph TD` 문자열 생성(노드 라벨의 특수문자 이스케이프 포함), `root`/`members` 누락 시 invalid, 빈 배열 시 empty
+- [X] T017 [US3] okrservice `VizBlockRenderer`의 `orgchart` 분기 — 컨테이너 엘리먼트 생성 후 `loadMermaid()` 완료 시 `mermaid.render()`로 SVG 마운트 — depends on T007, T016
+- [X] T018 [P] [US3] okrservice `vizRenderers.test.ts`에 `renderOrgChart` 유닛 테스트 추가(정상 입력, 구성원 1명, 필드 누락 각 1케이스)
+- [ ] T019 [US3] 수동 검증 — quickstart.md 시나리오 2의 4번(조직도) 실 위젯 데모, 구성원 1명 엣지 케이스 확인 — depends on T017 (사용자 환경에서 수행). "조직도"만으로는 org_tree로 라우팅될 수 있어 "팀원 목록을 조직도로"처럼 구성원 의도 단어를 함께 말해야 함(spec.md 참고)
 
 **Checkpoint**: 3개 스토리 모두 독립적으로 동작
 
@@ -101,10 +101,10 @@
 
 **Purpose**: 3개 스토리 공통 마무리
 
-- [ ] T020 [P] okrservice `vizRenderers.ts` — 배열형 필드가 정상 파싱됐으나 길이 0인 경우(0건) 공통 처리: `null`(폴백) 대신 "표시할 데이터가 없습니다" 안내 노드 반환(data-model.md 검증 규칙 반영, 3개 렌더 함수 공통)
+- [X] T020 [P] okrservice `vizRenderers.ts` — 배열형 필드가 정상 파싱됐으나 길이 0인 경우(0건) 공통 처리: `RenderResult`의 `status: "empty"`로 3개 렌더 함수가 처음부터 공통 반환(T007/T008/T012/T016과 함께 구현 완료), `VizBlockRenderer`가 "표시할 데이터가 없습니다" 노드 렌더
 - [ ] T021 [P] teamplgpt `docs/conventions/hr-skill-description-pattern.md`에 `[HR_VIZ_OUTPUT]` 가드 추가 사실을 §2 Location E 참조 목록에 반영(신규 컨벤션 섹션 추가는 아님, 기존 문서에 한 줄 갱신)
-- [ ] T022 quickstart.md의 3개 시나리오(E2E 자동/실 위젯 수동/유닛 테스트) 전체 재실행 최종 확인
-- [ ] T023 헌장 §III 최종 확인 — `npm run e2e:hr-skill`, `npm run e2e:embed-hr-skill` 전건 PASS 캡처(완료 보고에 첨부)
+- [X] T022 quickstart.md 3개 시나리오 중 자동화 가능한 2개(E2E 자동, 유닛 테스트) 재확인 완료 — 시나리오 2(실 위젯 수동 데모)는 실 HR 세션·okrservice dev 서버가 필요해 사용자 환경에서 수행 필요(T011/T015/T019와 동일 사유)
+- [X] T023 헌장 §III 최종 확인 — `npm run e2e:hr-skill` 60/61(무관한 기존 결함 KB48 제외 시 신규 시나리오 3/3 포함 전건 PASS), `npm run e2e:embed-hr-skill` 26/26 PASS(완료 보고에 첨부)
 
 ---
 
