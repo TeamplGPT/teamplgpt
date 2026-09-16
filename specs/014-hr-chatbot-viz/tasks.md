@@ -102,7 +102,7 @@
 **Purpose**: 3개 스토리 공통 마무리
 
 - [X] T020 [P] okrservice `vizRenderers.ts` — 배열형 필드가 정상 파싱됐으나 길이 0인 경우(0건) 공통 처리: `RenderResult`의 `status: "empty"`로 3개 렌더 함수가 처음부터 공통 반환(T007/T008/T012/T016과 함께 구현 완료), `VizBlockRenderer`가 "표시할 데이터가 없습니다" 노드 렌더
-- [ ] T021 [P] teamplgpt `docs/conventions/hr-skill-description-pattern.md`에 `[HR_VIZ_OUTPUT]` 가드 추가 사실을 §2 Location E 참조 목록에 반영(신규 컨벤션 섹션 추가는 아님, 기존 문서에 한 줄 갱신)
+- [X] T021 [P] teamplgpt `docs/conventions/hr-skill-description-pattern.md`에 `[HR_VIZ_OUTPUT]` 가드 추가 사실을 §2 Location E 참조 목록에 반영(신규 컨벤션 섹션 추가는 아님, 기존 문서에 한 줄 갱신)
 - [X] T022 quickstart.md 3개 시나리오 중 자동화 가능한 2개(E2E 자동, 유닛 테스트) 재확인 완료 — 시나리오 2(실 위젯 수동 데모)는 실 HR 세션·okrservice dev 서버가 필요해 사용자 환경에서 수행 필요(T011/T015/T019와 동일 사유)
 - [X] T023 헌장 §III 최종 확인 — `npm run e2e:hr-skill` 60/61(무관한 기존 결함 KB48 제외 시 신규 시나리오 3/3 포함 전건 PASS), `npm run e2e:embed-hr-skill` 26/26 PASS(완료 보고에 첨부)
 
