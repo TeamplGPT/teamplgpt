@@ -35,7 +35,7 @@
 
 **⚠️ CRITICAL**: 이 단계가 끝나야 Phase 3+ 스토리 작업을 시작할 수 있다.
 
-- [X] T002 teamplgpt `server/scripts/e2e-hr-skill/scenarios.json`에 시각화 요청 시나리오 3개(K60/K61/K62) 추가 + `mock-hr-api.js`에 salary_statement 다개월/org_members fixture 보강 — FAIL 확인 완료(3/3 FAIL, 사유: viz 블록 누락). 부수 발견: "조직도"만으로는 기존 라우팅이 org_tree로 가서 K62 메시지를 "팀원 목록을 조직도로" 형태로 보정(spec.md에 기록)
+- [X] T002 teamplgpt `server/scripts/e2e-hr-skill/scenarios.json`에 시각화 요청 시나리오 3개(K60/K61/K62) 추가 + `mock-hr-api.js`에 salary_statement 다개월/org_members fixture 보강 — FAIL 확인 완료(3/3 FAIL, 사유: viz 블록 누락). 부수 발견 → 후속 수정: "조직도"만으로는 기존 라우팅이 org_tree로 가던 문제를 hr-personnel plugin.json의 query_type 판별 문구·examples 수정으로 근본 해결(K63/EC-ALLOW-15로 검증, 아래 참고). K62는 명시적 "그래프로" 표현 경로 검증용으로 유지
 - [X] T003 teamplgpt `server/scripts/e2e-embed-hr-skill/scenarios.json`에 동일 3종(EC-ALLOW-12/13/14) 추가 — FAIL 확인 완료(3/3 FAIL, 사유 동일). 무관한 기존 실패(EC-ALLOW-04, 사전부터 실패) 확인 — 본 변경과 무관, 범위 밖
 - [X] T004 teamplgpt `server/utils/hrSkillGuard.js`의 `hrSkillCommonLines()`에 `[HR_VIZ_OUTPUT]` 규칙 추가(contracts/viz-block.schema.md 포맷 그대로 지시) — depends on T002, T003
 - [X] T005 teamplgpt T002·T003 시나리오 재실행, **전건 PASS 확인** — hr-skill 60/61(무관한 기존 결함 KB48 1건, 가드 적용 전 baseline에서도 동일 실패함을 stash로 대조 확인), embed-hr-skill 26/26(단독 실행 시) — depends on T004 (헌장 §III E2E-First 완료 지점)
@@ -82,16 +82,16 @@
 
 ## Phase 5: User Story 3 - 소속 팀 구성원을 조직도로 확인 (Priority: P3)
 
-**Goal**: "팀원 목록을 조직도로 보여줘" 요청 시 팀 1단계 트리 다이어그램 표시
+**Goal**: "조직도 보여줘" 요청 시 팀 1단계 트리 다이어그램 표시
 
-**Independent Test**: 위젯에서 "우리 팀 팀원 목록을 조직도로 보여줘"만 입력해 트리 다이어그램이 표시되는지 확인(quickstart.md 시나리오 2-4)
+**Independent Test**: 위젯에서 "우리 팀 조직도 보여줘"만 입력해 트리 다이어그램이 표시되는지 확인(quickstart.md 시나리오 2-4)
 
 ### Implementation for User Story 3
 
 - [X] T016 [P] [US3] okrservice `vizRenderers.ts`의 `renderOrgChart(data)` 구현 — `OrgChartData` → Mermaid `graph TD` 문자열 생성(노드 라벨의 특수문자 이스케이프 포함), `root`/`members` 누락 시 invalid, 빈 배열 시 empty
 - [X] T017 [US3] okrservice `VizBlockRenderer`의 `orgchart` 분기 — 컨테이너 엘리먼트 생성 후 `loadMermaid()` 완료 시 `mermaid.render()`로 SVG 마운트 — depends on T007, T016
 - [X] T018 [P] [US3] okrservice `vizRenderers.test.ts`에 `renderOrgChart` 유닛 테스트 추가(정상 입력, 구성원 1명, 필드 누락 각 1케이스)
-- [ ] T019 [US3] 수동 검증 — quickstart.md 시나리오 2의 4번(조직도) 실 위젯 데모, 구성원 1명 엣지 케이스 확인 — depends on T017 (사용자 환경에서 수행). "조직도"만으로는 org_tree로 라우팅될 수 있어 "팀원 목록을 조직도로"처럼 구성원 의도 단어를 함께 말해야 함(spec.md 참고)
+- [ ] T019 [US3] 수동 검증 — quickstart.md 시나리오 2의 4번(조직도) 실 위젯 데모, 구성원 1명 엣지 케이스 확인 — depends on T017 (사용자 환경에서 수행)
 
 **Checkpoint**: 3개 스토리 모두 독립적으로 동작
 
@@ -105,6 +105,7 @@
 - [X] T021 [P] teamplgpt `docs/conventions/hr-skill-description-pattern.md`에 `[HR_VIZ_OUTPUT]` 가드 추가 사실을 §2 Location E 참조 목록에 반영(신규 컨벤션 섹션 추가는 아님, 기존 문서에 한 줄 갱신)
 - [X] T022 quickstart.md 3개 시나리오 중 자동화 가능한 2개(E2E 자동, 유닛 테스트) 재확인 완료 — 시나리오 2(실 위젯 수동 데모)는 실 HR 세션·okrservice dev 서버가 필요해 사용자 환경에서 수행 필요(T011/T015/T019와 동일 사유)
 - [X] T023 헌장 §III 최종 확인 — `npm run e2e:hr-skill` 60/61(무관한 기존 결함 KB48 제외 시 신규 시나리오 3/3 포함 전건 PASS), `npm run e2e:embed-hr-skill` 26/26 PASS(완료 보고에 첨부)
+- [X] T024 [P] (실사용 피드백 반영) teamplgpt `hr-personnel/plugin.json` — `query_type` 판별 문구와 `examples`("조직도 보여줘"→`org_tree`였던 few-shot)를 수정해 "조직도"만으로도 `org_members`(사람 정보)로 라우팅되도록 근본 수정. `hrSkillGuard.js`의 `[HR_VIZ_OUTPUT]`도 "조직도" 자체를 시각화 트리거로 인정하도록 확장(그래프/차트/도표 없이도 동작). E2E-First: K63/EC-ALLOW-15를 자연 표현("우리 팀 조직도 보여줘")으로 추가해 FAIL(org_tree로 오라우팅) 확인 후 수정 → PASS 확인. `evals/hr-routing/dataset.jsonl`의 `per-org-01` 기대값도 `org_members`로 갱신, `node evals/hr-routing/run.js`(관련 발화 grep) 100% 확인
 
 ---
 

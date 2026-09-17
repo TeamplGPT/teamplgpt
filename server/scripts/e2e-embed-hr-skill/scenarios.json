@@ -376,6 +376,23 @@
       },
       "repeat": 1,
       "note": "specs/014-hr-chatbot-viz — embed 경로 orgchart viz 블록 검증."
+    },
+    {
+      "id": "EC-ALLOW-15",
+      "axis": "ALLOW",
+      "label": "자연스러운 표현('우리 팀 조직도 보여줘')으로 orgchart 트리거(HR_VIZ_OUTPUT, embed 경로)",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "우리 팀 조직도 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLHrBassiemMemberList\\.do",
+        "answer_pattern": [
+          "```viz",
+          "\"type\"\\s*:\\s*\"orgchart\""
+        ]
+      },
+      "repeat": 1,
+      "note": "specs/014-hr-chatbot-viz — hr-personnel plugin.json org_tree/org_members 판별 문구·examples 수정 + hrSkillGuard.js '조직도' 자체를 시각화 트리거로 인정하는 확장을 embed 경로에서도 검증."
     }
   ]
 }

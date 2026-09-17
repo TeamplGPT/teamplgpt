@@ -45,7 +45,7 @@
 {"id":"per-pf-03","tags":["colloquial"],"utterance":"회사에 등록된 내 연락처 확인해줘","expect":[[{"skill":"hr-personnel","query_type":"profile"}]]}
 {"id":"per-pd-01","tags":["colloquial"],"utterance":"인사카드에 내 학력 어떻게 올라가 있어?","expect":[[{"skill":"hr-personnel","query_type":"profile_detail"}]]}
 {"id":"per-pd-02","tags":["colloquial"],"utterance":"내 경력사항 등록된 거 보여줘","expect":[[{"skill":"hr-personnel","query_type":"profile_detail"}]]}
-{"id":"per-org-01","tags":["normalized"],"utterance":"조직도 보여줘","expect":[[{"skill":"hr-personnel","query_type":"org_tree"}]]}
+{"id":"per-org-01","tags":["normalized"],"utterance":"조직도 보여줘","expect":[[{"skill":"hr-personnel","query_type":"org_members"}]]}
 {"id":"per-org-02","tags":["colloquial"],"utterance":"우리 회사 부서가 어떻게 나뉘어 있어?","expect":[[{"skill":"hr-personnel","query_type":"org_tree"}]]}
 {"id":"per-om-01","tags":["colloquial"],"utterance":"개발팀에 누가 있는지 알려줘","expect":[[{"skill":"hr-personnel","query_type":"org_members"}],[{"skill":"hr-personnel","query_type":"org_tree"}]]}
 {"id":"per-td-01","tags":["colloquial"],"utterance":"나 지금 처리해야 할 일 몇 건이야?","expect":[[{"skill":"hr-personnel","query_type":"todo_count"}],[{"skill":"hr-approval","query_type":"pending"}]]}

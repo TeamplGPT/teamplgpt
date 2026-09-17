@@ -1011,6 +1011,27 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "specs/014-hr-chatbot-viz — org_members(본인 소속 팀 1단계 구성원 목록)를 orgchart viz 블록(root+members)으로 옮기는지 검증. '조직도'라는 단어만으로도 그래프 요청으로 인식되는지 함께 확인."
+    },
+    {
+      "id": "K63",
+      "label": "자연스러운 표현('우리 팀 조직도 보여줘')으로 orgchart 트리거(HR_VIZ_OUTPUT)",
+      "message": "@agent 우리 팀 조직도 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLHrBassiemMemberList\\.do",
+        "mock_body_pattern": [
+          "searchTypeVal=N"
+        ],
+        "answer_pattern": [
+          "```viz",
+          "\"type\"\\s*:\\s*\"orgchart\"",
+          "\"members\""
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/014-hr-chatbot-viz — K62는 '팀원 목록을 조직도로'라는 우회 표현이었다. 실사용자는 그냥 '조직도 보여줘'라고 말한다(실사용 피드백). hr-personnel plugin.json의 org_tree/org_members 판별 문구를 고쳐 '조직도'만으로도 사람이 있는 org_members로 가도록 했고, hrSkillGuard.js도 '조직도' 자체를 시각화 트리거로 인정하도록 확장했다. 이 시나리오가 K62를 대체하지는 않음(K62는 명시적 '그래프로' 표현 경로 검증용으로 유지)."
     }
   ]
 }
