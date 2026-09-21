@@ -282,12 +282,20 @@ function formatAttendance(data, label, columns, query_type) {
     renderSummary,
     renderWhitelisted,
   } = require("../_shared/formatTable");
+  const { normalizeDisplayRows } = require("../_shared/renderNormalize");
 
   let md = `## HR 근태 - ${label}\n\n`;
 
   // 화이트리스트 정의가 있으면 선별 렌더(내부 PK·사번·코드 제외).
   if (columns) {
-    const table = renderWhitelisted(data, columns);
+    // 표시용 사본만 정규화(week 영문 3자→한글, mark NORMAL/ABNORMAL→정상/비정상).
+    // summarizeWorkStatus는 원본 mark 문자열("NORMAL")로 비교하므로 반드시 원본
+    // data를 그대로 넘긴다 — 정규화된 사본을 넘기면 집계가 항상 0으로 깨진다.
+    const displayData = normalizeDisplayRows(data, {
+      weekKey: "week",
+      markKey: "mark",
+    });
+    const table = renderWhitelisted(displayData, columns);
     if (!table) return md + "> 조회된 데이터가 없습니다.";
     // 근무현황 요약만 표 위에 집계 한 줄을 붙인다. 실패해도 표 렌더는 살려야 한다
     // (집계는 부가 정보, 표가 본체 — specs/014).

@@ -63,10 +63,11 @@ const FIXTURES_BY_CMD = {
     ],
   },
   // 휴가 사용내역 (TAA-0490) — Q4: 2건 전건 포함(과요약 방지)
+  // week는 실측(2026-09-21 ntest)대로 영문 3자 원본 사용 — renderNormalize.js가 정규화.
   getTAADclzVcatnList2: {
     result: [
-      { ymd: "20260710", week: "금", leavNm: "연차", useDd: "1", reason: "개인사유" },
-      { ymd: "20260721", week: "화", leavNm: "반차", useDd: "0.5", reason: "병원" },
+      { ymd: "20260710", week: "FRI", leavNm: "연차", useDd: "1", reason: "개인사유" },
+      { ymd: "20260721", week: "TUE", leavNm: "반차", useDd: "0.5", reason: "병원" },
     ],
   },
   // 근무현황/출퇴근기록 (TAA-1410) — Q3: 지각 1건(07-03, 10분) / Q6: 특정일 발췌.
@@ -76,11 +77,15 @@ const FIXTURES_BY_CMD = {
   // 플래그 계열(lateYn·earlyYn·absentYn 등)은 Y/N이 아니다 — 실측(2026-09-14 ntest):
   // 해당 없으면 공란, 있을 때만 서술 텍스트/코드가 온다(specs/014 §4.1, gaps.md 부록B).
   // "N" 문자열을 넣으면 존재-기반 판정(has())이 전부 계상해버려 집계가 깨진다 — K4 실측 중 발견.
+  // week/mark도 실측(2026-09-21 ntest)대로 영문 원본 사용 — kiwibox는 "MON"/"SAT [주말]"처럼
+  // 영문 3자(+주말 접미사)와 "NORMAL"/"ABNORMAL"을 그대로 보낸다. 사용자가 이걸 그대로
+  // 본 화면에서 확인 — renderNormalize.js의 weekKey/markKey 정규화 대상(K64).
   getTAAWrkTimeStatusMgrList: {
     result: [
-      { workYmd: "20260701", week: "수", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0855", endTime: "1810", inTime: "0855", outTime: "1810", lateYn: "", earlyYn: "", absentYn: "", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
-      { workYmd: "20260703", week: "금", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0910", endTime: "1805", inTime: "0910", outTime: "1805", lateYn: "지각", earlyYn: "", absentYn: "", lateTime: "10", earlyTime: "0", goOutTime: "0", otTime: "0" },
-      { workYmd: "20260706", week: "월", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0850", endTime: "1800", inTime: "0850", outTime: "1800", lateYn: "", earlyYn: "", absentYn: "", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
+      { workYmd: "20260701", week: "WED", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0855", endTime: "1810", inTime: "0855", outTime: "1810", lateYn: "", earlyYn: "", absentYn: "", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
+      { workYmd: "20260703", week: "FRI", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0910", endTime: "1805", inTime: "0910", outTime: "1805", lateYn: "지각", earlyYn: "", absentYn: "", lateTime: "10", earlyTime: "0", goOutTime: "0", otTime: "0" },
+      { workYmd: "20260706", week: "MON", workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", staTime: "0850", endTime: "1800", inTime: "0850", outTime: "1800", lateYn: "", earlyYn: "", absentYn: "", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
+      { workYmd: "20260705", week: "SAT [주말]", workComment: "휴일근무 / 퇴근시간없음(휴일근무)", mark: "ABNORMAL", baseStaTime: "1000", baseEndTime: "2200", staTime: "1029", endTime: "", inTime: "1029", outTime: "", lateYn: "", earlyYn: "", absentYn: "", lateTime: "0", earlyTime: "0", goOutTime: "0", otTime: "0" },
     ],
   },
 };

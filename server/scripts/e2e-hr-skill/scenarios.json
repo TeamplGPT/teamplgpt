@@ -1032,6 +1032,33 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "specs/014-hr-chatbot-viz — K62는 '팀원 목록을 조직도로'라는 우회 표현이었다. 실사용자는 그냥 '조직도 보여줘'라고 말한다(실사용 피드백). hr-personnel plugin.json의 org_tree/org_members 판별 문구를 고쳐 '조직도'만으로도 사람이 있는 org_members로 가도록 했고, hrSkillGuard.js도 '조직도' 자체를 시각화 트리거로 인정하도록 확장했다. 이 시나리오가 K62를 대체하지는 않음(K62는 명시적 '그래프로' 표현 경로 검증용으로 유지)."
+    },
+    {
+      "id": "K64",
+      "label": "근무현황 표의 요일·상태가 한글로 정규화되는지(실사용 피드백)",
+      "message": "@agent 이번 달 근무현황 전체 표로 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "answer_pattern": [
+          "정상",
+          "비정상",
+          "월|수|금|토"
+        ],
+        "answer_not_pattern": [
+          "\\bMON\\b",
+          "\\bWED\\b",
+          "\\bFRI\\b",
+          "\\bSAT\\b",
+          "\\bNORMAL\\b",
+          "\\bABNORMAL\\b",
+          "\\[주말\\]"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "실사용 피드백 — kiwibox가 요일을 'MON'/'SAT [주말]' 영문으로, 상태를 'NORMAL'/'ABNORMAL' 영문으로 보내는데 hr-attendance가 그대로 렌더하고 있었다(work_status/timesheet 공용). handler.js에 있던 _shared/renderNormalize.js 미사용이 원인 — normalizeDisplayRows(weekKey/markKey)를 표시용 사본에만 적용해 수정(요약 집계용 원본 data는 그대로 유지, mark==='NORMAL' 문자열 비교가 깨지지 않도록). 확정적 검증은 node -e로 normalizeDisplayRows 순수 함수 직접 호출(WED→수, SAT [주말]→토, NORMAL→정상, ABNORMAL→비정상, 원본 불변 확인). 이 시나리오 자체는 LLM이 '전체 표로' 요청에도 요약/그래프로 답할 수 있어 다른 시나리오(K58 등)처럼 확률적으로 FAIL할 수 있음 — 그 경우 tool 결과 자체가 아니라 LLM 응답 형식 선택의 문제."
     }
   ]
 }

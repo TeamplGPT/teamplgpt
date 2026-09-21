@@ -21,6 +21,12 @@ const WEEK_KO = {
   SUN: "일",
 };
 
+// kiwibox 근태 mark 필드 — 화면 판정 기준 문자열(NORMAL/ABNORMAL) 그대로 온다.
+const MARK_KO = {
+  NORMAL: "정상",
+  ABNORMAL: "비정상",
+};
+
 /**
  * 날짜·요일 표시 보정. 원본은 변경하지 않는다.
  *
@@ -30,14 +36,16 @@ const WEEK_KO = {
  * 어떤 키를 어떻게 바꿀지 명시할 때만 동작한다.
  *
  * @param {any} records kiwibox 언랩 결과
- * @param {{dateFrom?: string, dateTo?: string, weekKey?: string}} opts
+ * @param {{dateFrom?: string, dateTo?: string, weekKey?: string, markKey?: string}} opts
  *   dateFrom의 YYYYMMDD를 YYYY-MM-DD로 바꿔 dateTo에 넣는다(같은 키면 제자리 치환).
- *   weekKey의 영문 3자 요일을 한글로 바꾼다. 형식이 다르면 각 항목을 건너뛴다.
+ *   weekKey의 영문 3자 요일을 한글로 바꾼다. 주말은 `SAT [주말]`처럼 접미사가 붙어
+ *   오므로 선행 알파벳만 매칭한다(실측 2026-09-21 ntest). 형식이 다르면 건너뛴다.
+ *   markKey의 NORMAL/ABNORMAL(화면 판정 기준 문자열)을 정상/비정상으로 바꾼다.
  * @returns {object[]}
  */
 function normalizeDisplayRows(records, opts) {
   const list = Array.isArray(records) ? records : records ? [records] : [];
-  const { dateFrom, dateTo, weekKey } = opts || {};
+  const { dateFrom, dateTo, weekKey, markKey } = opts || {};
   return list.map((row) => {
     const out = { ...row };
     if (dateFrom && dateTo) {
@@ -47,10 +55,18 @@ function normalizeDisplayRows(records, opts) {
       }
     }
     if (weekKey) {
-      const w = String(row?.[weekKey] ?? "")
+      const raw = String(row?.[weekKey] ?? "")
         .trim()
         .toUpperCase();
+      const leadingAlpha = raw.match(/^[A-Z]+/);
+      const w = leadingAlpha ? leadingAlpha[0] : raw;
       if (WEEK_KO[w]) out[weekKey] = WEEK_KO[w];
+    }
+    if (markKey) {
+      const m = String(row?.[markKey] ?? "")
+        .trim()
+        .toUpperCase();
+      if (MARK_KO[m]) out[markKey] = MARK_KO[m];
     }
     return out;
   });
