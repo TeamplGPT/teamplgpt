@@ -109,6 +109,22 @@
 
 ---
 
+## Phase 7: 후속 개선 — mermaid/chart.js → recharts + 커스텀 트리로 교체 (2026-09-22)
+
+**Purpose**: research.md R5(2026-09-22 개정)에 기록된 라이브러리 교체. `viz` JSON 계약과 teamplgpt 측은 변경하지 않고 okrservice 렌더러 내부 구현만 교체한다.
+
+- [X] T025 [P] okrservice `widgets/package.json` — `chart.js`·`mermaid` 제거, `recharts@^2.15.4` 추가 후 `yarn install`
+- [X] T026 [P] okrservice 신규 `widgets/client/messenger/components/chatbot/charts/` 디렉토리 — `WorkStatusBarChart.tsx`(recharts 막대), `SalaryTrendLineChart.tsx`(recharts 선, 다중 시리즈는 내부 키 `s0`/`s1`…로 분리해 시리즈명 충돌 방지), `OrgChartTree.tsx`(mermaid 대체, 순수 React 트리 + hover 강조)
+- [X] T027 okrservice `vizRenderers.ts` → `vizRenderers.tsx`로 rename — `renderWorkStatusChart`/`renderSalaryTrendChart`/`renderOrgChart`가 Chart.js config/Mermaid 문자열 대신 각 컴포넌트 payload 반환하도록 수정. `VizBlockRenderer`는 `useEffect`+canvas/innerHTML 직접 마운트 방식을 제거하고 `React.lazy`+`Suspense`로 3개 타입을 동일하게 선언적 렌더. lazy 청크 로드/recharts 런타임 예외로 챗봇 전체가 언마운트되지 않도록 `VizErrorBoundary` 추가(code-reviewer HIGH-1) — depends on T025, T026
+- [X] T028 [P] okrservice `vizRenderers.test.ts` 갱신(새 payload 형태로 assertion 수정, orgchart/salarytrend `dispatchViz` 케이스 보강) + 신규 `VizBlockRenderer.test.tsx`(3개 타입 렌더 DOM 확인, empty/invalid 분기, 단일/다중 시리즈 범례 분기) — code-reviewer HIGH-2(렌더 테스트 커버리지 0%) 대응, jsdom `ResizeObserver`/`getBoundingClientRect` 폴리필 필요
+- [X] T029 [P] 스펙 문서 갱신 — research.md(R5 신설), plan.md(Technical Context/Constraints/Project Structure), quickstart.md(시나리오 3), contracts/viz-block.schema.md(소비자 파일 경로) — depends on T027
+
+**검증**: `yarn jest client/messenger/components/chatbot` 96/96 PASS, `tsc --noEmit` 관련 파일 0 에러, `webpack --mode production` 통과(무관한 기존 node-sass arm64 에러 2건 제외). teamplgpt E2E는 `viz` JSON 계약이 불변이라 재실행 불필요(변경 범위가 okrservice 렌더러 내부로 한정).
+
+**Checkpoint**: 3개 스토리 모두 recharts/커스텀 트리 기반으로 동작 확인. 실 위젯 수동 데모(quickstart.md 시나리오 2)는 사용자 환경에서 재확인 권장.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

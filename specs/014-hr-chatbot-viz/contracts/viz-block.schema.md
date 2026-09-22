@@ -1,7 +1,7 @@
 # Contract: `viz` 코드블록 (LLM 출력 ↔ okrservice 렌더러)
 
 이 문서는 teamplgpt(생산자: LLM, `hrSkillGuard.js`의 `[HR_VIZ_OUTPUT]` 가드가 지시)와
-okrservice(소비자: `ChatbotView.tsx` → `vizRenderers.ts`) 사이의 유일한 인터페이스 계약이다.
+okrservice(소비자: `ChatbotView.tsx` → `vizRenderers.tsx` → `charts/*.tsx`, 2026-09-22 개정) 사이의 유일한 인터페이스 계약이다.
 서버-서버 API가 아니라 **채팅 응답 텍스트 안에 실리는 코드펜스 포맷** 계약이다.
 
 ## 포맷

@@ -31,7 +31,7 @@ embed 경로도 동일하게 `npm run e2e:embed-hr-skill -- --only=EC-VIZ-*`로 
 ## 시나리오 3 — 렌더러 유닛 테스트(자동, okrservice만)
 
 ```bash
-cd widgets && yarn jest chatbot/__tests__/vizRenderers.test.ts
+cd widgets && yarn jest chatbot/__tests__/vizRenderers.test.ts chatbot/__tests__/VizBlockRenderer.test.tsx
 ```
 
-**기대 결과**: `contracts/viz-block.schema.md`의 3개 예시 JSON을 입력으로 각 렌더 함수가 예상되는 Mermaid 문자열/Chart.js config 형태를 반환하고, 스키마를 벗어난 입력(필드 누락·타입 불일치)에 대해서는 폴백 신호(예: `null` 반환 또는 `ok:false`)를 반환하는지 검증한다.
+**기대 결과**: `contracts/viz-block.schema.md`의 3개 예시 JSON을 입력으로 각 렌더 함수가 recharts/트리 컴포넌트용 payload(`{data: ...}` 형태, 2026-09-22 개정 — research.md R5)를 반환하고, 스키마를 벗어난 입력(필드 누락·타입 불일치)에 대해서는 폴백 신호(`status: "invalid"`)를 반환하는지 검증한다. `VizBlockRenderer.test.tsx`는 3개 타입 모두 실제로 렌더되는지(막대/선 그래프 DOM, 트리 텍스트), empty/invalid 분기가 안내 문구·빈 렌더로 처리되는지까지 확인한다.

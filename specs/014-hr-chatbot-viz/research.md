@@ -24,3 +24,17 @@
 - **Decision**: 두 라이브러리 모두 동적 `import()`로 지연 로딩하며, `viz` 코드펜스가 실제로 감지된 시점에만 로드한다.
 - **Rationale**: 위젯은 임베드형이라 초기 로드 크기가 중요하고, 대부분의 대화에서는 시각화 요청이 없어(FR-001) 상시 번들에 포함할 이유가 없다.
 - **Alternatives considered**: 정적 import(빌드 시 항상 포함) — 기각(불필요한 초기 번들 증가).
+- **(2026-09-22 개정)**: R5 참조 — mermaid는 완전히 제거됐다. chart.js → recharts로 교체된 뒤에도 "실제 감지 시점에만 동적 import" 원칙 자체는 그대로 유지한다(`React.lazy` + `Suspense`로 구현, `webpackChunkName`도 유지).
+
+## R5. (2026-09-22 개정) mermaid/chart.js → recharts + 커스텀 트리 컴포넌트로 교체
+
+- **Decision**: R3·R4에서 채택했던 mermaid(조직도)·chart.js(근무현황·급여추세)를 제거하고, 근무현황·급여추세는 **recharts** 기반 React 컴포넌트로, 조직도는 **외부 라이브러리 없는 순수 React 트리 컴포넌트**(`charts/OrgChartTree.tsx`)로 교체했다. `viz` JSON 계약(`contracts/viz-block.schema.md`)과 teamplgpt 생산자 측(`hrSkillGuard.js`)은 변경하지 않았다 — 순수하게 okrservice 소비자(렌더러) 내부 구현 교체다.
+- **Rationale**:
+  - recharts는 React 컴포넌트로 선언적으로 조립되어 `VizBlockRenderer`가 `useEffect`로 canvas를 직접 만들고 `chart.destroy()`로 정리하던 명령형 코드를 제거할 수 있었고, React가 마운트/언마운트를 대신 처리해 메모리 누수·레이스 컨디션 표면이 줄었다.
+  - 조직도는 사용자 소속 팀 1단계(FR-004)만 그리는 얕은 구조라 Mermaid 같은 범용 다이어그램 엔진이 과할하고, Mermaid는 `innerHTML`로 SVG를 직접 주입해야 해서(문자열 기반 렌더) LLM이 만든 라벨 텍스트를 DOM에 꽂는 유일한 지점이었다. 순수 React 컴포넌트로 바꾸면 이름·직급이 React 텍스트 노드로 렌더되어 이스케이프가 필요 없고 해당 표면이 사라진다.
+  - chart.js는 프로젝트 전체에서 이 파일 하나만 참조했고, `mermaid`도 마찬가지였다 — 둘 다 제거해도 다른 영향이 없음을 `grep`으로 확인.
+- **Alternatives considered**:
+  - (A) chart.js/mermaid 유지 — 기각. 명령형 canvas/SVG 마운트 로직이 계속 남고, code-reviewer 리뷰에서 지적된 `chart.destroy()` cleanup·레이스 컨디션 표면을 줄일 기회를 놓침.
+  - (B) 21st.dev(UI 컴포넌트 마켓플레이스)에서 recharts 기반 완성 컴포넌트를 그대로 설치 — 기각. 조회해본 후보(Bar Chart 등)가 Tailwind + shadcn 전용 `chart-kit` 유틸 파일에 의존하는데 okrservice `widgets`는 Tailwind를 쓰지 않고, 21st.dev 무료 티어의 일일 전체 코드 조회 한도(2회)도 곧 소진돼 재현 가능한 방식이 아니었다. 대신 recharts를 직접 설치해 기존 `chatbotTheme.ts` 토큰(inline style)에 맞춰 최소 컴포넌트를 작성.
+  - (C) 조직도도 recharts의 트리 시각화로 통일 — 기각. recharts는 계층형 다이어그램 전용 컴포넌트가 약하고, 1단계 트리는 일반 DOM(flex 레이아웃)으로 표현하는 편이 접근성·번들 크기 면에서 더 낫다.
+- **영향받는 산출물**: plan.md(Technical Context·Constraints·Project Structure), quickstart.md(시나리오 1·3 기대 결과 문구), tasks.md(Phase 7 후속 태스크로 기록), contracts/viz-block.schema.md(소비자 파일명 `.tsx`로 갱신). JSON 스키마·teamplgpt 서버 측은 변경 없음.
