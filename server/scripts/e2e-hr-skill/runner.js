@@ -345,6 +345,11 @@ function parseSSE(text) {
   const events = text.split("\n\n").filter((e) => e.startsWith("data:"));
   let toolCall = null;
   let finalText = null;
+  // 라이브 스트림 전체 누적본 — toolCallingLoop가 라운드마다 completeText를
+  // 재할당해 누출된 preamble은 최종 저장본(finalText)엔 안 남지만, 실시간
+  // 화면엔 모든 라운드의 textResponseChunk가 순서대로 다 나간다. finalText만
+  // 보면 놓치는 "떴다 사라지는" 누출을 잡기 위해 전체를 따로 모은다.
+  let rawStreamText = "";
   for (const evt of events) {
     const m = evt.match(/^data:\s*(.*)$/m);
     if (!m) continue;
@@ -365,6 +370,9 @@ function parseSSE(text) {
       const cm = p.content.match(/^Assembling Tool Call: (.+)$/);
       if (cm) toolCall = cm[1];
     }
+    if (p.type === "textResponseChunk" && typeof p.textResponse === "string") {
+      rawStreamText += p.textResponse;
+    }
     if (
       p.type === "finalizeResponseStream" &&
       typeof p.textResponse === "string"
@@ -372,8 +380,14 @@ function parseSSE(text) {
       finalText = p.textResponse;
     }
   }
-  return { toolCall, finalText, eventCount: events.length };
+  return { toolCall, finalText, eventCount: events.length, rawStreamText };
 }
+
+// 모델이 실제 함수 호출(tool_call) 대신 그 모양을 흉내 낸 JSON을 답변 텍스트로
+// 적어버리는 누출(예: {"name":"work_status","arguments":{...}})을 감지한다.
+// ```viz 블록({"type":"workstatus","data":...})과는 키가 겹치지 않아 오탐이 없다.
+const LEAKED_TOOLCALL_PATTERN =
+  /"name"\s*:\s*"[\w.-]+"\s*,\s*"(arguments|input)"\s*:/;
 
 function readMockLogTail(mockLogPath, sinceIso) {
   if (!fs.existsSync(mockLogPath)) return [];
@@ -498,7 +512,7 @@ async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
     errorMsg = e.message;
   }
   const elapsedMs = Date.now() - t0;
-  const { toolCall, finalText, eventCount } = parseSSE(body);
+  const { toolCall, finalText, eventCount, rawStreamText } = parseSSE(body);
 
   const mockEntries = readMockLogTail(mockLogPath, startedAt);
   // 현행 kiwibox(*.do)만 대조 대상 (구세대 REST /api/v1/* 잔재 제거 —
@@ -519,6 +533,10 @@ async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
   if (errorMsg) {
     pass = false;
     reason = `request error: ${errorMsg}`;
+  } else if (LEAKED_TOOLCALL_PATTERN.test(rawStreamText)) {
+    pass = false;
+    reason =
+      "raw stream leaked a tool-call-shaped JSON preamble (sanitized before storage but visible live — see hrSkillGuard.js rule 8)";
   } else if (scenario.expect.tool_call && !toolCall) {
     pass = false;
     reason = "expected tool_call but LLM did not invoke any tool";
