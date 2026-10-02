@@ -257,14 +257,24 @@ module.exports.runtime = {
       // 날짜 없이 하루=1행으로 오는 endpoint는 연휴처럼 같은 값이 반복된다 — 렌더 전 중복 제거.
       if (spec.dedupeColumn) safe = dedupeByColumn(safe, spec.dedupeColumn);
       // 화이트리스트 컬럼 정의가 있으면 선별 렌더(코드값·내부 식별자 제외)
-      if (spec.columns)
-        return formatWhitelisted(
+      if (spec.columns) {
+        const rendered = formatWhitelisted(
           safe,
           label,
           spec.columns,
           spec.codeLabels,
           spec.maskYmdColumns
         );
+        // org_tree는 "타 조직 조회"가 가능한 유일한 query_type이라 찾는 조직이
+        // 이 목록에 없을 수 있다. 프롬프트 지시만으로는 모델이 "조회 기준이
+        // 어쩌구" 식으로 둘러대거나, 심하면 다른 조직 데이터를 그 조직인 것처럼
+        // 보여주는 사례가 있었다(L1만으로 불안정 — 실측). 결과 텍스트 자체에
+        // 안내를 박아 L2로 보강한다.
+        if (query_type === "org_tree") {
+          return `${rendered}\n\n> [안내] 사용자가 찾는 조직이 위 목록에 없으면, 그 조직은 확인해 드릴 수 없다고 답하고 본인 소속 조직 조회는 org_cd 없이 바로 가능하다고 제안하세요. 목록에 없는 조직명을 지어내거나 다른 조직의 정보를 그 조직인 것처럼 보여주지 마세요.`;
+        }
+        return rendered;
+      }
       return formatPersonnel(safe, label);
     } catch (e) {
       this.logger("Error in hr-personnel", e.message);
