@@ -19,6 +19,7 @@
  *   node evals/hr-routing/run.js --tags colloquial,typo
  *   node evals/hr-routing/run.js --grep 연차 --limit 5
  *   node evals/hr-routing/run.js --model gpt-5.1 --concurrency 4
+ *   node evals/hr-routing/run.js --prompt-file ./my-prompt.txt   # 워크스페이스 시스템 프롬프트 재현
  *
  * 리포트: evals/hr-routing/reports/<timestamp>.{json,md}
  */
@@ -58,6 +59,7 @@ function parseArgs(argv) {
     concurrency: 4,
     dry: false,
     verbose: false,
+    promptFile: null,
   };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
@@ -68,6 +70,7 @@ function parseArgs(argv) {
     else if (a === "--limit") args.limit = parseInt(argv[++i], 10);
     else if (a === "--model") args.model = argv[++i];
     else if (a === "--concurrency") args.concurrency = parseInt(argv[++i], 10);
+    else if (a === "--prompt-file") args.promptFile = argv[++i];
     else {
       console.error(`Unknown arg: ${a}`);
       process.exit(1);
@@ -117,11 +120,18 @@ function filterCases(cases, args) {
 }
 
 // ---------- System prompt (프로덕션 경로 우선, 실패 시 폴백) ----------
-async function buildSystemPrompt() {
+// promptFile: 워크스페이스 시스템 프롬프트(openAiPrompt) 자리에 넣을 파일 — 운영 위젯과 같은 조건으로
+// 측정할 때 쓴다(specs/016 R16). 없으면 기본 프롬프트(saneDefaultSystemPrompt).
+async function buildSystemPrompt(promptFile = null) {
   try {
     const { chatPrompt } = require(path.join(SERVER_DIR, "utils/chats/index"));
-    const prompt = await chatPrompt(null, null);
-    if (prompt && prompt.trim().length > 0) return { prompt, source: "chatPrompt" };
+    const workspace = promptFile
+      ? { openAiPrompt: fs.readFileSync(path.resolve(promptFile), "utf8") }
+      : null;
+    const prompt = await chatPrompt(workspace, null);
+    if (prompt && prompt.trim().length > 0) {
+      return { prompt, source: promptFile ? `chatPrompt(${path.basename(promptFile)})` : "chatPrompt" };
+    }
   } catch (e) {
     console.warn(`[eval] chatPrompt() 실패, 폴백 사용: ${e.message}`);
   }
@@ -318,6 +328,8 @@ function buildReport({ results, model, promptSource, toolCount, startedAt }) {
       error: r.error ?? null,
       expected: primaryExpectLabel(r.case),
       actual: r.error ? null : actualLabel(r.calls),
+      // 파라미터 실패(params_regex) 원인 확인용 — 판정에는 쓰지 않는다
+      calls: r.error ? null : r.calls.map((call) => ({ skill: call.skill, args: call.args })),
       durationMs: r.durationMs ?? null,
     })),
   };
@@ -402,7 +414,7 @@ async function main() {
   }
 
   const { prompt: systemPrompt, source: promptSource } =
-    await buildSystemPrompt();
+    await buildSystemPrompt(args.promptFile);
   const model = args.model || process.env.OPEN_MODEL_PREF || "gpt-4o";
 
   console.log(

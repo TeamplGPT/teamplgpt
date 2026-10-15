@@ -6,6 +6,7 @@
 //  - 주민번호(CTZ_NO 등)·계좌·내부 PK·코드값은 화이트리스트에서 전면 제외 (사용자 지시).
 //  - result(결정세액)는 summary에 통합(YndList/YndCal은 조회 부적합 — 실측).
 const { resolveDateParam } = require("../_shared/dateResolver");
+const { resolveYearPeriod } = require("../_shared/periodResolver");
 const { hrFetch, SELF_STAFF_ID_MARKER } = require("../_shared/hrSession");
 
 // 지원 귀속연도 (최신이 기본). 신규 연도 배포 시 배열에 추가.
@@ -150,7 +151,10 @@ module.exports.runtime = {
 
       // cal_yy → 지원 연도. 미지정 시 최신. 지원 목록 밖이면 안내.
       let year = DEFAULT_YEAR;
-      const resolved = resolveDateParam(cal_yy, "year"); // 'YYYY' or '작년' 등
+      // "재작년"·"이번년도"·"금년"은 dateResolver가 못 읽어 최신 연도(DEFAULT_YEAR)로 조용히
+      // 바뀌었다 — 연도 표현은 periodResolver로 먼저 해석한다(specs/015). 그 외는 기존 그대로.
+      const yearPeriod = resolveYearPeriod(cal_yy, { kind: "schedule" });
+      const resolved = yearPeriod ? yearPeriod.year : resolveDateParam(cal_yy, "year"); // 'YYYY' or '작년' 등
       if (resolved) {
         if (!SUPPORTED_YEARS.includes(resolved)) {
           return `> ⚠️ ${resolved}년 연말정산은 지원하지 않습니다. 지원 연도: ${SUPPORTED_YEARS.join(", ")}.`;

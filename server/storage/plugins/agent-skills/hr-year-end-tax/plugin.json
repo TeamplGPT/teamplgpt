@@ -10,7 +10,7 @@
     "file": "handler.js",
     "params": {
       "query_type": {
-        "description": "조회 종류 (필수). 키워드가 아니라 사용자의 의도로 판단하세요: summary=공제 전체 요약과 결정세액 — 환급/추가납부 여부나 연말정산 전체 결과가 관심사일 때, medical=의료비 공제(병원비 반영 여부 포함), family=부양가족 등록 현황, previous_employer=종전(이직 전) 근무지의 급여·세액 반영 내역, donation=기부금 공제, credit_card=신용카드 사용액 공제, insurance=보장성보험 공제(보험료 공제), education=교육비 공제, savings=연금저축 공제. 종류가 불분명하거나 여러 공제를 아우르면 summary를 사용하세요.",
+        "description": "조회 종류 (필수). 키워드가 아니라 사용자의 의도로 판단하세요: summary=공제 전체 요약과 결정세액 — 환급/추가납부 여부나 연말정산 전체 결과, 또는 공제 항목을 하나로 정하지 않은 공제(신청) 내역 전체가 관심사일 때, medical=의료비 공제(병원비 반영 여부 포함), family=부양가족 등록 현황, previous_employer=종전(이직 전) 근무지의 급여·세액 반영 내역, donation=기부금 공제, credit_card=신용카드 사용액 공제, insurance=보장성보험 공제(보험료 공제), education=교육비 공제, savings=연금저축 공제. 종류가 불분명하거나 여러 공제를 아우르면 summary를 사용하세요.",
         "type": "string",
         "enum": [
           "summary",

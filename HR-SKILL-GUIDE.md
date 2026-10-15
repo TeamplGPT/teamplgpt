@@ -112,7 +112,11 @@ teamplgpt에서 endpoint 경로나 cmd를 바꿔도 okrservice hrBridge의 `ALLO
 | `{skill}/handler.js` | **L2 코드 계층**: ENDPOINT_MAP(경로·cmd·BODY 고정값·`columns` 화이트리스트) + 렌더. **handler.js 무수정 원칙**은 LLM 행태 제어를 handler에 넣지 말고 description으로 하라는 뜻이다. 코드 가드(화이트리스트·검증)는 handler 소관 |
 | `_shared/hrSession.js` | kiwibox 호출 공통 계층: R1/서버폴백 자동 선택, 응답 래퍼 언랩(`result`/`DATA`/`Map`/`codeList`/`data`), 세션 만료(HTML) 감지 |
 | `_shared/formatTable.js` | 렌더 공통: `renderWhitelisted`(화이트리스트, UPPER_SNAKE·camel 키 모두 대응) / `renderTable`(raw 폴백) / `INTERNAL_KEYS`(servareaId·staffId·staffNo·corpId·loginId·oid 상시 차단 — 최후 방어선) / `ANSWER_GUIDE` footer(질문 유형 적응 3분기) |
-| `_shared/dateResolver.js` | `year_month`("3"/"지난달"/"2026-03"…) → 정규화 |
+| `_shared/dateResolver.js` | `year_month`("3"/"지난달"/"2026-03"…) → 정규화. ⚠ 연도만 준 입력은 한 달로 뭉갠다("2026"→202601, "올해"→이번 달) — 연도 판정은 아래 periodResolver 먼저 |
+| `_shared/periodResolver.js` | `resolveYearPeriod(raw, {kind})` — 월 없이 연도만 말한 표현("올해"/"이번년도"/"2026년"/"작년"/"재작년"…)을 그해 기간(start·end·months·label)으로. 연도가 아니면 `null` → handler는 기존 경로 그대로(specs/015) |
+| `_shared/yearQuery.js` | 연도 질의 도우미: `runMonthly`(searchYm 한 달만 받는 endpoint 순차 호출 — 첫 달 실패 시 중단·60초 예산), `withPeriodHeader`("조회 기간" 머리 줄), `renderMonthlySum`·`sumHHMM`(월별 합계 표) |
+| `_shared/otherEmployee.js` | 다른 직원 정보 차단(specs/016): 제공 중단 query_type 목록(`vacation_calendar`·`birthday`·결재 `pending`/`completed`/`rejected`/`referenced`)과 고정 거절 문구. 각 handler 진입부가 HR 호출 없이 거절 |
+| `server/utils/hrSelfDataNotice.js` | HR tool 결과 끝에 `[본인 데이터]` 안내 부착(조직도 제외). chat/query·embed는 `toolCalling/loop.js`, @agent는 `agents/imported.js`에서 적용 — handler 출력은 무변경 |
 
 ### 3.2 채팅 경로 가드 (시스템 프롬프트 층)
 
@@ -243,6 +247,9 @@ LLM 프롬프트(L1·가드)는 확률적으로 동작한다. 그래서 민감�
 | 세션 만료가 JSON 파싱 에러로 보임 | kiwibox가 로그인 HTML 반환 | `hrSession.parseKiwiboxBody`가 처리 — 신규 호출 계층 만들지 말고 hrSession 경유 |
 | 응답 언랩 실패 | 래퍼 키가 endpoint별 상이(`result`/`DATA`/`Map`/`codeList`/`data`) | hrSession 언랩 계층 사용 |
 | 신규 endpoint·cmd가 embed에서만 실패 | okrservice hrBridge ALLOWED_PATHS/CMD_ALLOWLIST 미갱신 | §2 동기화 규칙 — 작업지시서 발주 |
+| **"김기현 연차 알려줘"에 본인 연차를 김기현 님 것처럼 답함** (위젯 실사례: 17/2/15 — 실제 17/12/5) | ① 가드에 다른 직원 지칭 거절 규칙이 없었고 1항(본인 기준)·[ORDER](첫 액션 tool)가 tool 호출을 밀었다 ② tool은 본인 강제라 본인 값이 돌아옴 ③ **전체 허용 위젯은 첫 응답 tool 호출이 강제**(embed `shouldForceToolChoice`) — 지시만으로는 못 막음 | 가드 10항 + [ORDER] 단서(L1), tool 결과 `[본인 데이터]` 안내(L2, 위젯의 실질 방어선), 다른 직원 정보 조회 제거(휴가캘린더·생일자·남의 결재 문서), 조직원은 이름·소속·직위·직책만, 위젯 브리지 허용 목록도 같이 축소(specs/016). 평가 `other-employee` 태그·E2E K69·EC-ALLOW-17이 회귀 감지 |
+| **"그럼 노지용은?"에 본인 연차를 노지용 것으로 답함 / "어떻게 산정된거야?"에 "기본 15일 + 보상 5일 + 포상 3일"을 지어냄** (위젯 실사례: "앞서 말한 잔여 10일은 조회 없이 임의로 답한 값") | ① 전체 허용 위젯은 매 질문 tool 호출이 강제되는데 HR tool은 전부 본인 데이터만 줌 → 이어지는 다른 직원 질문에도 본인 조회 ② 대화 이력에 앞 턴 조회 결과가 없어 모델이 앞 수치의 출처를 모름 ③ 결과에 없는 근거·재계산을 막는 지시가 없었음 | 강제 호출 시 거절 선택지(`hr-other-employee-refusal`, `withHrRefusalTool`). `[본인 데이터]` 안내에 수치는 결과 값만·산정 질문은 "5240 HR 시스템에서 조회한 값이에요."로 시작. 가드 2항: 근거 재질문 시 재조회. 이어지는 질문은 E2E `setup_messages`로 검증(specs/016 research R14) |
+| **"이번년도 연장근무"에 1월(또는 이번 달)만 조회하고 "2026년 전체"라고 답함** (실제 14건 vs 답변 1건) | ① 가드 4항이 "연도 명시 시 YYYYMM"만 안내 → 모델이 "2026년"을 `202601`로 변환·생략 ② dateResolver가 연도만 준 입력을 한 달로 뭉갬 ③ 연장근무 API는 `searchYm` 한 달만 받음 | 가드 4항: 연도만 말하면 그대로 전달 + '조회 기간'보다 넓게 말하지 말 것. handler: `periodResolver`로 그해 기간 → 범위 1회/월별 순차/연도만 교정 + 결과에 "조회 기간" 머리 줄(specs/015). 월 단위 질의 무변경은 `period-golden.test.js` 골든이 지킨다 |
 
 ---
 

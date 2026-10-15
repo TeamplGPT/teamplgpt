@@ -22,6 +22,7 @@ const http = require("http");
 const { spawn, execFileSync, spawnSync } = require("child_process");
 
 const { createDevApiKey, deleteDevApiKey } = require("./helpers/apikey");
+const { compileExpectations, judgeRun } = require("./helpers/expectations");
 
 const SCRIPT_DIR = __dirname;
 
@@ -144,63 +145,22 @@ function loadScenarios() {
     if (typeof s.message !== "string" || s.message.length === 0) {
       fatal(`Scenario ${s.id}: message must be a non-empty string`);
     }
-    if (!s.expect || typeof s.expect.tool_call !== "boolean") {
-      fatal(`Scenario ${s.id}: expect.tool_call (boolean) required`);
-    }
+    // null = tool 호출 여부는 보지 않음(답변·mock 기대만 판정) — specs/016 K72
     if (
-      s.expect.mock_url_pattern != null &&
-      typeof s.expect.mock_url_pattern !== "string"
+      !s.expect ||
+      !(typeof s.expect.tool_call === "boolean" || s.expect.tool_call === null)
     ) {
-      fatal(`Scenario ${s.id}: expect.mock_url_pattern must be string or null`);
+      fatal(`Scenario ${s.id}: expect.tool_call (boolean or null) required`);
     }
-    if (s.expect.mock_url_pattern) {
-      try {
-        s._mockUrlRegex = new RegExp(s.expect.mock_url_pattern);
-      } catch (e) {
-        fatal(
-          `Scenario ${s.id}: invalid regex "${s.expect.mock_url_pattern}": ${e.message}`
-        );
-      }
+    try {
+      Object.assign(s, compileExpectations(s));
+    } catch (e) {
+      fatal(e.message);
     }
-    // kiwibox .do 계열: 파라미터가 POST body(urlencoded)에 있어 URL 대신 body를 검증
-    if (s.expect.mock_body_pattern != null) {
-      if (
-        !Array.isArray(s.expect.mock_body_pattern) ||
-        s.expect.mock_body_pattern.some((p) => typeof p !== "string")
-      ) {
-        fatal(`Scenario ${s.id}: expect.mock_body_pattern must be string[]`);
-      }
-      s._mockBodyRegexes = s.expect.mock_body_pattern.map((p) => {
-        try {
-          return new RegExp(p);
-        } catch (e) {
-          fatal(`Scenario ${s.id}: invalid body regex "${p}": ${e.message}`);
-        }
-      });
-    }
-    // 012-hr-answer-quality: 최종 답변 텍스트·HR 호출 건수 검증 (옵셔널 —
-    // 미존재 시 스킵, 기존 시나리오 판정 무영향). contracts/e2e-assertion-schema.md
-    for (const key of ["answer_pattern", "answer_not_pattern"]) {
+    for (const key of ["max_hr_calls", "min_hr_calls"]) {
       if (s.expect[key] == null) continue;
-      if (
-        !Array.isArray(s.expect[key]) ||
-        s.expect[key].some((p) => typeof p !== "string")
-      ) {
-        fatal(`Scenario ${s.id}: expect.${key} must be string[]`);
-      }
-      const compiled = s.expect[key].map((p) => {
-        try {
-          return new RegExp(p);
-        } catch (e) {
-          fatal(`Scenario ${s.id}: invalid ${key} regex "${p}": ${e.message}`);
-        }
-      });
-      if (key === "answer_pattern") s._answerRegexes = compiled;
-      else s._answerNotRegexes = compiled;
-    }
-    if (s.expect.max_hr_calls != null) {
-      if (!Number.isInteger(s.expect.max_hr_calls) || s.expect.max_hr_calls < 1) {
-        fatal(`Scenario ${s.id}: expect.max_hr_calls must be an integer >= 1`);
+      if (!Number.isInteger(s.expect[key]) || s.expect[key] < 1) {
+        fatal(`Scenario ${s.id}: expect.${key} must be an integer >= 1`);
       }
     }
     s.repeat = Number.isInteger(s.repeat) ? s.repeat : 1;
@@ -208,6 +168,14 @@ function loadScenarios() {
       fatal(`Scenario ${s.id}: repeat must be 1..20`);
     }
     s.pre_reset = s.pre_reset !== false;
+    // 016: 같은 대화에서 먼저 보낼 앞 메시지(판정 대상 아님) — 이어서 묻는 질문 검증용
+    if (
+      s.setup_messages != null &&
+      (!Array.isArray(s.setup_messages) ||
+        s.setup_messages.some((m) => typeof m !== "string" || m.length === 0))
+    ) {
+      fatal(`Scenario ${s.id}: setup_messages must be non-empty string[]`);
+    }
   }
   return raw.scenarios;
 }
@@ -383,12 +351,6 @@ function parseSSE(text) {
   return { toolCall, finalText, eventCount: events.length, rawStreamText };
 }
 
-// 모델이 실제 함수 호출(tool_call) 대신 그 모양을 흉내 낸 JSON을 답변 텍스트로
-// 적어버리는 누출(예: {"name":"work_status","arguments":{...}})을 감지한다.
-// ```viz 블록({"type":"workstatus","data":...})과는 키가 겹치지 않아 오탐이 없다.
-const LEAKED_TOOLCALL_PATTERN =
-  /"name"\s*:\s*"[\w.-]+"\s*,\s*"(arguments|input)"\s*:/;
-
 function readMockLogTail(mockLogPath, sinceIso) {
   if (!fs.existsSync(mockLogPath)) return [];
   const content = fs.readFileSync(mockLogPath, "utf8");
@@ -497,19 +459,33 @@ async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
       );
     }
   }
+  // 앞 대화는 먼저 보내고 판정·mock 집계에서 뺀다. 실패하면 문맥 없이 판정하게 되므로 run을 FAIL로 둔다
+  // (문맥 없이도 거절 답이 나와 잘못 PASS될 수 있고, timeout이면 앞 대화의 HR 호출이 판정 구간에 섞인다)
+  let setupError = null;
+  for (const setupMessage of scenario.setup_messages || []) {
+    try {
+      const res = await streamChat(apiKey, { message: setupMessage, mode: "chat", attachments: [] });
+      if (res.status !== 200) setupError = `setup message failed: HTTP ${res.status}`;
+    } catch (e) {
+      setupError = `setup message failed: ${e.message}`;
+    }
+    if (setupError) break;
+  }
   const startedAt = new Date().toISOString();
   const t0 = Date.now();
   let body = "";
-  let errorMsg = null;
-  try {
-    const res = await streamChat(apiKey, {
-      message: scenario.message,
-      mode: "chat",
-      attachments: [],
-    });
-    body = res.body;
-  } catch (e) {
-    errorMsg = e.message;
+  let errorMsg = setupError;
+  if (!setupError) {
+    try {
+      const res = await streamChat(apiKey, {
+        message: scenario.message,
+        mode: "chat",
+        attachments: [],
+      });
+      body = res.body;
+    } catch (e) {
+      errorMsg = e.message;
+    }
   }
   const elapsedMs = Date.now() - t0;
   const { toolCall, finalText, eventCount, rawStreamText } = parseSSE(body);
@@ -519,88 +495,24 @@ async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
   // backup 방식 폐기 이후 유효 호출은 .do뿐, hrCallCount 계수 대상도 동일)
   const relevantMock = mockEntries.filter((m) => /\.do$/.test(m.path || ""));
   const mockUrl =
-    relevantMock.length > 0 ? relevantMock[relevantMock.length - 1].fullUrl : null;
+    relevantMock.length > 0
+      ? relevantMock[relevantMock.length - 1].fullUrl
+      : null;
   const mockBody =
     relevantMock.length > 0
       ? mockBodyToString(relevantMock[relevantMock.length - 1].body)
       : null;
 
-  const asked =
-    !toolCall && finalText ? /연도|년/.test(finalText) : false;
-
-  let pass = true;
-  let reason = null;
-  if (errorMsg) {
-    pass = false;
-    reason = `request error: ${errorMsg}`;
-  } else if (LEAKED_TOOLCALL_PATTERN.test(rawStreamText)) {
-    pass = false;
-    reason =
-      "raw stream leaked a tool-call-shaped JSON preamble (sanitized before storage but visible live — see hrSkillGuard.js rule 8)";
-  } else if (scenario.expect.tool_call && !toolCall) {
-    pass = false;
-    reason = "expected tool_call but LLM did not invoke any tool";
-  } else if (!scenario.expect.tool_call && toolCall) {
-    pass = false;
-    reason = "expected no tool_call but LLM invoked one";
-  } else if (scenario._mockUrlRegex) {
-    if (!mockUrl) {
-      pass = false;
-      reason = "no mock URL captured (timing or tool-call non-HTTP)";
-    } else if (!scenario._mockUrlRegex.test(mockUrl)) {
-      pass = false;
-      reason = `mock URL did not match pattern ${scenario.expect.mock_url_pattern}`;
-    }
-  }
-  // body 검증 (kiwibox urlencoded 필수 파라미터 — 전 패턴 매칭 필요)
-  if (pass && scenario._mockBodyRegexes) {
-    if (mockBody == null) {
-      pass = false;
-      reason = "no mock body captured";
-    } else {
-      const missed = scenario.expect.mock_body_pattern.filter(
-        (p, i) => !scenario._mockBodyRegexes[i].test(mockBody)
-      );
-      if (missed.length > 0) {
-        pass = false;
-        reason = `mock body missing pattern(s): ${missed.join(" | ")}`;
-      }
-    }
-  }
-  // 012-hr-answer-quality: 최종 답변 검증 — 판정 4~7 (기존 체인 뒤 순차).
-  // contracts/e2e-assertion-schema.md
-  if (pass && (scenario._answerRegexes || scenario._answerNotRegexes)) {
-    if (finalText == null) {
-      pass = false;
-      reason = "no final answer captured";
-    }
-  }
-  if (pass && scenario._answerRegexes) {
-    const missed = scenario.expect.answer_pattern.filter(
-      (p, i) => !scenario._answerRegexes[i].test(finalText)
-    );
-    if (missed.length > 0) {
-      pass = false;
-      reason = `answer missing pattern(s): ${missed.join(" | ")}`;
-    }
-  }
-  if (pass && scenario._answerNotRegexes) {
-    const hit = scenario.expect.answer_not_pattern.filter((p, i) =>
-      scenario._answerNotRegexes[i].test(finalText)
-    );
-    if (hit.length > 0) {
-      pass = false;
-      reason = `answer contains forbidden pattern(s): ${hit.join(" | ")}`;
-    }
-  }
-  if (
-    pass &&
-    scenario.expect.max_hr_calls != null &&
-    relevantMock.length > scenario.expect.max_hr_calls
-  ) {
-    pass = false;
-    reason = `hr calls ${relevantMock.length} exceeded max ${scenario.expect.max_hr_calls}`;
-  }
+  const asked = !toolCall && finalText ? /연도|년/.test(finalText) : false;
+  const reason = judgeRun(scenario, {
+    errorMsg,
+    rawStreamText,
+    toolCall,
+    finalText,
+    mockUrl,
+    mockBody,
+    bodies: relevantMock.map((m) => mockBodyToString(m.body)),
+  });
 
   return {
     scenario: scenario.id,
@@ -614,7 +526,7 @@ async function runScenarioOnce(scenario, iteration, apiKey, mockLogPath) {
     hrCallCount: relevantMock.length,
     asked,
     eventCount,
-    pass,
+    pass: reason == null,
     reason,
   };
 }

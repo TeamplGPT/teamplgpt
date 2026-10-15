@@ -7,6 +7,9 @@
 //  - 사원증 계열 searchStaffId는 $SELF_STAFF_ID 마커 — 브리지/폴백이 본인 사번 치환 (self 강제).
 //  - family(주민번호 반환 SCIRegDependent)는 카탈로그 §7 등록 금지 — 미노출.
 const { resolveDateParam } = require("../_shared/dateResolver");
+const { resolveYearPeriod } = require("../_shared/periodResolver");
+const { OTHER_EMPLOYEE_REFUSAL, isBlockedQueryType } = require("../_shared/otherEmployee");
+const { withPeriodHeader } = require("../_shared/yearQuery");
 // 표시 보정은 _shared 공통 모듈 — handler별 사본 금지(specs/022 P0-2)
 const { stripHtmlBreaks, applyCodeLabel } = require("../_shared/renderNormalize");
 // 미지정 값은 LLM에게 추측시키지 않고 서버가 본인 컨텍스트에서 해석(specs/022 P-SELF)
@@ -81,16 +84,14 @@ const ENDPOINT_MAP = {
     // SQL(getMBLHrBassiemMemberList)의 sub_org_yn(searchTypeVal)은 'Y'/'N' 양자 분기라
     // 미전송(null) 시 OR 양쪽 모두 거짓 → 항상 0건. 직접 조직만 조회(N) 고정.
     fixed: { searchTypeVal: "N" },
-    // detail/seqNo/empOrder/staffId/orgCd(3종)/posSeqNo/name(중복)/imgExYn 차단
+    // detail/seqNo/empOrder/staffId/orgCd(3종)/posSeqNo/name(중복)/imgExYn 차단.
+    // 조직도 예외는 이름·소속·직위·직책까지만(specs/016 D2·D3) — 사번(STAFF_NO)·회사(CORP_NM)·
+    // 근무정보(WORK_TYPE: 육아단축근무·출장지·교육명 등 실측)·근무상황(WORK_INFO)은 다른 직원 정보라 뺀다.
     columns: {
       STAFF_NM: "성명",
-      STAFF_NO: "사번",
       ORG_NM: "소속",
       POS_NM: "직위",
       RES_NM: "직책",
-      CORP_NM: "회사",
-      WORK_TYPE: "근무정보",
-      WORK_INFO: "근무상황",
     },
   },
   todo_count: {
@@ -102,7 +103,7 @@ const ENDPOINT_MAP = {
     },
   },
   // getScheduleDay는 일자별 "건수"만 준다(집계 쿼리) — 무엇인지는 안 담겨 있다.
-  // "생일자 몇 명" 같은 건수 질문에만 쓰고, "누구 생일인지"는 birthday를 쓴다.
+  // "생일자 몇 명" 같은 건수 질문에만 쓴다. "누구 생일인지"는 다른 직원 정보라 제공하지 않는다(specs/016).
   schedule_day: {
     path: "/getScheduleDay.do", staffParam: null, gate: false, // 범위 a
     dateParam: "month-range",
@@ -112,20 +113,7 @@ const ENDPOINT_MAP = {
       RESULT: "건수",
     },
   },
-  birthday: {
-    // 실측(getBirthDetailList.do, cmd 없음): ymd(생년월일)·staffNm·orgNm·einfo5(직위)·title.
-    // 조회 범위는 kiwibox 설정(SRCH_BIRTH_AREA)이 통제 — skill이 임의로 넓히지 않는다.
-    path: "/getBirthDetailList.do", staffParam: null, gate: false, // 범위 a
-    dateParam: "month-range",
-    columns: {
-      YMD: "생일",
-      STAFF_NM: "성명",
-      ORG_NM: "소속",
-      EINFO5: "직위",
-    },
-    // ymd는 생년월일(연도 포함)이라 그대로 두면 나이가 드러난다 — 월-일만 표시.
-    maskYmdColumns: ["YMD"],
-  },
+  // birthday(생일자 명단) — 성명·소속·직위·생일이 다른 직원 정보라 제공 중단(specs/016)
   schedule_titles: {
     // 실측(getHRDetailList.do, cmd 없음): title 단일 필드(일정 제목+공휴일명,
     // 36자 초과 시 서버가 "..." 절단). ⚠ 날짜 필드가 없다 — 기간 내 제목 나열이며
@@ -181,7 +169,6 @@ const QUERY_LABELS = {
   org_members: "조직원 목록",
   todo_count: "할일/미결 건수",
   schedule_day: "일정/생일/공휴일 건수",
-  birthday: "생일자 명단",
   schedule_titles: "일정/공휴일 제목",
   education: "교육이력",
 };
@@ -189,7 +176,10 @@ const QUERY_LABELS = {
 module.exports.runtime = {
   handler: async function ({ query_type, year_month, org_cd }) {
     try {
-      if (!query_type || !ENDPOINT_MAP[query_type]) {
+      // 다른 직원 정보 조회는 HR 호출 없이 거절(specs/016) — 잘못된 값 안내보다 먼저
+      if (isBlockedQueryType("hr-personnel", query_type)) return OTHER_EMPLOYEE_REFUSAL;
+      // 자기 키만 인정 — "constructor"·"__proto__" 같은 프로토타입 키 우회 차단(코드 리뷰 H1)
+      if (typeof query_type !== "string" || !Object.hasOwn(ENDPOINT_MAP, query_type)) {
         const types = Object.keys(ENDPOINT_MAP).join(", ");
         return `> ⚠️ query_type이 올바르지 않습니다. 가능한 값: ${types}`;
       }
@@ -225,6 +215,14 @@ module.exports.runtime = {
         if (org) form[spec.orgParam.name] = org;
       }
 
+      // 일정 조회의 연도 단위 질의("올해"/"2026년" …)는 그해 1/1~12/31 (specs/015).
+      // 연도 표현이 아니면 null이라 기존 월 범위를 그대로 쓴다.
+      const yearPeriod =
+        spec.dateParam === "month-range"
+          ? resolveYearPeriod(year_month, { kind: "schedule" })
+          : null;
+      const withPeriod = (out) => (yearPeriod ? withPeriodHeader(out, yearPeriod) : out);
+
       if (spec.dateParam === "today") {
         form.searchSymd = todayYmd();
       } else if (spec.dateParam === "today-dashed") {
@@ -233,7 +231,7 @@ module.exports.runtime = {
         const ym =
           resolveDateParam(year_month, "year_month") ||
           resolveDateParam("이번달", "year_month");
-        const [sYmd, eYmd] = monthRange(ym);
+        const [sYmd, eYmd] = yearPeriod ? [yearPeriod.start, yearPeriod.end] : monthRange(ym);
         form.staYmd = sYmd;
         form.endYmd = eYmd;
       }
@@ -246,7 +244,7 @@ module.exports.runtime = {
       });
       if (errorMessage) return errorMessage;
       if (isEmpty) {
-        return `> ⚠️ **${label}** 조회 결과가 존재하지 않습니다.`;
+        return withPeriod(`> ⚠️ **${label}** 조회 결과가 존재하지 않습니다.`);
       }
 
       this.introspect(`${label} 조회 완료.`);
@@ -256,15 +254,13 @@ module.exports.runtime = {
         : records;
       // 날짜 없이 하루=1행으로 오는 endpoint는 연휴처럼 같은 값이 반복된다 — 렌더 전 중복 제거.
       if (spec.dedupeColumn) safe = dedupeByColumn(safe, spec.dedupeColumn);
+      // 일정 건수 1년치는 하루=1행(365행) — 일정 있는 날만 넘긴다(contracts §2)
+      if (yearPeriod && query_type === "schedule_day") {
+        return withPeriod(formatBusyDays(safe, label, spec.columns));
+      }
       // 화이트리스트 컬럼 정의가 있으면 선별 렌더(코드값·내부 식별자 제외)
       if (spec.columns) {
-        const rendered = formatWhitelisted(
-          safe,
-          label,
-          spec.columns,
-          spec.codeLabels,
-          spec.maskYmdColumns
-        );
+        const rendered = formatWhitelisted(safe, label, spec.columns, spec.codeLabels);
         // org_tree는 "타 조직 조회"가 가능한 유일한 query_type이라 찾는 조직이
         // 이 목록에 없을 수 있다. 프롬프트 지시만으로는 모델이 "조회 기준이
         // 어쩌구" 식으로 둘러대거나, 심하면 다른 조직 데이터를 그 조직인 것처럼
@@ -273,9 +269,9 @@ module.exports.runtime = {
         if (query_type === "org_tree") {
           return `${rendered}\n\n> [안내] 사용자가 찾는 조직이 위 목록에 없으면, 그 조직은 확인해 드릴 수 없다고 답하고 본인 소속 조직 조회는 org_cd 없이 바로 가능하다고 제안하세요. 목록에 없는 조직명을 지어내거나 다른 조직의 정보를 그 조직인 것처럼 보여주지 마세요.`;
         }
-        return rendered;
+        return withPeriod(rendered);
       }
-      return formatPersonnel(safe, label);
+      return withPeriod(formatPersonnel(safe, label));
     } catch (e) {
       this.logger("Error in hr-personnel", e.message);
       return `> ⚠️ 인사기록 조회 중 오류가 발생했습니다: ${e.message}`;
@@ -313,6 +309,24 @@ function dedupeByColumn(records, key) {
   });
 }
 
+// 건수(RESULT)가 1 이상인 날만 표로 — 나머지는 "그 외 N일은 일정 없음" 한 줄 (specs/015)
+function formatBusyDays(records, label, columns) {
+  const list = Array.isArray(records) ? records : records ? [records] : [];
+  const busy = list.filter((row) => Number(row.RESULT ?? row.result) >= 1);
+  if (busy.length === 0) {
+    return `## HR 인사기록 - ${label}\n\n> 조회 기간 동안 일정이 있는 날이 없습니다.`;
+  }
+  const rendered = formatWhitelisted(busy, label, columns);
+  const rest = list.length - busy.length;
+  if (rest === 0) return rendered;
+  // 보조 줄은 응답 지침(ANSWER_GUIDE) 앞, 표 바로 아래에 둔다
+  const { ANSWER_GUIDE } = require("../_shared/formatTable");
+  const restLine = `> 그 외 ${rest}일은 일정 없음`;
+  return rendered.includes(ANSWER_GUIDE)
+    ? rendered.replace(ANSWER_GUIDE, `\n${restLine}${ANSWER_GUIDE}`)
+    : `${rendered}\n${restLine}`;
+}
+
 function formatPersonnel(data, label) {
   const { normalizeData, renderTable, renderSummary } = require("../_shared/formatTable");
   const { rows, summary } = normalizeData(data);
@@ -333,26 +347,12 @@ function camel(snake) {
   return snake.toLowerCase().replace(/_([a-z])/g, (_, c) => c.toUpperCase());
 }
 
-// YYYYMMDD 생년월일에서 연도를 지운다 — 그대로 두면 나이가 드러난다.
-// 형식이 다르면 추측해 바꾸지 않고 원값을 그대로 둔다.
-function maskYmdToMonthDay(v) {
-  const s = String(v).trim();
-  return /^\d{8}$/.test(s) ? `${s.slice(4, 6)}-${s.slice(6, 8)}` : s;
-}
-
 // 컬럼 화이트리스트 렌더 — hr-approval/hr-certificate와 동일 패턴(코드값 제외 + union 정규화)
-function formatWhitelisted(
-  records,
-  label,
-  columnLabels,
-  codeLabels = {},
-  maskYmdColumns = []
-) {
+function formatWhitelisted(records, label, columnLabels, codeLabels = {}) {
   const list = Array.isArray(records) ? records : records ? [records] : [];
   let md = `## HR 인사기록 - ${label}\n\n`;
   if (list.length === 0) return md + "> 조회된 데이터가 없습니다.";
 
-  const maskYmd = new Set(maskYmdColumns);
   const pick = (row) => {
     const out = {};
     for (const [col, lab] of Object.entries(columnLabels)) {
@@ -362,7 +362,7 @@ function formatWhitelisted(
         continue;
       }
       if (v !== undefined && v !== null && String(v).trim() !== "") {
-        out[lab] = maskYmd.has(col) ? maskYmdToMonthDay(v) : stripHtmlBreaks(v);
+        out[lab] = stripHtmlBreaks(v);
       }
     }
     return out;

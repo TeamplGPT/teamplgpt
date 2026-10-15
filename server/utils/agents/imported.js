@@ -3,6 +3,7 @@ const path = require("path");
 const { safeJsonParse } = require("../http");
 const { isWithin, normalizePath } = require("../files");
 const { CollectorApi } = require("../collectorApi");
+const { wrapHrRuntime } = require("../hrSelfDataNotice");
 const pluginsPath =
   process.env.NODE_ENV === "development"
     ? path.resolve(__dirname, "../../storage/plugins/agent-skills")
@@ -187,7 +188,8 @@ class ImportedPlugin {
   }
 
   plugin(runtimeArgs = {}) {
-    const customFunctions = this.handler.runtime;
+    // fork(specs/016): hr-* 결과에 "본인 데이터" 안내 부착 — 그 외 skill은 원래 runtime 그대로
+    const customFunctions = wrapHrRuntime(this.name, this.handler.runtime);
     return {
       runtimeArgs,
       name: this.name,

@@ -145,6 +145,13 @@ function loadScenarios() {
     if (!s.expect || typeof s.expect.tool_call !== "boolean") {
       fatal(`Scenario ${s.id}: expect.tool_call (boolean) required`);
     }
+    // @agent 러너(e2e-hr-skill/helpers/expectations.js)에만 있는 판정 — 여기서는 조용히 무시되면
+    // 실패해야 할 run이 PASS가 되므로 로드 단계에서 막는다(specs/016 코드 리뷰)
+    for (const key of ["mock_body_pattern_any", "mock_body_pattern_none", "min_hr_calls"]) {
+      if (s.expect[key] != null) {
+        fatal(`Scenario ${s.id}: expect.${key} is not supported by the embed runner`);
+      }
+    }
     if (
       s.expect.mock_url_pattern != null &&
       typeof s.expect.mock_url_pattern !== "string"
@@ -198,6 +205,15 @@ function loadScenarios() {
     if (s.expect.max_hr_calls != null) {
       if (!Number.isInteger(s.expect.max_hr_calls) || s.expect.max_hr_calls < 1) {
         fatal(`Scenario ${s.id}: expect.max_hr_calls must be an integer >= 1`);
+      }
+    }
+    // 016: 같은 세션에서 먼저 보낼 앞 대화(판정 대상 아님) — 이어서 묻는 질문 검증용
+    if (s.setup_messages != null) {
+      if (
+        !Array.isArray(s.setup_messages) ||
+        s.setup_messages.some((m) => typeof m !== "string" || m.length === 0)
+      ) {
+        fatal(`Scenario ${s.id}: setup_messages must be non-empty string[]`);
       }
     }
     s.repeat = Number.isInteger(s.repeat) ? s.repeat : 1;
@@ -493,19 +509,39 @@ async function runScenarioOnce(scenario, iteration, configMap, mockLogPath) {
   const embedUuid = cfg.uuid;
   const sessionId = crypto.randomUUID();
 
+  // 앞 대화는 같은 세션으로 먼저 보내고 판정·mock 집계에서 뺀다. 실패하면 문맥 없이 판정하게 되므로
+  // run을 FAIL로 둔다(문맥 없이도 거절 답이 나와 잘못 PASS될 수 있고, timeout이면 앞 대화의 HR 호출이
+  // 판정 구간에 섞인다)
+  let setupError = null;
+  for (const setupMessage of scenario.setup_messages || []) {
+    try {
+      const res = await embedStreamChat(embedUuid, {
+        sessionId,
+        message: setupMessage,
+        prompt: TOOL_FRIENDLY_PROMPT,
+      });
+      if (res.status !== 200) setupError = `setup message failed: HTTP ${res.status}`;
+    } catch (e) {
+      setupError = `setup message failed: ${e.message}`;
+    }
+    if (setupError) break;
+  }
+
   const startedAt = new Date().toISOString();
   const t0 = Date.now();
   let body = "";
-  let errorMsg = null;
-  try {
-    const res = await embedStreamChat(embedUuid, {
-      sessionId,
-      message: scenario.message,
-      prompt: TOOL_FRIENDLY_PROMPT,
-    });
-    body = res.body;
-  } catch (e) {
-    errorMsg = e.message;
+  let errorMsg = setupError;
+  if (!setupError) {
+    try {
+      const res = await embedStreamChat(embedUuid, {
+        sessionId,
+        message: scenario.message,
+        prompt: TOOL_FRIENDLY_PROMPT,
+      });
+      body = res.body;
+    } catch (e) {
+      errorMsg = e.message;
+    }
   }
   const elapsedMs = Date.now() - t0;
   const { toolCall, finalText, eventCount } = parseSSE(body);

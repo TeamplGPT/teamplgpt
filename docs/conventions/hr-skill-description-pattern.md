@@ -1,6 +1,6 @@
 # HR Skill `plugin.json` description 작성 표준
 
-**버전** v1.4 (2026-09-08) · **상태** 영구 convention (archive 대상 아님)
+**버전** v1.6 (2026-10-15) · **상태** 영구 convention (archive 대상 아님)
 
 > **v1.4 (2026-09-08): P0-2/P1-1 재설계 반영 — v1.3은 2026-08-10 시점 역추출로 현행과 불일치.**
 > 2026-09-03~04에 HR skill 7종의 description이 "키워드 매핑표 + `[CRITICAL]` 반복" 방식에서 "정체성 / 의도 서술 / 경계" 구조로 전면 재작성됐고, 모든 skill에 공통인 지시(본인 기준·즉시 호출·기간 되묻기 금지·year_month 형식·required 필수·코드성 인자 선행 조회)는 description 밖 시스템 프롬프트 가드 `hrSkillChatGuard()`로 이관됐다. v1.4는 그 결과물인 실물 `plugin.json` 7종, `server/utils/chats/index.js`의 가드, `server/evals/hr-routing/` 평가 하네스에서 다시 역추출한 것이다.
@@ -44,7 +44,7 @@ description 규율은 한 곳에 있지 않다. 바꿀 때는 아래를 함께 �
 | 블록 | 내용 |
 |---|---|
 | `[HR_DATE_CONTEXT]` | 오늘 날짜(Asia/Seoul) 주입. 상대 날짜 해석 기준 |
-| `[HR_SKILL_COMMON]` 1~6 | ① 본인 기준 조회, 사번·이름 되묻기 금지 ② skill·query_type을 정했으면 즉시 tool 호출, 결과 추측 금지 ③ 기간 파라미터(year_month/cal_yy) 없으면 생략하고 즉시 호출, 연도 추론 금지 ④ year_month 전달 형식(연도 명시 시 `YYYYMM`/`YYYY-MM`/`YYYY년 M월`, 미명시 시 월 표현 그대로, 일 정보 무시) ⑤ required 파라미터는 enum이 하나여도 항상 채움 ⑥ 코드성 파라미터(pay_item/org_cd)는 선행 조회 결과의 코드값만 사용 |
+| `[HR_SKILL_COMMON]` 1~6·10 | ① 본인 기준 조회, 사번·이름 되묻기 금지 ② skill·query_type을 정했으면 즉시 tool 호출, 결과 추측 금지 — 앞 HR 수치의 산정 근거·내역을 다시 물어도 같은 조회를 다시 호출(specs/016 R14) ③ 기간 파라미터(year_month/cal_yy) 없으면 생략하고 즉시 호출, 연도 추론 금지 ④ year_month 전달 형식(호출 여부를 정하는 규칙이 아님을 명시. 월 없이 연도만 말하면 그 표현을 그대로 — 생략·특정 월 변환 금지, 서버가 그해 기준 조회. 연도+월이면 `YYYYMM`/`YYYY-MM`/`YYYY년 M월`, 연도 미명시 시 월 표현 그대로, 일 정보 무시. 결과의 '조회 기간'보다 넓게 말하지 말 것) ⑤ required 파라미터는 enum이 하나여도 항상 채움 ⑥ 코드성 파라미터(pay_item/org_cd)는 선행 조회 결과의 코드값만 사용 ⑩ 다른 직원 정보 요청(이름·사번·호칭 지칭, 팀 휴가자·생일자·남이 올린 결재 문서)은 tool 없이 거절 — 조직도(조직 구조·팀원 이름·소속·직위·직책)만 예외, 결재 대기 건수는 todo_count 허용. [ORDER]에 예외 단서 |
 | `[HR_TOOL_CALL_PRIORITY]` | workspace 프롬프트의 "모호성 검사 → 되묻기" 절차보다 HR 지시와 tool description이 우선 |
 | `[ORDER]` | HR 요청의 첫 액션은 tool_call |
 | `[HR_SALARY_TWO_STEP]` | hr-salary는 pay_item 미확보 시 무조건 `pay_periods` 선행 |
@@ -219,15 +219,15 @@ enum이 하나뿐인 skill(`hr-certificate`, `hr-welfare`).
 
 ## §6 적용 현황 매트릭스
 
-2026-09-08 기준. 실물 `plugin.json` 대조 결과.
+2026-09-08 기준, 2026-10-15(v1.6) hr-attendance·hr-personnel·hr-approval·hr-year-end-tax(summary 절) 갱신. 실물 `plugin.json` 대조 결과.
 
 | skill | ver | query_type 수 | 주기 파라미터 | 코드성 파라미터 | required | examples | B 형태 | 폴백 값 | 경계 위임처 |
 |---|---|---|---|---|---|---|---|---|---|
-| `hr-attendance` | 2.1.0 | 8 | `year_month` | — | `query_type` | 14 | 다값형 | `annual_leave_balance` | hr-approval, hr-salary |
-| `hr-personnel` | 2.2.0 | 8 | `year_month` | `org_cd` | `query_type` | 12 | 다값형 | `profile` | hr-year-end-tax, hr-approval |
+| `hr-attendance` | 2.1.0 | 7 | `year_month` | — | `query_type` | 13 | 다값형 | `annual_leave_balance` | hr-approval, hr-salary, (다른 직원 근태 미제공) |
+| `hr-personnel` | 2.2.0 | 8 | `year_month` | `org_cd` | `query_type` | 13 | 다값형 | `profile` | hr-year-end-tax, hr-approval, (다른 직원 개인 정보 미제공) |
 | `hr-salary` | 2.2.0 | 6 | `year_month` | `pay_item` | `query_type` | 8 | 선행 조회 의존형 | (2단계 규칙) | hr-year-end-tax |
 | `hr-year-end-tax` | 2.1.0 | 9 | `cal_yy` | — | `query_type` | 12 | 다값형 | `summary` | hr-salary |
-| `hr-approval` | 1.0.0 | 5 | `year_month` | — | `query_type` | 8 | 다값형 | `pending` | hr-personnel, hr-attendance |
+| `hr-approval` | 1.0.0 | 1 | `year_month` | — | `query_type` | 3 | 단일값형(`drafted`) | — | hr-personnel(todo_count), hr-attendance, (남이 올린 문서 미제공) |
 | `hr-certificate` | 1.0.0 | 1 | — | — | `query_type` | 4 | 단일값형 | — | (발급 신청 불가 명시) |
 | `hr-welfare` | 1.0.0 | 1 | — | — | `query_type` | 4 | 단일값형 | — | hr-year-end-tax, 미지원 항목 안내 |
 
@@ -309,6 +309,22 @@ v1.4 작성 시점에 확인된 코드-문서 불일치. 고칠 때 이 문서�
 ---
 
 ## 변경 이력
+
+### v1.5 → v1.6 (2026-10-15)
+
+| 항목 | v1.5 | v1.6 |
+|---|---|---|
+| 다른 직원 정보 | 지칭 질문 거절 규칙 없음 — "김기현 연차"에 본인 tool 호출 후 본인 값을 그 사람 것으로 답함(실사용) | `[HR_SKILL_COMMON]` 10항 + [ORDER] 단서. 조회 제거: hr-attendance `vacation_calendar`, hr-personnel `birthday`, hr-approval `pending`·`completed`·`rejected`·`referenced`(hr-approval은 단일값형 `drafted`). org_members는 이름·소속·직위·직책만. 제거 query_type은 handler가 고정 거절(L2). HR tool 결과 끝 `[본인 데이터]` 안내는 description이 아니라 실행 계층(`server/utils/hrSelfDataNotice.js`)에서 붙인다(specs/016) |
+| 주의 | — | 전체 허용 위젯은 첫 응답 tool 호출이 강제된다(embed `shouldForceToolChoice`). "tool 없이 거절" 지시만으로는 그 경로를 막을 수 없다 — L2 안내가 실질 방어선 |
+| 경계 회귀 | — | `birthday` 항목의 대조 문구("schedule_day 아님")가 사라지며 날짜형 일정 질문이 schedule_titles로 기운다(prod-per-04 14/20 → 2/20). 데이터셋 기대값을 둘 다 인정으로 확장(specs/016 contracts/test-expectations.md §1-1) |
+| 거절 경계 + 본인 예외 짝 | — | 거절 경계를 넣을 때는 본인 정보 예외를 같은 자리에 함께 쓴다. 거절 경계만 넣으면 다른 직원이 "언급만" 된 본인 질문까지 거절한다. hr-approval: "남이 올린 문서는 호출하지 말 것" 문장만 넣었을 때 "김팀장님이 반려한 내 신청서"가 2/10이었고, "내가 올린 문서는 결재자가 언급돼도 조회" 예외를 붙여 10/10이 됐다. hr-personnel: 10항 추가 후 "우리 회사 부서가 어떻게 나뉘어 있어?"·"우리 팀장님이 누구야?"가 가끔 tool 없이 거절됐다(specs/015 최종 가드 20/20 → 37/40). "조직도·부서 구성(…팀장·부서장이 누구인지)은 이 제한의 예외" 문장으로 20/20이 됐다. 예외를 넓히면 반대쪽(생일자 명단)이 새어 나가므로, 예외가 아닌 것도 같은 자리에 적는다("생일자 명단처럼 다른 직원의 개인 정보를 모은 목록은 예외가 아닙니다" — 15/20 → 20/20). 예외 예시는 평가 발화와 다른 표현으로 쓴다(과적합 방지). 측정: specs/016 contracts/blocked-query-types.md |
+| 가드 회귀를 skill 설명으로 보정 | — | 공통 가드 문장(10항)이 무관한 skill의 query_type 선택을 흔들 수 있다(hr-year-end-tax "소득공제신청 내역" summary 6/6 → 4/6). 가드를 다시 고치면 다른 회귀(EC-FILTER-03)가 나서, 해당 skill의 query_type 절을 보강했다(summary에 "공제 항목을 하나로 정하지 않은 공제(신청) 내역 전체" 추가 → 6/6) |
+
+### v1.4 → v1.5 (2026-10-15)
+
+| 항목 | v1.4 | v1.5 |
+|---|---|---|
+| `[HR_SKILL_COMMON]` 4항 | 연도 명시 시 `YYYYMM` 등 월 형식만 안내 — "올해"·"2026년"이 한 달로 수렴(생략 또는 `202601`/이번 달) | 범위 단서(인자 채우는 방법일 뿐 — 기간이 있다는 이유로 tool 호출 금지) + 연도만 말하면 그 표현 그대로 전달(반례 `'202601'` 명시) + '조회 기간'보다 넓게 말하지 말 것. 단서 없이 연도 문장만 넣으면 허용 tool 일부인 embed에서 무관한 tool 호출이 늘었다(EC-FILTER-03, specs/015 contracts/guard-rule.md). 서버 해석은 `_shared/periodResolver.js`(specs/015). description은 무수정 |
 
 ### v1.3 → v1.4 (2026-09-08)
 

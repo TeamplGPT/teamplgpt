@@ -1,0 +1,1161 @@
+__tests__/endpoints/embed.index.test.js › parseToolRuntimeOverrideHeaders development 환경에서는 헤더를 upper-case runtime override로 파싱한다
+__tests__/endpoints/embed.index.test.js › parseToolRuntimeOverrideHeaders gate가 닫혀 있으면 null을 반환한다
+__tests__/endpoints/embed.index.test.js › parseToolRuntimeOverrideHeaders production이어도 gate env=true면 파싱을 허용한다
+__tests__/endpoints/embed.index.test.js › parseToolRuntimeOverrideHeaders 배열 헤더는 첫 번째 값만 사용하고 빈 값은 무시한다
+__tests__/endpoints/embed.index.test.js › parseToolRuntimeOverrideHeaders 유효한 override 헤더가 하나도 없으면 null을 반환한다
+__tests__/integration/hybrid-search.integration.test.js › Hybrid Search Integration Tests H-1: hybridSearch=true가 performSimilaritySearch에 전달된다 공용 검색에도 hybridSearch=true가 전달된다
+__tests__/integration/hybrid-search.integration.test.js › Hybrid Search Integration Tests H-1: hybridSearch=true가 performSimilaritySearch에 전달된다 로컬 검색에 hybridSearch=true가 전달된다
+__tests__/integration/hybrid-search.integration.test.js › Hybrid Search Integration Tests H-2: hybridSearch=false일 때 기존 동작과 동일하다 hybridSearch 미전달 시 기본값 false로 전달된다
+__tests__/integration/hybrid-search.integration.test.js › Hybrid Search Integration Tests H-2: hybridSearch=false일 때 기존 동작과 동일하다 hybridSearch=false가 전달된다
+__tests__/integration/hybrid-search.integration.test.js › Hybrid Search Integration Tests H-2: hybridSearch=false일 때 기존 동작과 동일하다 rerank=true와 hybridSearch는 상호 배타적으로 전달 가능하다
+__tests__/integration/hybrid-search.integration.test.js › Hybrid Search Integration Tests H-3: hybridSearch와 adjacentChunks가 함께 전달된다 hybridSearch=true + adjacentChunks=2가 동시에 전달된다
+__tests__/integration/hybrid-search.integration.test.js › Hybrid Search Integration Tests H-4: hybrid 모드에서 로컬+공용 병렬 검색 후 합산 hybrid 결과가 RRF 점수로 올바르게 합산된다
+__tests__/integration/hybrid-search.integration.test.js › Hybrid Search Integration Tests H-4: hybrid 모드에서 로컬+공용 병렬 검색 후 합산 공용 검색의 adjacentChunks는 공용 WS 설정을 사용한다
+__tests__/integration/hybrid-search.integration.test.js › Hybrid Search Integration Tests H-5: hybrid 모드에서 공용 검색 실패 시 로컬 결과만 반환 공용 hybrid 검색 예외 시 로컬 hybrid 결과만 반환
+__tests__/integration/hybrid-search.integration.test.js › Hybrid Search Integration Tests H-5: hybrid 모드에서 공용 검색 실패 시 로컬 결과만 반환 공용 hybrid 검색이 에러 메시지 반환 시 로컬 결과만 반환
+__tests__/integration/hybrid-search.integration.test.js › Hybrid Search Integration Tests H-6: hybrid 모드에서 중복 제거 및 contextTexts 매핑 contextTexts와 sources 인덱스가 정렬 후에도 일치한다
+__tests__/integration/hybrid-search.integration.test.js › Hybrid Search Integration Tests H-6: hybrid 모드에서 중복 제거 및 contextTexts 매핑 로컬과 공용에 같은 chunkSource가 있으면 높은 점수만 유지
+__tests__/models/systemPromptVariables.test.js › SystemPromptVariables.expandSystemPromptVariables should expand user-defined system prompt variables
+__tests__/models/systemPromptVariables.test.js › SystemPromptVariables.expandSystemPromptVariables should expand user-defined system prompt variables
+__tests__/models/systemPromptVariables.test.js › SystemPromptVariables.expandSystemPromptVariables should expand workspace-defined system prompt variables
+__tests__/models/systemPromptVariables.test.js › SystemPromptVariables.expandSystemPromptVariables should fail gracefully with invalid variables that are undefined for any reason
+__tests__/models/systemPromptVariables.test.js › SystemPromptVariables.expandSystemPromptVariables should work with any combination of variables
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_mode field configuration text_splitter_chunk_mode는 protectedFields에 포함되지 않아야 함
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_mode field configuration text_splitter_chunk_mode는 publicFields에 포함되어 있어야 함
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_mode field configuration text_splitter_chunk_mode는 supportedFields에 포함되어 있어야 함
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_mode validation function 'character' 값은 유효함
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_mode validation function 'paragraph' 값은 유효함
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_mode validation function character 모드에서도 purgeEntireVectorCache가 호출되어야 함
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_mode validation function null 값은 기본값 'character'로 폴백
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_mode validation function undefined 값은 기본값 'character'로 폴백
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_mode validation function 대소문자가 다른 값은 기본값으로 폴백 (Character vs character)
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_mode validation function 모드 변경 시 purgeEntireVectorCache가 호출되어야 함
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_mode validation function 빈 문자열은 기본값 'character'로 폴백
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_mode validation function 숫자 값은 기본값 'character'로 폴백
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_mode validation function 유효하지 않은 값은 기본값 'character'로 폴백
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_overlap validation (관련 테스트) 0 값은 유효함
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_overlap validation (관련 테스트) null 값은 기본값 20으로 폴백
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_overlap validation (관련 테스트) 유효한 chunk_overlap 값
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_overlap validation (관련 테스트) 음수 값은 기본값 20으로 폴백
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_size validation (관련 테스트) 0 이하의 값은 기본값 1000으로 폴백
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_size validation (관련 테스트) null 값은 기본값 1000으로 폴백
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_size validation (관련 테스트) 문자열 숫자도 유효함
+__tests__/models/systemSettings.chunkMode.test.js › SystemSettings - text_splitter_chunk_mode validation text_splitter_chunk_size validation (관련 테스트) 유효한 chunk_size 값
+__tests__/models/workspace.chatMode.test.js › Workspace.validations.chatMode "chat"을 유효한 값으로 반환한다
+__tests__/models/workspace.chatMode.test.js › Workspace.validations.chatMode "query"를 유효한 값으로 반환한다
+__tests__/models/workspace.chatMode.test.js › Workspace.validations.chatMode "react"를 유효한 값으로 반환한다
+__tests__/models/workspace.chatMode.test.js › Workspace.validations.chatMode null은 "chat"으로 fallback한다
+__tests__/models/workspace.chatMode.test.js › Workspace.validations.chatMode undefined는 "chat"으로 fallback한다
+__tests__/models/workspace.chatMode.test.js › Workspace.validations.chatMode 빈 문자열은 "chat"으로 fallback한다
+__tests__/models/workspace.chatMode.test.js › Workspace.validations.chatMode 알 수 없는 값은 "chat"으로 fallback한다
+__tests__/models/workspace.isShared.test.js › Workspace._sharedCache TTL 상수가 30초이다
+__tests__/models/workspace.isShared.test.js › Workspace._sharedCache _invalidateSharedCache가 캐시를 초기화한다
+__tests__/models/workspace.isShared.test.js › Workspace._sharedCache 초기 캐시는 value가 undefined이다
+__tests__/models/workspace.isShared.test.js › Workspace.validateFields - isShared isShared: "false"를 검증하여 false로 변환한다
+__tests__/models/workspace.isShared.test.js › Workspace.validateFields - isShared isShared: "true"를 검증하여 true로 변환한다
+__tests__/models/workspace.isShared.test.js › Workspace.validateFields - isShared isShared: false를 검증하여 포함시킨다
+__tests__/models/workspace.isShared.test.js › Workspace.validateFields - isShared isShared: true를 검증하여 포함시킨다
+__tests__/models/workspace.isShared.test.js › Workspace.validateFields - isShared isShared가 writable 필드에 포함되어 있다
+__tests__/models/workspace.isShared.test.js › Workspace.validateFields - isShared 알 수 없는 필드는 무시한다
+__tests__/models/workspace.isShared.test.js › Workspace.validations.isShared "false" 문자열을 false로 반환한다
+__tests__/models/workspace.isShared.test.js › Workspace.validations.isShared "on" (HTML checkbox default)을 false로 반환한다
+__tests__/models/workspace.isShared.test.js › Workspace.validations.isShared "true" 문자열을 true로 반환한다
+__tests__/models/workspace.isShared.test.js › Workspace.validations.isShared false를 false로 반환한다
+__tests__/models/workspace.isShared.test.js › Workspace.validations.isShared null을 false로 반환한다
+__tests__/models/workspace.isShared.test.js › Workspace.validations.isShared true를 true로 반환한다
+__tests__/models/workspace.isShared.test.js › Workspace.validations.isShared undefined를 false로 반환한다
+__tests__/models/workspace.isShared.test.js › Workspace.validations.isShared 빈 문자열을 false로 반환한다
+__tests__/models/workspace.isShared.test.js › Workspace.validations.isShared 숫자 1을 false로 반환한다
+__tests__/models/workspace.queryRewriteMode.test.js › Workspace.validations.queryRewriteMode "llm"을 "llm"으로 반환한다
+__tests__/models/workspace.queryRewriteMode.test.js › Workspace.validations.queryRewriteMode "off"를 "off"로 반환한다
+__tests__/models/workspace.queryRewriteMode.test.js › Workspace.validations.queryRewriteMode "rule"을 "rule"로 반환한다
+__tests__/models/workspace.queryRewriteMode.test.js › Workspace.validations.queryRewriteMode null을 'off'로 반환한다
+__tests__/models/workspace.queryRewriteMode.test.js › Workspace.validations.queryRewriteMode undefined를 'off'로 반환한다
+__tests__/models/workspace.queryRewriteMode.test.js › Workspace.validations.queryRewriteMode 객체를 'off'로 반환한다
+__tests__/models/workspace.queryRewriteMode.test.js › Workspace.validations.queryRewriteMode 대문자 입력을 "off"로 반환한다 (대소문자 구분)
+__tests__/models/workspace.queryRewriteMode.test.js › Workspace.validations.queryRewriteMode 불리언을 'off'로 반환한다
+__tests__/models/workspace.queryRewriteMode.test.js › Workspace.validations.queryRewriteMode 빈 문자열을 "off"로 반환한다
+__tests__/models/workspace.queryRewriteMode.test.js › Workspace.validations.queryRewriteMode 숫자를 'off'로 반환한다
+__tests__/models/workspace.queryRewriteMode.test.js › Workspace.validations.queryRewriteMode 존재하지 않는 모드를 "off"로 반환한다
+__tests__/models/workspace.queryRewriteMode.test.js › Workspace.writable - queryRewriteMode queryRewriteMode가 writable 필드에 포함되어 있다
+__tests__/models/workspace.vectorSearchMode.test.js › Workspace.validations.vectorSearchMode W1: "hybrid"는 "default"로 강등된다
+__tests__/models/workspace.vectorSearchMode.test.js › Workspace.validations.vectorSearchMode W2: "default"는 그대로 반환된다
+__tests__/models/workspace.vectorSearchMode.test.js › Workspace.validations.vectorSearchMode W3: "rerank"는 그대로 반환된다
+__tests__/models/workspace.vectorSearchMode.test.js › Workspace.validations.vectorSearchMode W4: null → "default"
+__tests__/models/workspace.vectorSearchMode.test.js › Workspace.validations.vectorSearchMode undefined → "default"
+__tests__/models/workspace.vectorSearchMode.test.js › Workspace.validations.vectorSearchMode 미지원 문자열 → "default"
+__tests__/models/workspace.vectorSearchMode.test.js › Workspace.validations.vectorSearchMode 빈 문자열 → "default"
+__tests__/models/workspace.vectorSearchMode.test.js › Workspace.validations.vectorSearchMode 숫자 등 비문자열 → "default"
+__tests__/models/workspaceChats.llmMessageLog.test.js › WorkspaceChats.createLlmMessageLog createLlmMessageLog should handle empty arrays correctly
+__tests__/models/workspaceChats.llmMessageLog.test.js › WorkspaceChats.createLlmMessageLog createLlmMessageLog should handle errors from WorkspaceLlmMessageLogs.new
+__tests__/models/workspaceChats.llmMessageLog.test.js › WorkspaceChats.createLlmMessageLog createLlmMessageLog should handle unexpected errors
+__tests__/models/workspaceChats.llmMessageLog.test.js › WorkspaceChats.createLlmMessageLog createLlmMessageLog should pass all llmData fields correctly
+__tests__/models/workspaceChats.llmMessageLog.test.js › WorkspaceChats.createLlmMessageLog createLlmMessageLog should successfully create an LLM message log
+__tests__/models/workspaceChats.new.test.js › WorkspaceChats.new returns chat:null and error message when create fails
+__tests__/models/workspaceChats.new.test.js › WorkspaceChats.new stores reactTrace inside response JSON when saving a react chat
+__tests__/models/workspaceChats.whereWithData.test.js › WorkspaceChats.whereWithData should call getByChatId for each chat returned by where
+__tests__/models/workspaceChats.whereWithData.test.js › WorkspaceChats.whereWithData should handle errors gracefully
+__tests__/models/workspaceChats.whereWithData.test.js › WorkspaceChats.whereWithData should handle multiple chats with different llm message log states
+__tests__/models/workspaceChats.whereWithData.test.js › WorkspaceChats.whereWithData should include llmMessageLog with compressedMessages when log exists
+__tests__/models/workspaceChats.whereWithData.test.js › WorkspaceChats.whereWithData should pass correct parameters to where method
+__tests__/models/workspaceChats.whereWithData.test.js › WorkspaceChats.whereWithData should set llmMessageLog to null when no log exists
+__tests__/models/workspaceLlmMessageLogs.test.js › WorkspaceLlmMessageLogs count should count logs matching the clause
+__tests__/models/workspaceLlmMessageLogs.test.js › WorkspaceLlmMessageLogs count should return 0 on error
+__tests__/models/workspaceLlmMessageLogs.test.js › WorkspaceLlmMessageLogs delete should delete logs matching the clause
+__tests__/models/workspaceLlmMessageLogs.test.js › WorkspaceLlmMessageLogs delete should return false on error
+__tests__/models/workspaceLlmMessageLogs.test.js › WorkspaceLlmMessageLogs get should retrieve a log by clause
+__tests__/models/workspaceLlmMessageLogs.test.js › WorkspaceLlmMessageLogs get should return null if log not found
+__tests__/models/workspaceLlmMessageLogs.test.js › WorkspaceLlmMessageLogs getByChatId should retrieve a log by chat ID using unique constraint
+__tests__/models/workspaceLlmMessageLogs.test.js › WorkspaceLlmMessageLogs getByChatId should return null for non-existent chat ID
+__tests__/models/workspaceLlmMessageLogs.test.js › WorkspaceLlmMessageLogs new should create a log with null values for empty arrays
+__tests__/models/workspaceLlmMessageLogs.test.js › WorkspaceLlmMessageLogs new should handle errors gracefully
+__tests__/models/workspaceLlmMessageLogs.test.js › WorkspaceLlmMessageLogs where should retrieve logs with clause and options
+__tests__/models/workspaceLlmMessageLogs.test.js › WorkspaceLlmMessageLogs where should use default ordering when not specified
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 hr-attendance business_trips에 limit을 전달할 수 있어야 한다
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 hr-attendance leave_requests에 months와 status를 전달할 수 있어야 한다
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 hr-attendance work_plan_weekly에 base_date 자연어를 전달할 수 있어야 한다
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 hr-attendance work_type에 무효 파라미터를 전달해도 에러가 발생하지 않아야 한다
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 hr-attendance year 없이 annual_leave_balance를 조회할 수 있어야 한다
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 hr-attendance year=2025로 annual_leave_balance를 조회할 수 있어야 한다
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 hr-attendance year_month로 timesheet을 조회할 수 있어야 한다
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 hr-personnel (기존 동작 확인) 선택 파라미터 없이 employment를 조회할 수 있어야 한다
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 hr-salary account에 무효 파라미터를 전달해도 에러가 발생하지 않아야 한다
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 hr-salary annual_total에 year를 전달할 수 있어야 한다
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 hr-salary compare에 current_month/previous_month를 전달할 수 있어야 한다
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 hr-salary year_month 없이 payslip을 조회할 수 있어야 한다
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 hr-salary year_month=202501로 payslip을 조회할 수 있어야 한다
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 hr-year-end-tax cal_yy 없이 summary를 조회할 수 있어야 한다
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 hr-year-end-tax cal_yy=2024로 result를 조회할 수 있어야 한다
+__tests__/storage/plugins/agent-skills/hr-api-integration.test.js › HR API 통합테스트 상태 API 접근 상태를 확인한다
+__tests__/storage/plugins/agent-skills/hr-attendance-handler.test.js › hr-attendance handler PARAMS_MAP 정합성 annual_leave_balance는 year 파라미터를 허용해야 한다
+__tests__/storage/plugins/agent-skills/hr-attendance-handler.test.js › hr-attendance handler 필수 파라미터 유효성 검증 query_type이 유효하지 않으면 에러 메시지를 반환해야 한다
+__tests__/storage/plugins/agent-skills/hr-salary-handler.test.js › hr-salary handler 필수 파라미터 유효성 검증 query_type이 유효하지 않으면 에러를 반환해야 한다
+__tests__/storage/plugins/agent-skills/hr-year-end-tax-handler.test.js › hr-year-end-tax handler 필수 파라미터 유효성 검증 query_type이 유효하지 않으면 에러를 반환해야 한다
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-approval completed year_month=(빈 문자열)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-approval completed year_month=202512
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-approval completed year_month=2026-03
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-approval completed year_month=2026년 3월
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-approval completed year_month=3
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-approval completed year_month=3(숫자)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-approval completed year_month=3월 전체
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-approval completed year_month=다음달
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-approval completed year_month=올해 3월
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance annual_leave_balance year_month=(빈 문자열)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance annual_leave_balance year_month=202512
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance annual_leave_balance year_month=2026-03
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance annual_leave_balance year_month=2026년 3월
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance annual_leave_balance year_month=3
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance annual_leave_balance year_month=3(숫자)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance annual_leave_balance year_month=3월 전체
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance annual_leave_balance year_month=다음달
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance annual_leave_balance year_month=올해 3월
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance leave_requests year_month=(빈 문자열)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance leave_requests year_month=202512
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance leave_requests year_month=2026-03
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance leave_requests year_month=2026년 3월
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance leave_requests year_month=3
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance leave_requests year_month=3(숫자)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance leave_requests year_month=3월 전체
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance leave_requests year_month=다음달
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance leave_requests year_month=올해 3월
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance overtime year_month=(빈 문자열)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance overtime year_month=202512
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance overtime year_month=2026-03
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance overtime year_month=2026년 3월
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance overtime year_month=3
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance overtime year_month=3(숫자)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance overtime year_month=3월 전체
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance overtime year_month=다음달
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance overtime year_month=올해 3월
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance work_status year_month=(빈 문자열)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance work_status year_month=202512
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance work_status year_month=2026-03
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance work_status year_month=2026년 3월
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance work_status year_month=3
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance work_status year_month=3(숫자)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance work_status year_month=3월 전체
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance work_status year_month=다음달
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-attendance work_status year_month=올해 3월
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-personnel schedule_day year_month=(빈 문자열)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-personnel schedule_day year_month=202512
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-personnel schedule_day year_month=2026-03
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-personnel schedule_day year_month=2026년 3월
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-personnel schedule_day year_month=3
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-personnel schedule_day year_month=3(숫자)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-personnel schedule_day year_month=3월 전체
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-personnel schedule_day year_month=다음달
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-personnel schedule_day year_month=올해 3월
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary deductions pay_item=20260325NN year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary deductions pay_item=20260325NN year_month=2026
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary deductions pay_item=20260325NN year_month=올해
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary pay_periods year_month=(빈 문자열)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary pay_periods year_month=202512
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary pay_periods year_month=2026-03
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary pay_periods year_month=2026년 3월
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary pay_periods year_month=3
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary pay_periods year_month=3(숫자)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary pay_periods year_month=3월 전체
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary pay_periods year_month=다음달
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary pay_periods year_month=올해 3월
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary payslip pay_item=20260325NN year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary payslip pay_item=20260325NN year_month=2026
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary payslip pay_item=20260325NN year_month=올해
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary payslip_summary pay_item=20260325NN year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary payslip_summary pay_item=20260325NN year_month=2026
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary payslip_summary pay_item=20260325NN year_month=올해
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary salary_statement year_month=(빈 문자열)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary salary_statement year_month=202512
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary salary_statement year_month=2026-03
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary salary_statement year_month=2026년 3월
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary salary_statement year_month=3
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary salary_statement year_month=3(숫자)
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary salary_statement year_month=3월 전체
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary salary_statement year_month=다음달
+__tests__/storage/plugins/agent-skills/period-golden-extra.test.js › 기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은 변경 전과 동일 (specs/015 L-10) hr-salary salary_statement year_month=올해 3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval completed year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval completed year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval completed year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval completed year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval drafted year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval drafted year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval drafted year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval drafted year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval pending year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval pending year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval pending year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval pending year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval referenced year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval referenced year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval referenced year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval referenced year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval rejected year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval rejected year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval rejected year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-approval rejected year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance annual_leave_balance year_month=(없음) (모드 없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance annual_leave_balance year_month=202503 (모드 없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance annual_leave_balance year_month=2026 (모드 없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance annual_leave_balance year_month=3월 (모드 없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance annual_leave_balance year_month=올해 (모드 없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance annual_leave_balance year_month=이번년도 (모드 없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance annual_leave_balance year_month=작년 (모드 없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance annual_leave_balance year_month=지난달 (모드 없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance leave_requests year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance leave_requests year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance leave_requests year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance leave_requests year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance overtime year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance overtime year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance overtime year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance overtime year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance overtime_limit year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance overtime_limit year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance overtime_limit year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance overtime_limit year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance timesheet year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance timesheet year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance timesheet year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance timesheet year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance vacation_calendar year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance vacation_calendar year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance vacation_calendar year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance vacation_calendar year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance work_calendar year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance work_calendar year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance work_calendar year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance work_calendar year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance work_status year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance work_status year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance work_status year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-attendance work_status year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-personnel birthday year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-personnel birthday year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-personnel birthday year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-personnel birthday year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-personnel schedule_day year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-personnel schedule_day year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-personnel schedule_day year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-personnel schedule_day year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-personnel schedule_titles year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-personnel schedule_titles year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-personnel schedule_titles year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-personnel schedule_titles year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-salary daylabor year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-salary daylabor year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-salary daylabor year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-salary daylabor year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-salary pay_periods year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-salary pay_periods year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-salary pay_periods year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-salary pay_periods year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-salary salary_statement year_month=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-salary salary_statement year_month=202503
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-salary salary_statement year_month=3월
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-salary salary_statement year_month=지난달
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax credit_card cal_yy=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax credit_card cal_yy=2024
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax credit_card cal_yy=작년
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax donation cal_yy=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax donation cal_yy=2024
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax donation cal_yy=작년
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax education cal_yy=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax education cal_yy=2024
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax education cal_yy=작년
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax family cal_yy=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax family cal_yy=2024
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax family cal_yy=작년
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax insurance cal_yy=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax insurance cal_yy=2024
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax insurance cal_yy=작년
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax medical cal_yy=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax medical cal_yy=2024
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax medical cal_yy=작년
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax previous_employer cal_yy=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax previous_employer cal_yy=2024
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax previous_employer cal_yy=작년
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax savings cal_yy=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax savings cal_yy=2024
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax savings cal_yy=작년
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax summary cal_yy=(없음)
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax summary cal_yy=2024
+__tests__/storage/plugins/agent-skills/period-golden.test.js › 기간 파라미터 골든 — 월 단위·기간 없음 입력은 변경 전과 동일 (specs/015) hr-year-end-tax summary cal_yy=작년
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 경계 날짜 12월 31일 올해 record → end 12/31, 12개월
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 경계 날짜 1월 1일 올해 record → end 당일, 1개월
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 경계 날짜 now를 생략하면 현재 시각을 쓴다
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 경계 날짜 서울 자정 직후(UTC로는 전년도 12/31) → 서울 기준 2026년
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 경계 날짜 입력 객체를 변경하지 않는다
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "2026 전체" record → 2026 record와 동일 (흔한 변형·범위 접미사)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "2026" record → 1/1~오늘, 10개월
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "2026" schedule → 1/1~12/31, 12개월
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "2026년 전체" record → 2026 record와 동일 (흔한 변형·범위 접미사)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "2026년" record → 2026 record와 동일
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "2026년도 전체" record → 2026 record와 동일 (흔한 변형·범위 접미사)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "2026년도" record → 2026 record와 동일
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "금년" record → 2026 record와 동일
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "금년도" record → 2026 record와 동일 (흔한 변형·범위 접미사)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "내년" record → 2027 전체(미래 연도는 kind 무관 12/31)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "내후년" schedule → 2028
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "당해" record → 2026 record와 동일
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "당해년도" record → 2026 record와 동일 (흔한 변형·범위 접미사)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "당해연도" record → 2026 record와 동일 (흔한 변형·범위 접미사)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "올 한해 동안" record → 2026 record와 동일 (흔한 변형·범위 접미사)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "올 한해" record → 2026 record와 동일 (흔한 변형·범위 접미사)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "올해 내내" record → 2026 record와 동일 (흔한 변형·범위 접미사)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "올해 전부" record → 2026 record와 동일 (흔한 변형·범위 접미사)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "올해 전체" record → 2026 record와 동일 (흔한 변형·범위 접미사)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "올해" record → 2026 record와 동일
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "이번 년도" record → 2026 record와 동일
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "이번 연도" record → 2026 record와 동일 (흔한 변형·범위 접미사)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "이번년도" record → 2026 record와 동일
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "이번해" record → 2026 record와 동일
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "작년 전체" record → 2025 전체(과거 연도는 12/31까지)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "작년" record → 2025 전체(과거 연도는 12/31까지)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "작년도" record → 2025 전체(과거 연도는 12/31까지)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "재작년" schedule → 2024 전체
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "전년" record → 2025 전체(과거 연도는 12/31까지)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "전년도" record → 2025 전체(과거 연도는 12/31까지)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "지난년도" record → 2025 전체(과거 연도는 12/31까지)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 "지난해" record → 2025 전체(과거 연도는 12/31까지)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 2026 record → 2026 record와 동일
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위 표현 공백은 모두 무시한다 — " 2 0 2 5 년 " → 2025 전체
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "   " → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "" → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "0315" → null (1900~2999 밖 또는 연도 아님)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "1234" → null (1900~2999 밖 또는 연도 아님)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "1899" → null (1900~2999 밖 또는 연도 아님)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "2021년 1년" → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "202503" → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "2026-03" → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "2026년 3월 전체" → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "2026년 3월" → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "3000" → null (1900~2999 밖 또는 연도 아님)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "3월 전체" → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "3월" → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "9999" → null (1900~2999 밖 또는 연도 아님)
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "오늘" → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "올해 3월" → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "올해 상반기" → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "이번달 전체" → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "이번달" → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "전체" → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) "지난달" → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) kind가 없거나 잘못되면 예외 — 호출부 실수를 조용히 넘기지 않는다
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) null → null
+__tests__/storage/plugins/agent-skills/period-resolver.test.js › resolveYearPeriod — 연도 단위가 아니면 null (기존 경로 유지) undefined → null
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › monthly 모드 — 달마다 순차 호출 후 병합 (US1) overtime 올해 → 1월~10월 10회, 월 경계가 정확한 List cmd로(같은 경로·BODY, searchYm만 달마다)
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › monthly 모드 — 달마다 순차 호출 후 병합 (US1) overtime 월별 표 + 연간 합계 (빈 달은 —)
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › monthly 모드 — 달마다 순차 호출 후 병합 (US1) overtime_limit 2026년 → sumOt 기준 합계
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › monthly 모드 — 달마다 순차 호출 후 병합 (US1) pay_periods 올해 → 10회(YYYY-MM), 월 칸 추가, 코드 중복 제거, 지급 건 없는 달 표시
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › monthly 모드 — 달마다 순차 호출 후 병합 (US1) pay_periods 코드가 빈 행은 서로 다른 건일 수 있어 합치지 않는다
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › monthly 모드 — 달마다 순차 호출 후 병합 (US1) pay_periods 해당 연도 지급 건이 하나도 없으면 안내 + 조회 기간
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › monthly 모드 — 달마다 순차 호출 후 병합 (US1) 누적 60초를 넘기면 남은 달은 호출하지 않고 '시간 초과'로 표시
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › monthly 모드 — 달마다 순차 호출 후 병합 (US1) 모든 달이 데이터 없음 → 기존 문구 + 조회 기간
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › monthly 모드 — 달마다 순차 호출 후 병합 (US1) 셋째 달 실패 → 표에서 빼고 머리 줄에 표시, '조회된 달 합계'
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › monthly 모드 — 달마다 순차 호출 후 병합 (US1) 월별 값 형식이 섞이면 합계를 계산하지 않는다
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › monthly 모드 — 달마다 순차 호출 후 병합 (US1) 첫 달 실패 → 기존 오류 문구 그대로, 나머지 달 미호출
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › monthly 모드 — 달마다 순차 호출 후 병합 (US1) 한 달 응답이 여러 행이면 합산하지 않고 그 달을 실패로 돌린다(타인 행 혼입 방어)
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › monthly 모드 — 달마다 순차 호출 후 병합 (US1) 합계 값이 하나도 없으면 00:00이라 적지 않는다
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › range 모드 — 1회 호출, 기간만 1년 (US1) daylabor 2026 → searchDateSYmd/EYmd 1/1~오늘, 계좌 미노출
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › range 모드 — 1회 호출, 기간만 1년 (US1) timesheet 올해 → 1/1~오늘, 특이사항 있는 날만 표 + 그 외 N일
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › range 모드 — 1회 호출, 기간만 1년 (US1) work_status 이번년도 → 머리 줄 → 집계(전체 행 기준) → 특이사항 표 → 그 외 → 응답 지침 순
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › range 모드 — 1회 호출, 기간만 1년 (US1) 결재 completed 올해 → sdt/edt 1/1~오늘
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › range 모드 — 1회 호출, 기간만 1년 (US1) 결재 drafted 올해 → sdt/edt 1/1~오늘
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › range 모드 — 1회 호출, 기간만 1년 (US1) 결재 pending 올해 → sdt/edt 1/1~오늘
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › range 모드 — 1회 호출, 기간만 1년 (US1) 결재 referenced 올해 → sdt/edt 1/1~오늘
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › range 모드 — 1회 호출, 기간만 1년 (US1) 결재 rejected 올해 → sdt/edt 1/1~오늘
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › range 모드 — 1회 호출, 기간만 1년 (US1) 결재함 문서가 없으면 기존 문구 + 조회 기간
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › range 모드 — 1회 호출, 기간만 1년 (US1) 오류는 머리 줄 없이 그대로 반환한다
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › range 모드 — 1회 호출, 기간만 1년 (US1) 조회 결과가 없으면 기존 문구에 조회 기간을 붙인다
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › range 모드 — 1회 호출, 기간만 1년 (US1) 특이사항 있는 날이 없으면 표 대신 안내 문구
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 일정 조회 — 올해도 1/1~12/31 (US2) birthday 이번년도 → staYmd/endYmd 1년 + 머리 줄
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 일정 조회 — 올해도 1/1~12/31 (US2) schedule_day 올해 → staYmd/endYmd 1년, 건수 1 이상인 날만 + 그 외 N일은 일정 없음
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 일정 조회 — 올해도 1/1~12/31 (US2) schedule_day 일정 있는 날이 없으면 안내 문구
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 일정 조회 — 올해도 1/1~12/31 (US2) schedule_titles 연도 질의에서도 중복 제목은 합친다
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 일정 조회 — 올해도 1/1~12/31 (US2) schedule_titles 이번년도 → staYmd/endYmd 1년 + 머리 줄
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 일정 조회 — 올해도 1/1~12/31 (US2) vacation_calendar 2026 → searchSYmd/EYmd 1/1~12/31
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 일정 조회 — 올해도 1/1~12/31 (US2) work_calendar 올해 → searchYm=1월 + searchSYmd/EYmd 1년 (spec D7, 실서버 확인 전제)
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 일정 조회 — 올해도 1/1~12/31 (US2) work_calendar를 monthly로 전환하면 12개월 순차 호출 + 달별 행을 이어 붙여 같은 축약 적용(D7 대비)
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 지난해·특정 연도 — 그해 전체 (US3) annual_leave_balance는 연도 표현이 와도 기존 경로(머리 줄 없음)
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 지난해·특정 연도 — 그해 전체 (US3) leave_requests 재작년 → 휴가·회계연도 2024 + 머리 줄
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 지난해·특정 연도 — 그해 전체 (US3) overtime 지난해 → 2025년 12개월 순차 호출
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 지난해·특정 연도 — 그해 전체 (US3) salary_statement 재작년 → findText=2024 + 머리 줄
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 지난해·특정 연도 — 그해 전체 (US3) work_status 작년 → 2025-01-01~2025-12-31 (지난 연도는 실적도 12/31까지)
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 지난해·특정 연도 — 그해 전체 (US3) 연말정산 cal_yy=2023 → 2023년 경로·searchCalYy, 머리 줄 없음
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 지난해·특정 연도 — 그해 전체 (US3) 연말정산 cal_yy=2025년 → 2025년 경로·searchCalYy, 머리 줄 없음
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 지난해·특정 연도 — 그해 전체 (US3) 연말정산 cal_yy=금년 → 2026은 기존대로 미지원 안내
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 지난해·특정 연도 — 그해 전체 (US3) 연말정산 cal_yy=올해 → 2026은 기존대로 미지원 안내
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 지난해·특정 연도 — 그해 전체 (US3) 연말정산 cal_yy=이번년도 → 2026은 기존대로 미지원 안내
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 지난해·특정 연도 — 그해 전체 (US3) 연말정산 cal_yy=작년 → 2025년 경로·searchCalYy, 머리 줄 없음
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 지난해·특정 연도 — 그해 전체 (US3) 연말정산 cal_yy=재작년 → 2024년 경로·searchCalYy, 머리 줄 없음
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 코드 리뷰 반영 — 흔한 연도 변형·연차 연도 교정 annual_leave_balance 2024년도 → 휴가연도 2024 (머리 줄 없음, 기존 렌더)
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 코드 리뷰 반영 — 흔한 연도 변형·연차 연도 교정 annual_leave_balance 재작년 → 휴가연도 2024 (머리 줄 없음, 기존 렌더)
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 코드 리뷰 반영 — 흔한 연도 변형·연차 연도 교정 annual_leave_balance 전년도 → 휴가연도 2025 (머리 줄 없음, 기존 렌더)
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 코드 리뷰 반영 — 흔한 연도 변형·연차 연도 교정 work_calendar 1년치는 공휴일·평일/주말 각각의 평소 유형과 다른 날만 표 + 그 외 N일 요약
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 코드 리뷰 반영 — 흔한 연도 변형·연차 연도 교정 work_status 2026년 전체 → 연도 모드(이번 달로 축소되지 않음)
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 코드 리뷰 반영 — 흔한 연도 변형·연차 연도 교정 work_status 금년도 → 연도 모드(이번 달로 축소되지 않음)
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 코드 리뷰 반영 — 흔한 연도 변형·연차 연도 교정 work_status 올해 전체 → 연도 모드(이번 달로 축소되지 않음)
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 코드 리뷰 반영 — 흔한 연도 변형·연차 연도 교정 work_status 이번 연도 → 연도 모드(이번 달로 축소되지 않음)
+__tests__/storage/plugins/agent-skills/period-year-mode.test.js › 코드 리뷰 반영 — 흔한 연도 변형·연차 연도 교정 연장근무 합계 칸이 있는데 전부 비면(실서버: 연장근무 없는 달은 sumOt=null) '기록 없음'으로 안내
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › parseErrorMessage JSON 응답에서 message를 추출해야 한다
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › parseErrorMessage JSON 파싱 실패 시 fallback 메시지를 반환해야 한다
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › parseErrorMessage message 필드가 없으면 fallback 메시지를 반환해야 한다
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 부분 날짜 - 숫자만 (partial numeric) '0315' → base_date: 현재연도+0315 (MMDD 패턴)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 부분 날짜 - 숫자만 (partial numeric) '12' → year_month: 현재연도+12 (월로 해석)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 부분 날짜 - 숫자만 (partial numeric) '1225' → base_date: 현재연도+1225 (MMDD 패턴)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 부분 날짜 - 숫자만 (partial numeric) '13' → year_month: undefined (13월은 없음)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 부분 날짜 - 숫자만 (partial numeric) '15' → base_date: 현재연도+현재월+15 (일로 해석)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 부분 날짜 - 숫자만 (partial numeric) '3' → year_month: 현재연도+03 (월로 해석)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 부분 날짜 - 숫자만 (partial numeric) '315' → base_date: 현재연도+0315 (MDD 패턴)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 부분 날짜 - 숫자만 (partial numeric) '32' → base_date: undefined (32일은 없음, partial로 해석 불가)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 부분 날짜 - 숫자만 (partial numeric) '5' → base_date: 현재연도+현재월+05 (일로 해석)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 부분 날짜 - 한국어 표현 (sugar-date) '12월' → year_month: 현재연도+12
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 부분 날짜 - 한국어 표현 (sugar-date) '15일' → base_date: 현재연도+현재월+15
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 부분 날짜 - 한국어 표현 (sugar-date) '1월 5일' → base_date: 현재연도+0105
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 부분 날짜 - 한국어 표현 (sugar-date) '3월 15일' → base_date: 현재연도+0315
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 부분 날짜 - 한국어 표현 (sugar-date) '3월' → year_month: 현재연도+03
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 비표준 포맷 → sugar-date 해석 '2025-03' → '202503' (sugar-date가 해석)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 비표준 포맷 → sugar-date 해석 '2025/03/19' → '20250319' (sugar-date가 해석)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 빈값/미전달 처리 null → undefined
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 빈값/미전달 처리 undefined → undefined
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 빈값/미전달 처리 공백 문자열 → undefined
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 빈값/미전달 처리 빈 문자열 → undefined
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 정확한 포맷 pass-through YYYY 형식 pass-through
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 정확한 포맷 pass-through YYYYMM 형식 pass-through
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 정확한 포맷 pass-through YYYYMMDD 형식 pass-through
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 한국어 상대 날짜 표현 변환 '그저께' → YYYYMMDD
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 한국어 상대 날짜 표현 변환 '내일' → YYYYMMDD (내일 날짜)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 한국어 상대 날짜 표현 변환 '다음달' → YYYYMM (다음 월)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 한국어 상대 날짜 표현 변환 '모레' → YYYYMMDD
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 한국어 상대 날짜 표현 변환 '어제' → YYYYMMDD (어제 날짜)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 한국어 상대 날짜 표현 변환 '올해' → YYYY (현재 연도)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 한국어 상대 날짜 표현 변환 '작년' → YYYY (전년도)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 한국어 상대 날짜 표현 변환 '지난달' → YYYYMM (전월)
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 해석 불가 문자열 거부 'abc' → undefined
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › resolveDateParam 해석 불가 문자열 거부 완전히 무의미한 문자열 → undefined
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › unwrapResponse null 데이터를 isEmpty로 반환해야 한다
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › unwrapResponse 기존 에러 형태 (code: -1)를 isEmpty로 반환해야 한다
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › unwrapResponse 기존 정상 응답 (passthrough)을 반환해야 한다
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › unwrapResponse 단일 객체 데이터를 올바르게 unwrap해야 한다
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › unwrapResponse 래퍼 형태 성공 응답을 올바르게 unwrap해야 한다
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › unwrapResponse 래퍼 형태 실패 응답을 isEmpty로 반환해야 한다
+__tests__/storage/plugins/agent-skills/shared-utils.test.js › unwrapResponse 빈 배열 데이터를 isEmpty로 반환해야 한다
+__tests__/storage/plugins/agent-skills/year-query.test.js › failureReason "> ⚠️ HR 시스템 응답 시간이 초과되었습니다." → "HR 시스템 응답 시간이 초과되었습니다"
+__tests__/storage/plugins/agent-skills/year-query.test.js › failureReason "> ⚠️ HR 시스템 호출 실패 (HTTP 502)." → "HR 시스템 호출 실패 (HTTP 502)"
+__tests__/storage/plugins/agent-skills/year-query.test.js › failureReason "> ⚠️ HR 조회 응답이 시간 내에 도착하지 않았습니다. 5240 HR 화면이 열려 있고 로그인 상태인지 확인하세요." → "HR 조회 응답이 시간 내에 도착하지 않았습니다"
+__tests__/storage/plugins/agent-skills/year-query.test.js › failureReason "그냥 문장" → "그냥 문장"
+__tests__/storage/plugins/agent-skills/year-query.test.js › formatPeriodHeader 사유가 다르면 달마다 괄호로 붙인다
+__tests__/storage/plugins/agent-skills/year-query.test.js › formatPeriodHeader 사유가 모두 같으면 달을 나열하고 사유를 한 번만 붙인다 + 빠진 달을 밝히라는 안내
+__tests__/storage/plugins/agent-skills/year-query.test.js › formatPeriodHeader 실패한 달이 없으면 조회 기간 한 줄
+__tests__/storage/plugins/agent-skills/year-query.test.js › monthlyPeriod — 월 단위 조회 표기 12개월 → '그해 전체, 월 단위 조회'
+__tests__/storage/plugins/agent-skills/year-query.test.js › monthlyPeriod — 월 단위 조회 표기 올해(일부 월) → '2026년 1~4월, 월 단위 조회'
+__tests__/storage/plugins/agent-skills/year-query.test.js › monthlyPeriod — 월 단위 조회 표기 원본 period를 변경하지 않는다
+__tests__/storage/plugins/agent-skills/year-query.test.js › renderMonthlySum 값이 있으면 연간 합계
+__tests__/storage/plugins/agent-skills/year-query.test.js › renderMonthlySum 값이 하나도 없으면 00:00이라 적지 않는다(조용한 0 방지)
+__tests__/storage/plugins/agent-skills/year-query.test.js › runMonthly 기본 예산은 60초다
+__tests__/storage/plugins/agent-skills/year-query.test.js › runMonthly 둘째 달부터의 실패는 failedMonths에 사유와 함께 남기고 계속 조회한다
+__tests__/storage/plugins/agent-skills/year-query.test.js › runMonthly 둘째 달부터의 예외는 고정 사유 '조회 오류'로만 남긴다(내부 메시지 미노출)
+__tests__/storage/plugins/agent-skills/year-query.test.js › runMonthly 모든 달을 순서대로 한 번씩 호출하고 성공·빈 달을 나눈다
+__tests__/storage/plugins/agent-skills/year-query.test.js › runMonthly 시간 예산을 넘기면 남은 달은 호출하지 않고 '시간 초과'로 기록한다
+__tests__/storage/plugins/agent-skills/year-query.test.js › runMonthly 실패 사이에 성공이 끼면 연속 횟수는 초기화된다
+__tests__/storage/plugins/agent-skills/year-query.test.js › runMonthly 연속 2회 실패하면 남은 달은 부르지 않고 '연속 실패로 조회 중단'
+__tests__/storage/plugins/agent-skills/year-query.test.js › runMonthly 첫 달 예외는 다시 던져 handler의 기존 catch 문구로 보낸다
+__tests__/storage/plugins/agent-skills/year-query.test.js › runMonthly 첫 달이 실패하면 그 errorMessage를 그대로 반환하고 나머지는 부르지 않는다
+__tests__/storage/plugins/agent-skills/year-query.test.js › runMonthly 호출은 순차다 — 앞 달이 끝나기 전에 다음 달을 부르지 않는다
+__tests__/storage/plugins/agent-skills/year-query.test.js › sumHHMM 100시간을 넘어도 그대로 표기한다
+__tests__/storage/plugins/agent-skills/year-query.test.js › sumHHMM H:MM·HH:MM 값을 분 단위로 더해 HH:MM으로 반환한다
+__tests__/storage/plugins/agent-skills/year-query.test.js › sumHHMM 빈 목록은 00:00
+__tests__/storage/plugins/agent-skills/year-query.test.js › sumHHMM 형식이 다른 값이 섞이면 null — ["05:00", ""]
+__tests__/storage/plugins/agent-skills/year-query.test.js › sumHHMM 형식이 다른 값이 섞이면 null — ["05:00", "3.5"]
+__tests__/storage/plugins/agent-skills/year-query.test.js › sumHHMM 형식이 다른 값이 섞이면 null — ["05:00", null]
+__tests__/storage/plugins/agent-skills/year-query.test.js › sumHHMM 형식이 다른 값이 섞이면 null — ["1:2"]
+__tests__/storage/plugins/agent-skills/year-query.test.js › sumHHMM 형식이 다른 값이 섞이면 null — ["5:75"]
+__tests__/storage/plugins/agent-skills/year-query.test.js › withPeriodHeader 제목(## …) 바로 다음, 본문 앞에 머리 줄을 넣는다
+__tests__/storage/plugins/agent-skills/year-query.test.js › withPeriodHeader 제목이 없는 안내 문구에는 뒤에 붙인다
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods getBatchDelay returns default 1000ms when env var is NaN
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods getBatchDelay returns default 1000ms when env var not set
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods getBatchDelay returns env var value when set
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods getBatchDelay returns minimum 500ms when env var is below minimum
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods getRetryAfter parses decimal Retry-After header correctly
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods getRetryAfter parses integer Retry-After header correctly
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods getRetryAfter returns null when Retry-After header missing
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods getRetryAfter returns null when Retry-After is invalid
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods getRetryAfter returns null when Retry-After is zero or negative
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods getRetryConfig clamps negative maxRetries to 0
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods getRetryConfig returns default config when env vars not set
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods getRetryConfig returns env var values when set
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods is429Error returns false for non-429 errors
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods is429Error returns true when error.response.status is 429
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods is429Error returns true when error.status is 429
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods is429Error returns true when error.type is rate_limit_error
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder Helper Methods sleep waits for specified milliseconds
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder embedChunks applies delay between batches
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder embedChunks does not delay after last batch
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder embedChunks handles multiple batches correctly
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder embedChunks processes batches sequentially
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder embedChunks returns embeddings array on success
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder embedChunks throws error when batch fails
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder executeBatchWithRetry does not retry on non-429 errors
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder executeBatchWithRetry fails after maxRetries exceeded
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder executeBatchWithRetry respects maxDelay in exponential backoff
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder executeBatchWithRetry retries on 429 error with Retry-After header
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder executeBatchWithRetry returns data on first successful attempt
+__tests__/utils/EmbeddingEngines/openAi/index.test.js › OpenAiEmbedder executeBatchWithRetry uses exponential backoff when Retry-After header missing
+__tests__/utils/SQLConnectors/connectionParser.test.js › ConnectionStringParser Basic Parsing should handle empty passwords
+__tests__/utils/SQLConnectors/connectionParser.test.js › ConnectionStringParser Basic Parsing should parse a basic connection string without options
+__tests__/utils/SQLConnectors/connectionParser.test.js › ConnectionStringParser Basic Parsing should parse a connection string with options
+__tests__/utils/SQLConnectors/connectionParser.test.js › ConnectionStringParser Error Handling should throw error for invalid scheme
+__tests__/utils/SQLConnectors/connectionParser.test.js › ConnectionStringParser Error Handling should throw error for missing scheme
+__tests__/utils/SQLConnectors/connectionParser.test.js › ConnectionStringParser Multiple Hosts should handle hosts without ports
+__tests__/utils/SQLConnectors/connectionParser.test.js › ConnectionStringParser Multiple Hosts should parse multiple hosts
+__tests__/utils/SQLConnectors/connectionParser.test.js › ConnectionStringParser Provider-Specific Tests should parse MSSQL connection string with encryption options
+__tests__/utils/SQLConnectors/connectionParser.test.js › ConnectionStringParser Provider-Specific Tests should parse MySQL connection string
+__tests__/utils/SQLConnectors/connectionParser.test.js › ConnectionStringParser Provider-Specific Tests should parse PostgreSQL connection string
+__tests__/utils/SQLConnectors/connectionParser.test.js › ConnectionStringParser Special Characters should handle special characters in database name
+__tests__/utils/SQLConnectors/connectionParser.test.js › ConnectionStringParser Special Characters should handle special characters in username and password
+__tests__/utils/TextSplitter/index.test.js › TextSplitter applies a valid chunkPrefix to each chunk
+__tests__/utils/TextSplitter/index.test.js › TextSplitter applies chunk overlap of 20 characters on invalid chunkOverlap
+__tests__/utils/TextSplitter/index.test.js › TextSplitter applies specific metadata to stringifyHeader to each chunk
+__tests__/utils/TextSplitter/index.test.js › TextSplitter chunkMode character 모드에서 고정 길이로 분할해야 함
+__tests__/utils/TextSplitter/index.test.js › TextSplitter chunkMode chunkMode와 chunkPrefix를 함께 사용
+__tests__/utils/TextSplitter/index.test.js › TextSplitter chunkMode paragraph 모드에서 단일 줄바꿈도 분할 경계로 사용해야 함
+__tests__/utils/TextSplitter/index.test.js › TextSplitter chunkMode paragraph 모드에서 빈 줄바꿈만 있는 텍스트 처리
+__tests__/utils/TextSplitter/index.test.js › TextSplitter chunkMode paragraph 모드에서 여러 줄바꿈이 있는 긴 텍스트는 단락별로 분할됨
+__tests__/utils/TextSplitter/index.test.js › TextSplitter chunkMode paragraph 모드에서 이중 줄바꿈 경계로 분할해야 함
+__tests__/utils/TextSplitter/index.test.js › TextSplitter chunkMode paragraph 모드에서 줄바꿈이 없는 긴 텍스트는 chunkSize 기준으로 분할됨
+__tests__/utils/TextSplitter/index.test.js › TextSplitter chunkMode paragraph 모드에서 혼합 줄바꿈 처리 (\r\n)
+__tests__/utils/TextSplitter/index.test.js › TextSplitter chunkMode paragraph 모드와 character 모드의 결과가 다를 수 있음
+__tests__/utils/TextSplitter/index.test.js › TextSplitter chunkMode 기본 chunkMode는 'character'로 동작해야 함
+__tests__/utils/TextSplitter/index.test.js › TextSplitter chunkMode 빈 문서 처리
+__tests__/utils/TextSplitter/index.test.js › TextSplitter chunkMode 잘못된 chunkMode는 기본값(character)으로 동작해야 함
+__tests__/utils/TextSplitter/index.test.js › TextSplitter does not allow chunkOverlap to be greater than chunkSize
+__tests__/utils/TextSplitter/index.test.js › TextSplitter should split long text into n sized chunks
+__tests__/utils/agentFlows/executor.test.js › FlowExecutor: getValueFromPath can find a value by string key traversal
+__tests__/utils/agentFlows/executor.test.js › FlowExecutor: getValueFromPath can handle invalid objects
+__tests__/utils/agentFlows/executor.test.js › FlowExecutor: getValueFromPath can handle invalid paths
+__tests__/utils/agentFlows/executor.test.js › FlowExecutor: getValueFromPath can return a stringified item if the path target is not an object or array
+__tests__/utils/agentFlows/executor.test.js › FlowExecutor: getValueFromPath can return a stringified object if the path target is an array
+__tests__/utils/agentFlows/executor.test.js › FlowExecutor: getValueFromPath should be able to resolve a value from a dot path at various levels
+__tests__/utils/agentFlows/executor.test.js › FlowExecutor: getValueFromPath should return empty string if the object is invalid
+__tests__/utils/agentFlows/executor.test.js › FlowExecutor: getValueFromPath should return empty string if the path is invalid
+__tests__/utils/agents/aibitat/continue.multimodal.test.js › AIbitat.continue() multimodal support backward compatibility: string argument should handle empty string feedback — falls through to else branch
+__tests__/utils/agents/aibitat/continue.multimodal.test.js › AIbitat.continue() multimodal support backward compatibility: string argument should handle plain string feedback (existing behavior)
+__tests__/utils/agents/aibitat/continue.multimodal.test.js › AIbitat.continue() multimodal support error conditions should throw when last chat is not interrupted
+__tests__/utils/agents/aibitat/continue.multimodal.test.js › AIbitat.continue() multimodal support error conditions should throw when no interrupted chat exists
+__tests__/utils/agents/aibitat/continue.multimodal.test.js › AIbitat.continue() multimodal support interrupt state cleanup should remove the interrupt chat entry before processing
+__tests__/utils/agents/aibitat/continue.multimodal.test.js › AIbitat.continue() multimodal support null and undefined handling should handle null argument — goes to else branch
+__tests__/utils/agents/aibitat/continue.multimodal.test.js › AIbitat.continue() multimodal support null and undefined handling should handle undefined argument — goes to else branch
+__tests__/utils/agents/aibitat/continue.multimodal.test.js › AIbitat.continue() multimodal support null and undefined handling should handle { feedback: null } — goes to else branch
+__tests__/utils/agents/aibitat/continue.multimodal.test.js › AIbitat.continue() multimodal support object argument: { feedback, attachments: [...] } — multimodal should build multimodal content array with input_text + input_image
+__tests__/utils/agents/aibitat/continue.multimodal.test.js › AIbitat.continue() multimodal support object argument: { feedback, attachments: [...] } — multimodal should call chat() after newMessage with swapped from/to
+__tests__/utils/agents/aibitat/continue.multimodal.test.js › AIbitat.continue() multimodal support object argument: { feedback, attachments: [...] } — multimodal should handle multiple attachments
+__tests__/utils/agents/aibitat/continue.multimodal.test.js › AIbitat.continue() multimodal support object argument: { feedback, attachments: [] } should default attachments to [] when not provided in object
+__tests__/utils/agents/aibitat/continue.multimodal.test.js › AIbitat.continue() multimodal support object argument: { feedback, attachments: [] } should treat as plain text when attachments is empty
+__tests__/utils/agents/aibitat/extractTextFromContent.test.js › extractTextFromContent UT-6: multimodal array → text extraction should extract text from 'text' type items
+__tests__/utils/agents/aibitat/extractTextFromContent.test.js › extractTextFromContent UT-6: multimodal array → text extraction should extract text from input_text items
+__tests__/utils/agents/aibitat/extractTextFromContent.test.js › extractTextFromContent UT-6: multimodal array → text extraction should handle empty array
+__tests__/utils/agents/aibitat/extractTextFromContent.test.js › extractTextFromContent UT-6: multimodal array → text extraction should join multiple text items with space
+__tests__/utils/agents/aibitat/extractTextFromContent.test.js › extractTextFromContent UT-6: multimodal array → text extraction should return empty string when no text items exist
+__tests__/utils/agents/aibitat/extractTextFromContent.test.js › extractTextFromContent UT-7: string input → return as-is should handle string with special characters
+__tests__/utils/agents/aibitat/extractTextFromContent.test.js › extractTextFromContent UT-7: string input → return as-is should return empty string unchanged
+__tests__/utils/agents/aibitat/extractTextFromContent.test.js › extractTextFromContent UT-7: string input → return as-is should return plain string unchanged
+__tests__/utils/agents/aibitat/extractTextFromContent.test.js › extractTextFromContent edge cases should convert non-string, non-array to string
+__tests__/utils/agents/aibitat/extractTextFromContent.test.js › extractTextFromContent edge cases should convert null to string
+__tests__/utils/agents/aibitat/extractTextFromContent.test.js › extractTextFromContent edge cases should convert object to string
+__tests__/utils/agents/aibitat/extractTextFromContent.test.js › extractTextFromContent edge cases should convert undefined to string
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WEBSOCKET_BAIL_COMMANDS should include all expected bail commands
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — handleFeedback multimodal handleFeedback resolves { feedback, attachments } object should clean up handleFeedback after resolving
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — handleFeedback multimodal handleFeedback resolves { feedback, attachments } object should default attachments to [] when not in WebSocket message
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — handleFeedback multimodal handleFeedback resolves { feedback, attachments } object should handle empty attachments array
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — handleFeedback multimodal handleFeedback resolves { feedback, attachments } object should ignore non-awaitingFeedback messages
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — handleFeedback multimodal handleFeedback resolves { feedback, attachments } object should resolve with feedback text and attachments array
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — onInterrupt typeof branching bail command detection with object result should detect bail command "/exit" from object result
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — onInterrupt typeof branching bail command detection with object result should detect bail command "/halt" from object result
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — onInterrupt typeof branching bail command detection with object result should detect bail command "/reset" from object result
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — onInterrupt typeof branching bail command detection with object result should detect bail command "/stop" from object result
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — onInterrupt typeof branching bail command detection with object result should detect bail command "exit" from object result
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — onInterrupt typeof branching bail command detection with object result should detect bail command "halt" from object result
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — onInterrupt typeof branching bail command detection with object result should detect bail command "stop" from object result
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — onInterrupt typeof branching bail command detection with string result (timeout fallback) should detect "/exit" string
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — onInterrupt typeof branching bail command detection with string result (timeout fallback) should detect "exit" string from timeout fallback
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — onInterrupt typeof branching normal feedback passthrough should pass object result to aibitat.continue()
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — onInterrupt typeof branching normal feedback passthrough should pass object with empty attachments to aibitat.continue()
+__tests__/utils/agents/aibitat/plugins/websocket.multimodal.test.js › WebSocket plugin — onInterrupt typeof branching normal feedback passthrough should pass string result to aibitat.continue() for non-bail text
+__tests__/utils/agents/aibitat/providers/helpers/untooled.test.js › UnTooled: validFuncCall Be falsey if the function call has no name or arguments
+__tests__/utils/agents/aibitat/providers/helpers/untooled.test.js › UnTooled: validFuncCall Be falsey if the function call is valid but has an unknown argument defined (required or not)
+__tests__/utils/agents/aibitat/providers/helpers/untooled.test.js › UnTooled: validFuncCall Be falsey if the function call is valid but missing any required arguments
+__tests__/utils/agents/aibitat/providers/helpers/untooled.test.js › UnTooled: validFuncCall Be falsey if the function call references an unknown function definition
+__tests__/utils/agents/aibitat/providers/helpers/untooled.test.js › UnTooled: validFuncCall Be truthy if the function call is valid and has all required arguments
+__tests__/utils/agents/aibitat/providers/openai.formatResponses.test.js › OpenAIProvider #formatToResponsesInput UT-8: multimodal array content pass-through should handle multiple images in content array
+__tests__/utils/agents/aibitat/providers/openai.formatResponses.test.js › OpenAIProvider #formatToResponsesInput UT-8: multimodal array content pass-through should pass array content as-is without wrapping
+__tests__/utils/agents/aibitat/providers/openai.formatResponses.test.js › OpenAIProvider #formatToResponsesInput UT-9: string content wrapping — regression should handle function messages with originalFunctionCall
+__tests__/utils/agents/aibitat/providers/openai.formatResponses.test.js › OpenAIProvider #formatToResponsesInput UT-9: string content wrapping — regression should wrap assistant string content in output_text
+__tests__/utils/agents/aibitat/providers/openai.formatResponses.test.js › OpenAIProvider #formatToResponsesInput UT-9: string content wrapping — regression should wrap user string content in input_text
+__tests__/utils/agents/aibitat/providers/openai.formatResponses.test.js › OpenAIProvider #formatToResponsesInput mixed content types in conversation should handle first message as multimodal and rest as text
+__tests__/utils/agents/defaults.test.js › WORKSPACE_AGENT.getDefinition should handle workspace system prompt without user context
+__tests__/utils/agents/defaults.test.js › WORKSPACE_AGENT.getDefinition should return functions array in definition
+__tests__/utils/agents/defaults.test.js › WORKSPACE_AGENT.getDefinition should use LMStudio specific prompt when workspace has no openAiPrompt
+__tests__/utils/agents/defaults.test.js › WORKSPACE_AGENT.getDefinition should use provider default system prompt when workspace has no openAiPrompt
+__tests__/utils/agents/defaults.test.js › WORKSPACE_AGENT.getDefinition should use workspace system prompt with variable expansion when openAiPrompt exists
+__tests__/utils/agents/imported.test.js › ImportedPlugin.updateImportedPlugin — metadata deep merge T1: metadata 부재 skill에 metadata 없는 update 전달 시 기존 구조 보존
+__tests__/utils/agents/imported.test.js › ImportedPlugin.updateImportedPlugin — metadata deep merge T2: metadata 존재 + partial update 시 deep merge (다른 metadata 키 보존)
+__tests__/utils/agents/imported.test.js › ImportedPlugin.updateImportedPlugin — metadata deep merge T3: metadata가 배열이면 Array.isArray 가드로 deep merge skip (얕은 머지만)
+__tests__/utils/agents/imported.test.js › ImportedPlugin.updateImportedPlugin — metadata deep merge T4: setup_args 얕은 머지 유지 — metadata 특수 분기가 다른 필드에 영향 없음
+__tests__/utils/agents/imported.test.js › ImportedPlugin.updateImportedPlugin — metadata deep merge T5: metadata 부재 current + 신규 metadata 주입 시 신규 생성 (currentConfig.metadata = undefined 안전)
+__tests__/utils/chats/agents.cache.test.js › Agent Attachment Cache UT-1: cache → consume → delete cycle should store attachments and retrieve them via consumeAgentAttachments
+__tests__/utils/chats/agents.cache.test.js › Agent Attachment Cache UT-2: cache miss returns empty array should return [] for null UUID
+__tests__/utils/chats/agents.cache.test.js › Agent Attachment Cache UT-2: cache miss returns empty array should return [] for undefined UUID
+__tests__/utils/chats/agents.cache.test.js › Agent Attachment Cache UT-2: cache miss returns empty array should return [] for unknown UUID
+__tests__/utils/chats/agents.cache.test.js › Agent Attachment Cache UT-3: one-time consumption should return [] on second consume call
+__tests__/utils/chats/agents.cache.test.js › Agent Attachment Cache grepAgents attachments parameter should accept attachments parameter without error
+__tests__/utils/chats/agents.cache.test.js › Agent Attachment Cache grepAgents attachments parameter should default attachments to empty array
+__tests__/utils/chats/agents.cache.test.js › Agent Attachment Cache with grepAgents @agent flow should cache attachments when @agent message creates an invocation
+__tests__/utils/chats/agents.cache.test.js › Agent Attachment Cache with grepAgents @agent flow should not cache when attachments are empty
+__tests__/utils/chats/agents.cache.test.js › Agent Attachment Cache with grepAgents @agent flow should not cache when invocation creation fails
+__tests__/utils/chats/apiChatHandler.llmLog.test.js › apiChatHandler LLM Log fail-silent 보장 catch 블록에서 console.error로 에러를 로깅한다
+__tests__/utils/chats/apiChatHandler.llmLog.test.js › apiChatHandler LLM Log fail-silent 보장 createLlmMessageLog 호출이 WorkspaceChats.new() 이후에 위치한다
+__tests__/utils/chats/apiChatHandler.llmLog.test.js › apiChatHandler LLM Log 정적 분석 chatSync에서 systemPrompt를 messages에서 추출한다
+__tests__/utils/chats/apiChatHandler.llmLog.test.js › apiChatHandler LLM Log 정적 분석 createLlmMessageLog 호출이 2회 이상 존재한다 (chatSync + streamChat)
+__tests__/utils/chats/apiChatHandler.llmLog.test.js › apiChatHandler LLM Log 정적 분석 createLlmMessageLog를 import 또는 참조한다
+__tests__/utils/chats/apiChatHandler.llmLog.test.js › apiChatHandler LLM Log 정적 분석 로그 저장 시 필수 6개 필드를 모두 전달한다
+__tests__/utils/chats/apiChatHandler.llmLog.test.js › apiChatHandler LLM Log 정적 분석 모든 createLlmMessageLog 호출이 try-catch로 보호된다
+__tests__/utils/chats/apiChatHandler.llmLog.test.js › apiChatHandler chatSync LLM Log 데이터 매핑 chatSync에서 chatHistory로 rawHistory를 전달한다
+__tests__/utils/chats/apiChatHandler.llmLog.test.js › apiChatHandler chatSync LLM Log 데이터 매핑 chatSync에서 compressedMessages로 messages를 전달한다
+__tests__/utils/chats/apiChatHandler.llmLog.test.js › apiChatHandler chatSync LLM Log 데이터 매핑 chatSync에서 llmResponse로 textResponse를 전달한다
+__tests__/utils/chats/apiChatHandler.llmLog.test.js › apiChatHandler chatSync LLM Log 데이터 매핑 chatSync에서 userPrompt로 message를 전달한다
+__tests__/utils/chats/apiChatHandler.llmLog.test.js › apiChatHandler streamChat LLM Log 데이터 매핑 streamChat에서 chatHistory로 rawHistory를 전달한다
+__tests__/utils/chats/apiChatHandler.llmLog.test.js › apiChatHandler streamChat LLM Log 데이터 매핑 streamChat에서 compressedMessages로 messages를 전달한다
+__tests__/utils/chats/apiChatHandler.llmLog.test.js › apiChatHandler streamChat LLM Log 데이터 매핑 streamChat에서 llmResponse로 completeText를 전달한다
+__tests__/utils/chats/embed.allowlist.test.js › embed allowlist helpers CSV는 trim 후 허용된 tool만 남긴다
+__tests__/utils/chats/embed.allowlist.test.js › embed allowlist helpers buildEmbedSystemPrompt는 허용 tool 경계를 시스템 프롬프트에 추가한다
+__tests__/utils/chats/embed.allowlist.test.js › embed allowlist helpers chat-completions 형식에서는 function.name을 기준으로 필터링한다
+__tests__/utils/chats/embed.allowlist.test.js › embed allowlist helpers extractAllowedToolNames는 필터된 tool 이름 목록만 반환한다
+__tests__/utils/chats/embed.allowlist.test.js › embed allowlist helpers raw=''이면 빈 허용 목록으로 빈 배열을 반환한다
+__tests__/utils/chats/embed.allowlist.test.js › embed allowlist helpers raw=null이면 필터 없이 전체 tools를 반환한다
+__tests__/utils/chats/embed.allowlist.test.js › embed allowlist helpers 알 수 없는 format에서는 이름을 추출하지 못해 결과가 비어진다
+__tests__/utils/chats/embed.allowlist.test.js › embed allowlist helpers 전체 허용(null)이면 tool_choice 강제를 유지하고 subset이면 해제한다
+__tests__/utils/chats/openaiCompatible.test.js › OpenAICompatibleChat chatSync should handle OpenAI vision multimodal messages
+__tests__/utils/chats/openaiCompatible.test.js › OpenAICompatibleChat chatSync should handle regular text messages in OpenAI format
+__tests__/utils/chats/openaiCompatible.test.js › OpenAICompatibleChat streamChat should handle OpenAI vision multimodal messages in streaming mode
+__tests__/utils/chats/openaiCompatible.test.js › OpenAICompatibleChat streamChat should handle regular text messages in streaming mode
+__tests__/utils/chats/openaiHelpers.test.js › OpenAI Helper Functions extractAttachments should extract image attachments with correct mime types
+__tests__/utils/chats/openaiHelpers.test.js › OpenAI Helper Functions extractAttachments should handle array with no image content
+__tests__/utils/chats/openaiHelpers.test.js › OpenAI Helper Functions extractAttachments should handle empty array
+__tests__/utils/chats/openaiHelpers.test.js › OpenAI Helper Functions extractAttachments should handle invalid data URLs with PNG fallback
+__tests__/utils/chats/openaiHelpers.test.js › OpenAI Helper Functions extractAttachments should return empty array for string content
+__tests__/utils/chats/openaiHelpers.test.js › OpenAI Helper Functions extractTextContent should extract text from multi-modal content array
+__tests__/utils/chats/openaiHelpers.test.js › OpenAI Helper Functions extractTextContent should handle array with no text content
+__tests__/utils/chats/openaiHelpers.test.js › OpenAI Helper Functions extractTextContent should handle empty array
+__tests__/utils/chats/openaiHelpers.test.js › OpenAI Helper Functions extractTextContent should return string content as-is when not an array
+__tests__/utils/chats/react/index.test.js › streamReactChat DB 저장 실패 시 클라이언트에는 abort 청크를 보내지 않는다
+__tests__/utils/chats/react/index.test.js › streamReactChat LLM이 빈 응답을 반환하면 abort 청크를 전송한다
+__tests__/utils/chats/react/index.test.js › streamReactChat MAX_ITERATIONS 초과 시 요약 LLM 호출 후 최종 답변을 저장한다
+__tests__/utils/chats/react/index.test.js › streamReactChat createLlmMessageLog 실패 시에도 채팅 흐름이 정상 완료된다
+__tests__/utils/chats/react/index.test.js › streamReactChat createLlmMessageLog에 chatHistory(rawHistory)를 전달한다
+__tests__/utils/chats/react/index.test.js › streamReactChat createLlmMessageLog에 pinnedContextTexts를 contextTexts로 전달한다
+__tests__/utils/chats/react/index.test.js › streamReactChat embeddingsCount가 0이면 검색 없이 처리한다
+__tests__/utils/chats/react/index.test.js › streamReactChat emits stream chunks while processing react mode
+__tests__/utils/chats/react/index.test.js › streamReactChat getChatCompletion에서 예외 발생 시 sanitized abort 청크를 전송한다
+__tests__/utils/chats/react/index.test.js › streamReactChat persists reactTrace when the react loop performs search then finalizes
+__tests__/utils/chats/react/index.test.js › streamReactChat pinned docs가 있고 검색 결과도 있으면 양쪽 모두 소스로 포함하고 카운트에 합산한다
+__tests__/utils/chats/react/index.test.js › streamReactChat 검색 결과가 없어도 pinned docs가 있으면 컨텍스트와 소스로 사용한다
+__tests__/utils/chats/react/index.test.js › streamReactChat 벡터 검색 결과가 빈 contextTexts를 반환하면 적절히 처리한다
+__tests__/utils/chats/react/index.test.js › streamReactChat 벡터 검색이 오류 메시지를 반환하면 루프를 계속하고 최종 답변을 반환한다
+__tests__/utils/chats/react/index.test.js › streamReactChat 벡터화된 문서가 없을 경우 검색 없이 최종 답변을 반환한다
+__tests__/utils/chats/react/index.test.js › streamReactChat 복수 이미지 첨부 시 모든 이미지가 content 배열에 포함된다
+__tests__/utils/chats/react/index.test.js › streamReactChat 알 수 없는 action을 받으면 루프를 계속하고 최종 답변으로 마무리한다
+__tests__/utils/chats/react/index.test.js › streamReactChat 여러 반복에서 rawHistory가 변이되지 않아 backfill이 일관되게 동작한다
+__tests__/utils/chats/react/index.test.js › streamReactChat 이미지 없을 때 user 메시지가 기존과 동일하게 문자열이다
+__tests__/utils/chats/react/index.test.js › streamReactChat 이미지 첨부 시 초기 user 메시지가 멀티모달 content 배열로 구성된다
+__tests__/utils/chats/react/index.test.js › streamReactChat 정상 응답 시 createLlmMessageLog를 호출하여 LLM 로그를 저장한다
+__tests__/utils/chats/react/llmLog.test.js › react/index.js LLM Log fail-silent 및 위치 catch 블록에서 console.error로 에러를 로깅한다
+__tests__/utils/chats/react/llmLog.test.js › react/index.js LLM Log fail-silent 및 위치 createLlmMessageLog 호출이 WorkspaceChats.new() 이후에 위치한다
+__tests__/utils/chats/react/llmLog.test.js › react/index.js LLM Log fail-silent 및 위치 createLlmMessageLog 호출이 finalizeResponseStream 전에 위치한다
+__tests__/utils/chats/react/llmLog.test.js › react/index.js LLM Log 데이터 매핑 chatHistory로 rawHistory를 전달한다
+__tests__/utils/chats/react/llmLog.test.js › react/index.js LLM Log 데이터 매핑 compressedMessages로 messages를 전달한다
+__tests__/utils/chats/react/llmLog.test.js › react/index.js LLM Log 데이터 매핑 contextTexts로 pinnedContextTexts를 전달한다
+__tests__/utils/chats/react/llmLog.test.js › react/index.js LLM Log 데이터 매핑 llmResponse로 finalAnswer를 전달한다
+__tests__/utils/chats/react/llmLog.test.js › react/index.js LLM Log 데이터 매핑 systemPrompt를 직접 변수로 전달한다 (messages에서 추출하지 않음)
+__tests__/utils/chats/react/llmLog.test.js › react/index.js LLM Log 정적 분석 createLlmMessageLog 호출이 try-catch로 보호된다
+__tests__/utils/chats/react/llmLog.test.js › react/index.js LLM Log 정적 분석 createLlmMessageLog 호출이 존재한다
+__tests__/utils/chats/react/llmLog.test.js › react/index.js LLM Log 정적 분석 로그 저장 시 필수 6개 필드를 모두 전달한다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput action type Action Input이 JSON이 아닐 경우 원문 그대로 actionInput으로 반환한다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput action type JSON query를 포함한 표준 action 포맷을 파싱한다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput action type JSON에 query 키가 없을 경우 원문 Action Input을 그대로 사용한다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput action type Thought가 없어도 action을 파싱한다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput action type 알 수 없는 action 이름도 파싱하여 반환한다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput action type 키워드 대소문자에 관계없이 action을 파싱한다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput final_answer type Final Answer 키워드 대소문자를 구분하지 않는다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput final_answer type Final Answer가 Action보다 우선적으로 인식된다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput final_answer type Thought 없이도 Final Answer를 파싱한다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput final_answer type Thought와 Final Answer를 모두 파싱한다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput final_answer type 여러 줄에 걸친 Final Answer를 파싱한다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput incomplete type Action만 있고 Action Input이 없으면 incomplete로 반환한다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput incomplete type null 입력은 incomplete로 반환하고 text는 빈 문자열이다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput incomplete type undefined 입력은 incomplete로 반환한다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput incomplete type 빈 문자열은 incomplete로 반환한다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput incomplete type 앞뒤 공백은 제거한 후 파싱한다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput incomplete type 패턴과 매칭되지 않는 텍스트는 incomplete로 반환한다
+__tests__/utils/chats/react/outputParser.test.js › parseReactOutput thought extraction Thought가 여러 줄에 걸쳐 있어도 올바르게 추출한다
+__tests__/utils/chats/stream.react.test.js › streamChatWithWorkspace — react 모드 라우팅 chatMode가 chat일 때 streamReactChat을 호출하지 않는다
+__tests__/utils/chats/stream.react.test.js › streamChatWithWorkspace — react 모드 라우팅 chatMode가 query일 때 streamReactChat을 호출하지 않는다
+__tests__/utils/chats/stream.react.test.js › streamChatWithWorkspace — react 모드 라우팅 chatMode가 react일 때 streamReactChat으로 위임하고 즉시 반환한다
+__tests__/utils/chats/toolCalling/appendToolResult.test.js › appendToolResult anthropic format assistant(tool_use) + user(tool_result) 메시지를 추가해야 한다
+__tests__/utils/chats/toolCalling/appendToolResult.test.js › appendToolResult chat-completions format assistant(tool_calls) + tool role 메시지를 추가해야 한다
+__tests__/utils/chats/toolCalling/appendToolResult.test.js › appendToolResult openai-responses format arguments가 string이면 그대로 전달해야 한다
+__tests__/utils/chats/toolCalling/appendToolResult.test.js › appendToolResult openai-responses format function_call + function_call_output 메시지를 추가해야 한다
+__tests__/utils/chats/toolCalling/appendToolResult.test.js › appendToolResult unknown format messages를 변경하지 않고 그대로 반환해야 한다
+__tests__/utils/chats/toolCalling/appendToolResult.test.js › appendToolResult 원본 messages 불변성 원본 messages 배열을 수정하지 않아야 한다
+__tests__/utils/chats/toolCalling/executor.test.js › ToolExecutor context 바인딩 options.logger가 introspect와 logger에 바인딩되어야 한다
+__tests__/utils/chats/toolCalling/executor.test.js › ToolExecutor context 바인딩 runtimeArgs가 context에 바인딩되어야 한다
+__tests__/utils/chats/toolCalling/executor.test.js › ToolExecutor 에러 처리 handler 실행 에러 시 에러 문자열을 반환해야 한다
+__tests__/utils/chats/toolCalling/executor.test.js › ToolExecutor 에러 처리 inactive plugin일 때 에러 문자열을 반환해야 한다
+__tests__/utils/chats/toolCalling/executor.test.js › ToolExecutor 에러 처리 plugin not found일 때 에러 문자열을 반환해야 한다
+__tests__/utils/chats/toolCalling/executor.test.js › ToolExecutor 정상 실행 handler가 object를 반환하면 JSON.stringify 해야 한다
+__tests__/utils/chats/toolCalling/executor.test.js › ToolExecutor 정상 실행 handler가 문자열을 반환하면 그대로 반환해야 한다
+__tests__/utils/chats/toolCalling/executor.test.js › ToolExecutor 정상 실행 string arguments를 JSON.parse하여 handler에 전달해야 한다
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager anthropic format 올바른 Anthropic Messages API tool 형식을 반환해야 한다
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager array type with items (FR-05, FR-06) anthropic: array items를 보존해야 한다
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager array type with items (FR-05, FR-06) chat-completions: array items를 보존해야 한다
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager array type with items (FR-05, FR-06) items 미선언 array는 defensive default { type: string }을 주입해야 한다
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager array type with items (FR-05, FR-06) openai-responses: array items를 보존해야 한다
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager chat-completions format 올바른 Chat Completions API tool 형식을 반환해야 한다
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager getToolDefinitions active 플러그인만 반환해야 한다
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager getToolDefinitions active 플러그인이 없으면 빈 배열을 반환해야 한다
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager getToolDefinitions unknown format일 때 빈 배열을 반환해야 한다
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager getToolDefinitions 플러그인 변환 실패 시 해당 tool만 제외하고 나머지를 반환해야 한다
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager getToolDefinitions 플러그인이 없으면 빈 배열을 반환해야 한다
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager openai-responses format 올바른 OpenAI Responses API tool 형식을 반환해야 한다
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager web_search_preview 조건부 주입 (metadata.enable_web_search) anthropic: enable_web_search=true plugin이 있어도 web_search_preview 미주입 (provider 비호환)
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager web_search_preview 조건부 주입 (metadata.enable_web_search) chat-completions(OpenRouter): enable_web_search=true plugin이 있어도 미주입 (provider 비호환)
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager web_search_preview 조건부 주입 (metadata.enable_web_search) openai-responses: enable_web_search=false/미설정 plugin만 있으면 web_search_preview 미추가
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager web_search_preview 조건부 주입 (metadata.enable_web_search) openai-responses: enable_web_search=true plugin 존재 시 web_search_preview 추가
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager web_search_preview 조건부 주입 (metadata.enable_web_search) web_search_preview built-in tool은 name 필드가 없어야 한다 (embed whitelist 필터 우회 전제)
+__tests__/utils/chats/toolCalling/manager.test.js › ChatToolsManager 복수 플러그인 처리 여러 active 플러그인을 모두 변환해야 한다
+__tests__/utils/chats/traceLogger.test.js › ChatTraceLogger.traceStart → vsMode label TL1: pgvector workspace → vectorSearch: hybrid
+__tests__/utils/chats/traceLogger.test.js › ChatTraceLogger.traceStart → vsMode label TL1b: pgvector + vectorSearchMode='default' 컬럼값이어도 hybrid로 표기
+__tests__/utils/chats/traceLogger.test.js › ChatTraceLogger.traceStart → vsMode label TL2: lancedb + rerank → vectorSearch: rerank
+__tests__/utils/chats/traceLogger.test.js › ChatTraceLogger.traceStart → vsMode label TL3: lancedb (no mode) → vectorSearch: default
+__tests__/utils/chats/traceLogger.test.js › ChatTraceLogger.traceStart → vsMode label TL3b: chroma 등 미지원 DB → vectorSearch: default
+__tests__/utils/helpers/convertTo.test.js › prepareChatsForExport Should handle attachments for workspace chat type when json format is selected
+__tests__/utils/helpers/convertTo.test.js › prepareChatsForExport Should ignore attachments for workspace chat type when csv format is selected
+__tests__/utils/helpers/convertTo.test.js › prepareChatsForExport should return prepared data in csv and json format for workspace chat type
+__tests__/utils/helpers/convertTo.test.js › prepareChatsForExport should return prepared data in jsonAlpaca format for workspace chat type
+__tests__/utils/helpers/convertTo.test.js › prepareChatsForExport should return prepared data in jsonl format for workspace chat type
+__tests__/utils/helpers/convertTo.test.js › prepareChatsForExport should return prepared data in jsonl format for workspace chat type with attachments
+__tests__/utils/helpers/convertTo.test.js › prepareChatsForExport should throw error for invalid chat type
+__tests__/utils/helpers/convertTo.test.js › prepareChatsForExport should throw error for invalid export type
+__tests__/utils/helpers/messageArrayCompressor.test.js › messageArrayCompressor COMPRESS_ONLY_HISTORY should compress only history when COMPRESS_ONLY_HISTORY is true
+__tests__/utils/helpers/messageArrayCompressor.test.js › messageArrayCompressor COMPRESS_ONLY_HISTORY should log compression stats when COMPRESS_ONLY_HISTORY is true
+__tests__/utils/helpers/messageArrayCompressor.test.js › messageArrayCompressor COMPRESS_ONLY_HISTORY should log warning when system + user exceeds 90% of window
+__tests__/utils/helpers/messageArrayCompressor.test.js › messageArrayCompressor DISABLE_MESSAGE_COMPRESSION should process normally when DISABLE_MESSAGE_COMPRESSION is false
+__tests__/utils/helpers/messageArrayCompressor.test.js › messageArrayCompressor DISABLE_MESSAGE_COMPRESSION should return original messages when DISABLE_MESSAGE_COMPRESSION is true
+__tests__/utils/helpers/messageArrayCompressor.test.js › messageArrayCompressor Default compression behavior should compress history when it exceeds 15% limit
+__tests__/utils/helpers/messageArrayCompressor.test.js › messageArrayCompressor Default compression behavior should compress user prompt when it exceeds 70% of window
+__tests__/utils/helpers/messageArrayCompressor.test.js › messageArrayCompressor Default compression behavior should not compress when messages fit within window
+__tests__/utils/helpers/messageArrayCompressor.test.js › messageArrayCompressor Edge cases should handle empty history
+__tests__/utils/helpers/messageArrayCompressor.test.js › messageArrayCompressor Edge cases should handle undefined environment variables
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy chatHistory 처리 content가 객체(멀티모달)이면 JSON.stringify 후 자른다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy chatHistory 처리 긴 히스토리 메시지를 300자로 자른다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy chatHistory 처리 최근 3턴(6개 메시지)만 포함한다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy chatHistory 처리 히스토리의 role을 user/assistant로 정규화한다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy llmRewrite 기본 동작 LLM 응답을 정상적으로 반환한다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy llmRewrite 기본 동작 temperature 0으로 호출한다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy llmRewrite 기본 동작 마지막 메시지에 원본 질문이 포함된다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy llmRewrite 기본 동작 시스템 프롬프트가 첫 번째 메시지에 포함된다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy 상수 검증 시스템 프롬프트에 HR 관련 규칙이 포함된다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy 상수 검증 타임아웃이 3초이다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy 에러 및 타임아웃 처리 LLM API 에러 시 예외가 전파된다 (caller에서 catch)
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy 에러 및 타임아웃 처리 getChatCompletion이 textResponse 없이 반환 시 원본을 반환한다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy 에러 및 타임아웃 처리 getChatCompletion이 undefined 반환 시 원본을 반환한다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy 응답 가드레일 '답변' 포함 응답이면 원본을 반환한다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy 응답 가드레일 '알려드리' 포함 응답이면 원본을 반환한다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy 응답 가드레일 200자 이내 응답이면 정상 반환한다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy 응답 가드레일 200자 초과 응답이면 원본을 반환한다 (답변 생성 감지)
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy 응답 가드레일 null 응답이면 원본을 반환한다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy 응답 가드레일 빈 응답이면 원본을 반환한다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy 응답 가드레일 응답 앞뒤 공백을 제거한다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy 입력 검증 LLMConnector가 null이면 원본을 반환한다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy 입력 검증 input이 null이면 null을 반환한다
+__tests__/utils/queryRewriter/conversational.test.js › QueryRewriter - Conversational (LLM) Strategy 입력 검증 input이 빈 문자열이면 원본을 반환한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary expandSynonyms 실제 검색 시나리오 근태 관련 질의 확장
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary expandSynonyms 실제 검색 시나리오 급여 관련 질의 확장
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary expandSynonyms 실제 검색 시나리오 동의어가 없는 단어와 있는 단어가 혼합된 경우
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary expandSynonyms 실제 검색 시나리오 복합 키워드 질의 확장
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary expandSynonyms 실제 검색 시나리오 연말정산 관련 질의 확장
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary expandSynonyms 실제 검색 시나리오 중복 동의어가 제거된다 (Set 활용)
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 급여 관련 동의어 "급여"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 급여 관련 동의어 "보수"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 급여 관련 동의어 "봉급"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 급여 관련 동의어 "연봉"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 급여 관련 동의어 "월급"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 급여 관련 동의어 "임금"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 급여 관련 동의어 보너스/상여/성과급이 상호 매핑된다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 급여 관련 동의어 월급 → 급여 양방향 매핑이 된다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 사전 구조 무결성 모든 값이 비어있지 않은 문자열 배열이다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 사전 구조 무결성 모든 키가 문자열이다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 사전 구조 무결성 사전에 중복 값이 없다 (키 내부)
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 사회보험 관련 동의어 4대보험이 4개 보험을 모두 포함한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 사회보험 관련 동의어 개별 보험이 4대보험을 참조한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 연말정산 관련 동의어 "교육비"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 연말정산 관련 동의어 "세액공제"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 연말정산 관련 동의어 "소득공제"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 연말정산 관련 동의어 "연말정산"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 연말정산 관련 동의어 "의료비"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 인사정보 관련 동의어 "경력"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 인사정보 관련 동의어 "인사기록"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 인사정보 관련 동의어 "인사정보"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 인사정보 관련 동의어 "자격증"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 인사정보 관련 동의어 "학력"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 휴가/근태 관련 동의어 "반차"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 휴가/근태 관련 동의어 "병가"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 휴가/근태 관련 동의어 "연가"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 휴가/근태 관련 동의어 "연차"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 휴가/근태 관련 동의어 "유급휴가"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 휴가/근태 관련 동의어 "휴가"가 사전에 존재한다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 휴가/근태 관련 동의어 야근/초과근무 매핑이 된다
+__tests__/utils/queryRewriter/hrSynonyms.test.js › QueryRewriter - HR Synonyms Dictionary 휴가/근태 관련 동의어 연차 ↔ 유급휴가 양방향 매핑이 된다
+__tests__/utils/queryRewriter/index.test.js › QueryRewriter - Main Entry Point mode: llm LLM 재작성이 성공하면 llm 전략을 반환한다
+__tests__/utils/queryRewriter/index.test.js › QueryRewriter - Main Entry Point mode: llm LLM 호출 실패 시 rule-based 결과로 폴백한다
+__tests__/utils/queryRewriter/index.test.js › QueryRewriter - Main Entry Point mode: llm LLMConnector가 없으면 rule-based만 실행한다
+__tests__/utils/queryRewriter/index.test.js › QueryRewriter - Main Entry Point mode: llm LLM이 200자 이상 반환하면 rule-based로 폴백한다
+__tests__/utils/queryRewriter/index.test.js › QueryRewriter - Main Entry Point mode: llm chatHistory가 비어있으면 LLM을 호출하지 않는다
+__tests__/utils/queryRewriter/index.test.js › QueryRewriter - Main Entry Point mode: off passthrough - 원본 쿼리를 그대로 반환한다
+__tests__/utils/queryRewriter/index.test.js › QueryRewriter - Main Entry Point mode: off queryRewriteMode가 없으면 off로 동작한다
+__tests__/utils/queryRewriter/index.test.js › QueryRewriter - Main Entry Point mode: off 빈 입력을 처리한다
+__tests__/utils/queryRewriter/index.test.js › QueryRewriter - Main Entry Point mode: rule LLMConnector가 있어도 rule 모드에서는 LLM을 호출하지 않는다
+__tests__/utils/queryRewriter/index.test.js › QueryRewriter - Main Entry Point mode: rule 대화 히스토리 기반 참조 해소가 동작한다
+__tests__/utils/queryRewriter/index.test.js › QueryRewriter - Main Entry Point mode: rule 동의어 확장이 적용된다
+__tests__/utils/queryRewriter/index.test.js › QueryRewriter - Main Entry Point mode: rule 불용어가 제거된다
+__tests__/utils/queryRewriter/index.test.js › QueryRewriter - Main Entry Point 입력 길이 캡 2000자 이내 입력은 정상 처리된다
+__tests__/utils/queryRewriter/index.test.js › QueryRewriter - Main Entry Point 입력 길이 캡 2000자 초과 입력이 잘려서 처리된다
+__tests__/utils/queryRewriter/index.test.js › QueryRewriter - Main Entry Point 입력 길이 캡 MAX_INPUT_LENGTH 상수가 2000이다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy applyRuleBasedRewriting 빈 입력을 처리한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy applyRuleBasedRewriting 전체 파이프라인이 동작한다: 참조 해소 + 불용어 제거 + 동의어 확장
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy applyRuleBasedRewriting 히스토리 없이도 동의어 확장과 불용어 제거가 동작한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy expandSynonyms HR 동의어를 확장한다 (급여)
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy expandSynonyms HR 동의어를 확장한다 (연차)
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy expandSynonyms 동의어가 없는 단어는 그대로 유지한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy expandSynonyms 부분 매칭으로 복합어 내 동의어를 확장한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy expandSynonyms 빈 입력을 처리한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy expandSynonyms 연말정산 관련 동의어를 확장한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy extractContextKeywords - 날짜 오인 방지 YYYYMMDD 형식 날짜를 사원번호로 추출하지 않는다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy extractContextKeywords - 날짜 오인 방지 YYYY년 형식이 포함된 텍스트에서 연도를 추출하지 않는다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy extractContextKeywords - 날짜 오인 방지 사원번호와 날짜가 동시에 있으면 사원번호만 추출한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy extractContextKeywords - 날짜 오인 방지 실제 사원번호 패턴은 정상 추출한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy extractContextKeywords 사원번호를 추출한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy extractContextKeywords 일반 단어는 이름으로 추출하지 않는다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy extractContextKeywords 최대 3개까지만 추출한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy extractContextKeywords 한국어 이름을 추출한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber 5자리/7자리 숫자는 날짜로 인식하지 않는다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber YYYY 형식 '1999'를 날짜로 인식한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber YYYY 형식 '2000'를 날짜로 인식한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber YYYY 형식 '2025'를 날짜로 인식한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber YYYY 형식 '2026'를 날짜로 인식한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber YYYY 형식 '2099'를 날짜로 인식한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber YYYYMM 형식 '202601'를 날짜로 인식한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber YYYYMM 형식 '202604'를 날짜로 인식한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber YYYYMM 형식 '202612'를 날짜로 인식한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber YYYYMMDD 형식 '19990101'를 날짜로 인식한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber YYYYMMDD 형식 '20251231'를 날짜로 인식한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber YYYYMMDD 형식 '20260401'를 날짜로 인식한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber null/빈 값을 false로 반환한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber 범위 밖 연도 '1899'를 날짜로 인식하지 않는다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber 범위 밖 연도 '2100'를 날짜로 인식하지 않는다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber 범위 밖 연도 '3000'를 날짜로 인식하지 않는다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber 사원번호 '10000001'를 날짜로 인식하지 않는다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber 사원번호 '12345678'를 날짜로 인식하지 않는다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber 사원번호 '99999999'를 날짜로 인식하지 않는다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber 잘못된 월 '202600'를 날짜로 인식하지 않는다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber 잘못된 월 '202613'를 날짜로 인식하지 않는다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber 잘못된 일 '20260100'를 날짜로 인식하지 않는다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy isDateLikeNumber 잘못된 일 '20260432'를 날짜로 인식하지 않는다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy removeStopwords 모든 단어가 제거되면 원본을 반환한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy removeStopwords 부탁 표현을 제거한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy removeStopwords 빈 입력을 처리한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy removeStopwords 요청 표현을 제거한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy removeStopwords 인사말을 제거한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy removeStopwords 접속사/부사를 제거한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy resolveReferences '그 사람'을 이전 대화의 이름으로 대체한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy resolveReferences '그 직원'을 이전 대화의 이름으로 대체한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy resolveReferences 사원번호가 있는 대화에서 참조를 해소한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy resolveReferences 짧은 질의에 이전 대화의 키워드를 추가한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy resolveReferences 참조가 없으면 원본을 반환한다
+__tests__/utils/queryRewriter/ruleBased.test.js › QueryRewriter - Rule-based Strategy resolveReferences 히스토리가 없으면 원본을 반환한다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - '혹시' 접두사 제거 문장 시작의 '혹시'를 제거한다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 궁금/알고싶다 표현 제거 "급여 궁금합니다" → "급여"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 궁금/알고싶다 표현 제거 "급여 궁금해" → "급여"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 궁금/알고싶다 표현 제거 "급여 궁금해요" → "급여"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 궁금/알고싶다 표현 제거 "급여 알고 싶습니다" → "급여"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 궁금/알고싶다 표현 제거 "급여 알고 싶어요" → "급여"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 요청 표현 제거 "급여 말해주세요" → "급여"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 요청 표현 제거 "급여 말해줘" → "급여"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 요청 표현 제거 "급여 보여주세요" → "급여"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 요청 표현 제거 "급여 보여줘" → "급여"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 요청 표현 제거 "급여 알려주세요" → "급여"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 요청 표현 제거 "급여 알려줘" → "급여"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 요청 표현 제거 "급여 조회 부탁합니다" → "급여 조회"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 요청 표현 제거 "급여 조회 부탁해" → "급여 조회"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 요청 표현 제거 "급여 확인해주세요" → "급여"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 요청 표현 제거 "급여 확인해줘" → "급여"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 인사말 제거 "감사합니다 급여 조회" → "급여 조회"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 인사말 제거 "수고하세요 급여 조회" → "급여 조회"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 인사말 제거 "안녕 급여 조회" → "급여 조회"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 인사말 제거 "안녕하세요 급여 조회" → "급여 조회"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 인사말 제거 "안녕하세요, 급여 조회" → "급여 조회"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary FILLER_PATTERNS - 인사말 제거 "안녕하세요. 급여 조회" → "급여 조회"
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 대명사 제거 "나"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 대명사 제거 "내"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 대명사 제거 "우리"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 대명사 제거 "저"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 대명사 제거 "제"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 접속사/부사 제거 "그냥"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 접속사/부사 제거 "그래서"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 접속사/부사 제거 "그런데"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 접속사/부사 제거 "그리고"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 접속사/부사 제거 "너무"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 접속사/부사 제거 "또"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 접속사/부사 제거 "또한"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 접속사/부사 제거 "매우"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 접속사/부사 제거 "아주"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 접속사/부사 제거 "정말"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 접속사/부사 제거 "진짜"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary STOPWORDS - 접속사/부사 제거 "하지만"가 STOPWORDS에 포함된다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary removeStopwords - 복합 시나리오 HR 핵심 키워드는 보존한다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary removeStopwords - 복합 시나리오 공백만 남으면 원본을 반환한다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary removeStopwords - 복합 시나리오 대명사 + 불용어가 섞인 문장을 정리한다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary removeStopwords - 복합 시나리오 숫자와 사원번호는 보존한다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary removeStopwords - 복합 시나리오 이미 깨끗한 쿼리는 변경하지 않는다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary removeStopwords - 복합 시나리오 인사말 + 요청 표현이 함께 있을 때 모두 제거한다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary removeStopwords - 복합 시나리오 접속사 + 부사가 혼합된 문장을 정리한다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary 엣지 케이스 null을 처리한다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary 엣지 케이스 undefined를 처리한다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary 엣지 케이스 단일 단어 쿼리 (불용어)는 원본을 반환한다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary 엣지 케이스 단일 단어 쿼리 (유효)는 그대로 반환한다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary 엣지 케이스 빈 문자열을 처리한다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary 엣지 케이스 숫자 타입을 처리한다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary 엣지 케이스 숫자만 있는 쿼리를 보존한다
+__tests__/utils/queryRewriter/stopwords.test.js › QueryRewriter - Stopwords Dictionary 엣지 케이스 연속 공백을 정리한다
+__tests__/utils/safeJSONStringify/safeJSONStringify.test.js › safeJSONStringify converts BigInt to string
+__tests__/utils/safeJSONStringify/safeJSONStringify.test.js › safeJSONStringify handles arrays with BigInt
+__tests__/utils/safeJSONStringify/safeJSONStringify.test.js › safeJSONStringify handles invariants
+__tests__/utils/safeJSONStringify/safeJSONStringify.test.js › safeJSONStringify handles mixed complex objects
+__tests__/utils/safeJSONStringify/safeJSONStringify.test.js › safeJSONStringify handles nested BigInt values
+__tests__/utils/safeJSONStringify/safeJSONStringify.test.js › safeJSONStringify handles regular objects without BigInt
+__tests__/utils/vectorDbProviders/astra/adjacentChunks.test.js › AstraDB.adjacentChunks getAdjacentChunks DB 쿼리 에러가 발생해도 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/astra/adjacentChunks.test.js › AstraDB.adjacentChunks getAdjacentChunks adjacentCount=1일 때 앞뒤 1개씩의 청크를 조회해야 함
+__tests__/utils/vectorDbProviders/astra/adjacentChunks.test.js › AstraDB.adjacentChunks getAdjacentChunks chunkIndex=0일 때 음수 인덱스는 조회하지 않아야 함
+__tests__/utils/vectorDbProviders/astra/adjacentChunks.test.js › AstraDB.adjacentChunks getAdjacentChunks chunkIndex가 숫자가 아닌 경우 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/astra/adjacentChunks.test.js › AstraDB.adjacentChunks getAdjacentChunks chunkIndex가 없는 경우 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/astra/adjacentChunks.test.js › AstraDB.adjacentChunks getAdjacentChunks excludeIds에 포함된 청크는 결과에서 제외해야 함
+__tests__/utils/vectorDbProviders/astra/adjacentChunks.test.js › AstraDB.adjacentChunks getAdjacentChunks 현재 청크 자체는 제외해야 함
+__tests__/utils/vectorDbProviders/astra/adjacentChunks.test.js › AstraDB.adjacentChunks performSimilaritySearch - adjacentChunks integration adjacentChunks=0일 때 기존 검색 결과만 반환해야 함
+__tests__/utils/vectorDbProviders/astra/adjacentChunks.test.js › AstraDB.adjacentChunks performSimilaritySearch - adjacentChunks integration adjacentChunks>0일 때 이웃 청크를 포함해야 함
+__tests__/utils/vectorDbProviders/astra/adjacentChunks.test.js › AstraDB.adjacentChunks performSimilaritySearch - adjacentChunks integration chunkIndex가 없는 청크는 이웃 청크 조회를 스킵해야 함
+__tests__/utils/vectorDbProviders/astra/adjacentChunks.test.js › AstraDB.adjacentChunks performSimilaritySearch - adjacentChunks integration 중복 청크는 제외해야 함
+__tests__/utils/vectorDbProviders/lance/adjacentChunks.test.js › LanceDb.adjacentChunks getAdjacentChunks DB 쿼리 에러가 발생해도 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/lance/adjacentChunks.test.js › LanceDb.adjacentChunks getAdjacentChunks adjacentCount=1일 때 앞뒤 1개씩의 청크를 조회해야 함
+__tests__/utils/vectorDbProviders/lance/adjacentChunks.test.js › LanceDb.adjacentChunks getAdjacentChunks chunkIndex=0일 때 음수 인덱스는 조회하지 않아야 함
+__tests__/utils/vectorDbProviders/lance/adjacentChunks.test.js › LanceDb.adjacentChunks getAdjacentChunks chunkIndex가 숫자가 아닌 경우 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/lance/adjacentChunks.test.js › LanceDb.adjacentChunks getAdjacentChunks chunkIndex가 없는 경우 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/lance/adjacentChunks.test.js › LanceDb.adjacentChunks getAdjacentChunks excludeIds에 포함된 청크는 결과에서 제외해야 함
+__tests__/utils/vectorDbProviders/lance/adjacentChunks.test.js › LanceDb.adjacentChunks performSimilaritySearch - adjacentChunks integration adjacentChunks=0일 때 기존 검색 결과만 반환해야 함
+__tests__/utils/vectorDbProviders/lance/adjacentChunks.test.js › LanceDb.adjacentChunks performSimilaritySearch - adjacentChunks integration adjacentChunks>0일 때 이웃 청크를 포함해야 함
+__tests__/utils/vectorDbProviders/lance/adjacentChunks.test.js › LanceDb.adjacentChunks performSimilaritySearch - adjacentChunks integration chunkIndex가 없는 청크는 이웃 청크 조회를 스킵해야 함
+__tests__/utils/vectorDbProviders/lance/adjacentChunks.test.js › LanceDb.adjacentChunks performSimilaritySearch - adjacentChunks integration 중복 청크는 제외해야 함
+__tests__/utils/vectorDbProviders/milvus/adjacentChunks.test.js › Milvus.adjacentChunks getAdjacentChunks DB 쿼리 에러가 발생해도 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/milvus/adjacentChunks.test.js › Milvus.adjacentChunks getAdjacentChunks adjacentCount=1일 때 앞뒤 1개씩의 청크를 조회해야 함
+__tests__/utils/vectorDbProviders/milvus/adjacentChunks.test.js › Milvus.adjacentChunks getAdjacentChunks chunkIndex=0일 때 음수 인덱스는 조회하지 않아야 함
+__tests__/utils/vectorDbProviders/milvus/adjacentChunks.test.js › Milvus.adjacentChunks getAdjacentChunks chunkIndex가 숫자가 아닌 경우 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/milvus/adjacentChunks.test.js › Milvus.adjacentChunks getAdjacentChunks chunkIndex가 없는 경우 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/milvus/adjacentChunks.test.js › Milvus.adjacentChunks getAdjacentChunks excludeIds에 포함된 청크는 결과에서 제외해야 함
+__tests__/utils/vectorDbProviders/milvus/adjacentChunks.test.js › Milvus.adjacentChunks performSimilaritySearch - adjacentChunks integration adjacentChunks=0일 때 기존 검색 결과만 반환해야 함
+__tests__/utils/vectorDbProviders/milvus/adjacentChunks.test.js › Milvus.adjacentChunks performSimilaritySearch - adjacentChunks integration adjacentChunks>0일 때 이웃 청크를 포함해야 함
+__tests__/utils/vectorDbProviders/milvus/adjacentChunks.test.js › Milvus.adjacentChunks performSimilaritySearch - adjacentChunks integration chunkIndex가 없는 청크는 이웃 청크 조회를 스킵해야 함
+__tests__/utils/vectorDbProviders/milvus/adjacentChunks.test.js › Milvus.adjacentChunks performSimilaritySearch - adjacentChunks integration 중복 청크는 제외해야 함
+__tests__/utils/vectorDbProviders/pgvector/adjacentChunks.test.js › PGVector.adjacentChunks chunkIndex 메타데이터 저장 임베딩 시 chunkIndex와 totalChunks가 포함되어야 함
+__tests__/utils/vectorDbProviders/pgvector/adjacentChunks.test.js › PGVector.adjacentChunks getAdjacentChunks DB 쿼리 에러가 발생해도 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/pgvector/adjacentChunks.test.js › PGVector.adjacentChunks getAdjacentChunks adjacentCount=1일 때 앞뒤 1개씩의 청크를 조회해야 함
+__tests__/utils/vectorDbProviders/pgvector/adjacentChunks.test.js › PGVector.adjacentChunks getAdjacentChunks chunkIndex=0일 때 음수 인덱스는 조회하지 않아야 함
+__tests__/utils/vectorDbProviders/pgvector/adjacentChunks.test.js › PGVector.adjacentChunks getAdjacentChunks chunkIndex가 숫자가 아닌 경우 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/pgvector/adjacentChunks.test.js › PGVector.adjacentChunks getAdjacentChunks chunkIndex가 없는 경우 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/pgvector/adjacentChunks.test.js › PGVector.adjacentChunks getAdjacentChunks excludeIds에 포함된 청크는 결과에서 제외해야 함
+__tests__/utils/vectorDbProviders/pgvector/adjacentChunks.test.js › PGVector.adjacentChunks performSimilaritySearch - adjacentChunks integration adjacentChunks=0일 때 기존 검색 결과만 반환해야 함
+__tests__/utils/vectorDbProviders/pgvector/adjacentChunks.test.js › PGVector.adjacentChunks performSimilaritySearch - adjacentChunks integration adjacentChunks>0일 때 이웃 청크를 포함해야 함
+__tests__/utils/vectorDbProviders/pgvector/adjacentChunks.test.js › PGVector.adjacentChunks performSimilaritySearch - adjacentChunks integration chunkIndex가 없는 청크는 이웃 청크 조회를 스킵해야 함
+__tests__/utils/vectorDbProviders/pgvector/adjacentChunks.test.js › PGVector.adjacentChunks performSimilaritySearch - adjacentChunks integration 중복 청크는 제외해야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch hybridSearchResponse vector와 keyword 검색을 병렬 실행해야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch hybridSearchResponse 최종 결과가 topN으로 제한되어야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch hybridSearchResponse 후보 수가 topN * 3으로 설정되어야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch keywordSearchResponse filterIdentifiers에 포함된 소스는 제외해야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch keywordSearchResponse 빈 결과를 올바르게 처리해야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch keywordSearchResponse 올바른 SQL 쿼리 파라미터를 전달해야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch keywordSearchResponse 점수가 0 이하인 결과는 제외해야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch keywordSearchResponse 키워드 매칭 결과를 점수 내림차순으로 반환해야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch performSimilaritySearch - hybridSearch branching hybridSearch 파라미터 기본값은 false여야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch performSimilaritySearch - hybridSearch branching hybridSearch=false일 때 similarityResponse를 호출해야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch performSimilaritySearch - hybridSearch branching hybridSearch=true에서도 adjacentChunks가 동작해야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch performSimilaritySearch - hybridSearch branching hybridSearch=true일 때 hybridSearchResponse를 호출해야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch performSimilaritySearch - hybridSearch branching hybridSearch=true일 때 queryText가 올바르게 전달되어야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch rrfFusion RRF 점수가 내림차순으로 정렬되어야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch rrfFusion topN 파라미터가 결과 수를 제한해야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch rrfFusion 같은 docId+chunkIndex+text를 가진 문서는 중복 제거되어야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch rrfFusion 벡터와 키워드 양쪽에 모두 나타난 문서가 가장 높은 점수를 받아야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch rrfFusion 양쪽 결과가 모두 비어있으면 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/pgvector/hybridSearch.test.js › PGVector.hybridSearch rrfFusion 한쪽 검색 결과가 비어있어도 다른 쪽 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/pgvector/index.test.js › PGVector.sanitizeForJsonb converts Date to ISO string
+__tests__/utils/vectorDbProviders/pgvector/index.test.js › PGVector.sanitizeForJsonb deeply sanitizes arrays
+__tests__/utils/vectorDbProviders/pgvector/index.test.js › PGVector.sanitizeForJsonb deeply sanitizes objects
+__tests__/utils/vectorDbProviders/pgvector/index.test.js › PGVector.sanitizeForJsonb does not mutate original objects/arrays
+__tests__/utils/vectorDbProviders/pgvector/index.test.js › PGVector.sanitizeForJsonb keeps safe whitespace (tab, LF, CR) and removes disallowed C0 controls
+__tests__/utils/vectorDbProviders/pgvector/index.test.js › PGVector.sanitizeForJsonb removes only disallowed control chars; keeps normal printable chars
+__tests__/utils/vectorDbProviders/pgvector/index.test.js › PGVector.sanitizeForJsonb returns null/undefined as-is
+__tests__/utils/vectorDbProviders/pgvector/index.test.js › PGVector.sanitizeForJsonb returns primitives unchanged (number, boolean, bigint)
+__tests__/utils/vectorDbProviders/pgvector/index.test.js › PGVector.sanitizeForJsonb returns symbol unchanged
+__tests__/utils/vectorDbProviders/pinecone/adjacentChunks.test.js › Pinecone.adjacentChunks getAdjacentChunks adjacentCount=1일 때 범위/제외 필터를 동시에 적용해야 함
+__tests__/utils/vectorDbProviders/pinecone/adjacentChunks.test.js › Pinecone.adjacentChunks getAdjacentChunks chunkIndex가 없는 경우 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/pinecone/adjacentChunks.test.js › Pinecone.adjacentChunks getAdjacentChunks excludeIds에 포함된 청크는 결과에서 제외해야 함
+__tests__/utils/vectorDbProviders/pinecone/adjacentChunks.test.js › Pinecone.adjacentChunks getAdjacentChunks queryVectorLength가 없으면 경고 후 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/pinecone/adjacentChunks.test.js › Pinecone.adjacentChunks getAdjacentChunks 쿼리 실패 시 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/pinecone/adjacentChunks.test.js › Pinecone.adjacentChunks performSimilaritySearch - adjacentChunks integration adjacentChunks=0일 때 기존 검색 결과만 반환해야 함
+__tests__/utils/vectorDbProviders/pinecone/adjacentChunks.test.js › Pinecone.adjacentChunks performSimilaritySearch - adjacentChunks integration adjacentChunks>0일 때 이웃 청크를 포함해야 함
+__tests__/utils/vectorDbProviders/zilliz/adjacentChunks.test.js › Zilliz.adjacentChunks getAdjacentChunks DB 쿼리 에러가 발생해도 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/zilliz/adjacentChunks.test.js › Zilliz.adjacentChunks getAdjacentChunks adjacentCount=1일 때 앞뒤 1개씩의 청크를 조회해야 함
+__tests__/utils/vectorDbProviders/zilliz/adjacentChunks.test.js › Zilliz.adjacentChunks getAdjacentChunks chunkIndex=0일 때 음수 인덱스는 조회하지 않아야 함
+__tests__/utils/vectorDbProviders/zilliz/adjacentChunks.test.js › Zilliz.adjacentChunks getAdjacentChunks chunkIndex가 숫자가 아닌 경우 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/zilliz/adjacentChunks.test.js › Zilliz.adjacentChunks getAdjacentChunks chunkIndex가 없는 경우 빈 결과를 반환해야 함
+__tests__/utils/vectorDbProviders/zilliz/adjacentChunks.test.js › Zilliz.adjacentChunks getAdjacentChunks excludeIds에 포함된 청크는 결과에서 제외해야 함
+__tests__/utils/vectorDbProviders/zilliz/adjacentChunks.test.js › Zilliz.adjacentChunks performSimilaritySearch - adjacentChunks integration adjacentChunks=0일 때 기존 검색 결과만 반환해야 함
+__tests__/utils/vectorDbProviders/zilliz/adjacentChunks.test.js › Zilliz.adjacentChunks performSimilaritySearch - adjacentChunks integration adjacentChunks>0일 때 이웃 청크를 포함해야 함
+__tests__/utils/vectorDbProviders/zilliz/adjacentChunks.test.js › Zilliz.adjacentChunks performSimilaritySearch - adjacentChunks integration chunkIndex가 없는 청크는 이웃 청크 조회를 스킵해야 함
+__tests__/utils/vectorDbProviders/zilliz/adjacentChunks.test.js › Zilliz.adjacentChunks performSimilaritySearch - adjacentChunks integration 중복 청크는 제외해야 함
+__tests__/utils/vectorSearch/mergeSharedResults.test.js › performMergedSearch Graceful Degradation 공용 검색 실패 시 자체 결과만 반환한다
+__tests__/utils/vectorSearch/mergeSharedResults.test.js › performMergedSearch Graceful Degradation 공용 검색이 에러 메시지를 반환하면 자체 결과만 반환한다
+__tests__/utils/vectorSearch/mergeSharedResults.test.js › performMergedSearch contextTexts와 sources 매핑 contextTexts가 sources와 올바르게 매핑된다
+__tests__/utils/vectorSearch/mergeSharedResults.test.js › performMergedSearch skipRewrite 파라미터 skipRewrite 미지정(기본값 false): 기존 동작과 동일하다
+__tests__/utils/vectorSearch/mergeSharedResults.test.js › performMergedSearch skipRewrite 파라미터 skipRewrite=true + 공용 WS: 양쪽 검색 모두 원본 쿼리를 사용한다
+__tests__/utils/vectorSearch/mergeSharedResults.test.js › performMergedSearch skipRewrite 파라미터 skipRewrite=true: 원본 쿼리가 그대로 VectorDb에 전달된다
+__tests__/utils/vectorSearch/mergeSharedResults.test.js › performMergedSearch 공용 검색이 정상적으로 수행될 때 topN으로 결과를 제한한다
+__tests__/utils/vectorSearch/mergeSharedResults.test.js › performMergedSearch 공용 검색이 정상적으로 수행될 때 공용 검색 설정은 공용 WS 자체 값을 사용한다
+__tests__/utils/vectorSearch/mergeSharedResults.test.js › performMergedSearch 공용 검색이 정상적으로 수행될 때 동일 chunkSource 중복 시 높은 score만 유지한다
+__tests__/utils/vectorSearch/mergeSharedResults.test.js › performMergedSearch 공용 검색이 정상적으로 수행될 때 로컬 소스에는 fromShared가 없다
+__tests__/utils/vectorSearch/mergeSharedResults.test.js › performMergedSearch 공용 검색이 정상적으로 수행될 때 병렬 검색 후 합산 결과를 반환한다
+__tests__/utils/vectorSearch/mergeSharedResults.test.js › performMergedSearch 공용 네임스페이스가 존재하지 않을 때 일반 검색만 수행한다
+__tests__/utils/vectorSearch/mergeSharedResults.test.js › performMergedSearch 공용 워크스페이스가 없을 때 일반 검색만 수행한다
+__tests__/utils/vectorSearch/mergeSharedResults.test.js › performMergedSearch 자기 자신이 공용 워크스페이스일 때 합산 스킵하고 일반 검색만 수행한다
+__tests__/utils/vectorSearch/searchModeHelpers.test.js › searchModeHelpers shouldUseHybridSearch T1: pgvector workspace returns true
+__tests__/utils/vectorSearch/searchModeHelpers.test.js › searchModeHelpers shouldUseHybridSearch T2: pgvector + default mode returns true
+__tests__/utils/vectorSearch/searchModeHelpers.test.js › searchModeHelpers shouldUseHybridSearch T3: pgvector + rerank mode still returns true (mode ignored)
+__tests__/utils/vectorSearch/searchModeHelpers.test.js › searchModeHelpers shouldUseHybridSearch T4 (hybrid part): lancedb returns false
+__tests__/utils/vectorSearch/searchModeHelpers.test.js › searchModeHelpers shouldUseHybridSearch T7 (hybrid part): chroma returns false
+__tests__/utils/vectorSearch/searchModeHelpers.test.js › searchModeHelpers shouldUseHybridSearch T8 (hybrid part): empty object returns false
+__tests__/utils/vectorSearch/searchModeHelpers.test.js › searchModeHelpers shouldUseHybridSearch T9 (hybrid part): null/undefined returns false
+__tests__/utils/vectorSearch/searchModeHelpers.test.js › searchModeHelpers shouldUseRerank T4 (rerank part): lancedb without mode returns false
+__tests__/utils/vectorSearch/searchModeHelpers.test.js › searchModeHelpers shouldUseRerank T5: lancedb + rerank mode returns true
+__tests__/utils/vectorSearch/searchModeHelpers.test.js › searchModeHelpers shouldUseRerank T6: lancedb + default mode returns false
+__tests__/utils/vectorSearch/searchModeHelpers.test.js › searchModeHelpers shouldUseRerank T7 (rerank part): chroma never reranks
+__tests__/utils/vectorSearch/searchModeHelpers.test.js › searchModeHelpers shouldUseRerank T8 (rerank part): empty object returns false
+__tests__/utils/vectorSearch/searchModeHelpers.test.js › searchModeHelpers shouldUseRerank T9 (rerank part): null/undefined returns false
+__tests__/utils/vectorSearch/searchModeHelpers.test.js › searchModeHelpers shouldUseRerank rerank is false for pgvector regardless of mode
+utils/AiProviders/openAi/__tests__/handleStream.test.js › openAi.handleStream — L2 guards (T-L2-1~7) T-L2-1: 정상 종료 (response.completed + 텍스트) → {text, closeChunkSent:true} + close 청크 1회 + listener 0 + endMeasurement 1회
+utils/AiProviders/openAi/__tests__/handleStream.test.js › openAi.handleStream — L2 guards (T-L2-1~7) T-L2-2: tool call 감지 → {text, toolCalls, closeChunkSent:false} + close 청크 0회 + listener 0 + endMeasurement 1회
+utils/AiProviders/openAi/__tests__/handleStream.test.js › openAi.handleStream — L2 guards (T-L2-1~7) T-L2-3: stream 에러 (for await throw) → {text, closeChunkSent:true} + abort 청크 시도 + listener 0 + endMeasurement 1회
+utils/AiProviders/openAi/__tests__/handleStream.test.js › openAi.handleStream — L2 guards (T-L2-1~7) T-L2-4: 클라이언트 close 이벤트 → legacy string(fullText) resolve + listener 0 + endMeasurement 1회
+utils/AiProviders/openAi/__tests__/handleStream.test.js › openAi.handleStream — L2 guards (T-L2-1~7) T-L2-5: endMeasurement 멱등 — catch + finally 동시 진입 시 1회만 호출
+utils/AiProviders/openAi/__tests__/handleStream.test.js › openAi.handleStream — L2 guards (T-L2-1~7) T-L2-6: 10회 handleStream 실행 후 response.listenerCount('close') === 0 (리스너 누수 가드)
+utils/AiProviders/openAi/__tests__/handleStream.test.js › openAi.handleStream — L2 guards (T-L2-1~7) T-L2-7: writable=false 상태에서 close 청크 시도 → L3 가드로 silent skip, 에러 없이 resolve
+utils/chats/toolCalling/__tests__/clientToolBroker.test.js › ClientToolBroker disposeAll은 잔여 pending을 reject한다 (스트림 종료 정리)
+utils/chats/toolCalling/__tests__/clientToolBroker.test.js › ClientToolBroker embedUuid/sessionId 불일치 결과는 거부된다 (위조 주입 차단)
+utils/chats/toolCalling/__tests__/clientToolBroker.test.js › ClientToolBroker request는 clientToolRequest SSE 이벤트를 기록하고 결과 회신으로 resolve된다
+utils/chats/toolCalling/__tests__/clientToolBroker.test.js › ClientToolBroker 모르는 callId는 matched=false
+utils/chats/toolCalling/__tests__/clientToolBroker.test.js › ClientToolBroker 스트림이 이미 닫혔으면 request는 즉시 reject
+utils/chats/toolCalling/__tests__/clientToolBroker.test.js › ClientToolBroker 타임아웃 시 reject되고 pending에서 제거된다
+utils/chats/toolCalling/__tests__/executor.test.js › ToolExecutor.execute — runtimeOverrides 병합 TC-E1: overrides 미제공 → parseCallOptions 결과 그대로 (기존 동작 회귀 없음)
+utils/chats/toolCalling/__tests__/executor.test.js › ToolExecutor.execute — runtimeOverrides 병합 TC-E2: overrides가 setup_args.value 덮어쓰기 (plugin 설정 무변경)
+utils/chats/toolCalling/__tests__/executor.test.js › ToolExecutor.execute — runtimeOverrides 병합 TC-E3: override 키가 base에 없으면 신규 키로 추가
+utils/chats/toolCalling/__tests__/executor.test.js › ToolExecutor.execute — runtimeOverrides 병합 TC-E4: override 값이 null/undefined면 무시 (기본값 보존, 실수로 비우는 것 방지)
+utils/chats/toolCalling/__tests__/executor.test.js › ToolExecutor.execute — runtimeOverrides 병합 TC-E5: overrides가 빈 객체면 base 그대로
+utils/chats/toolCalling/__tests__/executor.test.js › ToolExecutor.execute — runtimeOverrides 병합 TC-E6: plugin 미존재 → Error 문자열 반환 (overrides 무관)
+utils/chats/toolCalling/__tests__/executor.test.js › ToolExecutor.execute — runtimeOverrides 병합 TC-E7: plugin inactive → Error 문자열 반환
+utils/chats/toolCalling/__tests__/executor.test.js › ToolExecutor.execute — runtimeOverrides 병합 TC-E8: base runtimeArgs 객체 mutation 금지 (불변성)
+utils/chats/toolCalling/__tests__/executor.test.js › ToolExecutor.execute — runtimeOverrides 병합 TC-E9: string arguments (OpenAI Responses format) JSON.parse 경로 정상 + override 적용
+utils/chats/toolCalling/__tests__/hrRouting.test.js › hrRouting E125 문구도 지역 대학 졸업 직원 검색으로 인식한다
+utils/chats/toolCalling/__tests__/hrRouting.test.js › hrRouting chat-completions 형식에서도 function.name으로 대상 도구를 찾는다
+utils/chats/toolCalling/__tests__/hrRouting.test.js › hrRouting 대상 hr-personnel-search function이 없으면 web_search_preview만으로 라우팅하지 않는다
+utils/chats/toolCalling/__tests__/hrRouting.test.js › hrRouting 일반 HR 질의는 도구 목록을 변경하지 않는다
+utils/chats/toolCalling/__tests__/hrRouting.test.js › hrRouting 지역 대학 졸업자 질의는 hr-personnel-search와 web_search_preview를 남기고 tool_choice required를 반환한다
+utils/chats/toolCalling/__tests__/loop-stream-guard.test.js › toolCallingLoop — L1 stream guard T-L1-1: round 2 진입 시점에 writable=false → round 0,1만 LLM 호출 후 break
+utils/chats/toolCalling/__tests__/loop-stream-guard.test.js › toolCallingLoop — L1 stream guard T-L1-2: handleStream closeChunkSent=false → 안전망 close 청크 발송
+utils/chats/toolCalling/__tests__/loop-stream-guard.test.js › toolCallingLoop — L1 stream guard T-L1-3: handleStream closeChunkSent=true → 안전망 skip (이중 close 차단)
+utils/chats/toolCalling/__tests__/loop-stream-guard.test.js › toolCallingLoop — L1 stream guard T-L1-4: handleStream 레거시 string 반환 → closeChunkSent=true로 간주, 안전망 skip
+utils/chats/toolCalling/__tests__/loop-stream-guard.test.js › toolCallingLoop — L1 stream guard T-L1-5: maxRounds 도달 + toolCalls 지속 → close 청크 1회 (중복 방지)
+utils/chats/toolCalling/__tests__/loop-stream-guard.test.js › toolCallingLoop — L1 stream guard T-L1-6: streamGetChatCompletion 에 AbortSignal 전달됨
+utils/chats/toolCalling/__tests__/loop-stream-guard.test.js › toolCallingLoop — L1 stream guard T-L1-7: response close 이벤트 → AbortController signal.aborted=true
+utils/chats/toolCalling/__tests__/loop-stream-guard.test.js › toolCallingLoop — L1 stream guard T-L1-8: round 0 진입 전 writable=false → streamGuard({round:0}) + LLM 호출 0회
+utils/chats/toolCalling/__tests__/loop-stream-guard.test.js › toolCallingLoop — L1 stream guard T-L1-9: close 리스너 cleanup — loop 종료 후 removeListener 호출
+utils/chats/toolCalling/__tests__/loop.test.js › injectToolChoice — 4분기 decision matrix TC-1: caller='workspace' → tool_choice 미주입
+utils/chats/toolCalling/__tests__/loop.test.js › injectToolChoice — 4분기 decision matrix TC-2: caller='embed' + tools=[] → tool_choice 미주입 (edge guard 1)
+utils/chats/toolCalling/__tests__/loop.test.js › injectToolChoice — 4분기 decision matrix TC-3: caller='embed' + tools=null → tool_choice 미주입
+utils/chats/toolCalling/__tests__/loop.test.js › injectToolChoice — 4분기 decision matrix TC-3b: caller='embed' + tools=undefined → tool_choice 미주입
+utils/chats/toolCalling/__tests__/loop.test.js › injectToolChoice — 4분기 decision matrix TC-4: caller='embed' + tools.length≥1 + env unset → tool_choice='required'
+utils/chats/toolCalling/__tests__/loop.test.js › injectToolChoice — 4분기 decision matrix TC-5: caller='embed' + tools.length≥1 + env='false' → tool_choice 미주입 (kill-switch)
+utils/chats/toolCalling/__tests__/loop.test.js › injectToolChoice — 4분기 decision matrix TC-5b: forceToolChoiceRequired=false면 embed여도 tool_choice 미주입
+utils/chats/toolCalling/__tests__/loop.test.js › injectToolChoice — 4분기 decision matrix TC-6: caller='embed' + tools.length≥1 + env='FALSE' (대문자) → tool_choice='required' (엄격 equality, Q-C)
+utils/chats/toolCalling/__tests__/loop.test.js › injectToolChoice — 4분기 decision matrix TC-6b: caller='embed' + env='0' → tool_choice='required' (엄격 equality, '0' ≠ 'false')
+utils/chats/toolCalling/__tests__/loop.test.js › injectToolChoice — 4분기 decision matrix TC-6c: caller='embed' + env='true' → tool_choice='required'
+utils/chats/toolCalling/__tests__/loop.test.js › injectToolChoice — 4분기 decision matrix TC-7: llmOptions 원본 mutation 금지 (불변성)
+utils/chats/toolCalling/__tests__/loop.test.js › injectToolChoice — 4분기 decision matrix TC-7b: 주입 미발생 시 원본 객체 그대로 반환 (동일 참조)
+utils/chats/toolCalling/__tests__/loop.test.js › toolCallingLoop — caller → LLMConnector forward 통합 TC-8: caller='embed' + tools.length≥1 → streamGetChatCompletion에 tool_choice='required' forward
+utils/chats/toolCalling/__tests__/loop.test.js › toolCallingLoop — caller → LLMConnector forward 통합 TC-8b: caller 생략 (기본 'workspace') → tool_choice 미전달 (회귀 가드)
+utils/chats/toolCalling/__tests__/loop.test.js › toolCallingLoop — caller → LLMConnector forward 통합 TC-8c: caller='embed' + env='false' → tool_choice 미전달 (kill-switch runtime)
+utils/chats/toolCalling/__tests__/loop.test.js › toolCallingLoop — caller → LLMConnector forward 통합 TC-8d-2: workspace 라우팅으로 전달된 tool_choice도 tool 결과 재호출부터는 제거
+utils/chats/toolCalling/__tests__/loop.test.js › toolCallingLoop — caller → LLMConnector forward 통합 TC-8d: embed에서는 첫 호출만 tool_choice='required', tool 결과 재호출부터는 미전달
+utils/chats/toolCalling/__tests__/loop.test.js › toolCallingLoop — caller → LLMConnector forward 통합 TC-8e: forceToolChoiceRequired=false면 첫 호출에도 tool_choice를 전달하지 않는다
+utils/helpers/chat/__tests__/responses.test.js › isResponseWritable — boundary matrix (T-L3-1~5) T-L3-1: null → false
+utils/helpers/chat/__tests__/responses.test.js › isResponseWritable — boundary matrix (T-L3-1~5) T-L3-2: undefined → false
+utils/helpers/chat/__tests__/responses.test.js › isResponseWritable — boundary matrix (T-L3-1~5) T-L3-3: writable=true, writableEnded=false → true
+utils/helpers/chat/__tests__/responses.test.js › isResponseWritable — boundary matrix (T-L3-1~5) T-L3-4: writable=false → false
+utils/helpers/chat/__tests__/responses.test.js › isResponseWritable — boundary matrix (T-L3-1~5) T-L3-5: writableEnded=true → false
+utils/helpers/chat/__tests__/responses.test.js › writeResponseChunk — guarded write (T-L3-6~9) T-L3-6: writable response → response.write called once
+utils/helpers/chat/__tests__/responses.test.js › writeResponseChunk — guarded write (T-L3-6~9) T-L3-7: writableEnded=true → noop + debug log
+utils/helpers/chat/__tests__/responses.test.js › writeResponseChunk — guarded write (T-L3-6~9) T-L3-8: writable=false → noop
+utils/helpers/chat/__tests__/responses.test.js › writeResponseChunk — guarded write (T-L3-6~9) T-L3-9: null response → noop, no throw

@@ -116,6 +116,29 @@ FIXTURES_BY_CMD.getSALDaylabMgrList = {
   ],
 };
 
+// 연장근무 내역/한도(TAADclzWorkOtSchdul) — 015 연도 질의: 월별 순차 호출·연간 합계 검증.
+// 요청 월과 무관하게 같은 값을 돌려준다. 합계 칸이 HH:MM이라는 건 실서버 미확인 가정이다
+// (research R9). 내부 식별자(staffId 등) 포함 — 화이트리스트 미노출 검증용.
+FIXTURES_BY_CMD.getTAADclzWorkOtSchdulList2 = {
+  DATA: [
+    {
+      staffId: "2026000001", workStaffId: "2026000001", orgCd: "0303", staffNo: "20260001",
+      staffNm: "오사공", orgNm: "개발팀", posNm: "책임",
+      otWeek01: "02:00", otWeek02: "03:00", otWeek03: "", otWeek04: "", otWeek05: "", otWeek06: "",
+      otWeekSum: "05:00",
+    },
+  ],
+};
+FIXTURES_BY_CMD.getTAADclzWorkOtSchdulList = {
+  DATA: [
+    {
+      staffId: "2026000001", staffNo: "20260001",
+      staffNm: "오사공", orgNm: "개발팀", posNm: "책임",
+      ot03: "2:00", ot10: "1:30", sumOt: "03:30",
+    },
+  ],
+};
+
 // 월별지급내역(SALSalaryBassMgr) — K61: salary_statement를 그래프로 요청 시
 // 여러 달치 레코드가 salarytrend viz 블록의 series로 옮겨지는지 검증.
 FIXTURES_BY_CMD.getSALSalaryBassMgrTab110List = {
@@ -205,6 +228,15 @@ const server = http.createServer((req, res) => {
     if (parsed.pathname === "/health") {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ ok: true }));
+    } else if (
+      // 015 연도 질의 부분 실패(K68): 연장근무 월 합계(List) 3월분만 HTTP 500 —
+      // "조회되지 않은 달"을 답변에서 밝히는지 검증. 3월에 월 단위 K7을 돌리면 이 분기에 걸린다.
+      parsedBody &&
+      parsedBody.cmd === "getTAADclzWorkOtSchdulList" &&
+      /^\d{4}03$/.test(String(parsedBody.searchYm || ""))
+    ) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, message: "mock failure" }));
     } else if (parsed.pathname === "/CommonCode.do") {
       // 급여 2단 체인용 fixture: pay_periods(getSalYmdTypeCdList2) 응답 —
       // LLM이 code(20260619P)를 pay_item으로 이어 호출할 수 있게 한다 (specs/011 K10).

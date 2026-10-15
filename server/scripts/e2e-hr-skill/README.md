@@ -79,16 +79,22 @@ Overall: 7/9 (77.8%)
 | `expect.tool_call=true` 이나 tool-call 없음 (되묻기 등) | FAIL |
 | `expect.mock_url_pattern` 정규식이 Mock 로그의 최근 URL과 매칭 | PASS |
 | `expect.mock_url_pattern`이 `null` | URL 검증 skip, tool_call만 확인 |
+| `expect.tool_call`이 `null` | tool-call 발생 여부를 보지 않음 — 답변·mock 기대만 판정 (016 K72: 조직도 조회는 허용 정보라 호출돼도 무방, 답변이 거절이어야 함) |
 | `expect.answer_pattern` 중 최종 답변(finalText) 미매치 존재 | FAIL (`answer missing pattern(s)`) |
 | `expect.answer_not_pattern` 중 최종 답변 매치 존재 | FAIL (`answer contains forbidden pattern(s)`) |
 | answer 계열 필드 존재인데 최종 답변 미캡처 | FAIL (`no final answer captured`) |
 | Mock HR 호출 건수 > `expect.max_hr_calls` | FAIL (`hr calls N exceeded max M`) |
+| `expect.mock_body_pattern_any` 중 어느 요청 body와도 안 맞는 패턴 존재 | FAIL (`no mock body (of N) matched pattern(s)`) |
+| Mock HR 호출 건수 < `expect.min_hr_calls` | FAIL (`hr calls N below min M`) |
+| `expect.mock_body_pattern_none` 중 하나라도 기록된 요청 body와 맞음 | FAIL (`forbidden mock body pattern(s) requested`) |
 | 요청 timeout | FAIL (해당 run만, 다음 시나리오는 계속 진행) |
 
-판정 순서: tool_call → mock_url → mock_body → answer_pattern → answer_not_pattern → max_hr_calls.
+판정 순서: tool_call → mock_url → mock_body → mock_body_pattern_any → mock_body_pattern_none → answer_pattern → answer_not_pattern → max_hr_calls → min_hr_calls.
 answer 계열 3필드는 전부 옵셔널 — 미사용 시나리오 판정 무영향. `result.json` 각 run에
 `hrCallCount`(mock HR 실호출 건수) 기록. 스키마 정본:
 `specs/012-hr-answer-quality/contracts/e2e-assertion-schema.md`
+판정 코드는 `helpers/expectations.js`(`compileExpectations`·`judgeRun`)에 있다 — 단위 테스트
+`server/__tests__/scripts/e2e-hr-skill-expectations.test.js`.
 
 Exit code: 전원 PASS면 `0`, 하나라도 FAIL이면 `1`.
 
@@ -118,12 +124,16 @@ Exit code: 전원 PASS면 `0`, 하나라도 FAIL이면 `1`.
 | `id` | string | ✅ | - | `^[A-Z0-9\-]+$` |
 | `label` | string | - | - | 사람 판독용 라벨 |
 | `message` | string | ✅ | - | LLM에 보낼 질의 |
-| `expect.tool_call` | boolean | ✅ | - | tool-call 발생 기대 여부 |
+| `expect.tool_call` | boolean \| null | ✅ | - | tool-call 발생 기대 여부. `null`이면 판정하지 않음 |
 | `expect.mock_url_pattern` | string\|null | - | `null` | Mock URL 매칭 정규식 |
 | `expect.mock_body_pattern` | string[] | - | - | Mock POST body 매칭 정규식(전건 필수) |
 | `expect.answer_pattern` | string[] | - | - | 최종 답변 필수 포함 정규식(전건 필수) |
 | `expect.answer_not_pattern` | string[] | - | - | 최종 답변 금지 정규식(하나라도 매치 시 FAIL) |
 | `expect.max_hr_calls` | number | - | - | Mock HR 호출 건수 상한(정수 ≥1) |
+| `expect.mock_body_pattern_any` | string[] | - | - | 시나리오 중 기록된 **모든** Mock 요청 body 중 하나라도 맞으면 충족(패턴마다 독립 판정). `mock_body_pattern`은 마지막 요청만 본다 — 월별 순차 호출 검증용 |
+| `expect.min_hr_calls` | number | - | - | Mock HR 호출 건수 하한(정수 ≥1) |
+| `expect.mock_body_pattern_none` | string[] | - | - | 시나리오 중 기록된 **어떤** Mock 요청 body와도 맞으면 안 되는 패턴 — "이 조회는 일어나지 않아야 함" 검증용(016) |
+| `setup_messages` | string[] | - | - | 같은 대화에서 먼저 보낼 앞 메시지(016). 판정·mock 집계에서 빠지고 `message`만 판정한다 — "그럼 노지용은?" 같은 이어지는 질문 검증용 |
 | `repeat` | number | - | `1` | 반복 횟수 (1~20) |
 | `pre_reset` | boolean | - | `true` | 직전 `/reset` 수행 |
 
@@ -150,7 +160,7 @@ Exit code: 전원 PASS면 `0`, 하나라도 FAIL이면 `1`.
 ## 관련 문서
 
 > **아래 `docs/` 산출물은 전부 유실됐다.** `docs/`가 `.gitignore` 대상이라 커밋된 적이 없고 2026-07 워킹트리 정리 때 사라졌다. 복구 사본은 없다.
-> **현재 정본은 이 README와 `runner.js`·`scenarios.json` 자체다.**
+> **현재 정본은 이 README와 `runner.js`·`helpers/expectations.js`·`scenarios.json` 자체다.**
 
 - ~~Plan: `docs/01-plan/features/hr-e2e-automation-script.plan.md`~~ — 유실, 대체 spec 없음
 - ~~Design: `docs/02-design/features/hr-e2e-automation-script.design.md`~~ — 유실, 대체 spec 없음

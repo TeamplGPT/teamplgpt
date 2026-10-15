@@ -88,6 +88,9 @@ Schema (design 문서는 유실 — 현행 정본은 [`specs/013-embed-e2e-kiwib
 - 옵셔널 확장 필드(specs/012 `contracts/e2e-assertion-schema.md` 준용):
   `answer_pattern[]`(최종 답변 필수 포함) / `answer_not_pattern[]`(금지) /
   `max_hr_calls`(mock HR 호출 상한, 정수 ≥1). `result.json`에 `hrCallCount` 기록.
+- `setup_messages[]`(specs/016): 같은 세션으로 먼저 보낼 앞 대화. 판정·mock 집계에서 빠지고
+  `message`만 판정한다 — "김기현 연차 알려줘" 다음의 "그럼 노지용은?" 같은 이어지는 질문 검증용.
+- `mock_body_pattern_any`·`mock_body_pattern_none`·`min_hr_calls`는 @agent 러너 전용 — 넣으면 로드 단계에서 fatal.
 
 ## Regression — does not affect `e2e-hr-skill`
 

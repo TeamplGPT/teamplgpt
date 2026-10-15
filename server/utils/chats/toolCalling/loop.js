@@ -1,6 +1,12 @@
 const { ToolExecutor } = require("./executor");
 const { appendToolResult } = require("./appendToolResult");
 const {
+  withHrRefusalTool,
+  withSelfDataNotice,
+  isBlockedTool,
+  OTHER_EMPLOYEE_REFUSAL,
+} = require("../../hrSelfDataNotice");
+const {
   writeResponseChunk,
   isResponseWritable,
 } = require("../../helpers/chat/responses");
@@ -56,12 +62,16 @@ const MAX_TOOL_ROUNDS = 5;
  * @returns {Object} llmOptions (possibly with tool_choice='required' added)
  */
 function injectToolChoice({ llmOptions, caller, tools, forceToolChoiceRequired = true }) {
-  const envDisabled = process.env.EMBED_TOOL_CHOICE_REQUIRED === "false";
-  const hasTools = Array.isArray(tools) && tools.length >= 1;
-  if (caller === "embed" && hasTools && !envDisabled && forceToolChoiceRequired) {
+  if (isToolChoiceForced({ caller, tools, forceToolChoiceRequired })) {
     return { ...llmOptions, tool_choice: "required" };
   }
   return llmOptions;
+}
+
+function isToolChoiceForced({ caller, tools, forceToolChoiceRequired = true }) {
+  const envDisabled = process.env.EMBED_TOOL_CHOICE_REQUIRED === "false";
+  const hasTools = Array.isArray(tools) && tools.length >= 1;
+  return caller === "embed" && hasTools && !envDisabled && forceToolChoiceRequired;
 }
 
 function omitToolChoice(llmOptions) {
@@ -86,7 +96,7 @@ async function toolCallingLoop(opts) {
   const {
     response,
     LLMConnector,
-    tools,
+    tools: inputTools,
     llmOptions,
     uuid,
     sources,
@@ -97,6 +107,10 @@ async function toolCallingLoop(opts) {
     toolRuntimeOverrides,
     clientToolBroker = null,
   } = opts;
+
+  // HR tool이 있으면 다른 직원 질문을 거절할 선택지를 함께 준다(specs/016 research R14·R15).
+  // 강제 호출 여부와 무관하다 — 강제가 없는 필터 위젯에서도 다른 직원 질문에 본인 조회를 불렀다(R15).
+  const tools = withHrRefusalTool(inputTools, LLMConnector.toolCallingFormat?.());
 
   // AbortController: propagate client disconnect to upstream fetch (best-effort).
   // Provider must support `signal` in streamGetChatCompletion for this to take effect.
@@ -369,12 +383,15 @@ async function executeAndAppend({
 }) {
   logger.toolCall?.({ name: tc.name, arguments: tc.arguments, round });
   const tcStart = Date.now();
-  const toolResult = await ToolExecutor.execute(tc, {
-    runtimeOverrides: toolRuntimeOverrides,
-    clientToolTransport: clientToolBroker
-      ? (spec) => clientToolBroker.request(spec)
-      : null,
-  });
+  // 다른 직원 검색 skill·거절 선택지는 실행하지 않는다(specs/016 — 운영 storage 잔존 대비, R14)
+  const toolResult = isBlockedTool(tc.name)
+    ? OTHER_EMPLOYEE_REFUSAL
+    : await ToolExecutor.execute(tc, {
+        runtimeOverrides: toolRuntimeOverrides,
+        clientToolTransport: clientToolBroker
+          ? (spec) => clientToolBroker.request(spec)
+          : null,
+      });
 
   // 관측성 (env HR_DEBUG_TOOL_IO=true) — tool 입력 args + LLM에 들어갈 렌더 결과.
   // 한 줄 JSON(개행 X)이라 `grep tool-io` 한 줄에 다 잡힘. ⚠️ 급여·주민번호 등 민감정보
@@ -410,10 +427,12 @@ async function executeAndAppend({
     isError,
     resultIsGuardrail,
   });
+  // 판정 플래그는 위에서 원래 결과로 계산했다. 모델에 넘기는 값에만 HR "본인 데이터"
+  // 안내를 끝에 붙인다 — 다른 직원 질문에 본인 데이터를 그 사람 것처럼 답하지 않게(specs/016).
   return appendToolResult(
     currentMessages,
     tc,
-    toolResult,
+    withSelfDataNotice(tc.name, tc.arguments, toolResult),
     LLMConnector.toolCallingFormat()
   );
 }

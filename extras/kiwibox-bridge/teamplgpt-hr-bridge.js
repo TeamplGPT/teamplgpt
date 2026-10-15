@@ -9,8 +9,11 @@
  *  - postMessage origin 검증: 등록된 위젯 origin에서 온 요청만 처리
  *  - endpoint allowlist: 등록된 kiwibox 경로 외 실행 거부 (임의 URL 실행 차단)
  *  - path + cmd 조합 allowlist: 허용 경로라도 조회 cmd 외(save*·delete* 등) 거부
- *  - self 강제: "$SELF_STAFF_ID" 마커를 페이지 컨텍스트의 본인 사번으로만 치환
+ *  - self 강제: "$SELF_STAFF_ID" 마커를 페이지 컨텍스트의 본인 사번으로만 치환.
+ *    사번 파라미터(STAFF_PARAM_KEYS)는 마커만 허용 — 리터럴 STAFF_ID(다른 직원)는 거부
  *  - 게이트 스킵 값 차단: searchType=mobile 등 금지 조합 거부
+ *  - 다른 직원 정보 차단(specs/016): 조직 휴가캘린더·휴가 상세 경로 제외, 결재함은
+ *    본인 기안함(selectGubun=2)만 — okrservice hrBridge.ts와 같은 정책
  *
  * 사용법: extras/kiwibox-bridge/README.md 참조.
  */
@@ -33,26 +36,48 @@
     "/SALPayslipNewMgr.do",
     "/SALSalaryDtstmnMgr.do",
     "/SALDaylabMgr.do",
-    "/TAAWrkTimeListMgrByDate.do",
     "/TAAWrkTimeStatusMgr.do",
     "/TAADclzVcatnList.do", // 연차 잔여/휴가 사용내역 정본 (getTAADclzVcatnList1/2)
     "/SALSalaryBassMgr.do", // 월별 지급내역 (getSALSalaryBassMgrTab110List)
     "/TAADclzWorkSearchCldr.do",
     "/TAADclzWorkOtSchdul.do",
-    "/TAADclzVcatnCldrMgr.do",
-    "/getMBLLeavDetailStaff.do",
-    "/getMBLHomeLeaveDetail.do",
+    // 조직 휴가캘린더(/TAADclzVcatnCldrMgr.do)·휴가 상세(/getMBLLeavDetailStaff.do,
+    // /getMBLHomeLeaveDetail.do)는 다른 직원 정보라 제외(specs/016). 폐기 경로
+    // /TAAWrkTimeListMgrByDate.do·미배포 /getContactList.do도 제외 — okrservice와 동기화.
     "/getMBLPrtEmpCard.do",
     "/getMBLPrtEmpCardPop.do",
     "/getMBLHrBassiemOrgList.do",
     "/getMBLHrBassiemMemberList.do",
     "/getTodoIconCnt.do",
     "/getScheduleDay.do",
-    "/getContactList.do",
+    "/getHRDetailList.do", // schedule_titles — 회사 일정·공휴일 제목(개인 정보 없음)
   ];
 
   // 게이트 스킵/위험 파라미터 값 차단 (카탈로그 §4.5)
   var FORBIDDEN_PARAM_VALUES = { searchType: ["mobile"] };
+
+  // 대상 사번 파라미터 — 값은 반드시 self 마커(specs/016). 리터럴 STAFF_ID를 받으면
+  // 다른 직원의 데이터를 이 페이지 세션으로 조회하게 되므로 거부한다.
+  var STAFF_PARAM_KEYS = ["staffId", "cmmSearchStaffId", "searchStaffId", "searchId"];
+
+  // 파라미터 값 allowlist — 같은 cmd가 값에 따라 다른 사람의 데이터를 돌려주는 경로.
+  // 키는 반드시 있어야 하고 값은 목록 안이어야 한다(미지정 = 서버 기본 범위라 거부).
+  // EAPRequestMgr selectGubun: 2=기안함(본인 기안)만. 3 미결·4 기결·5 참조·6 반려는
+  // 다른 직원 문서다(EAPRequestMgr_SQL appl_kind, specs/016 D4).
+  var PARAM_VALUE_ALLOWLIST = {
+    "/EAPRequestMgr.do": { selectGubun: ["2"] },
+  };
+
+  function areParamValuesAllowed(path, formObj) {
+    if (!Object.prototype.hasOwnProperty.call(PARAM_VALUE_ALLOWLIST, path)) return true;
+    var rules = PARAM_VALUE_ALLOWLIST[path];
+    return Object.keys(rules).every(function (key) {
+      return (
+        Object.prototype.hasOwnProperty.call(formObj, key) &&
+        rules[key].indexOf(String(formObj[key])) !== -1
+      );
+    });
+  }
 
   // 범용 endpoint(/CommonCode.do)는 queryId 화이트리스트로 제한 — 임의 쿼리 실행 차단.
   // path → 허용 queryId 목록. 목록에 없는 path는 이 제약을 받지 않음.
@@ -76,7 +101,6 @@
       "getTAADclzWorkOtSchdulList",
       "getTAADclzWorkOtSchdulList2",
     ],
-    "/TAADclzVcatnCldrMgr.do": ["getTAADclzVcatnCldrMgr"],
     "/TAADclzVcatnList.do": ["getTAADclzVcatnList1", "getTAADclzVcatnList2"],
     "/PRCHrBassiemMgrTab220.do": ["getPRCHrBassiemMgrTab220List"],
     "/SALPayslipNewMgr.do": [
@@ -194,6 +218,15 @@
       return;
     }
 
+    if (!areParamValuesAllowed(spec.path, spec.form || {})) {
+      this._reply(callId, {
+        ok: false,
+        status: 0,
+        body: "bridge: param not allowed",
+      });
+      return;
+    }
+
     // 범용 endpoint queryId 화이트리스트 검사
     var allowedQueryIds = QUERY_ID_ALLOWLIST[spec.path];
     if (allowedQueryIds) {
@@ -221,6 +254,14 @@
           ok: false,
           status: 0,
           body: "bridge: forbidden param value",
+        });
+        return;
+      }
+      if (STAFF_PARAM_KEYS.indexOf(key) !== -1 && value !== SELF_MARKER) {
+        this._reply(callId, {
+          ok: false,
+          status: 0,
+          body: "bridge: staff param must be self",
         });
         return;
       }
