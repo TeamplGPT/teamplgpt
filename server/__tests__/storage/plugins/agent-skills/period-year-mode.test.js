@@ -441,11 +441,23 @@ describe("monthly 모드 — 달마다 순차 호출 후 병합 (US1)", () => {
         `${HEADER_MONTHLY}\n\n` +
         "| 월 | 연장근무 합계 |\n| ------ | ------ |\n" +
         `${rows}\n\n` +
-        "> 연간 합계 **45:00** (조회된 10개월)" +
+        "> 연간 합계 **45:00** (조회된 10개월)\n" +
+        require("../../../../storage/plugins/agent-skills/_shared/yearQuery").MONTHLY_TABLE_LINE +
         require("../../../../storage/plugins/agent-skills/_shared/formatTable").ANSWER_GUIDE
     );
     expect(output).not.toContain("홍길동");
     expect(output).not.toContain("1주");
+  });
+
+  // 값 있는 달이 한 달뿐이면 표 지시를 붙이지 않는다 — 한 줄 답이 낫다
+  it("overtime 값 있는 달이 하나면 표 형식 지시가 없다", async () => {
+    const { MONTHLY_TABLE_LINE } = require("../../../../storage/plugins/agent-skills/_shared/yearQuery");
+    const { output } = await runHandler(
+      "hr-attendance",
+      { query_type: "overtime", year_month: "이번년도" },
+      (req) => (req.form.searchYm === "202603" ? otByMonth(req) : { DATA: [] })
+    );
+    expect(output).not.toContain(MONTHLY_TABLE_LINE);
   });
 
   it("overtime_limit 2026년 → sumOt 기준 합계", async () => {

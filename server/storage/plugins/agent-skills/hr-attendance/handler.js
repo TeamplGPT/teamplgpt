@@ -11,6 +11,7 @@
 const { resolveDateParam } = require("../_shared/dateResolver");
 const { resolveYearPeriod } = require("../_shared/periodResolver");
 const { OTHER_EMPLOYEE_REFUSAL, isBlockedQueryType } = require("../_shared/otherEmployee");
+const { prepareAttendanceTable, DAY_TABLE_LINE, ISSUE_SUMMARY_LINE } = require("../_shared/attendanceDisplay");
 const {
   runMonthly,
   monthlyPeriod,
@@ -491,12 +492,25 @@ function formatNotableDays(data, label, columns, query_type) {
   const { renderWhitelisted } = require("../_shared/formatTable");
   const { normalizeDisplayRows } = require("../_shared/renderNormalize");
   const displayData = normalizeDisplayRows(notable, { weekKey: "week", markKey: "mark" });
-  const table = renderWhitelisted(displayData, columns);
+  const shown = prepareAttendanceTable(displayData, columns);
+  const table = renderWhitelisted(shown.rows, shown.columns);
   if (!table) return `${head}> 조회된 데이터가 없습니다.`;
   const rest = rows.length - notable.length;
+  const body = withIssueSummary(table, notable);
   return rest > 0
-    ? head + appendBeforeAnswerGuide(table, `> 그 외 ${rest}일은 특이사항 없음`)
-    : head + table;
+    ? head + shown.basisLine + appendBeforeAnswerGuide(body, `> 그 외 ${rest}일은 특이사항 없음`)
+    : head + shown.basisLine + body;
+}
+
+// 날짜별 기록 표의 답변 형식(사용자 결정 2026-10-16): 여러 날이면 표 그대로, 지각·조퇴·결근·
+// 출퇴근 누락이 있으면 표 아래 요약
+function withIssueSummary(table, rawRows) {
+  const asTable = rawRows.length >= 2 ? appendBeforeAnswerGuide(table, DAY_TABLE_LINE) : table;
+  const hasIssue = rawRows.some((row) => {
+    const f = dayFlags(row);
+    return f.isLate || f.isEarly || f.isAbsent || f.isMissing;
+  });
+  return hasIssue ? appendBeforeAnswerGuide(asTable, ISSUE_SUMMARY_LINE) : asTable;
 }
 
 function formatAttendance(data, label, columns, query_type) {
@@ -519,13 +533,20 @@ function formatAttendance(data, label, columns, query_type) {
       weekKey: "week",
       markKey: "mark",
     });
-    const table = renderWhitelisted(displayData, columns);
-    if (!table) return md + "> 조회된 데이터가 없습니다.";
+    // 출퇴근 기록·근무현황은 시각 HH:MM + 기준시간 분리(_shared/attendanceDisplay)
+    const isDayRows = DAY_ROW_QUERY_TYPES.has(query_type);
+    const shown = isDayRows
+      ? prepareAttendanceTable(displayData, columns)
+      : { rows: displayData, columns, basisLine: "" };
+    const rendered = renderWhitelisted(shown.rows, shown.columns);
+    if (!rendered) return md + "> 조회된 데이터가 없습니다.";
+    const rawRows = Array.isArray(data) ? data : data ? [data] : [];
+    const table = isDayRows ? withIssueSummary(rendered, rawRows) : rendered;
     // 근무현황 요약만 표 위에 집계 한 줄을 붙인다. 실패해도 표 렌더는 살려야 한다
     // (집계는 부가 정보, 표가 본체 — specs/014).
     const summaryLine =
       query_type === "work_status" ? safeSummarizeWorkStatus(data) : "";
-    return md + summaryLine + table;
+    return md + summaryLine + shown.basisLine + table;
   }
 
   // 정의 없는 query_type은 통짜 렌더(하위호환) — 단 공통 내부 식별자만 제외.

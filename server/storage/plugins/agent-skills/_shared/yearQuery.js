@@ -208,11 +208,18 @@ function renderMonthlySum(merged, valueOf, valueLabel, noValueLine) {
   const values = rows.filter((r) => r.value != null).map((r) => r.value);
   const total = sumHHMM(values);
   const scope = merged.failedMonths.length > 0 ? "조회된 달 합계" : "연간 합계";
-  return appendBeforeAnswerGuide(
+  const withTotal = appendBeforeAnswerGuide(
     table,
     totalLine({ values, total, scope, months: rows.length, noValueLine })
   );
+  // 값 있는 달이 여러 개면 목록 대신 월별 표로, 합계는 표 마지막 줄로 보이게 한다(사용자 결정 2026-10-16).
+  // 첫 칸을 정확히 '합계'로 해야 위젯(okrservice MarkdownTable isTotalRow)이 합계 줄로 강조한다.
+  // 값이 없거나 한 달뿐이면 한 줄 답이 낫다 — 지시를 붙이지 않는다.
+  return values.length >= 2 ? appendBeforeAnswerGuide(withTotal, MONTHLY_TABLE_LINE) : withTotal;
 }
+
+const MONTHLY_TABLE_LINE =
+  "> [응답 형식] 월별 값을 목록이 아니라 위 표(월 | 값 2열) 그대로 표로 보여주고, 합계는 표 아래 문장이 아니라 표의 마지막 줄로 넣으세요(첫 칸은 정확히 '합계' — 조회 안 된 달이 있으면 그 사실은 표 위 문장에 적으세요). 이 줄은 답변에 포함하지 마세요.";
 
 // 값이 하나도 없으면 "00:00"이라 적지 않는다 — 형식 미확인 필드의 "조용한 0" 방지(코드 리뷰 M-3)
 function totalLine({ values, total, scope, months, noValueLine }) {
@@ -224,6 +231,7 @@ function totalLine({ values, total, scope, months, noValueLine }) {
 }
 
 module.exports = {
+  MONTHLY_TABLE_LINE,
   runMonthly,
   monthlyPeriod,
   formatPeriodHeader,
