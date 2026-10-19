@@ -14,6 +14,8 @@
  */
 
 const SELF_STAFF_ID_MARKER = "$SELF_STAFF_ID";
+const { seoulWallClock } = require("./seoulClock");
+const { selfStaffProblem } = require("./staffParams");
 
 function normalizeCookie(raw) {
   const v = String(raw || "").trim();
@@ -79,6 +81,11 @@ async function hrFetch(ctx, { path, form, gate = false }) {
     form instanceof URLSearchParams
       ? Object.fromEntries(form)
       : { ...(form || {}) };
+
+  // 본인 사번 관문 — 사번 칸이 빠졌거나 본인 마커가 아니면 보내지 않는다. 빈 사번은 kiwibox에서
+  // 조회 권한 범위 직원 전체가 된다(_shared/staffParams). 위임·직접 호출 모두 이 관문을 지난다.
+  const selfProblem = selfStaffProblem(path, formEntries, SELF_STAFF_ID_MARKER);
+  if (selfProblem) return { errorMessage: selfProblem };
 
   // --- 1) 클라이언트 위임 (R1) ---
   if (typeof ctx.clientToolTransport === "function") {
@@ -194,8 +201,9 @@ function monthRange(ym) {
   return [`${ym}01`, `${ym}${String(lastDay).padStart(2, "0")}`];
 }
 
+// 오늘·N개월 전은 서울 날짜(_shared/seoulClock) — 서버 시간대가 UTC여도 하루가 밀리지 않게
 function todayYmd() {
-  const d = new Date();
+  const d = seoulWallClock();
   return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
 }
 
@@ -207,7 +215,7 @@ function todayDashed() {
 
 // n개월 전 달의 1일 "YYYYMM01" — 증명서·대출 등 장기 조회 기본 시작일
 function monthsAgoFirstYmd(n) {
-  const d = new Date();
+  const d = seoulWallClock();
   d.setDate(1);
   d.setMonth(d.getMonth() - n);
   return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}01`;

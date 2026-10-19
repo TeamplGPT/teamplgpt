@@ -84,5 +84,5 @@ HR agent-skill 7종(`hr-attendance`, `hr-salary`, `hr-personnel`, `hr-year-end-t
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan:
-`specs/016-hr-other-employee-block/plan.md`
+`specs/018-hr-table-passthrough/plan.md`
 <!-- SPECKIT END -->

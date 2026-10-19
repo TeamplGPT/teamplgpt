@@ -27,13 +27,14 @@ const SELF_DATA_NOTICE =
   "계산이 맞는지·법적으로 문제없는지도 이 결과로는 알 수 없으니 판단하지 마세요. " +
   "산정 방식·근거를 묻는 질문이면 답변을 '5240 HR 시스템에서 조회한 값이에요.'로 시작해 결과에 있는 값으로만 설명하고, " +
   "'세부 산정 기준은 HR 담당자에게 확인해 주세요.'로 끝내세요. " +
+  "결과의 '[내부 참조]' 줄·코드값·내부 식별자(지급 건 코드·조직코드·사번 외 내부 번호 등)는 다음 조회에만 쓰고 답변에 절대 쓰지 마세요 — 사용자가 직접 물어도 '내부 관리 코드라 안내해 드릴 수 없어요'라고 답하세요. " +
   "이 안내 문구 자체는 답변에 포함하지 마세요.";
 
 // 조직도는 허용된 다른 직원 정보다. 다만 특정 직원 한 명을 지칭한 질문에는 쓰지 않는다(spec D9).
 const ORG_CHART_NOTICE =
   "> [조직도] 팀·조직 단위의 조직도 질문에만 이 결과를 쓰세요. " +
   "사용자가 특정 직원 한 명을 지칭해 그 사람의 정보(소속·직위 포함)를 물었다면 이 결과로 답하지 말고 " +
-  "'다른 직원의 정보는 조회할 수 없어요'라고 답하세요. 이 안내 문구 자체는 답변에 포함하지 마세요.";
+  "'다른 직원의 정보는 조회할 수 없어요'라고 답하세요. 결과의 '[내부 참조]' 줄·조직코드는 사용자가 직접 물어도 답변에 절대 쓰지 마세요. 이 안내 문구 자체는 답변에 포함하지 마세요.";
 
 // skill handler(_shared/otherEmployee.js)의 거절 문구와 같아야 한다 — 테스트로 묶는다.
 // 플러그인 폴더는 운영에서 STORAGE_DIR 아래(리포 밖)일 수 있어 여기서 require하지 않는다.
@@ -46,10 +47,24 @@ const OTHER_EMPLOYEE_REFUSAL =
 // 않고 거절한다.
 const REFUSAL_TOOL_NAME = "hr-other-employee-refusal";
 const REFUSAL_TOOL_DESCRIPTION =
-  "로그인한 본인이 아닌 다른 직원(이름·사번·호칭으로 지칭하거나, '그럼 ○○은?'처럼 앞 질문에 이어 다른 사람을 묻는 경우, " +
+  "오직 다른 직원에 관한 질문일 때만 쓰는 tool입니다. 로그인한 본인이 아닌 다른 직원(이름·사번·호칭으로 지칭하거나, '그럼 ○○은?'처럼 앞 질문에 이어 다른 사람을 묻는 경우, " +
   "앞서 거절된 다른 직원 질문을 '다시 조회해봐'처럼 다시 요청하는 경우 포함)의 정보를 묻는 질문이면 HR 조회 tool 대신 이 tool을 호출하세요. " +
   "본인 정보도 함께 물었다면 본인 정보 조회 tool과 이 tool을 함께 호출하세요. " +
-  "본인 정보만 묻는 질문, 조직도(팀·조직 단위 — 팀원·팀장이 누구인지 포함), 결재 대기·할일 '건수' 질문, 인사말·일반 대화에는 호출하지 마세요.";
+  "본인 정보만 묻는 질문, 조직도(팀·조직 단위 — 팀원·팀장이 누구인지 포함), 결재 대기·할일 '건수' 질문에는 호출하지 마세요. " +
+  "인사말·일반 대화, 챗봇이 조회하지 않는 정보, 이 위젯에서 쓸 수 없는 HR 항목(예: 급여 조회가 없는 위젯의 급여 질문)에는 hr-unsupported-info를 쓰세요.";
+
+// 강제 호출 위젯은 HR과 무관한 질문에도 tool을 하나 골라야 해서, 거절 선택지를 범용 "못 해요"로 써
+// "내 복지포인트 얼마 남았어?"에 "다른 직원의 정보는…"으로 답했다(2026-10-19 실측). 그 자리를 받는 선택지.
+const UNSUPPORTED_TOOL_NAME = "hr-unsupported-info";
+const UNSUPPORTED_TOOL_DESCRIPTION =
+  "HR 조회 tool로 답할 수 없는 질문이면 이 tool을 호출하세요 — 챗봇이 조회하지 않는 항목(예: 복지포인트), 지금 쓸 수 있는 tool에 없는 HR 항목, 날씨·인사말·일반 대화, " +
+  "회사 정책·5240 메뉴 위치처럼 HR 데이터 조회가 아닌 질문. 다른 직원에 관한 질문에는 hr-other-employee-refusal을, " +
+  "본인 HR 데이터 질문에는 해당 조회 tool을 쓰세요.";
+const UNSUPPORTED_NOTICE =
+  "> [조회 없음] 이 질문은 HR 조회로 답할 수 있는 내용이 아닙니다. 제공된 문서에 근거가 있으면 그 문서로만 답하고, " +
+  "인사말·일반 대화면 그에 맞게 짧게 답하세요. 챗봇이 조회하지 않는 HR 항목이면 '그 정보는 챗봇에서 조회할 수 없어요. " +
+  "연차·급여·근태·연말정산·인사·결재·증명서·대출 정보를 물어봐 주세요.'라고 안내하세요. 다른 직원 정보라는 말은 하지 마세요. " +
+  "이 안내 문구 자체는 답변에 포함하지 마세요.";
 
 // 다른 직원을 검색하는 skill — git에서는 제거됐지만 운영 storage에 남아 있을 수 있다(코드 리뷰 M4).
 // 실행하지 않고 거절한다. 거절 선택지도 같은 경로로 거절 문구를 돌려준다.
@@ -96,13 +111,14 @@ function isNonResult(result) {
   return (
     result.startsWith("Error") ||
     result === OTHER_EMPLOYEE_REFUSAL ||
+    result === UNSUPPORTED_NOTICE ||
     result.includes("query_type이 올바르지 않습니다")
   );
 }
 
-function refusalToolDefinition(format) {
+function refusalToolDefinition(format, name = REFUSAL_TOOL_NAME, description = REFUSAL_TOOL_DESCRIPTION) {
   const parameters = { type: "object", properties: {}, additionalProperties: false };
-  const meta = { name: REFUSAL_TOOL_NAME, description: REFUSAL_TOOL_DESCRIPTION };
+  const meta = { name, description };
   if (format === "chat-completions") return { type: "function", function: { ...meta, parameters } };
   if (format === "anthropic") return { ...meta, input_schema: parameters };
   // ChatToolsManager의 Responses 형식과 같게 strict: false(기본값 true면 스키마 검증 규칙이 달라진다)
@@ -122,8 +138,25 @@ function toolNameOf(tool) {
  */
 function withHrRefusalTool(tools, format) {
   if (!Array.isArray(tools) || !tools.some((t) => isHrTool(toolNameOf(t)))) return tools;
-  if (tools.some((t) => toolNameOf(t) === REFUSAL_TOOL_NAME)) return tools;
-  return [...tools, refusalToolDefinition(format)];
+  const names = new Set(tools.map(toolNameOf));
+  if (names.has(REFUSAL_TOOL_NAME) && names.has(UNSUPPORTED_TOOL_NAME)) return tools;
+  return [
+    ...tools,
+    ...(names.has(REFUSAL_TOOL_NAME) ? [] : [refusalToolDefinition(format)]),
+    ...(names.has(UNSUPPORTED_TOOL_NAME)
+      ? []
+      : [refusalToolDefinition(format, UNSUPPORTED_TOOL_NAME, UNSUPPORTED_TOOL_DESCRIPTION)]),
+  ];
+}
+
+/**
+ * 실행하지 않고 고정 결과를 돌려주는 tool(차단 skill·거절 선택지·조회 불가 선택지)의 결과. 해당 없으면 null.
+ * @param {string} toolName
+ * @returns {string|null}
+ */
+function pseudoToolResult(toolName) {
+  if (skillIdOf(toolName) === UNSUPPORTED_TOOL_NAME) return UNSUPPORTED_NOTICE;
+  return isBlockedTool(toolName) ? OTHER_EMPLOYEE_REFUSAL : null;
 }
 
 /**
@@ -157,7 +190,15 @@ function wrapHrRuntime(toolName, runtime) {
     ...runtime,
     handler: async function (args) {
       if (isBlockedTool(toolName)) return OTHER_EMPLOYEE_REFUSAL;
-      const result = await original.call(this, args);
+      // 사용자가 말하지 않은 연도 인자는 떼고 조회한다(2026-10-19 "지어내는 건 절대 안 돼") —
+      // 채팅·위젯 tool 루프와 같은 규칙. aibitat 대화(this.super.chats)의 USER 메시지가 근거다.
+      // hrYearGuard가 이 모듈을 require하므로 순환을 피해 여기서 불러온다.
+      const { allowedYears, correctToolArgs } = require("./hrYearGuard");
+      const userMessages = (this?.super?.chats || [])
+        .filter((c) => c && c.from === "USER")
+        .map((c) => ({ role: "user", content: c.content }));
+      const { tc } = correctToolArgs({ name: toolName, arguments: args }, allowedYears(userMessages));
+      const result = await original.call(this, tc.arguments);
       const budget = DEFAULT_MAX_CHARS - SELF_DATA_NOTICE.length - TRUNCATION_MARKER_ROOM;
       return withSelfDataNotice(toolName, args, truncateToolResult(result, budget));
     },
@@ -169,7 +210,12 @@ module.exports = {
   ORG_CHART_NOTICE,
   OTHER_EMPLOYEE_REFUSAL,
   REFUSAL_TOOL_NAME,
+  UNSUPPORTED_TOOL_NAME,
+  UNSUPPORTED_NOTICE,
   isBlockedTool,
+  isHrTool,
+  skillIdOf,
+  pseudoToolResult,
   withHrRefusalTool,
   withSelfDataNotice,
   wrapHrRuntime,

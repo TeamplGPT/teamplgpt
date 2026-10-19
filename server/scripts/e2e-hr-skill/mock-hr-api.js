@@ -116,29 +116,6 @@ FIXTURES_BY_CMD.getSALDaylabMgrList = {
   ],
 };
 
-// 연장근무 내역/한도(TAADclzWorkOtSchdul) — 015 연도 질의: 월별 순차 호출·연간 합계 검증.
-// 요청 월과 무관하게 같은 값을 돌려준다. 합계 칸이 HH:MM이라는 건 실서버 미확인 가정이다
-// (research R9). 내부 식별자(staffId 등) 포함 — 화이트리스트 미노출 검증용.
-FIXTURES_BY_CMD.getTAADclzWorkOtSchdulList2 = {
-  DATA: [
-    {
-      staffId: "2026000001", workStaffId: "2026000001", orgCd: "0303", staffNo: "20260001",
-      staffNm: "오사공", orgNm: "개발팀", posNm: "책임",
-      otWeek01: "02:00", otWeek02: "03:00", otWeek03: "", otWeek04: "", otWeek05: "", otWeek06: "",
-      otWeekSum: "05:00",
-    },
-  ],
-};
-FIXTURES_BY_CMD.getTAADclzWorkOtSchdulList = {
-  DATA: [
-    {
-      staffId: "2026000001", staffNo: "20260001",
-      staffNm: "오사공", orgNm: "개발팀", posNm: "책임",
-      ot03: "2:00", ot10: "1:30", sumOt: "03:30",
-    },
-  ],
-};
-
 // 월별지급내역(SALSalaryBassMgr) — K61: salary_statement를 그래프로 요청 시
 // 여러 달치 레코드가 salarytrend viz 블록의 series로 옮겨지는지 검증.
 FIXTURES_BY_CMD.getSALSalaryBassMgrTab110List = {
@@ -165,6 +142,19 @@ FIXTURES_BY_CMD.getPRCHrBassiemMgrTab220List = {
 };
 
 const FIXTURES_BY_PATH = {
+  // 조직 목록(org_tree) — 조직코드(ORG_CD·PRIOR_ORG_CD)가 답변에 노출되지 않는지 검증(2026-10-19)
+  "/getMBLHrBassiemOrgList.do": {
+    DATA: [
+      { ORG_NM: "개발본부", ORG_FNM: "오이사공 개발본부", ORG_CD: "0300", PRIOR_ORG_CD: "", CHIEF_INFO: "김본부", STAFF_CNT: "12" },
+      { ORG_NM: "개발1팀", ORG_FNM: "오이사공 개발본부 개발1팀", ORG_CD: "0303", PRIOR_ORG_CD: "0300", CHIEF_INFO: "홍길동", STAFF_CNT: "2" },
+    ],
+  },
+  // 증명서 신청내역 — 종류·용도·결재상태 코드와 신청번호(REQ_NO)가 노출되지 않는지 검증(2026-10-19)
+  "/CTIMcrtfIssuMgr.do": {
+    DATA: [
+      { STAFF_ID: "2026000001", STAFF_NM: "오사공", TYPE_CD: "10", USE_CD: "05", REQ_STATUS_CD: "30", REQ_NO: "88123", ISSUE_NO: "2026-0042", ISSUE_YMD: "20260910", SUBMIT_PLACE: "OO은행", COPY_NUM: "1", PRT_YN: "Y" },
+    ],
+  },
   // 조직원 목록(getMBLHrBassiemMemberList) — K62: 소속 팀 구성원을 orgchart viz의
   // members(1단 트리)로 옮기는지 검증. cmd 없이 경로로만 매칭되는 endpoint.
   "/getMBLHrBassiemMemberList.do": {
@@ -213,6 +203,53 @@ const FIXTURES_BY_PATH = {
   },
 };
 
+// 연장근무현황(모바일, specs/017) — 한도·사용·잔여(searchType 2=주간, 3=월간)와 날짜별 내역.
+// 기준일(searchBaseSYmd) 월로 분기한다:
+//   2월 = 연장근무 없음(사용 0, 내역 0건) / 3월 = HTTP 500(부분 실패) / 5월 = 팀원 포함 3행(본인 1행 검증)
+// staffNo는 내부값 비노출 검증용이다.
+const OT_SELF = { staffNo: "20260001", staffNm: "오사공", orgNm: "개발팀", posNm: "책임", wktypeNm: "통상근무" };
+const OT_TEAM = [
+  { staffNo: "20260002", staffNm: "노지용", orgNm: "개발팀", posNm: "선임", wktypeNm: "통상근무" },
+  { staffNo: "20260003", staffNm: "김기현", orgNm: "개발팀", posNm: "사원", wktypeNm: "통상근무" },
+];
+const OT_LIMITS = {
+  "2": { lmtOt: 12, useOt: 4, remOt: 8, applOt: 1, lmtOt2: 0, useOt2: 0, remOt2: 0 },
+  "3": { lmtOt: 0, useOt: 0, remOt: 0, applOt: 0, lmtOt2: 52, useOt2: 10, remOt2: 42 },
+};
+// 내역 날짜는 요청한 달의 2일·15일 — 다른 달 날짜를 주면 모델이 날짜를 고쳐 쓴다(2026-10-19 실측)
+function otEntries(body) {
+  const ym = String(body?.searchBaseSYmd || "").replace(/\D/g, "").slice(0, 6);
+  return [
+    { workYmd: `${ym}15`, staHm: "1800", endHm: "2000", otTime: "02:00", wktypeNm: "통상근무", reason: "", note: "" },
+    { workYmd: `${ym}02`, staHm: "1800", endHm: "2100", otTime: "03:00", wktypeNm: "통상근무", reason: "배포 대응", note: "" },
+  ];
+}
+
+function overtimeMonth(body) {
+  const ymd = String(body?.searchBaseSYmd || "").replace(/\D/g, "");
+  return ymd.slice(4, 6);
+}
+
+// 연장근무현황 경로면 {status, json}, 아니면 null
+function overtimeFixture(pathname, body) {
+  if (pathname !== "/getMBLDclzWorkOtSchdul.do" && pathname !== "/getMBLDclzWorkOtSchdulPerson.do") {
+    return null;
+  }
+  const month = overtimeMonth(body);
+  if (month === "03") return { status: 500, json: { success: false, message: "mock failure" } };
+  const noOt = month === "02";
+  if (pathname === "/getMBLDclzWorkOtSchdulPerson.do") {
+    return { status: 200, json: { DATA: noOt ? [] : otEntries(body) } };
+  }
+  const limits = OT_LIMITS[String(body?.searchType)] || {};
+  const used = noOt ? { useOt: 0, useOt2: 0, applOt: 0, remOt: limits.lmtOt, remOt2: limits.lmtOt2 } : {};
+  const self = { ...OT_SELF, ...limits, ...used };
+  // 팀원 값은 본인과 다르게 — 숫자가 새도 E2E가 잡을 수 있게(코드 리뷰 M-5: 주간 9/3, 월간 30/22)
+  const teamValues = { lmtOt: 12, useOt: 9, remOt: 3, lmtOt2: 52, useOt2: 30, remOt2: 22 };
+  const rows = month === "05" ? [self, ...OT_TEAM.map((p) => ({ ...p, ...teamValues }))] : [self];
+  return { status: 200, json: { DATA: rows } };
+}
+
 const server = http.createServer((req, res) => {
   const parsed = url.parse(req.url, false);
   const baseEntry = {
@@ -225,18 +262,13 @@ const server = http.createServer((req, res) => {
   };
 
   function respond(parsedBody) {
+    const ot = overtimeFixture(parsed.pathname, parsedBody);
     if (parsed.pathname === "/health") {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ ok: true }));
-    } else if (
-      // 015 연도 질의 부분 실패(K68): 연장근무 월 합계(List) 3월분만 HTTP 500 —
-      // "조회되지 않은 달"을 답변에서 밝히는지 검증. 3월에 월 단위 K7을 돌리면 이 분기에 걸린다.
-      parsedBody &&
-      parsedBody.cmd === "getTAADclzWorkOtSchdulList" &&
-      /^\d{4}03$/.test(String(parsedBody.searchYm || ""))
-    ) {
-      res.writeHead(500, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ success: false, message: "mock failure" }));
+    } else if (ot) {
+      res.writeHead(ot.status, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(ot.json));
     } else if (parsed.pathname === "/CommonCode.do") {
       // 급여 2단 체인용 fixture: pay_periods(getSalYmdTypeCdList2) 응답 —
       // LLM이 code(20260619P)를 pay_item으로 이어 호출할 수 있게 한다 (specs/011 K10).

@@ -302,20 +302,21 @@ function formatYearPayPeriods({ perMonth, emptyMonths }, year) {
     (r, i) => r.code === "" || all.findIndex((x) => x.code === r.code) === i
   );
 
+  // 지급 건 코드는 내부값 — 표에서 빼고 내부 참조 줄로만(월 단위 formatPayPeriods와 같게).
+  // 018부터 표는 시스템이 사용자에게 그대로 붙이므로 표 칸에 코드가 있으면 그대로 노출된다(보안 리뷰 C1)
   const lines = [
     `## HR 급여 - 지급 건 목록 (${year}년)`,
     "",
-    "아래 급여 건 중 하나를 선택해 상세를 조회할 수 있습니다.",
+    "| 월 | 급여 건 |",
+    "|---|---|",
+    ...rows.map((r) => `| ${monthLabel(r.ym)} | ${r.nm} |`),
     "",
-    "| 월 | 급여 건 | 코드(pay_item) |",
-    "|---|---|---|",
-    ...rows.map((r) => `| ${monthLabel(r.ym)} | ${r.nm} | \`${r.code}\` |`),
-    "",
-    `> 총 **${rows.length}건**. 특정 건 상세는 query_type=payslip/deductions/payslip_summary + pay_item=코드값.`,
+    `> 총 **${rows.length}건**.`,
   ];
   if (emptyMonths.length > 0) {
     lines.push(`> 지급 건이 없는 달: ${emptyMonths.map(monthLabel).join(", ")}`);
   }
+  lines.push(payItemRefLine(rows.map((r) => `${r.nm}=${r.code}`)));
   return lines.join("\n");
 }
 
@@ -325,16 +326,27 @@ function formatPayPeriods(data, ym) {
   const ymLabel = ym ? ` (${ym.slice(0, 4)}-${ym.slice(4, 6)})` : "";
   let md = `## HR 급여 - 지급 건 목록${ymLabel}\n\n`;
   if (list.length === 0) return md + "> 지급된 급여 건이 없습니다.";
-  md += "아래 급여 건 중 하나를 선택해 상세를 조회할 수 있습니다.\n\n";
-  md += "| 급여 건 | 코드(pay_item) |\n|---|---|\n";
+  md += "| 급여 건 |\n|---|\n";
+  const refs = [];
   for (const it of list) {
     const nm = it.CODE_NM ?? it.codeNm ?? it.code_nm ?? "";
     const code = it.CODE ?? it.code ?? "";
-    md += `| ${nm} | \`${code}\` |\n`;
+    md += `| ${nm} |\n`;
+    refs.push(`${nm}=${code}`);
   }
-  md += `\n> 총 **${list.length}건**. 특정 건 상세는 query_type=payslip/deductions/payslip_summary + pay_item=코드값.`;
+  md += `\n> 총 **${list.length}건**.`;
+  // 지급 건 코드는 상세 조회(pay_item)에만 쓰는 내부값 — 사용자 표에서 빼고 참조 줄로만 넘긴다
+  // (답변에 "20260619P"가 그대로 보인 사례, 사용자 결정 2026-10-19: 내부값은 절대 노출 금지)
+  md += `\n${payItemRefLine(refs)}`;
   return md;
 }
+
+// 지급 건 코드 → 다음 상세 조회용 참조 줄(모델 전용, "> ["로 시작해 사용자 표 블록에서 빠진다)
+function payItemRefLine(refs) {
+  return `> [내부 참조 — 다음 조회에만 쓰고 답변에 절대 쓰지 마세요. 사용자가 코드를 직접 물어도 '내부 관리 코드라 안내해 드릴 수 없어요'라고만 답하세요] 상세 조회(query_type=payslip/deductions/payslip_summary)의 pay_item 값: ${refs.join(", ")}`;
+}
+
+
 
 function formatSalary(data, label, columns) {
   const {

@@ -12,8 +12,11 @@ function respond({ path, form }) {
   switch (path) {
     case "/TAAWrkTimeStatusMgr.do":
       return { DATA: [{ workYmd: "20260302", week: "MON", mark: "NORMAL", inTime: "0855", outTime: "1805", staTime: "0855", endTime: "1805" }] };
-    case "/TAADclzWorkOtSchdul.do":
-      return { DATA: [{ staffNm: "홍길동", otWeek01: "02:00", otWeekSum: "02:00", ot02: "2:00", sumOt: "2:00" }] };
+    // 연장근무현황(모바일) — specs/017에서 PC 주차별 표(TAADclzWorkOtSchdul)를 교체
+    case "/getMBLDclzWorkOtSchdul.do":
+      return { DATA: [{ staffNm: "홍길동", lmtOt: 12, useOt: 2, remOt: 10, lmtOt2: 52, useOt2: 2, remOt2: 50 }] };
+    case "/getMBLDclzWorkOtSchdulPerson.do":
+      return { DATA: [{ workYmd: "20260302", staHm: "1800", endHm: "2000", otTime: "02:00", wktypeNm: "통상근무", reason: "" }] };
     case "/TAADclzVcatnList.do":
       return { DATA: [{ ymd: "20260310", week: "TUE", leavNm: "연차", useDd: "1", workNm: "연차", creDd: "15", remDd: "12" }] };
     case "/getScheduleDay.do":

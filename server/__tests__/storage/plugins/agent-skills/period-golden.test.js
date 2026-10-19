@@ -31,17 +31,18 @@ function respond({ path, form }) {
           { ymd: "20260302", workTypeNm: "주간근무", holidayNm: "", mark: "NORMAL", kind: "W" },
         ],
       };
-    case "/TAADclzWorkOtSchdul.do":
-      if (form.cmd === "getTAADclzWorkOtSchdulList2") {
-        return {
-          DATA: [
-            { ...ROW_STAFF, staffNm: "홍길동", orgNm: "인사팀", posNm: "사원", otWeek01: "02:00", otWeek02: "00:00", otWeek03: "01:30", otWeek04: "", otWeek05: "", otWeek06: "", otWeekSum: "03:30" },
-          ],
-        };
-      }
+    // 연장근무현황(모바일) — specs/017에서 PC 주차별 표(TAADclzWorkOtSchdul)를 교체
+    case "/getMBLDclzWorkOtSchdul.do":
       return {
         DATA: [
-          { ...ROW_STAFF, staffNm: "홍길동", orgNm: "인사팀", posNm: "사원", ot02: "2:00", ot17: "1:30", sumOt: "3:30" },
+          { ...ROW_STAFF, staffNm: "홍길동", orgNm: "인사팀", posNm: "사원", lmtOt: 12, useOt: 3.5, remOt: 8.5, lmtOt2: 52, useOt2: 3.5, remOt2: 48.5 },
+        ],
+      };
+    case "/getMBLDclzWorkOtSchdulPerson.do":
+      return {
+        DATA: [
+          { workYmd: "20260317", staHm: "1800", endHm: "1930", otTime: "01:30", wktypeNm: "통상근무", reason: "" },
+          { workYmd: "20260302", staHm: "1800", endHm: "2000", otTime: "02:00", wktypeNm: "통상근무", reason: "월초 마감" },
         ],
       };
     case "/TAADclzVcatnList.do":

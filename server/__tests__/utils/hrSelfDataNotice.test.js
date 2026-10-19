@@ -6,7 +6,10 @@ const {
   ORG_CHART_NOTICE,
   OTHER_EMPLOYEE_REFUSAL,
   REFUSAL_TOOL_NAME,
+  UNSUPPORTED_TOOL_NAME,
+  UNSUPPORTED_NOTICE,
   isBlockedTool,
+  pseudoToolResult,
   withHrRefusalTool,
   withSelfDataNotice,
   wrapHrRuntime,
@@ -37,6 +40,9 @@ describe("withSelfDataNotice", () => {
     expect(SELF_DATA_NOTICE).toContain("산정 근거(근속연수·직위·회사 정책·법정 기준 등)는 추측('~로 보입니다')으로도 말하지 마세요");
     expect(SELF_DATA_NOTICE).toContain("'5240 HR 시스템에서 조회한 값이에요.'로 시작해");
     expect(SELF_DATA_NOTICE).toContain("계산이 맞는지·법적으로 문제없는지도 이 결과로는 알 수 없으니 판단하지 마세요");
+    expect(SELF_DATA_NOTICE).toContain("'[내부 참조]' 줄·코드값·내부 식별자");
+    expect(ORG_CHART_NOTICE).toContain("'[내부 참조]' 줄·조직코드는 사용자가 직접 물어도 답변에 절대 쓰지 마세요");
+    expect(SELF_DATA_NOTICE).toContain("사용자가 직접 물어도 '내부 관리 코드라 안내해 드릴 수 없어요'");
   });
 
   it.each(["org_tree", "org_members"])("조직도(hr-personnel %s)에는 조직도 안내를 붙인다", (qt) => {
@@ -125,8 +131,9 @@ describe("withHrRefusalTool (강제 호출 위젯의 거절 선택지, R14)", ()
     ["anthropic", (t) => t.name, (t) => t.input_schema],
   ])("%s 형식으로 거절 선택지를 덧붙인다", (format, nameOf, schemaOf) => {
     const out = withHrRefusalTool([HR], format);
-    expect(out).toHaveLength(2);
+    expect(out).toHaveLength(3);
     expect(nameOf(out[1])).toBe(REFUSAL_TOOL_NAME);
+    expect(nameOf(out[2])).toBe(UNSUPPORTED_TOOL_NAME);
     expect(schemaOf(out[1])).toEqual({ type: "object", properties: {}, additionalProperties: false });
   });
 
@@ -136,7 +143,7 @@ describe("withHrRefusalTool (강제 호출 위젯의 거절 선택지, R14)", ()
 
   it("이름 없는 built-in tool(web_search_preview)이 섞여 있어도 HR tool이 있으면 붙인다", () => {
     const out = withHrRefusalTool([{ type: "web_search_preview" }, HR], "openai-responses");
-    expect(out.map((t) => t.name ?? t.type)).toEqual(["web_search_preview", "hr-attendance", REFUSAL_TOOL_NAME]);
+    expect(out.map((t) => t.name ?? t.type)).toEqual(["web_search_preview", "hr-attendance", REFUSAL_TOOL_NAME, UNSUPPORTED_TOOL_NAME]);
   });
 
   it("chat-completions 형식의 HR tool도 알아본다", () => {
@@ -148,7 +155,8 @@ describe("withHrRefusalTool (강제 호출 위젯의 거절 선택지, R14)", ()
     const { description } = withHrRefusalTool([HR], "openai-responses")[1];
     expect(description).toContain("조직도");
     expect(description).toContain("결재 대기·할일 '건수'");
-    expect(description).toContain("인사말·일반 대화에는 호출하지 마세요");
+    expect(description).toContain("오직 다른 직원에 관한 질문일 때만 쓰는 tool입니다");
+    expect(description).toContain("이 위젯에서 쓸 수 없는 HR 항목(예: 급여 조회가 없는 위젯의 급여 질문)에는 hr-unsupported-info를 쓰세요");
     expect(description).toContain("앞서 거절된 다른 직원 질문을 '다시 조회해봐'처럼 다시 요청하는 경우");
   });
 
@@ -167,6 +175,18 @@ describe("withHrRefusalTool (강제 호출 위젯의 거절 선택지, R14)", ()
 
   it("거절 선택지는 실행 계층에서 차단(거절 문구) 대상이다", () => {
     expect(isBlockedTool(REFUSAL_TOOL_NAME)).toBe(true);
+  });
+
+  it("실행하지 않는 tool의 고정 결과 — 거절·조회 없음·그 외 null", () => {
+    expect(pseudoToolResult(REFUSAL_TOOL_NAME)).toBe(OTHER_EMPLOYEE_REFUSAL);
+    expect(pseudoToolResult("hr-personnel-search")).toBe(OTHER_EMPLOYEE_REFUSAL);
+    expect(pseudoToolResult(UNSUPPORTED_TOOL_NAME)).toBe(UNSUPPORTED_NOTICE);
+    expect(pseudoToolResult("hr-attendance")).toBeNull();
+  });
+
+  it("조회 없음 안내에는 본인 데이터 안내를 붙이지 않는다", () => {
+    expect(withSelfDataNotice(UNSUPPORTED_TOOL_NAME, {}, UNSUPPORTED_NOTICE)).toBe(UNSUPPORTED_NOTICE);
+    expect(UNSUPPORTED_NOTICE).toContain("다른 직원 정보라는 말은 하지 마세요");
   });
 });
 

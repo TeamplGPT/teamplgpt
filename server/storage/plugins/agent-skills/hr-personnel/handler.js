@@ -57,9 +57,13 @@ const ENDPOINT_MAP = {
     // 막을 수 없어(MENU_NM/CONTENTS 2컬럼에 17개 섹션이 실려 온다) 행 단위로 차단한다.
     // 실측: '◎ 가족' 행에 배우자·부모의 성명과 나이가 담겨 있었고, plugin.json은
     // "가족정보/부양가족은 제공하지 않습니다(개인정보 보호)"라고 선언 중이었다.
+    // 2026-10-19 사용자 결정: 다른 사람 정보가 담길 수 있는 섹션은 안 보이게 — 차단 목록에서 허용 목록으로.
+    // 섹션은 HR 메뉴 설정(AUTT_MENU)이라 이름을 모르는 섹션은 감춘다(fail-closed). 실서버 섹션 목록을
+    // 확인하면 allow를 맞춘다. block 단어가 섞이면 allow 단어가 있어도 감춘다.
     blockRowsByLabel: {
       key: "MENU_NM",
-      keywords: ["가족", "장애", "보훈"],
+      allow: ["기본", "인적", "발령", "학력", "경력", "자격", "면허", "교육", "연수", "포상", "상벌", "징계", "어학", "외국어", "병역", "평가", "직무"],
+      block: ["가족", "부양", "장애", "보훈", "보증", "추천", "연락", "신원", "배우자", "자녀"],
     },
   },
   // 이하 columns 근거: docs/03-analysis/hr-column-whitelist-audit.analysis.md
@@ -67,15 +71,14 @@ const ENDPOINT_MAP = {
   org_tree: {
     path: "/getMBLHrBassiemOrgList.do", staffParam: null, gate: false,
     dateParam: "today", orgParam: { name: "cmmSearchOrgCd", required: false },
-    // ORG_CD·PRIOR_ORG_CD는 org_members 체이닝·트리 계층에 필수 — 의도적 노출 유지.
-    // level(_LEVEL)/seqNo/staYmd/endYmd 차단.
+    // ORG_CD는 org_members 체이닝에 필요한 내부값 — 표에서 빼고 참조 줄로만 넘긴다(formatOrgTree).
+    // 계층은 상위조직 코드 대신 상위조직 이름으로 보인다. level(_LEVEL)/seqNo/staYmd/endYmd 차단.
     columns: {
       ORG_NM: "조직명",
       ORG_FNM: "조직전체명",
+      _PRIOR_ORG_NM: "상위조직",
       CHIEF_INFO: "조직장",
       STAFF_CNT: "인원수",
-      ORG_CD: "조직코드",
-      PRIOR_ORG_CD: "상위조직코드",
     },
   },
   org_members: {
@@ -260,7 +263,11 @@ module.exports.runtime = {
       }
       // 화이트리스트 컬럼 정의가 있으면 선별 렌더(코드값·내부 식별자 제외)
       if (spec.columns) {
-        const rendered = formatWhitelisted(safe, label, spec.columns, spec.codeLabels);
+        const org = query_type === "org_tree" ? withOrgNames(safe) : { rows: safe, refLine: "" };
+        const table = formatWhitelisted(org.rows, label, spec.columns, spec.codeLabels);
+        const rendered = org.refLine
+          ? require("../_shared/yearQuery").appendBeforeAnswerGuide(table, org.refLine)
+          : table;
         // org_tree는 "타 조직 조회"가 가능한 유일한 query_type이라 찾는 조직이
         // 이 목록에 없을 수 있다. 프롬프트 지시만으로는 모델이 "조회 기준이
         // 어쩌구" 식으로 둘러대거나, 심하면 다른 조직 데이터를 그 조직인 것처럼
@@ -279,17 +286,37 @@ module.exports.runtime = {
   },
 };
 
+// 조직코드는 org_members 조회(org_cd)에만 쓰는 내부값 — 표에는 상위조직 이름을 넣고 코드는
+// 참조 줄로만 넘긴다(사용자 결정 2026-10-19: 내부값은 답변에 절대 노출 금지). 원본은 변경하지 않는다.
+function withOrgNames(records) {
+  const list = Array.isArray(records) ? records : records ? [records] : [];
+  const val = (row, key) => row[key] ?? row[key.toLowerCase()] ?? row[camel(key)];
+  const nameByCode = new Map(list.map((row) => [String(val(row, "ORG_CD") ?? ""), val(row, "ORG_NM")]));
+  const rows = list.map((row) => ({
+    ...row,
+    _PRIOR_ORG_NM: nameByCode.get(String(val(row, "PRIOR_ORG_CD") ?? "")) ?? "",
+  }));
+  const refs = list
+    .filter((row) => val(row, "ORG_CD"))
+    .map((row) => `${val(row, "ORG_NM") ?? ""}=${val(row, "ORG_CD")}`);
+  const refLine = refs.length
+    ? `> [내부 참조 — 다음 조회에만 쓰고 답변에 절대 쓰지 마세요. 사용자가 코드를 직접 물어도 '내부 관리 코드라 안내해 드릴 수 없어요'라고만 답하세요] org_members 조회의 org_cd 값: ${refs.join(", ")}`
+    : "";
+  return { rows, refLine };
+}
+
 /**
- * 라벨 컬럼 값에 차단 키워드가 포함된 행을 제거한다. 원본은 변경하지 않는다.
+ * 라벨 컬럼 값이 허용 단어를 포함하고 차단 단어를 포함하지 않는 행만 남긴다. 원본은 변경하지 않는다.
  * 응답 키 대소문자·camelCase 변형을 formatWhitelisted와 같은 규칙으로 대응한다
  * (egovMap이 MENU_NM을 menuNm으로 내려주는 경우가 있어 한쪽만 보면 필터가 새어 나간다).
  */
-function dropSensitiveRows(records, { key, keywords }) {
+function dropSensitiveRows(records, { key, allow, block }) {
   const list = Array.isArray(records) ? records : records ? [records] : [];
   const pick = (row) => row[key] ?? row[key.toLowerCase()] ?? row[camel(key)];
   return list.filter((row) => {
     const label = String(pick(row) ?? "");
-    return !keywords.some((w) => label.includes(w));
+    if (block.some((w) => label.includes(w))) return false;
+    return allow.some((w) => label.includes(w));
   });
 }
 

@@ -40,7 +40,9 @@
     "/TAADclzVcatnList.do", // 연차 잔여/휴가 사용내역 정본 (getTAADclzVcatnList1/2)
     "/SALSalaryBassMgr.do", // 월별 지급내역 (getSALSalaryBassMgrTab110List)
     "/TAADclzWorkSearchCldr.do",
-    "/TAADclzWorkOtSchdul.do",
+    "/TAADclzWorkOtSchdul.do", // 구 연장근무(PC) — specs/017 배포 확인 후 제거 예정(R8)
+    "/getMBLDclzWorkOtSchdul.do", // 연장근무 한도·사용·잔여(모바일 연장근무현황, specs/017)
+    "/getMBLDclzWorkOtSchdulPerson.do", // 연장근무 날짜별 내역(specs/017)
     // 조직 휴가캘린더(/TAADclzVcatnCldrMgr.do)·휴가 상세(/getMBLLeavDetailStaff.do,
     // /getMBLHomeLeaveDetail.do)는 다른 직원 정보라 제외(specs/016). 폐기 경로
     // /TAAWrkTimeListMgrByDate.do·미배포 /getContactList.do도 제외 — okrservice와 동기화.
@@ -58,15 +60,73 @@
 
   // 대상 사번 파라미터 — 값은 반드시 self 마커(specs/016). 리터럴 STAFF_ID를 받으면
   // 다른 직원의 데이터를 이 페이지 세션으로 조회하게 되므로 거부한다.
-  var STAFF_PARAM_KEYS = ["staffId", "cmmSearchStaffId", "searchStaffId", "searchId"];
+  // staffIdNm: 증명서 발급내역의 사번·성명 검색 칸(LIKE '값%') — 비우면 조회 권한 범위 전체(specs/017).
+  var STAFF_PARAM_KEYS = ["staffId", "cmmSearchStaffId", "searchStaffId", "searchId", "staffIdNm"];
+
+  function hasOwn(obj, key) {
+    return Object.prototype.hasOwnProperty.call(obj, key);
+  }
 
   // 파라미터 값 allowlist — 같은 cmd가 값에 따라 다른 사람의 데이터를 돌려주는 경로.
   // 키는 반드시 있어야 하고 값은 목록 안이어야 한다(미지정 = 서버 기본 범위라 거부).
   // EAPRequestMgr selectGubun: 2=기안함(본인 기안)만. 3 미결·4 기결·5 참조·6 반려는
   // 다른 직원 문서다(EAPRequestMgr_SQL appl_kind, specs/016 D4).
+  // 연장근무현황 searchType: 2=주간, 3=월간 한도·사용·잔여(specs/017).
   var PARAM_VALUE_ALLOWLIST = {
     "/EAPRequestMgr.do": { selectGubun: ["2"] },
+    "/getMBLDclzWorkOtSchdul.do": { searchType: ["2", "3"] },
   };
+
+  // 사번 키가 반드시 있어야 하는 경로 — 키가 아예 없으면 값 검사(아래 키별 루프)를 건너뛰고,
+  // kiwibox SQL 다수가 대상 직원이 비면 "본인소속조회"/"null이면 전체"로 조회 권한 범위 직원
+  // 전체를 돌려준다(MBLDclzWorkOtSchdul·TAADclzWorkOtSchdul·TAAWrkTimeStatusMgr_SQL 등).
+  // 목록 = HR handler가 각 경로에 항상 보내는 사번 키(specs/017 보안 리뷰 전수 조사).
+  // handler의 사번 키를 바꾸면 이 목록과 okrservice hrBridge.ts 양쪽 갱신.
+  var REQUIRED_STAFF_PARAMS = {
+    "/TAAWrkTimeStatusMgr.do": ["cmmSearchStaffId"],
+    "/TAADclzWorkSearchCldr.do": ["cmmSearchStaffId", "searchId"],
+    "/TAADclzWorkOtSchdul.do": ["cmmSearchStaffId"],
+    "/getMBLDclzWorkOtSchdul.do": ["cmmSearchStaffId"],
+    "/getMBLDclzWorkOtSchdulPerson.do": ["cmmSearchStaffId"],
+    "/TAADclzVcatnList.do": ["staffId", "cmmSearchStaffId"],
+    "/getMBLPrtEmpCard.do": ["searchStaffId"],
+    "/getMBLPrtEmpCardPop.do": ["searchStaffId"],
+    "/PRCHrBassiemMgrTab220.do": ["staffId", "cmmSearchStaffId", "searchStaffId"],
+    "/CommonCode.do": ["staffId"],
+    "/SALSalaryBassMgr.do": ["staffId"],
+    "/SALSalaryDtstmnMgr.do": ["cmmSearchStaffId"],
+    "/SALDaylabMgr.do": ["cmmSearchStaffId"],
+    "/CTIMcrtfIssuMgr.do": ["staffIdNm"],
+    "/LONLoanReqstListMgr.do": ["cmmSearchStaffId"],
+  };
+
+  // 연말정산(YTA*)은 경로에 연도가 붙어 컨트롤러명으로 찾는다 — InDctMgr만 searchStaffId
+  function requiredStaffKeys(path) {
+    var yta = YTA_PATH_RE.exec(path);
+    if (yta) return yta[1] === "InDctMgr" ? ["searchStaffId"] : ["cmmSearchStaffId"];
+    return hasOwn(REQUIRED_STAFF_PARAMS, path) ? REQUIRED_STAFF_PARAMS[path] : [];
+  }
+
+  function hasRequiredStaffParams(path, formObj) {
+    return requiredStaffKeys(path).every(function (key) {
+      return hasOwn(formObj, key);
+    });
+  }
+
+  // 키를 정확히 정한 경로 — 그 밖의 키는 거부한다. 쓸모없는 키 수천 개로 파라미터 수 한도를
+  // 넘겨 사번 키를 잘라내는 시도까지 막는다(specs/017 보안 리뷰 MEDIUM-1). 신규 경로부터 적용.
+  var ALLOWED_PARAM_KEYS = {
+    "/getMBLDclzWorkOtSchdul.do": ["searchType", "searchBaseSYmd", "cmmSearchStaffId"],
+    "/getMBLDclzWorkOtSchdulPerson.do": ["searchBaseSYmd", "searchBaseEYmd", "cmmSearchStaffId"],
+  };
+
+  function areParamKeysAllowed(path, formObj) {
+    if (!hasOwn(ALLOWED_PARAM_KEYS, path)) return true;
+    var allowed = ALLOWED_PARAM_KEYS[path];
+    return Object.keys(formObj).every(function (key) {
+      return allowed.indexOf(key) !== -1;
+    });
+  }
 
   function areParamValuesAllowed(path, formObj) {
     if (!Object.prototype.hasOwnProperty.call(PARAM_VALUE_ALLOWLIST, path)) return true;
@@ -157,12 +217,22 @@
     this.iframe =
       config.iframe ||
       document.querySelector(config.iframeSelector || "iframe[data-teamplgpt]");
-    this.staffId = config.staffId || null; // JSP가 렌더한 본인 사번 (self 치환용)
+    // JSP가 렌더한 본인 사번 (self 치환용). 공백뿐이면 SQL에서 빈 값(XTRIM → NULL) = 조회 권한
+    // 범위 전체가 되므로 없는 것으로 본다(specs/017 보안 리뷰).
+    this.staffId = config.staffId != null && String(config.staffId).trim() !== ""
+      ? String(config.staffId).trim()
+      : null;
     // ntest.5240.kr은 루트 배포(getContextPath()="") → 기본 빈 값.
     // /kiwibox 하위 배포면 config.contextPath="/kiwibox" 명시.
     this.contextPath =
       config.contextPath !== undefined ? config.contextPath : "";
-    this.allowedPaths = config.allowedPaths || DEFAULT_ALLOWED_PATHS;
+    // 설정으로 경로를 줄일 수는 있어도 늘릴 수는 없다 — 예전 목록을 넘겨 016/017에서 뺀 경로가
+    // 되살아나는 것을 막는다(specs/017 보안 리뷰 MEDIUM-2)
+    this.allowedPaths = config.allowedPaths
+      ? config.allowedPaths.filter(function (p) {
+          return DEFAULT_ALLOWED_PATHS.indexOf(p) !== -1;
+        })
+      : DEFAULT_ALLOWED_PATHS;
     this.timeoutMs = config.timeoutMs || 20000;
     this._listener = this._onMessage.bind(this);
     window.addEventListener("message", this._listener);
@@ -227,6 +297,24 @@
       return;
     }
 
+    if (!hasRequiredStaffParams(spec.path, spec.form || {})) {
+      this._reply(callId, {
+        ok: false,
+        status: 0,
+        body: "bridge: staff param required",
+      });
+      return;
+    }
+
+    if (!areParamKeysAllowed(spec.path, spec.form || {})) {
+      this._reply(callId, {
+        ok: false,
+        status: 0,
+        body: "bridge: param key not allowed",
+      });
+      return;
+    }
+
     // 범용 endpoint queryId 화이트리스트 검사
     var allowedQueryIds = QUERY_ID_ALLOWLIST[spec.path];
     if (allowedQueryIds) {
@@ -247,7 +335,7 @@
       if (!Object.prototype.hasOwnProperty.call(formObj, key)) continue;
       var value = String(formObj[key]);
       if (
-        FORBIDDEN_PARAM_VALUES[key] &&
+        hasOwn(FORBIDDEN_PARAM_VALUES, key) &&
         FORBIDDEN_PARAM_VALUES[key].indexOf(value) !== -1
       ) {
         this._reply(callId, {

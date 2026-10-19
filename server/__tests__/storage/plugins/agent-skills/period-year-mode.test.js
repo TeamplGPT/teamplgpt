@@ -27,9 +27,11 @@ const WORK_ROWS = [
 
 const APPROVAL_ROW = { APPL_NM: "휴가신청", TITLE: "연차 신청", REQ_STATUS_NM: "완료", APPL_YMD: "20260305", REQ_NO: "R0001" };
 
-// 연도 질의의 overtime은 월 경계가 정확한 List(sumOt)로 합산한다 (코드 리뷰 HIGH-1)
-const otRow = (sum) => ({ staffId: "S0001", staffNm: "홍길동", orgNm: "인사팀", posNm: "사원", ot02: sum, sumOt: sum });
-const otLimitRow = (sum) => ({ staffId: "S0001", staffNm: "홍길동", orgNm: "인사팀", posNm: "사원", ot02: sum, sumOt: sum });
+// 연장근무 월간(searchType=3) 응답 1행 — 한도 52, 사용 used (specs/017)
+const otMonthRow = (used) => ({
+  staffNo: "20260001", staffNm: "홍길동", orgNm: "인사팀", posNm: "사원",
+  lmtOt: 0, useOt: 0, remOt: 0, lmtOt2: 52, useOt2: used, remOt2: 52 - used,
+});
 
 beforeEach(() => freezeClock());
 afterEach(() => jest.useRealTimers());
@@ -299,15 +301,16 @@ describe("지난해·특정 연도 — 그해 전체 (US3)", () => {
     expect(output).toContain(`\n\n${HEADER_2025}\n\n`);
   });
 
-  it("overtime 지난해 → 2025년 12개월 순차 호출", async () => {
+  it("overtime 지난해 → 2025년 12개월 순차 호출(각 달 말일 기준)", async () => {
     const { calls } = await runHandler(
       "hr-attendance",
       { query_type: "overtime", year_month: "지난해" },
-      () => ({ DATA: [otRow("01:00")] })
+      () => ({ DATA: [otMonthRow(1)] })
     );
-    expect(calls.map((c) => c.form.searchYm)).toEqual(
-      Array.from({ length: 12 }, (_, i) => `2025${String(i + 1).padStart(2, "0")}`)
-    );
+    expect(calls).toHaveLength(12);
+    expect(calls[0].form.searchBaseSYmd).toBe("2025-01-31");
+    expect(calls[1].form.searchBaseSYmd).toBe("2025-02-28");
+    expect(calls[11].form.searchBaseSYmd).toBe("2025-12-31");
   });
 
   it("leave_requests 재작년 → 휴가·회계연도 2024 + 머리 줄", async () => {
@@ -380,115 +383,71 @@ describe("지난해·특정 연도 — 그해 전체 (US3)", () => {
 });
 
 describe("monthly 모드 — 달마다 순차 호출 후 병합 (US1)", () => {
-  // 2월은 데이터 없음, 나머지 달은 05:00
-  const otByMonth = ({ form }) =>
-    form.searchYm === "202602" ? { DATA: [] } : { DATA: [otRow("05:00")] };
+  // 연장근무 연도 질의는 5240 모바일 월간 조회(searchType=3)를 달마다 부른다(specs/017).
+  // 렌더 세부는 overtime-status.test.js가 맡고, 여기서는 handler → hrFetch 연결과 runMonthly 승계를 본다.
+  const OT_PATH = "/getMBLDclzWorkOtSchdul.do";
+  const MONTH_ENDS_TO_OCT = [
+    "2026-01-31", "2026-02-28", "2026-03-31", "2026-04-30", "2026-05-31",
+    "2026-06-30", "2026-07-31", "2026-08-31", "2026-09-30", "2026-10-15",
+  ];
+  const monthOf = (form) => form.searchBaseSYmd.slice(5, 7);
 
-  it("overtime 올해 → 1월~10월 10회, 월 경계가 정확한 List cmd로(같은 경로·BODY, searchYm만 달마다)", async () => {
+  it("overtime 올해 → 1월~10월 10회, 월간(searchType=3) 기준일은 말일(이번 달은 오늘), 본인 마커", async () => {
     const { calls } = await runHandler(
       "hr-attendance",
       { query_type: "overtime", year_month: "올해" },
-      otByMonth
+      () => ({ DATA: [otMonthRow(5)] })
     );
-    expect(calls.map((c) => c.form.searchYm)).toEqual(MONTHS_TO_OCT);
+    expect(calls.map((c) => c.form.searchBaseSYmd)).toEqual(MONTH_ENDS_TO_OCT);
     for (const c of calls) {
-      expect(c.path).toBe("/TAADclzWorkOtSchdul.do");
-      expect(c.form).toEqual({
-        cmd: "getTAADclzWorkOtSchdulList",
-        searchYm: c.form.searchYm,
-        cmmSearchStaffId: SELF,
-        searchType: "2",
-      });
+      expect(c.path).toBe(OT_PATH);
+      expect(c.form).toEqual({ searchType: "3", searchBaseSYmd: c.form.searchBaseSYmd, cmmSearchStaffId: SELF });
     }
   });
 
-  it("한 달 응답이 여러 행이면 합산하지 않고 그 달을 실패로 돌린다(타인 행 혼입 방어)", async () => {
+  it("overtime_limit도 같은 경로 — 월별 표 + 사용 합계", async () => {
+    const { output } = await runHandler(
+      "hr-attendance",
+      { query_type: "overtime_limit", year_month: "2026년" },
+      () => ({ DATA: [otMonthRow(3.5)] })
+    );
+    expect(output).toContain("## HR 근태 - 연장근무 현황");
+    expect(output).toContain(`${HEADER_MONTHLY}\n`);
+    expect(output).toContain("| 2026-01 | 52.0 | 3.5 | 48.5 |");
+    expect(output).toContain("| 합계 | — | 35.0 | — |");
+  });
+
+  it("한 달 응답이 여러 행이면 그 달을 실패로 돌리고 다른 직원 값은 쓰지 않는다", async () => {
     const { output } = await runHandler(
       "hr-attendance",
       { query_type: "overtime", year_month: "올해" },
       ({ form }) =>
-        form.searchYm === "202604"
-          ? { DATA: [otRow("05:00"), { ...otRow("09:00"), staffId: "S0002", staffNm: "김철수" }] }
-          : { DATA: [otRow("05:00")] }
+        monthOf(form) === "04"
+          ? { DATA: [otMonthRow(5), { ...otMonthRow(9), staffNo: "20260002", staffNm: "김철수" }] }
+          : { DATA: [otMonthRow(5)] }
     );
-    expect(output).toContain("> 조회되지 않은 달: 2026-04 (응답 행이 여러 개라 합산하지 않았습니다)");
-    expect(output).not.toContain("09:00");
-    expect(output).not.toContain("김철수");
-    expect(output).toContain("> 조회된 달 합계 **45:00** (조회된 9개월)");
+    expect(output).toContain("> 조회되지 않은 달: 2026-04 (표에 —로 표시)");
+    expect(output).toContain("조회되지 않은 사유: 2026-04 (본인 한 명 분이 아닌 응답이라 사용하지 않았습니다)");
+    expect(output).toContain("| 2026-04 | — | — | — |");
+    expect(output).toContain("| 합계 (조회된 9개월) | — | 45.0 | — |");
+    expect(output).not.toMatch(/김철수|20260002|9\.0/);
   });
 
-  it("합계 값이 하나도 없으면 00:00이라 적지 않는다", async () => {
-    const { output } = await runHandler(
-      "hr-attendance",
-      { query_type: "overtime", year_month: "올해" },
-      () => ({ DATA: [{ staffId: "S0001", staffNm: "홍길동" }] })
-    );
-    expect(output).toContain("> 월별 합계 값이 없어 연간 합계를 계산하지 않았습니다.");
-    expect(output).not.toContain("00:00");
-  });
-
-  it("overtime 월별 표 + 연간 합계 (빈 달은 —)", async () => {
-    const { output } = await runHandler(
-      "hr-attendance",
-      { query_type: "overtime", year_month: "이번년도" },
-      otByMonth
-    );
-    const rows = MONTHS_TO_OCT.map(
-      (ym) => `| ${ym.slice(0, 4)}-${ym.slice(4)} | ${ym === "202602" ? "—" : "05:00"} |`
-    ).join("\n");
-    expect(output).toBe(
-      "## HR 근태 - 연장근무(OT) 신청 내역\n\n" +
-        `${HEADER_MONTHLY}\n\n` +
-        "| 월 | 연장근무 합계 |\n| ------ | ------ |\n" +
-        `${rows}\n\n` +
-        "> 연간 합계 **45:00** (조회된 10개월)\n" +
-        require("../../../../storage/plugins/agent-skills/_shared/yearQuery").MONTHLY_TABLE_LINE +
-        require("../../../../storage/plugins/agent-skills/_shared/formatTable").ANSWER_GUIDE
-    );
-    expect(output).not.toContain("홍길동");
-    expect(output).not.toContain("1주");
-  });
-
-  // 값 있는 달이 한 달뿐이면 표 지시를 붙이지 않는다 — 한 줄 답이 낫다
-  it("overtime 값 있는 달이 하나면 표 형식 지시가 없다", async () => {
-    const { MONTHLY_TABLE_LINE } = require("../../../../storage/plugins/agent-skills/_shared/yearQuery");
-    const { output } = await runHandler(
-      "hr-attendance",
-      { query_type: "overtime", year_month: "이번년도" },
-      (req) => (req.form.searchYm === "202603" ? otByMonth(req) : { DATA: [] })
-    );
-    expect(output).not.toContain(MONTHLY_TABLE_LINE);
-  });
-
-  it("overtime_limit 2026년 → sumOt 기준 합계", async () => {
-    const { calls, output } = await runHandler(
-      "hr-attendance",
-      { query_type: "overtime_limit", year_month: "2026년" },
-      () => ({ DATA: [otLimitRow("3:30")] })
-    );
-    expect(calls).toHaveLength(10);
-    expect(calls[0].form.cmd).toBe("getTAADclzWorkOtSchdulList");
-    expect(output).toContain("## HR 근태 - 연장근무(OT) 한도/잔여");
-    expect(output).toContain("| 2026-01 | 3:30 |");
-    expect(output).toContain("> 연간 합계 **35:00** (조회된 10개월)");
-  });
-
-  it("셋째 달 실패 → 표에서 빼고 머리 줄에 표시, '조회된 달 합계'", async () => {
+  it("셋째 달 실패 → 행은 —(018 D12), 머리 줄에 표시, 합계는 조회된 달 수와 함께", async () => {
     const { calls, output } = await runHandler(
       "hr-attendance",
       { query_type: "overtime", year_month: "올해" },
       (req) =>
-        req.form.searchYm === "202603"
+        monthOf(req.form) === "03"
           ? { __raw: { ok: false, status: 500, body: "error" } }
-          : otByMonth(req)
+          : { DATA: [otMonthRow(5)] }
     );
     expect(calls).toHaveLength(10);
     expect(output).toContain(
-      `${HEADER_MONTHLY}\n> 조회되지 않은 달: 2026-03 (HR 시스템 호출 실패 (HTTP 500))\n${MISSING_NOTE}\n`
+      `${HEADER_MONTHLY}\n> 조회되지 않은 달: 2026-03 (표에 —로 표시)\n${MISSING_NOTE}\n> [내부 참조 — 답변에 쓰지 마세요] 조회되지 않은 사유: 2026-03 (HR 시스템 호출 실패 (HTTP 500))\n`
     );
-    expect(output).not.toContain("| 2026-03 |");
-    expect(output).toContain("> 조회된 달 합계 **40:00** (조회된 9개월)");
-    expect(output).not.toContain("연간 합계");
+    expect(output).toContain("| 2026-03 | — | — | — |");
+    expect(output).toContain("| 합계 (조회된 9개월) | — | 45.0 | — |");
   });
 
   it("첫 달 실패 → 기존 오류 문구 그대로, 나머지 달 미호출", async () => {
@@ -501,44 +460,32 @@ describe("monthly 모드 — 달마다 순차 호출 후 병합 (US1)", () => {
     expect(output).toBe(SESSION_EXPIRED);
   });
 
-  it("월별 값 형식이 섞이면 합계를 계산하지 않는다", async () => {
-    const { output } = await runHandler(
-      "hr-attendance",
-      { query_type: "overtime", year_month: "올해" },
-      ({ form }) => ({ DATA: [otRow(form.searchYm === "202605" ? "1.5" : "05:00")] })
-    );
-    expect(output).toContain("| 2026-05 | 1.5 |");
-    expect(output).toContain("> 월별 값의 형식이 달라 연간 합계를 계산하지 않았습니다.");
-    expect(output).not.toContain("연간 합계 **");
-  });
-
-  it("모든 달이 데이터 없음 → 기존 문구 + 조회 기간", async () => {
-    const { calls, output } = await runHandler(
-      "hr-attendance",
-      { query_type: "overtime", year_month: "올해" },
-      () => ({ DATA: [] })
-    );
-    expect(calls).toHaveLength(10);
-    expect(output).toBe(
-      `> ⚠️ **연장근무(OT) 신청 내역** 조회 결과가 존재하지 않습니다.\n${HEADER_MONTHLY}\n`
-    );
-  });
-
   it("누적 60초를 넘기면 남은 달은 호출하지 않고 '시간 초과'로 표시", async () => {
     const { calls, output } = await runHandler(
       "hr-attendance",
       { query_type: "overtime", year_month: "올해" },
-      (req) => {
+      () => {
         jest.setSystemTime(Date.now() + 25_000);
-        return otByMonth(req);
+        return { DATA: [otMonthRow(5)] };
       }
     );
-    expect(calls.map((c) => c.form.searchYm)).toEqual(["202601", "202602", "202603"]);
+    expect(calls).toHaveLength(3);
     expect(output).toContain(
-      "> 조회되지 않은 달: 2026-04, 2026-05, 2026-06, 2026-07, 2026-08, 2026-09, 2026-10 (시간 초과)"
+      "> 조회되지 않은 달: 2026-04, 2026-05, 2026-06, 2026-07, 2026-08, 2026-09, 2026-10 (표에 —로 표시)"
     );
-    expect(output).toContain("> 조회된 달 합계 **10:00** (조회된 3개월)");
+    expect(output).toContain("| 합계 (조회된 3개월) | — | 15.0 | — |");
     expect(output).toContain(MISSING_NOTE);
+  });
+
+  it("모든 달 사용 0 → 그해 연장근무 기록 없음", async () => {
+    const { output } = await runHandler(
+      "hr-attendance",
+      { query_type: "overtime", year_month: "올해" },
+      () => ({ DATA: [otMonthRow(0)] })
+    );
+    expect(output).toContain("> 2026년 연장근무 기록이 없습니다.");
+    // 응답 형식 줄은 '"1건" 같은 표현은 쓰지 마세요'라고 금지어를 인용하므로 빼고 본다
+    expect(output.replace(/\[응답 형식\][^\n]*/g, "")).not.toContain("1건");
   });
 
   it("pay_periods 올해 → 10회(YYYY-MM), 월 칸 추가, 코드 중복 제거, 지급 건 없는 달 표시", async () => {
@@ -574,12 +521,15 @@ describe("monthly 모드 — 달마다 순차 호출 후 병합 (US1)", () => {
       staffId: SELF,
     });
     expect(output.startsWith(`## HR 급여 - 지급 건 목록 (2026년)\n\n${HEADER_MONTHLY}\n\n`)).toBe(true);
-    expect(output).toContain("| 월 | 급여 건 | 코드(pay_item) |");
-    expect(output).toContain("| 2026-01 | 2026-01-25 정기급여 | `20260125NN` |");
-    expect(output).toContain("| 2026-03 | 2026-03-10 상여 | `20260310BN` |");
-    expect(output.match(/20260225NN/g)).toHaveLength(1);
+    // 지급 건 코드는 표에 없고 내부 참조 줄에만(018 보안 리뷰 C1 — 연 단위도 월 단위와 같게)
+    expect(output).toContain("| 월 | 급여 건 |");
+    expect(output).toContain("| 2026-01 | 2026-01-25 정기급여 |");
+    expect(output).toContain("| 2026-03 | 2026-03-10 상여 |");
+    const table = output.split("\n").filter((l) => l.startsWith("|")).join("\n");
+    expect(table).not.toMatch(/20260125NN|pay_item|코드/);
+    expect(output.match(/2026-02-25 정기급여=20260225NN/g)).toHaveLength(1);
     expect(output).toContain("> 총 **10건**.");
-    expect(output.trimEnd().endsWith("> 지급 건이 없는 달: 2026-10")).toBe(true);
+    expect(output).toContain("> 지급 건이 없는 달: 2026-10");
   });
 
   it("pay_periods 해당 연도 지급 건이 하나도 없으면 안내 + 조회 기간", async () => {
@@ -659,16 +609,5 @@ describe("코드 리뷰 반영 — 흔한 연도 변형·연차 연도 교정", 
     const rest = output.indexOf("> 그 외 7일은 평일 주간근무 / 주말 휴일");
     expect(rest).toBeGreaterThan(0);
     expect(rest).toBeLessThan(output.indexOf("[응답 지침]"));
-  });
-
-  it("연장근무 합계 칸이 있는데 전부 비면(실서버: 연장근무 없는 달은 sumOt=null) '기록 없음'으로 안내", async () => {
-    const { output } = await runHandler(
-      "hr-attendance",
-      { query_type: "overtime", year_month: "올해" },
-      () => ({ DATA: [{ staffId: "S0001", staffNm: "홍길동", sumOt: null }] })
-    );
-    expect(output).toContain("> 조회 기간 동안 연장근무 기록이 없습니다.");
-    expect(output).not.toContain("00:00");
-    expect(output).not.toContain("계산하지 않았습니다");
   });
 });

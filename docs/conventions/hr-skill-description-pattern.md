@@ -1,6 +1,6 @@
 # HR Skill `plugin.json` description 작성 표준
 
-**버전** v1.6 (2026-10-15) · **상태** 영구 convention (archive 대상 아님)
+**버전** v1.8 (2026-10-19) · **상태** 영구 convention (archive 대상 아님)
 
 > **v1.4 (2026-09-08): P0-2/P1-1 재설계 반영 — v1.3은 2026-08-10 시점 역추출로 현행과 불일치.**
 > 2026-09-03~04에 HR skill 7종의 description이 "키워드 매핑표 + `[CRITICAL]` 반복" 방식에서 "정체성 / 의도 서술 / 경계" 구조로 전면 재작성됐고, 모든 skill에 공통인 지시(본인 기준·즉시 호출·기간 되묻기 금지·year_month 형식·required 필수·코드성 인자 선행 조회)는 description 밖 시스템 프롬프트 가드 `hrSkillChatGuard()`로 이관됐다. v1.4는 그 결과물인 실물 `plugin.json` 7종, `server/utils/chats/index.js`의 가드, `server/evals/hr-routing/` 평가 하네스에서 다시 역추출한 것이다.
@@ -219,7 +219,7 @@ enum이 하나뿐인 skill(`hr-certificate`, `hr-welfare`).
 
 ## §6 적용 현황 매트릭스
 
-2026-09-08 기준, 2026-10-15(v1.6) hr-attendance·hr-personnel·hr-approval·hr-year-end-tax(summary 절) 갱신. 실물 `plugin.json` 대조 결과.
+2026-09-08 기준, 2026-10-15(v1.6) hr-attendance·hr-personnel·hr-approval·hr-year-end-tax(summary 절) 갱신, 2026-10-19(v1.7) hr-attendance overtime·overtime_limit 설명 갱신. 실물 `plugin.json` 대조 결과.
 
 | skill | ver | query_type 수 | 주기 파라미터 | 코드성 파라미터 | required | examples | B 형태 | 폴백 값 | 경계 위임처 |
 |---|---|---|---|---|---|---|---|---|---|
@@ -309,6 +309,19 @@ v1.4 작성 시점에 확인된 코드-문서 불일치. 고칠 때 이 문서�
 ---
 
 ## 변경 이력
+
+### v1.7 → v1.8 (2026-10-19)
+
+| 항목 | v1.7 | v1.8 |
+|---|---|---|
+| 표 출력 | 모델이 tool 결과 표를 다시 써서 답변 — handler의 `[응답 형식] 표 그대로` 지시에 의존 | 위젯·채팅 경로는 시스템이 표 블록을 그대로 붙인다(specs/018). description은 무변경. handler 출력 관례가 **계약**이 됐다: 모델용 지시는 `> [`로 시작하는 줄 또는 끝의 공통 `[응답 지침]` 블록으로만, 사용자에게 보일 정보 줄은 `> `(대괄호 없음). 이 관례를 어기면 지시 문구가 사용자 화면에 나간다 |
+
+### v1.6 → v1.7 (2026-10-19)
+
+| 항목 | v1.6 | v1.7 |
+|---|---|---|
+| hr-attendance `overtime`·`overtime_limit` (Location B) | `overtime`=연장근무 신청 내역, `overtime_limit`=연장근무 한도/잔여시간 — 데이터는 PC 주차별 신청 표라 한도가 없었다 | 둘 다 "연장근무 현황(한도·사용·잔여 + 날짜별 연장근무 내역)". 차이 축은 관심사(얼마나 했는지 / 더 할 수 있는지)만 남기고 "둘 다 이번 주·이번 달(또는 지정한 달·연도) 한도·사용·잔여를 돌려줍니다"를 붙였다. enum(Location C)·`year_month` 문구(T-A)·examples 무변경. 라우팅 평가 연장근무 10건 2회 모두 통과(specs/017) |
+| 응답 형식 줄과 공통 응답 지침의 충돌 | — | tool 결과의 `[응답 형식]` 줄(표 그대로)과 공통 footer `[응답 지침]`(관련 행만 추려서)이 부딪히면 모델이 footer 쪽을 따라 표를 목록으로 바꾸거나 줄을 뺀다. 형식 줄에 "아래 [응답 지침]보다 우선"을 명시해도 질문이 기간을 좁히면("이번 달 연장근무") 그 기간만 답한다 — 질문 의도에 맞는 동작이라 시나리오 기대를 질문별로 나눴다(specs/017 E2E K6·K83) |
 
 ### v1.5 → v1.6 (2026-10-15)
 

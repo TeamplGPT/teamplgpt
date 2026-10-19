@@ -29,10 +29,11 @@ const ENDPOINT = {
 // 목록 반환 컬럼 화이트리스트 (specs/006 실측 — 주소·내부 PK·코드값 제외).
 // 키: kiwibox 컬럼(대/소문자 대응), 값: 한글 라벨.
 // getCTIMcrtfIssuMgrList 반환 컬럼 기준(실측 SQL 대조 — 주소 ADDR·내부 PK 제외).
-// TYPE_CD/USE_CD는 코드값만 제공됨(명칭 컬럼 없음) — 명칭 매핑은 CommonCode 후속 개선.
+// TYPE_CD/USE_CD/REQ_STATUS_CD는 코드값만 제공됨(명칭 컬럼 없음) → 아래 CODE_NAMES로 명칭만 보인다.
+// 내부값(코드·신청번호 REQ_NO)은 답변에 보이면 안 된다(사용자 결정 2026-10-19).
 const COLUMN_LABELS = {
-  TYPE_CD: "증명서종류코드",
-  USE_CD: "용도코드",
+  TYPE_CD: "증명서종류",
+  USE_CD: "용도",
   SUBMIT_PLACE: "제출처",
   COPY_NUM: "부수",
   ISSUE_NO: "발급번호",
@@ -40,9 +41,28 @@ const COLUMN_LABELS = {
   REQ_DATE2: "신청일시",
   PRT_YN: "출력가능",
   STAFF_NM: "성명",
-  REQ_STATUS_CD: "상태코드",
-  REQ_NO: "신청번호",
+  REQ_STATUS_CD: "결재상태",
 };
+
+// 공통코드 명칭 — kiwibox spec-db/common-code-catalog(CTI_TYPE_CD·CTI_USE_CD·EAP_STATUS_CD,
+// ctiMcrtfIssuMgr.jsp가 쓰는 그룹). 목록에 없는 코드는 코드 대신 "기타"로 보인다.
+const CODE_NAMES = {
+  TYPE_CD: {
+    10: "재직증명서", 11: "재직증명서(영문)", 20: "경력증명서", 21: "경력증명서(영문)",
+    30: "원천징수영수증(국문)", 40: "갑종근로소득세",
+  },
+  USE_CD: {
+    "01": "공공기관제출용", "02": "교육기관제출용", "03": "군대제출용", "04": "금융감독원제출용",
+    "05": "금융기관제출용", "06": "학교제출용", "07": "비자발급용", "08": "예비군제출용",
+    "09": "입찰용", 10: "제안서제출용", 12: "회사제출용", 99: "기타",
+  },
+  REQ_STATUS_CD: { 10: "임시저장", 20: "결재중", 30: "결재완료", 40: "반려" },
+};
+
+function codeName(col, value) {
+  const names = CODE_NAMES[col];
+  return names ? names[String(value).trim()] ?? "기타" : value;
+}
 
 function camel(snake) {
   return snake.toLowerCase().replace(/_([a-z])/g, (_, c) => c.toUpperCase());
@@ -53,7 +73,7 @@ function pick(row) {
   for (const [col, label] of Object.entries(COLUMN_LABELS)) {
     const v = row[col] ?? row[col.toLowerCase()] ?? row[camel(col)];
     if (v !== undefined && v !== null && String(v).trim() !== "") {
-      out[label] = v;
+      out[label] = codeName(col, v);
     }
   }
   return out;

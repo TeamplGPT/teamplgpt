@@ -17,6 +17,18 @@
  * @param {boolean} [bold=false] - Wrap numbers in bold
  * @returns {string}
  */
+/**
+ * 표 칸 문자열 정리 — 018부터 표는 시스템이 사용자 화면에 그대로 붙인다(보안 리뷰 M1·M2).
+ * "|"·줄바꿈은 표를 깨뜨려 표 밖에 임의 줄을 만들고, "[텍스트](주소)"는 위젯에서 링크가 된다.
+ * @param {string} s
+ */
+function safeCell(s) {
+  return String(s)
+    .replace(/\|/g, "/")
+    .replace(/\s*[\r\n]+\s*/g, " ")
+    .replace(/\]\(/g, "] (");
+}
+
 function formatCellValue(v, bold = false) {
   if (v === null || v === undefined) return "-";
   if (Array.isArray(v)) {
@@ -40,7 +52,7 @@ function formatCellValue(v, bold = false) {
   if (typeof v === "number") {
     return v.toLocaleString("ko-KR");
   }
-  return String(v);
+  return safeCell(v);
 }
 
 /**
@@ -215,6 +227,7 @@ function renderWhitelisted(records, columnLabels) {
 }
 
 module.exports = {
+  safeCell,
   formatCellValue,
   normalizeData,
   renderTable,

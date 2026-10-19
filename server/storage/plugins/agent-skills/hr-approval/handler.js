@@ -44,7 +44,7 @@ const COLUMN_LABELS = {
   MEMO: "신청사유",
   SIGN_LINE: "결재라인",
   LAST_SIGN_YMD: "최종결재일",
-  REQ_NO: "문서번호",
+  // REQ_NO(신청서번호)는 내부값이라 표에 넣지 않는다(사용자 결정 2026-10-19, 018 보안 리뷰 H1)
 };
 
 function pick(row) {

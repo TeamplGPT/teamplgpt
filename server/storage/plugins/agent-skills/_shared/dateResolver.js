@@ -16,6 +16,11 @@
  */
 const Sugar = require("sugar-date");
 require("sugar-date/locales/ko");
+const { seoulWallClock } = require("./seoulClock");
+
+// "어제"·"지난달"·"3월" 같은 상대 표현의 기준 "현재"를 서울 시각으로 — 서버가 UTC면 서울 기준
+// 매월 1일 아침에 "이번달"이 지난달로 해석됐다. sugar-date는 서버 안에서 이 모듈만 쓴다.
+Sugar.Date.setOption("newDateInternal", () => seoulWallClock());
 
 const FORMAT_REGEX = {
   year: /^\d{4}$/,
@@ -59,7 +64,7 @@ function formatDate(date, format) {
  * @returns {string|undefined} Resolved date string or undefined if not a partial date
  */
 function resolvePartialNumeric(str, format) {
-  const now = new Date();
+  const now = seoulWallClock();
   const curY = now.getFullYear();
   const curM = now.getMonth() + 1;
   const curD = now.getDate();

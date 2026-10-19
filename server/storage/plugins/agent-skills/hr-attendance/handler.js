@@ -17,8 +17,8 @@ const {
   monthlyPeriod,
   withPeriodHeader,
   appendBeforeAnswerGuide,
-  renderMonthlySum,
 } = require("../_shared/yearQuery");
+const { planOvertime, runOvertime } = require("../_shared/overtimeStatus");
 const {
   hrFetch,
   monthRange,
@@ -48,18 +48,11 @@ const ENDPOINT_MAP = {
     staffParam: ["searchId", "cmmSearchStaffId"], gate: false,
     baseYmdDashed: true, // §2.2 — searchId 무게이트, self 강제 필수
   },
-  overtime: {
-    // SQL(getTAADclzWorkOtSchdulList2) 정본 기간 파라미터 = searchYm(YYYYMM).
-    // searchBaseSYmd/EYmd는 읽지 않아 미전송 시 base_ym=null로 항상 0건이 된다.
-    path: "/TAADclzWorkOtSchdul.do", cmd: "getTAADclzWorkOtSchdulList2",
-    period: "ym", staffParam: "cmmSearchStaffId", gate: true,
-    fixed: { searchType: "2" }, // §2.6 실측
-  },
-  overtime_limit: {
-    path: "/TAADclzWorkOtSchdul.do", cmd: "getTAADclzWorkOtSchdulList",
-    period: "ym", staffParam: "cmmSearchStaffId", gate: true,
-    fixed: { searchType: "2" },
-  },
+  // 연장근무 두 값은 같은 경로 — 5240 모바일 연장근무현황(한도·사용·잔여 + 날짜별 내역)을
+  // _shared/overtimeStatus가 조회·렌더한다(specs/017). 기존 PC 주차별 표(TAADclzWorkOtSchdul)는
+  // 한도가 없고, 연장근무가 없는 달엔 성명·소속만 남아 "1건"으로 오답이 났다.
+  overtime: { custom: "overtimeStatus" },
+  overtime_limit: { custom: "overtimeStatus" },
   leave_requests: {
     path: "/TAADclzVcatnList.do", cmd: "getTAADclzVcatnList2", // TAA-0490 정본(§3.2)
     period: "none", staffParam: ["staffId", "cmmSearchStaffId"], gate: false,
@@ -77,8 +70,8 @@ const QUERY_LABELS = {
   timesheet: "출퇴근 기록",
   work_status: "근무현황 요약",
   work_calendar: "월 근무캘린더",
-  overtime: "연장근무(OT) 신청 내역",
-  overtime_limit: "연장근무(OT) 한도/잔여",
+  overtime: "연장근무 현황",
+  overtime_limit: "연장근무 현황",
   leave_requests: "본인 휴가신청 상세",
   annual_leave_balance: "연차 발생/사용/잔여",
 };
@@ -92,19 +85,12 @@ const QUERY_LABELS = {
 const YEAR_MODE = {
   timesheet: { kind: "record", mode: "range" },
   work_status: { kind: "record", mode: "range" },
-  // List2의 otWeekSum은 "그 달이 걸친 첫 주 ~ +5주" 6개 주차 합이라(TAADclzWorkOtSchdul_SQL
-  // OT_WEEK_SUM) 월 경계 주차가 두 달에 중복 계상된다 — 달마다 더하면 연간 합계가 부풀려진다.
-  // 연도 질의는 같은 일별 OT(TAAF_OT_TIME, 동일 플래그)를 그 달 1~말일로만 더하는 List의 sumOt를 쓴다.
-  overtime: {
-    kind: "record", mode: "monthly", sumField: "sumOt",
-    yearCmd: "getTAADclzWorkOtSchdulList",
-  },
-  overtime_limit: { kind: "record", mode: "monthly", sumField: "sumOt" },
+  // 연장근무(overtime·overtime_limit)의 연도 질의는 _shared/overtimeStatus가 직접 처리한다(specs/017).
   // 휴가·회계연도 칸(searchSymdLv 등)은 항상 그해 1/1~12/31로 보낸다 — 머리 줄도 그해 전체(schedule).
   // 연도 교정은 기존 leaveBody 블록에서 하고, 여기서는 머리 줄만 붙인다.
   leave_requests: { kind: "schedule", mode: "yearOnly" },
   // searchYm도 필수인 endpoint — 1년 범위 1회 조회가 실서버에서 12개월치를 주는지 확인 전(spec D7).
-  // 안 되면 mode를 "monthly"로 바꾼다(sumField 없으면 달별 행을 이어 붙여 렌더).
+  // 안 되면 mode를 "monthly"로 바꾼다(달별 행을 이어 붙여 렌더).
   work_calendar: { kind: "schedule", mode: "range" },
 };
 // 단위 테스트 전용 — work_calendar monthly 전환 경로 검증용(로더는 runtime만 읽는다)
@@ -169,20 +155,7 @@ const COLUMNS_BY_QT = {
     leaveAbsence: "휴직",
   },
   // 이하 근거: docs/03-analysis/hr-column-whitelist-audit.analysis.md
-  // (TAADclzWorkOtSchdul_SQL·TAADclzWorkSearchCldr_SQL·TAADclzVcatnCldrMgr_SQL 대조)
-  overtime: {
-    // getTAADclzWorkOtSchdulList2 — staffId/workStaffId/orgCd/empOrder/staffNo 차단
-    staffNm: "성명",
-    orgNm: "소속",
-    posNm: "직위",
-    otWeek01: "1주",
-    otWeek02: "2주",
-    otWeek03: "3주",
-    otWeek04: "4주",
-    otWeek05: "5주",
-    otWeek06: "6주",
-    otWeekSum: "합계",
-  },
+  // (TAADclzWorkSearchCldr_SQL·TAADclzVcatnCldrMgr_SQL 대조)
   work_calendar: {
     // getTAADclzWorkSearchCldr — kind/wktypeCd/reqNo 차단
     ymd: "일자",
@@ -191,16 +164,6 @@ const COLUMNS_BY_QT = {
     mark: "상태",
   },
 };
-
-// overtime_limit(getTAADclzWorkOtSchdulList) — 일별 매트릭스 ot01~ot31 전개
-COLUMNS_BY_QT.overtime_limit = (() => {
-  const cols = { staffNm: "성명", orgNm: "소속", posNm: "직위" };
-  for (let d = 1; d <= 31; d++) {
-    cols[`ot${String(d).padStart(2, "0")}`] = `${d}일`;
-  }
-  cols.sumOt = "합계";
-  return cols;
-})();
 
 module.exports.runtime = {
   handler: async function ({ query_type, year_month }) {
@@ -215,6 +178,14 @@ module.exports.runtime = {
 
       const spec = ENDPOINT_MAP[query_type];
       const label = QUERY_LABELS[query_type];
+
+      // 연장근무 — 대상은 본인 마커 고정(모듈 내부), 응답이 본인 1행이 아니면 결과를 쓰지 않는다
+      if (spec.custom === "overtimeStatus") {
+        this.introspect(`${label} 조회 중...`);
+        return await runOvertime(planOvertime(year_month), (req) =>
+          hrFetch(this, { ...req, gate: false })
+        );
+      }
 
       const form = {};
       if (spec.cmd) form.cmd = spec.cmd;
@@ -315,11 +286,10 @@ module.exports.runtime = {
  * form은 변경하지 않는다(기간 칸만 바꾼 사본으로 호출).
  */
 async function runYearQuery(ctx, { query_type, spec, label, form, yearPeriod }) {
-  const { mode, sumField, yearCmd } = YEAR_MODE[query_type];
+  const { mode } = YEAR_MODE[query_type];
   if (mode === "monthly") {
-    const monthForm = yearCmd ? { ...form, cmd: yearCmd } : form;
     return runYearMonthly(ctx, {
-      query_type, spec, label, form: monthForm, yearPeriod: monthlyPeriod(yearPeriod), sumField,
+      query_type, spec, label, form, yearPeriod: monthlyPeriod(yearPeriod),
     });
   }
 
@@ -377,22 +347,11 @@ function withMonth(form, spec, ym) {
   return next;
 }
 
-// 합계 행은 본인 1행이어야 한다. 여러 행이면(self 마커 미치환 등으로 타인 행 혼입 가능)
-// 더하지 않고 그 달을 실패로 돌린다 — 타인 수치가 "내 합계" 한 숫자로 숨는 것을 막는다.
-async function fetchSelfMonth(ctx, spec, form, sumField) {
-  const res = await hrFetch(ctx, { path: spec.path, form, gate: spec.gate });
-  const rows = Array.isArray(res.records) ? res.records : res.records ? [res.records] : [];
-  if (sumField && rows.length > 1) {
-    return { errorMessage: "> ⚠️ 응답 행이 여러 개라 합산하지 않았습니다." };
-  }
-  return res;
-}
-
 // searchYm 한 달만 받는 endpoint — 1월부터 달마다 순차 호출
-async function runYearMonthly(ctx, { query_type, spec, label, form, yearPeriod, sumField }) {
+async function runYearMonthly(ctx, { query_type, spec, label, form, yearPeriod }) {
   ctx.introspect(`${label} ${yearPeriod.year}년 월별 조회 중...`);
   const merged = await runMonthly(yearPeriod.months, (ym) =>
-    fetchSelfMonth(ctx, spec, withMonth(form, spec, ym), sumField)
+    hrFetch(ctx, { path: spec.path, form: withMonth(form, spec, ym), gate: spec.gate })
   );
   if (merged.errorMessage) return merged.errorMessage;
   if (merged.perMonth.length === 0) {
@@ -404,37 +363,15 @@ async function runYearMonthly(ctx, { query_type, spec, label, form, yearPeriod, 
   }
 
   ctx.introspect(`${label} 조회 완료.`);
-  if (!sumField) {
-    // 합계 칸이 없는 조회는 달별 행을 이어 붙여 range 모드와 같은 렌더러로 그린다
-    const rows = merged.perMonth.flatMap(({ records }) =>
-      Array.isArray(records) ? records : records ? [records] : []
-    );
-    return withPeriodHeader(
-      formatYearRecords(rows, label, query_type),
-      yearPeriod,
-      merged.failedMonths
-    );
-  }
-  // 실서버 확인(T039): 연장근무가 없는 달은 sumOt 키는 오고 값만 null이다(SQL SUM(OT)=NULL).
-  // 모든 달이 그 형태면 "기록 없음"이 사실이다. 키 자체가 없으면 형식 미확인으로 보고 단정하지 않는다.
-  const sumKeyPresent = merged.perMonth.every(({ records }) => {
-    const row = Array.isArray(records) ? records[0] : records;
-    return row != null && sumField in row;
-  });
-  const table = renderMonthlySum(
-    merged,
-    (records) => monthTotal(records, sumField),
-    "연장근무 합계",
-    sumKeyPresent ? "> 조회 기간 동안 연장근무 기록이 없습니다." : undefined
+  // 달별 행을 이어 붙여 range 모드와 같은 렌더러로 그린다
+  const rows = merged.perMonth.flatMap(({ records }) =>
+    Array.isArray(records) ? records : records ? [records] : []
   );
-  return withPeriodHeader(`## HR 근태 - ${label}\n\n${table}`, yearPeriod, merged.failedMonths);
-}
-
-// 한 달 응답(본인 1행 — fetchSelfMonth가 보장)의 합계 칸. 값이 없으면 null(표에 —)
-function monthTotal(records, sumField) {
-  const row = Array.isArray(records) ? records[0] : records;
-  const value = row ? field(row, sumField) : null;
-  return has(value) ? String(value).trim() : null;
+  return withPeriodHeader(
+    formatYearRecords(rows, label, query_type),
+    yearPeriod,
+    merged.failedMonths
+  );
 }
 
 /**

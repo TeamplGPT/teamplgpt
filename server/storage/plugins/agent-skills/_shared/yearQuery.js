@@ -128,14 +128,16 @@ function describeFailed(failedMonths) {
  * @param {Array<{ym: string, reason: string}>} [failedMonths]
  * @returns {string} 줄바꿈으로 끝나는 머리 줄(1~2줄)
  */
-function formatPeriodHeader(period, failedMonths = []) {
+function formatPeriodHeader(period, failedMonths = [], { monthsNote = "" } = {}) {
   const lines = [`> 조회 기간: ${period.label}`];
   if (failedMonths.length > 0) {
-    lines.push(`> 조회되지 않은 달: ${describeFailed(failedMonths)}`);
+    // 사용자에게 보이는 줄은 달 목록만 — 실패 사유(내부 오류 문구)는 모델 전용 줄로(specs/018 코드 리뷰 M-1)
+    lines.push(`> 조회되지 않은 달: ${failedMonths.map((f) => monthLabel(f.ym)).join(", ")}${monthsNote}`);
     // 가드 9항(판단 근거·실패 사유 설명 금지)과 충돌하지 않게 "어느 달이 빠졌는지"만 밝히게 한다(FR-007)
     lines.push(
       "> [안내] 답변에서 위 달이 빠졌다는 것만 짧게 밝히고(사유 설명 불필요), 결과를 그해 전체인 것처럼 말하지 마세요."
     );
+    lines.push(`> [내부 참조 — 답변에 쓰지 마세요] 조회되지 않은 사유: ${describeFailed(failedMonths)}`);
   }
   return `${lines.join("\n")}\n`;
 }
@@ -144,8 +146,8 @@ function formatPeriodHeader(period, failedMonths = []) {
  * 도구 결과에 머리 줄을 넣는다. "## 제목\n\n" 뒤(본문 앞)에 넣고, 제목이 없는
  * 안내 문구("> ⚠️ … 조회 결과가 존재하지 않습니다." 등)에는 뒤에 붙인다.
  */
-function withPeriodHeader(output, period, failedMonths = []) {
-  const header = formatPeriodHeader(period, failedMonths);
+function withPeriodHeader(output, period, failedMonths = [], options = {}) {
+  const header = formatPeriodHeader(period, failedMonths, options);
   if (output.startsWith("## ")) {
     const bodyAt = output.indexOf("\n\n");
     if (bodyAt !== -1) {
