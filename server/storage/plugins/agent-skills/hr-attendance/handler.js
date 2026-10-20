@@ -110,8 +110,7 @@ const COLUMNS_BY_QT = {
     creDd: "발생일수",
     useDd: "사용일수",
     remDd: "잔여일수",
-    staYmd: "시작일",
-    endYmd: "종료일",
+    // staYmd·endYmd(시작일·종료일)는 뺀다 — 사용자 결정 2026-10-20 "시작일 종료일 필요 없지 않아?"
   },
   leave_requests: {
     // §3.2 TAADclzVcatnList2 실측 7필드 중 dayTypeCd·addNum 제외
@@ -164,6 +163,8 @@ const COLUMNS_BY_QT = {
     mark: "상태",
   },
 };
+// 단위 테스트 전용 — 표 열 정의 검증용(로더는 runtime만 읽는다)
+module.exports.COLUMNS_BY_QT = COLUMNS_BY_QT;
 
 module.exports.runtime = {
   handler: async function ({ query_type, year_month }) {

@@ -13,6 +13,8 @@ describe("safeCell", () => {
     ["[공지](javascript:alert(1))", "[공지] (javascript:alert(1))"],
     ["[링크](https://evil.example)", "[링크] (https://evil.example)"],
     ["평범한 값", "평범한 값"],
+    // 실서버 휴가종류 이름의 이모지는 그대로 둔다(사용자 결정 2026-10-20)
+    ["연차✈️", "연차✈️"],
   ])("%p → %p", (input, expected) => {
     expect(safeCell(input)).toBe(expected);
   });
@@ -24,5 +26,12 @@ describe("renderWhitelisted 칸 값", () => {
     const rows = md.split("\n").filter((l) => l.startsWith("| 연차"));
     expect(rows).toEqual(["| 연차 신청 | 개인 사유/병원 [클릭] (javascript:alert(1)) |"]);
     expect(md).not.toMatch(/\]\(/);
+  });
+});
+
+describe("연차 잔여 표 열 (사용자 결정 2026-10-20: 시작일·종료일 불필요)", () => {
+  it("휴가종류·발생·사용·잔여만 나간다", () => {
+    const { COLUMNS_BY_QT } = require(path.resolve(__dirname, "../../../../storage/plugins/agent-skills/hr-attendance/handler.js"));
+    expect(Object.values(COLUMNS_BY_QT.annual_leave_balance)).toEqual(["휴가종류", "발생일수", "사용일수", "잔여일수"]);
   });
 });
