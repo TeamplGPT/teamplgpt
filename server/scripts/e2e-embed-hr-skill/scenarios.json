@@ -886,6 +886,52 @@
       },
       "note": "specs/018 T007. mock timesheet 4일 — 모델이 줄을 빼거나 순서·날짜를 바꾸지 않는다.",
       "repeat": 1
+    },
+    {
+      "id": "EC-ALLOW-31",
+      "axis": "ALLOW",
+      "label": "연차현황 → 잔여 표 + 사용내역 표",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "내 연차현황 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
+        "answer_pattern": [
+          "\\| 연차 \\| 23 \\| 1 \\| 22 \\|",
+          "\\| 개인사유 \\|"
+        ],
+        "answer_not_pattern": [
+          "\\[응답 지침\\]",
+          "(^|\\n)\\s*([-*•]|\\d+\\.)\\s[^\\n]*\\d+(\\.\\d+)?\\s*(시간|일|원|건|분)"
+        ]
+      },
+      "repeat": 3,
+      "note": "사용자 결정 2026-10-20: \"연차현황\"은 잔여와 사용내역 둘 다(5240 휴가현황 화면과 같음). 수정 전 FAIL 기대."
+    },
+    {
+      "id": "EC-ALLOW-32",
+      "axis": "ALLOW",
+      "label": "남은 일수 질문은 잔여 표만 (EC-ALLOW-31 가드)",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "연차 며칠 남았어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAADclzVcatnList1"
+        ],
+        "answer_pattern": [
+          "\\| 연차 \\| 23 \\| 1 \\| 22 \\|"
+        ],
+        "answer_not_pattern": [
+          "\\[응답 지침\\]",
+          "(^|\\n)\\s*([-*•]|\\d+\\.)\\s[^\\n]*\\d+(\\.\\d+)?\\s*(시간|일|원|건|분)",
+          "개인사유"
+        ],
+        "max_hr_calls": 1
+      },
+      "repeat": 3,
+      "note": "EC-ALLOW-31 가드 — 남은 일수만 물으면 사용내역을 붙이지 않는다."
     }
   ]
 }

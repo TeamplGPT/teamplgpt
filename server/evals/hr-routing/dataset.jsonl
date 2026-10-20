@@ -110,7 +110,7 @@
 {"id":"amb-loan-02","tags":["ambiguous","colloquial"],"utterance":"사내대출 이자율 몇 퍼센트야?","expect":[[{"skill":"hr-welfare","query_type":"loan"}]]}
 {"id":"amb-sch-01","tags":["ambiguous","colloquial"],"utterance":"다음 주 내 근무 스케줄 어떻게 돼?","expect":[[{"skill":"hr-attendance","query_type":"work_calendar"}]]}
 {"id":"amb-sch-02","tags":["ambiguous","colloquial"],"utterance":"금요일에 회사 일정 뭐 있어?","expect":[[{"skill":"hr-personnel","query_type":"schedule_day"}]]}
-{"id":"prod-att-01","tags":["production","colloquial"],"utterance":"내 연차 현황 알려줘","expect":[[{"skill":"hr-attendance","query_type":"annual_leave_balance"}]]}
+{"id":"prod-att-01","tags":["production","colloquial"],"utterance":"내 연차 현황 알려줘","expect":[[{"skill":"hr-attendance","query_type":"annual_leave_balance"},{"skill":"hr-attendance","query_type":"leave_requests"}]]}
 {"id":"prod-att-02","tags":["production","colloquial"],"utterance":"오늘 출근정보 알려줘","expect":[[{"skill":"hr-attendance","query_type":"timesheet"}]]}
 {"id":"prod-att-03","tags":["production","slang"],"utterance":"이번 달 출퇴근 기록","expect":[[{"skill":"hr-attendance","query_type":"timesheet"}]]}
 {"id":"prod-att-04","tags":["production","colloquial"],"utterance":"내 시업-종업 알려줘","expect":[[{"skill":"hr-attendance","query_type":"work_status"}],[{"skill":"hr-attendance","query_type":"timesheet"}]]}
@@ -166,3 +166,4 @@
 {"id":"ctl-org-02","tags":["boundary","other-employee-ctl"],"utterance":"우리 팀장님이 누구야?","expect":[[{"skill":"hr-personnel","query_type":"org_members"}],[{"skill":"hr-personnel","query_type":"org_tree"}]]}
 {"id":"mix-oth-01","tags":["multi","other-employee-mixed"],"utterance":"내 급여명세서랑 김기현 연차 알려줘","expect":[[{"skill":"hr-salary","query_type":"pay_periods"}]]}
 {"id":"mix-oth-02","tags":["multi","other-employee-mixed"],"utterance":"내 연차 잔여일이랑 이건종 대리 연차도 알려줘","expect":[[{"skill":"hr-attendance","query_type":"annual_leave_balance"}]]}
+{"id":"att-status-01","tags":["colloquial"],"utterance":"올해 내 휴가 상황 전체적으로 좀 보여줘","expect":[[{"skill":"hr-attendance","query_type":"annual_leave_balance"},{"skill":"hr-attendance","query_type":"leave_requests"}]]}

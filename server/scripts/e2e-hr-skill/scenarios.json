@@ -614,7 +614,7 @@
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "TAA-0490 menuNm(휴가현황) → annual_leave_balance"
+      "note": "TAA-0490 menuNm(휴가현황) → annual_leave_balance. @agent 경로는 잔여만 — 업스트림 aibitat가 parallel_tool_calls:false라 첫 조회 뒤 답한다. 사용자 결정 2026-10-20 \"agent는 그냥 지금처럼\". 위젯·채팅의 '현황'→잔여+사용내역은 EC-ALLOW-31이 검사."
     },
     {
       "id": "KB42",
@@ -1517,6 +1517,41 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "2026-10-19 사용자 결정(지어내기 절대 금지). 위젯 실측: 모델이 year_month=\"2023-06\"을 보냄. @agent는 tool 루프를 거치지 않아 wrapHrRuntime(hrSelfDataNotice)이 aibitat 대화의 USER 메시지로 같은 교정을 한다. 답변 문장 거르기는 @agent에 없다(D9) — answer_not_pattern으로 측정."
+    },
+    {
+      "id": "K85",
+      "label": "연차현황 → 잔여 (@agent는 사용내역 미포함)",
+      "message": "@agent 내 연차현황 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAADclzVcatnList1"
+        ]
+      },
+      "repeat": 3,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "@agent 경로는 잔여만 — 업스트림 aibitat가 parallel_tool_calls:false라 첫 조회 뒤 답한다. 사용자 결정 2026-10-20 \"agent는 그냥 지금처럼\". 위젯·채팅의 '현황'→잔여+사용내역은 EC-ALLOW-31이 검사."
+    },
+    {
+      "id": "K86",
+      "label": "남은 일수만 묻는 질문은 잔여만 (K85 가드)",
+      "message": "@agent 연차 며칠 남았어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAADclzVcatnList\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAADclzVcatnList1"
+        ],
+        "mock_body_pattern_none": [
+          "cmd=getTAADclzVcatnList2"
+        ]
+      },
+      "repeat": 3,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "K85 가드 — '현황' 매핑이 남은 일수 질문까지 사용내역을 끌어오면 FAIL."
     }
   ]
 }
