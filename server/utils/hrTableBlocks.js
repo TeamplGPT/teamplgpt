@@ -12,7 +12,7 @@
 const { isHrTool, REFUSAL_TOOL_NAME, UNSUPPORTED_TOOL_NAME, skillIdOf } = require("./hrSelfDataNotice");
 
 const TABLE_NOTICE =
-  "[표 표시] 질문에 답하려면 조회가 더 필요하면 먼저 그 조회를 하세요. 답변에는 위 표를 시스템이 끝에 그대로 붙입니다. 표나 목록으로 값을 다시 쓰지 말고 질문에 맞는 요점만 1~2문장으로 쓰세요. 특정 값을 물으면 첫 문장에 그 값을 쓰세요. 수치는 표에 있는 값만 쓰세요. 이 줄은 답변에 포함하지 마세요.";
+  "[표 표시] 질문에 답하려면 조회가 더 필요하면 먼저 그 조회를 하세요. 답변에는 위 표를 시스템이 끝에 그대로 붙입니다. 표나 목록으로 값을 다시 쓰지 말고 질문에 맞는 요점만 1~2문장으로 쓰세요. 특정 값을 물으면 첫 문장에 그 값을 쓰세요. 수치는 표에 있는 값만, 반올림하거나 바꾸지 말고 표에 적힌 그대로 쓰세요(53.14를 53으로 쓰지 않기). 이 줄은 답변에 포함하지 마세요.";
 
 const ANSWER_GUIDE_START = "\n---\n[응답 지침]";
 const PSEUDO_TOOLS = new Set([REFUSAL_TOOL_NAME, UNSUPPORTED_TOOL_NAME]);
@@ -108,6 +108,40 @@ function sanitizeModelText(text) {
     .trim();
 }
 
+// 모델 문장의 "N시간"·"N일" — 날짜("10월 15일")는 수치로 보지 않는다
+const UNIT_NUMBER_RE = /(?<![\d.])(\d+(?:\.\d+)?)\s*(시간|일)/g;
+const DATE_DAY_RE = /\d{1,2}\s*월\s*$/;
+const NUMBER_RE = /\d+(?:\.\d+)?/g;
+
+/** 글에 나온 숫자 값들(Number) */
+function numbersIn(text) {
+  return (String(text ?? "").replace(/,/g, "").match(NUMBER_RE) || []).map(Number);
+}
+
+/** 사용자 메시지에 나온 숫자 — "3일 쉬고 싶은데"의 3처럼 모델이 되받아 써도 되는 값 */
+function userNumbers(messages) {
+  const textOf = (c) => (typeof c === "string" ? c : Array.isArray(c) ? c.map((p) => p?.text ?? "").join(" ") : "");
+  return numbersIn((messages || []).filter((m) => m?.role === "user").map((m) => textOf(m.content)).join("\n"));
+}
+
+/**
+ * 표·질문에 없는 "N시간"·"N일" 수치가 든 줄을 뺀다(2026-10-21) — 모델이 표의 53.14를 "53시간"으로
+ * 반올림하거나 합계를 계산해 쓴 사례. 표가 없으면 그대로.
+ * @param {string} text - sanitizeModelText 결과
+ * @param {string[]} blocks - 붙일 표 블록
+ * @param {number[]} [extra] - 질문에 나온 숫자
+ */
+function dropUnsupportedNumbers(text, blocks, extra = []) {
+  if (typeof text !== "string" || !blocks || blocks.length === 0) return text;
+  const known = new Set([...numbersIn(blocks.join("\n")), ...extra]);
+  const supported = (line) =>
+    [...line.matchAll(UNIT_NUMBER_RE)].every((m) => {
+      if (m[2] === "일" && DATE_DAY_RE.test(line.slice(0, m.index))) return true;
+      return known.has(Number(m[1]));
+    });
+  return tidyBlankLines(text.split("\n").filter(supported)).join("\n").trim();
+}
+
 /**
  * 최종 답변(contracts §4) — 모델 문장 + 표 블록(순서 유지, 같은 블록은 한 번).
  * @param {string} text - sanitizeModelText 결과
@@ -159,5 +193,7 @@ module.exports = {
   extractTableBlock,
   toModelResult,
   sanitizeModelText,
+  dropUnsupportedNumbers,
+  userNumbers,
   joinFinalAnswer,
 };

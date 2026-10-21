@@ -20,10 +20,17 @@ function toNumber(v) {
   return DECIMAL_RE.test(s) ? Number(s) : null;
 }
 
-/** 시간 숫자 → "12.0". 값이 없거나 숫자가 아니면 "—"(0으로 바꾸지 않는다) */
+/**
+ * 시간 숫자 → 5240이 준 자릿수 그대로("53.14", "82.5"), 정수는 "52.0". 소수 셋째 자리부터는 자른다 —
+ * 5240 홈 화면과 같은 방식(xTRUNC_N(…, 2)). 반올림하지 않는다(2026-10-21: 홈 "53.14"인데 챗봇 "53.1").
+ * 값이 없거나 숫자가 아니면 "—"(0으로 바꾸지 않는다). 부동소수 오차를 피하려 문자열로 자른다.
+ */
 function formatHours(v) {
   const n = toNumber(v);
-  return n === null ? DASH : n.toFixed(1);
+  if (n === null) return DASH;
+  const [int, frac = ""] = String(n).split(".");
+  const kept = frac.slice(0, 2).replace(/0+$/, "");
+  return `${int}.${kept || "0"}`;
 }
 
 /** 서울 기준 오늘 {y, m, d} — 서버 시간대가 UTC여도 날짜가 밀리지 않게 */

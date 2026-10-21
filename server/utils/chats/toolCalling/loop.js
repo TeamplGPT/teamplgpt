@@ -15,6 +15,8 @@ const {
   extractTableBlock,
   toModelResult,
   sanitizeModelText,
+  dropUnsupportedNumbers,
+  userNumbers,
   joinFinalAnswer,
   isPrepLookup,
   isRefusalText,
@@ -149,6 +151,8 @@ async function toolCallingLoop(opts) {
     mainAttempted: false,
     hrCalled: false,
     years: allowedYears(opts.messages),
+    // userNumbers: 질문에 나온 숫자 — 모델 문장이 되받아 써도 되는 수치(2026-10-21)
+    userNumbers: userNumbers(opts.messages),
   };
   // 캡처하지 않고 이미 흘려보낸 앞 라운드 문장(예: tool 호출 전 "확인해 볼게요.")
   let streamedText = "";
@@ -477,7 +481,10 @@ function finalizeText(text, tables) {
 
 function withTableBlocks(text, tables) {
   if (!hasBlocks(tables) || isRefusalText(text)) return text;
-  return joinFinalAnswer(sanitizeModelText(text), selectBlocks(tables.entries, tables.mainAttempted));
+  const blocks = selectBlocks(tables.entries, tables.mainAttempted);
+  // 표·질문에 없는 시간·일 수치(반올림·계산)가 든 문장은 뺀다 — 표가 정답이다
+  const sentence = dropUnsupportedNumbers(sanitizeModelText(text), blocks, tables.userNumbers);
+  return joinFinalAnswer(sentence, blocks);
 }
 
 // 붙일 표가 있는가 — 거절 선택지가 호출된 답변은 표 없이 지금처럼 스트리밍한다

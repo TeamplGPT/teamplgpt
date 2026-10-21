@@ -206,6 +206,7 @@ const FIXTURES_BY_PATH = {
 // 연장근무현황(모바일, specs/017) — 한도·사용·잔여(searchType 2=주간, 3=월간)와 날짜별 내역.
 // 기준일(searchBaseSYmd) 월로 분기한다:
 //   2월 = 연장근무 없음(사용 0, 내역 0건) / 3월 = HTTP 500(부분 실패) / 5월 = 팀원 포함 3행(본인 1행 검증)
+//   4월 = 월 한도가 소수(53.14, 회사 설정값) — 모델이 "53시간"으로 반올림해 쓰면 안 된다(2026-10-21)
 // staffNo는 내부값 비노출 검증용이다.
 const OT_SELF = { staffNo: "20260001", staffNm: "오사공", orgNm: "개발팀", posNm: "책임", wktypeNm: "통상근무" };
 const OT_TEAM = [
@@ -237,13 +238,15 @@ function overtimeFixture(pathname, body) {
   }
   const month = overtimeMonth(body);
   if (month === "03") return { status: 500, json: { success: false, message: "mock failure" } };
-  const noOt = month === "02";
+  const noOt = month === "02" || month === "04";
   if (pathname === "/getMBLDclzWorkOtSchdulPerson.do") {
     return { status: 200, json: { DATA: noOt ? [] : otEntries(body) } };
   }
   const limits = OT_LIMITS[String(body?.searchType)] || {};
   const used = noOt ? { useOt: 0, useOt2: 0, applOt: 0, remOt: limits.lmtOt, remOt2: limits.lmtOt2 } : {};
-  const self = { ...OT_SELF, ...limits, ...used };
+  const decimalLimit =
+    month === "04" && String(body?.searchType) === "3" ? { lmtOt2: 53.14, useOt2: 0, remOt2: 53.14 } : {};
+  const self = { ...OT_SELF, ...limits, ...used, ...decimalLimit };
   // 팀원 값은 본인과 다르게 — 숫자가 새도 E2E가 잡을 수 있게(코드 리뷰 M-5: 주간 9/3, 월간 30/22)
   const teamValues = { lmtOt: 12, useOt: 9, remOt: 3, lmtOt2: 52, useOt2: 30, remOt2: 22 };
   const rows = month === "05" ? [self, ...OT_TEAM.map((p) => ({ ...p, ...teamValues }))] : [self];

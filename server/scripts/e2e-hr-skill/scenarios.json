@@ -1695,6 +1695,26 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "2026-10-21 dateResolver 수정. 모델이 '작년 3월'을 그대로 넘기면 전에는 해석 실패로 이번 달(10월)을 조회했다. 숫자(202503)로 바꿔 보내도 같은 결과여야 한다. (mock 3월 = HTTP 500이라 답변은 '조회하지 못함' 쪽 — 요청 기간만 판정)"
+    },
+    {
+      "id": "K94",
+      "label": "소수 한도 — 53.14를 53시간으로 반올림하지 않음 (@agent, L1)",
+      "message": "@agent 4월 연장근무 몇 시간 남았었어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLDclzWorkOtSchdul",
+        "answer_pattern": [
+          "53\\.14"
+        ],
+        "answer_not_pattern": [
+          "(?<![\\d.])53\\s*시간",
+          "약\\s*53"
+        ]
+      },
+      "repeat": 3,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "2026-10-21 사용자 확인: 5240 홈 '금월잔여연장 53.14'인데 챗봇은 '53시간 남았다'고 답함 — 표는 53.1(반올림), 문장은 모델이 53으로 다시 반올림. mock 4월 = 한도 53.14. 수정 전 FAIL 기대. @agent는 표 직접 출력·문장 수치 검사(L2)가 없는 경로라 L1(설명·결과 지시)로만 지킨다."
     }
   ]
 }

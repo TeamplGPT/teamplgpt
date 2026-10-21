@@ -811,9 +811,10 @@ describe("toolCallingLoop — 018 리뷰 반영", () => {
 
   test("L-2: tool 호출 전에 흘린 문장이 있으면 표 답변은 줄을 띄워 이어진다", async () => {
     ToolExecutor.execute.mockResolvedValueOnce(OT);
-    const { out } = await run(llm([{ text: "확인해 볼게요.", toolCalls: [att("a8", "overtime")] }, { text: "42시간 남았어요." }]));
-    expect(finalChunks()[0].textResponse.startsWith("\n\n42시간 남았어요.")).toBe(true);
-    expect(out.completeText).toBe("확인해 볼게요.\n\n42시간 남았어요.\n\n| 구분 | 한도 |\n| --- | --- |\n| 이번 달(10월) | 52.0 |");
+    // 문장의 시간 수치는 표에 있는 값이어야 남는다(2026-10-21 수치 검사) — 표의 52.0을 쓴다
+    const { out } = await run(llm([{ text: "확인해 볼게요.", toolCalls: [att("a8", "overtime")] }, { text: "한도는 52.0시간이에요." }]));
+    expect(finalChunks()[0].textResponse.startsWith("\n\n한도는 52.0시간이에요.")).toBe(true);
+    expect(out.completeText).toBe("확인해 볼게요.\n\n한도는 52.0시간이에요.\n\n| 구분 | 한도 |\n| --- | --- |\n| 이번 달(10월) | 52.0 |");
   });
 
   test("M-5: 표가 있으면 모델에 공통 응답 지침([응답 지침])도 넘기지 않는다", async () => {
@@ -902,5 +903,50 @@ describe("toolCallingLoop — 지어낸 연도 막기 (2026-10-19 사용자 결�
     const { out, response } = await run(L, "2023년은 무슨 해야?");
     expect(response.write).toHaveBeenCalledTimes(1);
     expect(out.completeText).toBe("2023년은 토끼해예요.");
+  });
+});
+
+describe("toolCallingLoop — 모델 문장의 숫자 바꿔 쓰기 막기 (2026-10-21)", () => {
+  const { ToolExecutor } = require("../executor");
+  const { writeResponseChunk } = require("../../../helpers/chat/responses");
+  const OT_RESULT =
+    "## HR 근태 - 연장근무 현황\n\n| 구분 | 한도 | 사용 | 잔여 |\n| --- | --- | --- | --- |\n| 이번 달(10월) | 53.14 | 0.0 | 53.14 |\n\n> 사용 시간에는 결재 중인 신청 건이 포함됩니다.";
+  function llm(rounds) {
+    const handleStream = jest.fn();
+    rounds.forEach((r) =>
+      handleStream.mockImplementationOnce(async (response) => {
+        if (r.text) response.write(`data: ${JSON.stringify({ type: "textResponseChunk", textResponse: r.text })}\n\n`);
+        return { text: r.text || "", toolCalls: r.toolCalls, closeChunkSent: !r.toolCalls };
+      })
+    );
+    return { streamingEnabled: () => true, streamGetChatCompletion: jest.fn().mockResolvedValue({ metrics: {} }), handleStream, toolCallingFormat: () => "openai-responses" };
+  }
+  async function run(L, question) {
+    writeResponseChunk.mockClear();
+    ToolExecutor.execute.mockClear();
+    const response = { write: jest.fn(), on: jest.fn(), removeListener: jest.fn(), writable: true };
+    return toolCallingLoop({
+      response, LLMConnector: L, messages: [{ role: "user", content: question }],
+      tools: [{ type: "function", name: "hr-attendance" }], llmOptions: {}, uuid: "u", sources: [], logger: {}, caller: "embed",
+    });
+  }
+  const ot = (id) => ({ name: "hr-attendance", call_id: id, arguments: JSON.stringify({ query_type: "overtime_limit" }) });
+
+  test("표의 53.14를 53시간으로 반올림한 문장은 빼고 표는 붙인다", async () => {
+    ToolExecutor.execute.mockResolvedValueOnce(OT_RESULT);
+    const out = await run(llm([{ toolCalls: [ot("n1")] }, { text: "이번 달 연장근무는 53시간 남았어요." }]), "연장 얼마나 남았어?");
+    expect(out.completeText).not.toMatch(/53시간/);
+    expect(out.completeText).toContain("| 이번 달(10월) | 53.14 | 0.0 | 53.14 |");
+  });
+
+  test("표의 숫자 그대로 쓴 문장은 남긴다", async () => {
+    ToolExecutor.execute.mockResolvedValueOnce(OT_RESULT);
+    const out = await run(llm([{ toolCalls: [ot("n2")] }, { text: "이번 달 연장근무는 53.14시간 남았어요." }]), "연장 얼마나 남았어?");
+    expect(out.completeText.startsWith("이번 달 연장근무는 53.14시간 남았어요.")).toBe(true);
+  });
+
+  test("모델 지시에 반올림 금지가 들어 있다(L1)", () => {
+    const { TABLE_NOTICE } = require("../../../hrTableBlocks");
+    expect(TABLE_NOTICE).toMatch(/반올림/);
   });
 });

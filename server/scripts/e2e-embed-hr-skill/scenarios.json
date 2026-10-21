@@ -1119,6 +1119,26 @@
       },
       "repeat": 3,
       "note": "specs/019 US3. @agent K91에서 모델이 '2025년'만 보내 연 단위 안내로 끝난 사례(1/3 통과) — year_month 설명에 '달을 빼지 말 것' 추가. (이전 EC-ALLOW-40 '다음 달 근무시간'은 @agent K92로 옮김.)"
+    },
+    {
+      "id": "EC-ALLOW-42",
+      "axis": "ALLOW",
+      "label": "소수 한도 — 5240이 준 53.14 그대로, 문장에서 53시간으로 바꾸지 않음",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "4월 연장근무 몇 시간 남았었어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLDclzWorkOtSchdul",
+        "answer_pattern": [
+          "\\| 4월 \\| 53\\.14 \\| 0\\.0 \\| 53\\.14 \\|"
+        ],
+        "answer_not_pattern": [
+          "(?<![\\d.])53\\s*시간",
+          "약\\s*53"
+        ]
+      },
+      "repeat": 3,
+      "note": "2026-10-21 사용자 확인: 5240 홈 '금월잔여연장 53.14'인데 챗봇은 '53시간 남았다'고 답함 — 표는 53.1(반올림), 문장은 모델이 53으로 다시 반올림. mock 4월 = 한도 53.14. 수정 전 FAIL 기대."
     }
   ]
 }

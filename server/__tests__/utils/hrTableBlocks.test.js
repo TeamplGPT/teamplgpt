@@ -188,3 +188,38 @@ describe("sanitizeModelText — 코드 리뷰 M-2·M-3", () => {
     expect(sanitizeModelText(line)).toBe(line);
   });
 });
+
+describe("dropUnsupportedNumbers — 표·질문에 없는 시간·일 수치가 든 문장은 뺀다 (2026-10-21)", () => {
+  const { dropUnsupportedNumbers } = require("../../utils/hrTableBlocks");
+  const OT = "| 구분 | 한도 | 사용 | 잔여 |\n| --- | --- | --- | --- |\n| 이번 달(10월) | 53.14 | 0.0 | 53.14 |";
+
+  it.each([
+    ["이번 달 연장근무는 53시간 남았어요.", ""],
+    ["약 53시간 남았어요.", ""],
+    ["이번 달 연장근무는 53.14시간 남았어요.", "이번 달 연장근무는 53.14시간 남았어요."],
+    ["아직 사용한 시간은 0시간이에요.", "아직 사용한 시간은 0시간이에요."],
+    ["한도 53.14시간 중 0.0시간을 썼어요.", "한도 53.14시간 중 0.0시간을 썼어요."],
+  ])("%p → %p", (text, expected) => {
+    expect(dropUnsupportedNumbers(text, [OT])).toBe(expected);
+  });
+
+  it("여러 줄 중 바뀐 숫자가 든 줄만 뺀다", () => {
+    const text = "이번 달 잔여는 53.14시간입니다.\n대략 53시간 정도 더 할 수 있어요.";
+    expect(dropUnsupportedNumbers(text, [OT])).toBe("이번 달 잔여는 53.14시간입니다.");
+  });
+
+  it("날짜(10월 15일)는 수치로 보지 않는다", () => {
+    expect(dropUnsupportedNumbers("10월 15일 기준 53.14시간 남았어요.", [OT])).toBe("10월 15일 기준 53.14시간 남았어요.");
+  });
+
+  it("사용자가 말한 수치는 쓸 수 있다", () => {
+    const leave = "| 휴가종류 | 발생일수 | 사용일수 | 잔여일수 |\n| --- | --- | --- | --- |\n| 연차 | 23 | 1 | 22 |";
+    expect(dropUnsupportedNumbers("3일 쉬어도 연차 22일이 남아 충분해요.", [leave], [3])).toBe("3일 쉬어도 연차 22일이 남아 충분해요.");
+    expect(dropUnsupportedNumbers("3일 쉬어도 연차 22일이 남아 충분해요.", [leave], [])).toBe("");
+  });
+
+  it("단위 없는 숫자·표가 없으면 그대로", () => {
+    expect(dropUnsupportedNumbers("총 2건이에요.", [OT])).toBe("총 2건이에요.");
+    expect(dropUnsupportedNumbers("53시간 남았어요.", [])).toBe("53시간 남았어요.");
+  });
+});
