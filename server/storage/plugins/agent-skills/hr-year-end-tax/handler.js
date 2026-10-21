@@ -7,6 +7,7 @@
 //  - result(결정세액)는 summary에 통합(YndList/YndCal은 조회 부적합 — 실측).
 const { resolveDateParam } = require("../_shared/dateResolver");
 const { resolveYearPeriod } = require("../_shared/periodResolver");
+const { periodProblem } = require("../_shared/periodCheck");
 const { hrFetch, SELF_STAFF_ID_MARKER } = require("../_shared/hrSession");
 
 // 지원 귀속연도 (최신이 기본). 신규 연도 배포 시 배열에 추가.
@@ -148,6 +149,9 @@ module.exports.runtime = {
         return `> ⚠️ query_type이 올바르지 않습니다. 가능한 값: ${types}`;
       }
       const spec = QUERY_MAP[query_type];
+      // 귀속연도를 말했는데 해석하지 못하면 최신 연도로 바꿔 조회하지 않고 안내(2026-10-21, _shared/periodCheck)
+      const periodMsg = periodProblem(cal_yy, "year");
+      if (periodMsg) return periodMsg;
 
       // cal_yy → 지원 연도. 미지정 시 최신. 지원 목록 밖이면 안내.
       let year = DEFAULT_YEAR;

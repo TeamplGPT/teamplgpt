@@ -1676,6 +1676,25 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "specs/019 US3-3. '다음 달 근무시간'은 근무캘린더(앞으로의 근무시간 계획)도 맞는 경로라 tool 선택은 판정하지 않는다(null) — work_hours면 '아직 지나지 않은 달' 안내, 이번 달 값(82.5)이 나오면 FAIL. (위젯 러너는 tool_call을 불리언으로만 받아 위젯판 EC-ALLOW-40은 두지 않는다.)"
+    },
+    {
+      "id": "K93",
+      "label": "연도 상대 표현 + 월 — '작년 3월'은 2025년 3월 조회",
+      "message": "@agent 작년 3월 연장근무 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLDclzWorkOtSchdul",
+        "mock_body_pattern_any": [
+          "searchBaseSYmd=2025-03-"
+        ],
+        "mock_body_pattern_none": [
+          "searchBaseSYmd=2026-10-"
+        ]
+      },
+      "repeat": 3,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "2026-10-21 dateResolver 수정. 모델이 '작년 3월'을 그대로 넘기면 전에는 해석 실패로 이번 달(10월)을 조회했다. 숫자(202503)로 바꿔 보내도 같은 결과여야 한다. (mock 3월 = HTTP 500이라 답변은 '조회하지 못함' 쪽 — 요청 기간만 판정)"
     }
   ]
 }

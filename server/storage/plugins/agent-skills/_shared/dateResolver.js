@@ -98,6 +98,61 @@ function resolvePartialNumeric(str, format) {
   return undefined;
 }
 
+// "올해 3월"·"작년 12월" — sugar-date 한국어 로케일은 "3월"·"작년"은 알지만 둘이 붙은 표현은 몰라
+// undefined였다(→ 월 단위 조회가 이번 달로 대체됨). 재작년을 작년보다 먼저 본다.
+const RELATIVE_YEAR_OFFSETS = [
+  [/^재작년$/, -2],
+  [/^(작년|지난\s*해|전년)$/, -1],
+  [/^(올해|금년|이번\s*년도?|이번\s*해)$/, 0],
+  [/^내년$/, 1],
+];
+const RELATIVE_YEAR_MONTH_RE = /^(재작년|작년|지난\s*해|전년|올해|금년|이번\s*년도?|이번\s*해|내년)\s*(\d{1,2})\s*월$/;
+// "3월 전체", "9월 한 달" — 범위 꼬리말은 떼고 해석한다
+const WHOLE_SUFFIX_RE = /\s*(전체|한\s*달)$/;
+
+// sugar-date 한국어 로케일이 모르는 자주 쓰는 표현을 아는 표현으로 바꾼다(2026-10-21).
+// 해석하지 못한 기간은 조회하지 않고 안내하게 됐으므로(_shared/periodCheck) 흔한 말은 읽어야 한다.
+const KOREAN_MONTHS = {
+  일월: 1, 이월: 2, 삼월: 3, 사월: 4, 오월: 5, 유월: 6,
+  칠월: 7, 팔월: 8, 구월: 9, 시월: 10, 십일월: 11, 십이월: 12,
+};
+const KOREAN_COUNT = { 한: 1, 두: 2, 세: 3, 네: 4, 다섯: 5, 여섯: 6 };
+const SYNONYMS = [
+  [/^(이달|금월|당월)$/, "이번 달"],
+  [/^익월$/, "다음 달"],
+  [/^전월$/, "지난달"],
+  [/^저번\s*/, "지난"], // 저번 달 → 지난달, 저번주 → 지난주
+  [/^지지난\s*달$/, "2개월 전"],
+];
+
+function normalizeKorean(input) {
+  let s = input.replace(/\s+/g, " ").trim();
+  s = s.replace(/(\d{1,2})\s*월\s*(초순|초|중순|하순|말일|말|달|까지)$/, "$1월"); // 3월 초·3월달
+  s = s.replace(/\s*달\s*까지$/, " 달"); // 이번 달까지
+  s = s.replace(/^(\d{2})\s*년\s*(\d{1,2})\s*월$/, "20$1년 $2월"); // 25년 3월
+  if (KOREAN_MONTHS[s] != null) s = `${KOREAN_MONTHS[s]}월`;
+  s = s.replace(/^(\d+|한|두|세|네|다섯|여섯)\s*달\s*전$/, (_, n) => `${KOREAN_COUNT[n] ?? n}개월 전`);
+  for (const [re, to] of SYNONYMS) s = s.replace(re, to);
+  return s;
+}
+
+/**
+ * 연도 상대 표현 + 월 → YYYYMM(year_month) 또는 YYYY(year). 해당 없으면 undefined.
+ * @param {string} str
+ * @param {"year"|"year_month"|"base_date"} format
+ */
+function resolveRelativeYearMonth(str, format) {
+  if (format !== "year_month" && format !== "year") return undefined;
+  const m = RELATIVE_YEAR_MONTH_RE.exec(str);
+  if (!m) return undefined;
+  const month = Number(m[2]);
+  if (month < 1 || month > 12) return undefined;
+  const offset = RELATIVE_YEAR_OFFSETS.find(([re]) => re.test(m[1].replace(/\s+/g, " ").trim()))?.[1];
+  if (offset === undefined) return undefined;
+  const year = seoulWallClock().getFullYear() + offset;
+  return format === "year" ? String(year) : `${year}${pad(month)}`;
+}
+
 /**
  * Resolve a date parameter value into the expected format string.
  *
@@ -118,8 +173,9 @@ function resolvePartialNumeric(str, format) {
  */
 function resolveDateParam(value, format) {
   if (value === undefined || value === null) return undefined;
-  const str = String(value).trim();
-  if (str === "") return undefined;
+  const raw = String(value).trim();
+  if (raw === "") return undefined;
+  const str = normalizeKorean(raw.replace(WHOLE_SUFFIX_RE, "").trim() || raw);
 
   // 1) Already in the exact expected format -> pass-through
   if (FORMAT_REGEX[format]?.test(str)) return str;
@@ -128,7 +184,12 @@ function resolveDateParam(value, format) {
   const partial = resolvePartialNumeric(str, format);
   if (partial) return partial;
 
-  // 3) Try parsing as Korean date expression via sugar-date (handles 3월, 15일, 어제, 지난달 etc.)
+  // 3) 연도 상대 표현 + 월("올해 3월", "작년 12월")
+  const relative = resolveRelativeYearMonth(str, format);
+  if (relative) return relative;
+  if (RELATIVE_YEAR_MONTH_RE.test(str)) return undefined; // "작년 13월"처럼 없는 달 — sugar-date 추측 금지
+
+  // 4) Try parsing as Korean date expression via sugar-date (handles 3월, 15일, 어제, 지난달 etc.)
   try {
     const parsed = Sugar.Date.create(str, { locale: "ko" });
     if (parsed instanceof Date && !isNaN(parsed.getTime())) {
@@ -138,7 +199,7 @@ function resolveDateParam(value, format) {
     // sugar-date parsing failed -> fall through
   }
 
-  // 4) Unresolvable -> undefined (API server will use its own default)
+  // 5) Unresolvable -> undefined (API server will use its own default)
   return undefined;
 }
 

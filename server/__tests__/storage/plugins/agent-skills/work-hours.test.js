@@ -266,7 +266,7 @@ describe("코드 리뷰 반영 (019 M-2·M-7·L-2)", () => {
     const plan = planWorkHours(ym, NOW);
     expect(plan.kind).toBe("unknown");
     const { calls, fetch } = okFetch(OCT);
-    expect(await runWorkHours(plan, fetch)).toMatch(/기간을 해석하지 못했습니다/);
+    expect(await runWorkHours(plan, fetch)).toMatch(/기간을 해석하지 못해/);
     expect(await workHoursBlock(plan, fetch)).toBe("");
     expect(calls).toHaveLength(0);
   });

@@ -40,6 +40,8 @@ function respond({ path, form }) {
 }
 
 // 연도 단위가 아닌 입력 — periodResolver가 null을 돌려 기존 경로를 타야 한다
+// "올해 3월"·"3월 전체"는 2026-10-21에 의도적으로 바뀌었다 — 전에는 해석하지 못해 이번 달(10월)을 조회했고,
+// 이제 3월을 조회한다(dateResolver 연도 상대 표현 + 월, date-relative-month.test.js). 나머지 입력은 변경 전과 동일.
 const NON_YEAR_INPUTS = ["2026년 3월", "올해 3월", "2026-03", "3", 3, "202512", "", "다음달", "3월 전체"];
 
 const CASES = [

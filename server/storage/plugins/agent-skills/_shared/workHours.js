@@ -18,6 +18,7 @@ const { resolveDateParam } = require("./dateResolver");
 const { resolveYearPeriod } = require("./periodResolver");
 const { SELF_STAFF_ID_MARKER } = require("./hrSession");
 const { ANSWER_GUIDE } = require("./formatTable");
+const { cleanPeriod, UNRESOLVED_PERIOD } = require("./periodCheck");
 const { DASH, field, toNumber, formatHours, seoulToday, lastDay, dashed, ymOf, mdTable } = require("./monthHours");
 
 const HOME_PATH = "/Home.do";
@@ -31,8 +32,7 @@ const ANSWER_LINE =
   "> [응답 형식] 근무시간을 물으면 누적 근로를 첫 문장에 쓰세요. 표의 값을 바꾸거나 더하고 빼지 마세요. 이 줄은 답변에 포함하지 마세요.";
 const YEAR_TEXT =
   '> ⚠️ 근무시간은 월 단위로만 조회할 수 있습니다. "9월 근무시간"처럼 달을 지정해 주세요.';
-const UNKNOWN_TEXT =
-  '> ⚠️ 말씀하신 기간을 해석하지 못했습니다. "9월 근무시간"처럼 달을 지정해 주세요.';
+const UNKNOWN_TEXT = UNRESOLVED_PERIOD; // 다른 skill과 같은 안내(_shared/periodCheck)
 const EMPTY = Object.freeze({ ok: false, worked: null, normal: null, max: null, toNormal: null });
 
 // ─── 값 도우미 ────────────────────────────────────────────────────────────────
@@ -68,8 +68,9 @@ function planWorkHours(yearMonth, now = new Date()) {
   }
   const parsed = resolveDateParam(yearMonth, "year_month");
   const validMonth = parsed && Number(parsed.slice(4, 6)) >= 1 && Number(parsed.slice(4, 6)) <= 12;
-  // 기간을 말했는데 읽지 못하면 이번 달로 바꾸지 않는다 — "작년 12월"에 이번 달 값을 답하게 된다(019 코드 리뷰 M-2)
-  if (!validMonth && String(yearMonth ?? "").trim() !== "") return { kind: "unknown" };
+  // 기간을 말했는데 읽지 못하면 이번 달로 바꾸지 않는다 — "작년 12월"에 이번 달 값을 답하게 된다(019 코드 리뷰 M-2).
+  // "최근"·"전체"처럼 기간을 정하지 않는 말은 지정 없음과 같다(_shared/periodCheck)
+  if (!validMonth && cleanPeriod(yearMonth) !== undefined) return { kind: "unknown" };
   const ym = validMonth ? parsed : ymOf(today.y, today.m);
   const y = Number(ym.slice(0, 4));
   const m = Number(ym.slice(4, 6));

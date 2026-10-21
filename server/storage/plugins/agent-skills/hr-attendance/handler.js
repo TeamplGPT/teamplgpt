@@ -11,6 +11,7 @@
 const { resolveDateParam } = require("../_shared/dateResolver");
 const { resolveYearPeriod } = require("../_shared/periodResolver");
 const { OTHER_EMPLOYEE_REFUSAL, isBlockedQueryType } = require("../_shared/otherEmployee");
+const { periodProblem } = require("../_shared/periodCheck");
 const { prepareAttendanceTable, DAY_TABLE_LINE, ISSUE_SUMMARY_LINE } = require("../_shared/attendanceDisplay");
 const {
   runMonthly,
@@ -179,6 +180,9 @@ module.exports.runtime = {
         const types = Object.keys(ENDPOINT_MAP).join(", ");
         return `> ⚠️ query_type이 올바르지 않습니다. 가능한 값: ${types}`;
       }
+      // 연차 잔여는 기간을 쓰지 않는다. 기간을 말했는데 해석하지 못하면 다른 기간으로 바꿔 조회하지 않고 안내(2026-10-21, _shared/periodCheck)
+      const periodMsg = query_type === "annual_leave_balance" ? null : periodProblem(year_month);
+      if (periodMsg) return periodMsg;
 
       const spec = ENDPOINT_MAP[query_type];
       const label = QUERY_LABELS[query_type];

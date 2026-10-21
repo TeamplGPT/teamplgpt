@@ -8,6 +8,7 @@ const { resolveDateParam } = require("../_shared/dateResolver");
 const { resolveYearPeriod } = require("../_shared/periodResolver");
 const { withPeriodHeader } = require("../_shared/yearQuery");
 const { OTHER_EMPLOYEE_REFUSAL, isBlockedQueryType } = require("../_shared/otherEmployee");
+const { periodProblem } = require("../_shared/periodCheck");
 const {
   hrFetch,
   monthRange,
@@ -79,6 +80,9 @@ module.exports.runtime = {
         const types = Object.keys(QUERY_TYPES).join(", ");
         return `> ⚠️ query_type이 올바르지 않습니다. 가능한 값: ${types}`;
       }
+      // 기간을 말했는데 해석하지 못하면 다른 기간으로 바꿔 조회하지 않고 안내(2026-10-21, _shared/periodCheck)
+      const periodMsg = periodProblem(year_month);
+      if (periodMsg) return periodMsg;
       const qt = QUERY_TYPES[query_type];
 
       // 기간 파라미터 정본 = sdt/edt (EAPRequestMgr_SQL·eapRequestMgr.jsp 실측).

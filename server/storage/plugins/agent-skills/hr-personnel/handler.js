@@ -9,6 +9,7 @@
 const { resolveDateParam } = require("../_shared/dateResolver");
 const { resolveYearPeriod } = require("../_shared/periodResolver");
 const { OTHER_EMPLOYEE_REFUSAL, isBlockedQueryType } = require("../_shared/otherEmployee");
+const { periodProblem } = require("../_shared/periodCheck");
 const { withPeriodHeader } = require("../_shared/yearQuery");
 // 표시 보정은 _shared 공통 모듈 — handler별 사본 금지(specs/022 P0-2)
 const { stripHtmlBreaks, applyCodeLabel } = require("../_shared/renderNormalize");
@@ -220,6 +221,9 @@ module.exports.runtime = {
 
       // 일정 조회의 연도 단위 질의("올해"/"2026년" …)는 그해 1/1~12/31 (specs/015).
       // 연도 표현이 아니면 null이라 기존 월 범위를 그대로 쓴다.
+      // 월 범위 조회만 기간을 쓴다. 기간을 말했는데 해석하지 못하면 다른 기간으로 바꿔 조회하지 않고 안내(2026-10-21, _shared/periodCheck)
+      const periodMsg = spec.dateParam === "month-range" ? periodProblem(year_month) : null;
+      if (periodMsg) return periodMsg;
       const yearPeriod =
         spec.dateParam === "month-range"
           ? resolveYearPeriod(year_month, { kind: "schedule" })

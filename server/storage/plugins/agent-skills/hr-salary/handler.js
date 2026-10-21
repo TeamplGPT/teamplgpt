@@ -7,6 +7,7 @@
 //  - 대상 식별자는 LLM 미노출: $SELF_STAFF_ID 마커 → 브리지(ssnStaffId)/HR_STAFF_ID(폴백) 치환.
 const { resolveDateParam } = require("../_shared/dateResolver");
 const { resolveYearPeriod } = require("../_shared/periodResolver");
+const { periodProblem } = require("../_shared/periodCheck");
 const {
   runMonthly,
   monthlyPeriod,
@@ -163,6 +164,9 @@ module.exports.runtime = {
       if (!query_type || !valid.includes(query_type)) {
         return `> ⚠️ query_type이 올바르지 않습니다. 가능한 값: ${valid.join(", ")}`;
       }
+      // 기간을 말했는데 해석하지 못하면 다른 기간으로 바꿔 조회하지 않고 안내(2026-10-21, _shared/periodCheck)
+      const periodMsg = periodProblem(year_month);
+      if (periodMsg) return periodMsg;
 
       const ym =
         resolveDateParam(year_month, "year_month") ||
