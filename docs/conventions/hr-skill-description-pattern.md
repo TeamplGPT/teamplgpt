@@ -1,6 +1,6 @@
 # HR Skill `plugin.json` description 작성 표준
 
-**버전** v1.9 (2026-10-20) · **상태** 영구 convention (archive 대상 아님)
+**버전** v1.10 (2026-10-21) · **상태** 영구 convention (archive 대상 아님)
 
 > **v1.4 (2026-09-08): P0-2/P1-1 재설계 반영 — v1.3은 2026-08-10 시점 역추출로 현행과 불일치.**
 > 2026-09-03~04에 HR skill 7종의 description이 "키워드 매핑표 + `[CRITICAL]` 반복" 방식에서 "정체성 / 의도 서술 / 경계" 구조로 전면 재작성됐고, 모든 skill에 공통인 지시(본인 기준·즉시 호출·기간 되묻기 금지·year_month 형식·required 필수·코드성 인자 선행 조회)는 description 밖 시스템 프롬프트 가드 `hrSkillChatGuard()`로 이관됐다. v1.4는 그 결과물인 실물 `plugin.json` 7종, `server/utils/chats/index.js`의 가드, `server/evals/hr-routing/` 평가 하네스에서 다시 역추출한 것이다.
@@ -223,7 +223,7 @@ enum이 하나뿐인 skill(`hr-certificate`, `hr-welfare`).
 
 | skill | ver | query_type 수 | 주기 파라미터 | 코드성 파라미터 | required | examples | B 형태 | 폴백 값 | 경계 위임처 |
 |---|---|---|---|---|---|---|---|---|---|
-| `hr-attendance` | 2.1.0 | 7 | `year_month` | — | `query_type` | 13 | 다값형 | `annual_leave_balance` | hr-approval, hr-salary, (다른 직원 근태 미제공) |
+| `hr-attendance` | 2.1.0 | 8 | `year_month` | — | `query_type` | 16 | 다값형 | `annual_leave_balance` | hr-approval, hr-salary, (다른 직원 근태 미제공) |
 | `hr-personnel` | 2.2.0 | 8 | `year_month` | `org_cd` | `query_type` | 13 | 다값형 | `profile` | hr-year-end-tax, hr-approval, (다른 직원 개인 정보 미제공) |
 | `hr-salary` | 2.2.0 | 6 | `year_month` | `pay_item` | `query_type` | 8 | 선행 조회 의존형 | (2단계 규칙) | hr-year-end-tax |
 | `hr-year-end-tax` | 2.1.0 | 9 | `cal_yy` | — | `query_type` | 12 | 다값형 | `summary` | hr-salary |
@@ -309,6 +309,13 @@ v1.4 작성 시점에 확인된 코드-문서 불일치. 고칠 때 이 문서�
 ---
 
 ## 변경 이력
+
+### v1.9 → v1.10 (2026-10-21)
+
+| 항목 | v1.9 | v1.10 |
+|---|---|---|
+| 신규 query_type | — | `hr-attendance` `work_hours`(월 근무시간 — 누적 근로·월간 소정·최대 가능, specs/019). §7.1 3-Location: A 정체성 문장에 "월 근무시간", B 의도 서술 + 차이 축 두 방향("야근·연장근무 시간만 물으면 overtime" / overtime 쪽 "일한 시간 전체는 work_hours"), D examples 4형태(생략·월만·상대 표현·연월 명시 — §5.4, 연월 명시를 빼면 "2025년 9월"을 "2025년"으로 보내는 사례 2/3). `year_month` 사용 목록에 추가하고 "work_hours는 한 달 단위라 연도와 달을 함께 전달" 한 문장을 덧붙임(T-A 본문 불변) |
+| 결과가 다른 조회를 포함하는 값 | — | `work_status` 설명에 "그 달 근무시간이 함께 나오므로 work_hours를 따로 부르지 마세요" — handler가 두 조회를 합쳐 주는 값은 모델이 중복 호출하지 않게 설명에 밝힌다. ⚠️ 처음 "근무시간 **표**가 함께"로 썼다가 "내 근무표 좀"(att-wc-03, work_calendar)이 work_status로 끌려갔다(2/5) — 설명에 넣는 명사가 다른 값의 우회 표현과 겹치지 않는지 본다(§7.4 규칙 1) |
 
 ### v1.8 → v1.9 (2026-10-20)
 

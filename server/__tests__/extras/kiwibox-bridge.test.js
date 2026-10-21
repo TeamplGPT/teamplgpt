@@ -128,3 +128,37 @@ describe("teamplgpt-hr-bridge 사번 키 필수·설정 경로 (specs/017 보안
     expect(reply).toBeDefined();
   });
 });
+
+// 월 근무시간(5240 홈 "월별 근무현황") — /Home.do는 이 cmd 하나만(specs/019 contracts/bridge-contract.md)
+describe("teamplgpt-hr-bridge 월 근무시간 (specs/019)", () => {
+  const HOME = "/Home.do";
+  const CMD = "getHomeWorkStatusBarWidgetMap";
+  const ok = { cmd: CMD, searchYmd: "2026-10-21", cmmSearchStaffId: "$SELF_STAFF_ID" };
+
+  it("정상 요청은 본인 STAFF_ID로 조회한다", async () => {
+    const { fetch, send } = loadBridge();
+    await send({ path: HOME, form: ok });
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch.mock.calls[0][0]).toBe(HOME);
+    expect(fetch.mock.calls[0][1].body).toBe(`cmd=${CMD}&searchYmd=2026-10-21&cmmSearchStaffId=STAFF123`);
+  });
+
+  it.each([
+    ["다른 홈 위젯 cmd", { ...ok, cmd: "getHomeOverTimeChartMapDetailStaff" }, "bridge: cmd not allowed"],
+    ["cmd 없음", { searchYmd: "2026-10-21", cmmSearchStaffId: "$SELF_STAFF_ID" }, "bridge: cmd not allowed"],
+    ["사번 키 없음", { cmd: CMD, searchYmd: "2026-10-21" }, "bridge: staff param required"],
+    ["본인 아닌 사번", { ...ok, cmmSearchStaffId: "S9999" }, "bridge: staff param must be self"],
+    ["정해진 키 외 파라미터", { ...ok, searchOrgCd: "100" }, "bridge: param key not allowed"],
+  ])("%s → fetch 없이 거부", async (_label, form, reason) => {
+    const { fetch, send } = loadBridge();
+    const reply = await send({ path: HOME, form });
+    expect(reply.body).toBe(reason);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("설정 allowedPaths에 /Home.do만 지정해도 기본 목록과 교집합이라 허용", async () => {
+    const { fetch, send } = loadBridge({ allowedPaths: [HOME] });
+    await send({ path: HOME, form: ok });
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+});

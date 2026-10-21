@@ -82,8 +82,8 @@
       "message": "@agent 이번 달 근무현황 요약해줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
-        "mock_body_pattern": [
+        "mock_url_pattern": "^/(TAAWrkTimeStatusMgr|Home)\\.do",
+        "mock_body_pattern_any": [
           "cmd=getTAAWrkTimeStatusMgrList",
           "searchBaseSYmd=\\d{8}",
           "searchSYmd=\\d{8}",
@@ -93,7 +93,7 @@
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/011 US2. §2.1 실측 BODY(양 range 동시). 구현 전 FAIL(searchSYmd 누락)"
+      "note": "specs/011 US2. §2.1 실측 BODY(양 range 동시). 구현 전 FAIL(searchSYmd 누락) [specs/019] 월 단위 근무현황은 근무시간(/Home.do)을 동시에 조회한다 — 마지막 요청이 어느 쪽일지 정해지지 않아 경로는 둘 다 허용하고, 근무현황 조회 여부는 모든 요청 본문(mock_body_pattern_any)으로 본다."
     },
     {
       "id": "K5",
@@ -622,15 +622,15 @@
       "message": "@agent 이번 달 출근현황 조회해줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
-        "mock_body_pattern": [
+        "mock_url_pattern": "^/(TAAWrkTimeStatusMgr|Home)\\.do",
+        "mock_body_pattern_any": [
           "cmd=getTAAWrkTimeStatusMgrList"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "TAA-0340 menuNm(출근현황) → timesheet(TAA-1410 정본)"
+      "note": "TAA-0340 menuNm(출근현황) → timesheet(TAA-1410 정본) [specs/019] '출근현황'은 출퇴근 기록·근무현황 둘 다 같은 조회(getTAAWrkTimeStatusMgrList)를 쓰고, 근무현황이면 근무시간(/Home.do)도 동시에 조회한다 — 경로는 둘 다 허용, 근무현황 조회 여부는 모든 요청 본문으로 본다."
     },
     {
       "id": "KB43",
@@ -774,19 +774,22 @@
       "message": "@agent 이번 달 지각 있어?",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
-        "max_hr_calls": 1,
+        "mock_url_pattern": "^/(TAAWrkTimeStatusMgr|Home)\\.do",
+        "max_hr_calls": 2,
         "answer_pattern": [
           "지각"
         ],
         "answer_not_pattern": [
           "\\[응답 지침\\]"
+        ],
+        "mock_body_pattern_any": [
+          "cmd=getTAAWrkTimeStatusMgrList"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/012 US2/AS1. description 가드(T010) 구현 전 FAIL(3건 fan-out) 기대"
+      "note": "specs/012 US2/AS1. description 가드(T010) 구현 전 FAIL(3건 fan-out) 기대 [specs/019] 월 단위 근무현황은 근무시간(/Home.do)을 동시에 조회한다 — 마지막 요청이 어느 쪽일지 정해지지 않아 경로는 둘 다 허용하고, 근무현황 조회 여부는 모든 요청 본문(mock_body_pattern_any)으로 본다."
     },
     {
       "id": "Q4",
@@ -819,6 +822,9 @@
           "0701[\\s\\S]*0703[\\s\\S]*0706|07-01[\\s\\S]*07-03[\\s\\S]*07-06",
           "오늘[^\\n]{0,20}(2024|07-?01|7월\\s*1일)",
           "\\[응답 지침\\]"
+        ],
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList"
         ]
       },
       "repeat": 1,
@@ -841,6 +847,9 @@
           "0701|07-01|7월 1일",
           "0706|07-06|7월 6일",
           "\\[응답 지침\\]"
+        ],
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList"
         ]
       },
       "repeat": 1,
@@ -974,21 +983,21 @@
       "message": "@agent 이번 달 근무현황 그래프로 보여줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
-        "mock_body_pattern": [
-          "cmd=getTAAWrkTimeStatusMgrList"
-        ],
+        "mock_url_pattern": "^/(TAAWrkTimeStatusMgr|Home)\\.do",
         "answer_pattern": [
           "```viz",
           "\"type\"\\s*:\\s*\"workstatus\"",
           "\"labels\"",
           "\"values\""
+        ],
+        "mock_body_pattern_any": [
+          "cmd=getTAAWrkTimeStatusMgrList"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "specs/014-hr-chatbot-viz — 그래프 명시 요청 시에만 hrSkillGuard.js의 [HR_VIZ_OUTPUT] 규칙이 tool 결과(work_status)를 viz 코드블록으로 재포장하는지 검증. 가드 추가 전에는 answer_pattern 미충족으로 FAIL해야 한다."
+      "note": "specs/014-hr-chatbot-viz — 그래프 명시 요청 시에만 hrSkillGuard.js의 [HR_VIZ_OUTPUT] 규칙이 tool 결과(work_status)를 viz 코드블록으로 재포장하는지 검증. 가드 추가 전에는 answer_pattern 미충족으로 FAIL해야 한다. [specs/019] 월 단위 근무현황은 근무시간(/Home.do)을 동시에 조회한다 — 마지막 요청이 어느 쪽일지 정해지지 않아 경로는 둘 다 허용하고, 근무현황 조회 여부는 모든 요청 본문(mock_body_pattern_any)으로 본다."
     },
     {
       "id": "K61",
@@ -1063,7 +1072,7 @@
       "message": "@agent 이번 달 근무현황 전체 표로 보여줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "mock_url_pattern": "^/(TAAWrkTimeStatusMgr|Home)\\.do",
         "answer_pattern": [
           "지각",
           "월|수|금|토"
@@ -1077,12 +1086,15 @@
           "\\bABNORMAL\\b",
           "\\[주말\\]",
           "비정상"
+        ],
+        "mock_body_pattern_any": [
+          "cmd=getTAAWrkTimeStatusMgrList"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "실사용 피드백 — kiwibox가 요일을 'MON'/'SAT [주말]' 영문으로, 상태를 'NORMAL'/'ABNORMAL' 영문으로 보내는데 hr-attendance가 그대로 렌더하고 있었다(work_status/timesheet 공용). handler.js에 있던 _shared/renderNormalize.js 미사용이 원인 — normalizeDisplayRows(weekKey/markKey)를 표시용 사본에만 적용해 수정(요약 집계용 원본 data는 그대로 유지, mark==='NORMAL' 문자열 비교가 깨지지 않도록). 확정적 검증은 node -e로 normalizeDisplayRows 순수 함수 직접 호출(WED→수, SAT [주말]→토, NORMAL→정상, ABNORMAL→비정상, 원본 불변 확인). 이 시나리오 자체는 LLM이 '전체 표로' 요청에도 요약/그래프로 답할 수 있어 다른 시나리오(K58 등)처럼 확률적으로 FAIL할 수 있음 — 그 경우 tool 결과 자체가 아니라 LLM 응답 형식 선택의 문제. [2026-10-21] 상태(정상/비정상) 칸을 5240 화면의 근무판정 한 칸으로 바꿈(사용자 결정) — 비정상은 더 나오지 않아야 한다."
+      "note": "실사용 피드백 — kiwibox가 요일을 'MON'/'SAT [주말]' 영문으로, 상태를 'NORMAL'/'ABNORMAL' 영문으로 보내는데 hr-attendance가 그대로 렌더하고 있었다(work_status/timesheet 공용). handler.js에 있던 _shared/renderNormalize.js 미사용이 원인 — normalizeDisplayRows(weekKey/markKey)를 표시용 사본에만 적용해 수정(요약 집계용 원본 data는 그대로 유지, mark==='NORMAL' 문자열 비교가 깨지지 않도록). 확정적 검증은 node -e로 normalizeDisplayRows 순수 함수 직접 호출(WED→수, SAT [주말]→토, NORMAL→정상, ABNORMAL→비정상, 원본 불변 확인). 이 시나리오 자체는 LLM이 '전체 표로' 요청에도 요약/그래프로 답할 수 있어 다른 시나리오(K58 등)처럼 확률적으로 FAIL할 수 있음 — 그 경우 tool 결과 자체가 아니라 LLM 응답 형식 선택의 문제. [2026-10-21] 상태(정상/비정상) 칸을 5240 화면의 근무판정 한 칸으로 바꿈(사용자 결정) — 비정상은 더 나오지 않아야 한다. [specs/019] 월 단위 근무현황은 근무시간(/Home.do)을 동시에 조회한다 — 마지막 요청이 어느 쪽일지 정해지지 않아 경로는 둘 다 허용하고, 근무현황 조회 여부는 모든 요청 본문(mock_body_pattern_any)으로 본다."
     },
     {
       "id": "K65",
@@ -1091,11 +1103,11 @@
       "expect": {
         "tool_call": true,
         "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "max_hr_calls": 1,
         "mock_body_pattern": [
           "searchBaseSYmd=20\\d\\d0101",
           "searchBaseEYmd=20\\d\\d(0[2-9]|1[0-2])\\d\\d"
-        ],
-        "max_hr_calls": 1
+        ]
       },
       "repeat": 1,
       "pre_reset": true,
@@ -1552,6 +1564,118 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "K85 가드 — '현황' 매핑이 남은 일수 질문까지 사용내역을 끌어오면 FAIL."
+    },
+    {
+      "id": "K87",
+      "label": "근무시간 질문 → work_hours(본인 마커·기준일)",
+      "message": "@agent 이번 달 몇 시간 일했어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/Home\\.do",
+        "mock_body_pattern": [
+          "cmd=getHomeWorkStatusBarWidgetMap",
+          "searchYmd=\\d{4}-\\d{2}-\\d{2}",
+          "cmmSearchStaffId=E2E001"
+        ],
+        "answer_pattern": [
+          "82\\.5"
+        ],
+        "answer_not_pattern": [
+          "20260001",
+          "오사공"
+        ]
+      },
+      "repeat": 3,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/019 US2. 수정 전 FAIL 기대(근무시간 조회 없음 — 근무현황·근무캘린더로 감)."
+    },
+    {
+      "id": "K88",
+      "label": "야근 시간 질문은 연장근무로 — /Home.do 조회 없음 (US2 경계)",
+      "message": "@agent 이번 달 야근 몇 시간 했어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLDclzWorkOtSchdul",
+        "mock_body_pattern_none": [
+          "cmd=getHomeWorkStatusBarWidgetMap"
+        ]
+      },
+      "repeat": 3,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/019 FR-011. 수정 전에도 PASS 기대."
+    },
+    {
+      "id": "K89",
+      "label": "다른 직원 근무시간 질문 거절 — 조회 없음",
+      "message": "@agent 김기현 이번 달 몇 시간 일했어?",
+      "expect": {
+        "tool_call": false,
+        "mock_url_pattern": null,
+        "answer_pattern": [
+          "다른 직원|제공하지 않|조회할 수 없"
+        ],
+        "answer_not_pattern": [
+          "82\\.5"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/019 FR-012."
+    },
+    {
+      "id": "K90",
+      "label": "지난 달 근무시간 — 말일 기준",
+      "message": "@agent 9월에 몇 시간 일했어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/Home\\.do",
+        "mock_body_pattern": [
+          "searchYmd=2026-09-30"
+        ],
+        "answer_pattern": [
+          "176"
+        ]
+      },
+      "repeat": 3,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/019 US3."
+    },
+    {
+      "id": "K91",
+      "label": "다른 해 지난 달 근무시간 — 연도 유지",
+      "message": "@agent 2025년 9월 근무시간 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/Home\\.do",
+        "mock_body_pattern": [
+          "searchYmd=2025-09-30"
+        ]
+      },
+      "repeat": 1,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/019 US3. 사용자가 말한 연도라 018 연도 가드가 떼지 않아야 한다."
+    },
+    {
+      "id": "K92",
+      "label": "오지 않은 달 근무시간 — 지어낸 값 없음",
+      "message": "@agent 다음 달 근무시간 알려줘",
+      "expect": {
+        "tool_call": null,
+        "mock_url_pattern": null,
+        "answer_not_pattern": [
+          "82\\.5",
+          "\\| 이번 달"
+        ]
+      },
+      "repeat": 3,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/019 US3-3. '다음 달 근무시간'은 근무캘린더(앞으로의 근무시간 계획)도 맞는 경로라 tool 선택은 판정하지 않는다(null) — work_hours면 '아직 지나지 않은 달' 안내, 이번 달 값(82.5)이 나오면 FAIL. (위젯 러너는 tool_call을 불리언으로만 받아 위젯판 EC-ALLOW-40은 두지 않는다.)"
     }
   ]
 }

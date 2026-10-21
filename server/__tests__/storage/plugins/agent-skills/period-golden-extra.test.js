@@ -15,6 +15,9 @@ function respond({ path, form }) {
     // 연장근무현황(모바일) — specs/017에서 PC 주차별 표(TAADclzWorkOtSchdul)를 교체
     case "/getMBLDclzWorkOtSchdul.do":
       return { DATA: [{ staffNm: "홍길동", lmtOt: 12, useOt: 2, remOt: 10, lmtOt2: 52, useOt2: 2, remOt2: 50 }] };
+    // 월 근무시간(5240 홈 "월별 근무현황", specs/019) — 근무현황 앞에 붙는다
+    case "/Home.do":
+      return { Map: { workT: 82.5, basTime1: 171, basTime2: 53, remT: "88.5" } };
     case "/getMBLDclzWorkOtSchdulPerson.do":
       return { DATA: [{ workYmd: "20260302", staHm: "1800", endHm: "2000", otTime: "02:00", wktypeNm: "통상근무", reason: "" }] };
     case "/TAADclzVcatnList.do":

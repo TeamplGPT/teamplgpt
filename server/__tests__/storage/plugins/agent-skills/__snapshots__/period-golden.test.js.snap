@@ -1280,8 +1280,22 @@ exports[`기간 파라미터 골든 — 월 단위·기간 없음 입력은 변�
       },
       "path": "/TAAWrkTimeStatusMgr.do",
     },
+    {
+      "form": {
+        "cmd": "getHomeWorkStatusBarWidgetMap",
+        "cmmSearchStaffId": "$SELF_STAFF_ID",
+        "searchYmd": "2026-10-15",
+      },
+      "path": "/Home.do",
+    },
   ],
   "output": "## HR 근태 - 근무현황 요약
+
+| 구분 | 누적 근로 | 월간 소정 | 최대 가능 | 소정까지 |
+| --- | --- | --- | --- | --- |
+| 이번 달(10월) | 82.5 | 171.0 | 224.0 | 88.5 |
+
+> 단위는 시간이며, 누적 근로에는 연장근무 시간이 포함됩니다.
 
 > 집계(4일) · 정상 2일 · 지각 1회 · 휴가 1일 · 연장근로 1일(승인 3.0h)
 
@@ -1321,8 +1335,22 @@ exports[`기간 파라미터 골든 — 월 단위·기간 없음 입력은 변�
       },
       "path": "/TAAWrkTimeStatusMgr.do",
     },
+    {
+      "form": {
+        "cmd": "getHomeWorkStatusBarWidgetMap",
+        "cmmSearchStaffId": "$SELF_STAFF_ID",
+        "searchYmd": "2026-03-31",
+      },
+      "path": "/Home.do",
+    },
   ],
   "output": "## HR 근태 - 근무현황 요약
+
+| 구분 | 누적 근로 | 월간 소정 | 최대 가능 | 소정까지 |
+| --- | --- | --- | --- | --- |
+| 3월 | 82.5 | 171.0 | 224.0 | — |
+
+> 단위는 시간이며, 누적 근로에는 연장근무 시간이 포함됩니다.
 
 > 집계(4일) · 정상 2일 · 지각 1회 · 휴가 1일 · 연장근로 1일(승인 3.0h)
 
@@ -1362,8 +1390,22 @@ exports[`기간 파라미터 골든 — 월 단위·기간 없음 입력은 변�
       },
       "path": "/TAAWrkTimeStatusMgr.do",
     },
+    {
+      "form": {
+        "cmd": "getHomeWorkStatusBarWidgetMap",
+        "cmmSearchStaffId": "$SELF_STAFF_ID",
+        "searchYmd": "2025-03-31",
+      },
+      "path": "/Home.do",
+    },
   ],
   "output": "## HR 근태 - 근무현황 요약
+
+| 구분 | 누적 근로 | 월간 소정 | 최대 가능 | 소정까지 |
+| --- | --- | --- | --- | --- |
+| 2025년 3월 | 82.5 | 171.0 | 224.0 | — |
+
+> 단위는 시간이며, 누적 근로에는 연장근무 시간이 포함됩니다.
 
 > 집계(4일) · 정상 2일 · 지각 1회 · 휴가 1일 · 연장근로 1일(승인 3.0h)
 
@@ -1403,8 +1445,22 @@ exports[`기간 파라미터 골든 — 월 단위·기간 없음 입력은 변�
       },
       "path": "/TAAWrkTimeStatusMgr.do",
     },
+    {
+      "form": {
+        "cmd": "getHomeWorkStatusBarWidgetMap",
+        "cmmSearchStaffId": "$SELF_STAFF_ID",
+        "searchYmd": "2026-09-30",
+      },
+      "path": "/Home.do",
+    },
   ],
   "output": "## HR 근태 - 근무현황 요약
+
+| 구분 | 누적 근로 | 월간 소정 | 최대 가능 | 소정까지 |
+| --- | --- | --- | --- | --- |
+| 9월 | 82.5 | 171.0 | 224.0 | — |
+
+> 단위는 시간이며, 누적 근로에는 연장근무 시간이 포함됩니다.
 
 > 집계(4일) · 정상 2일 · 지각 1회 · 휴가 1일 · 연장근로 1일(승인 3.0h)
 

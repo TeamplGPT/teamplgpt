@@ -38,6 +38,9 @@ function respond({ path, form }) {
           { ...ROW_STAFF, staffNm: "홍길동", orgNm: "인사팀", posNm: "사원", lmtOt: 12, useOt: 3.5, remOt: 8.5, lmtOt2: 52, useOt2: 3.5, remOt2: 48.5 },
         ],
       };
+    // 월 근무시간(5240 홈 "월별 근무현황", specs/019) — 근무현황 앞에 붙는다
+    case "/Home.do":
+      return { Map: { workT: 82.5, basTime1: 171, basTime2: 53, remT: "88.5" } };
     case "/getMBLDclzWorkOtSchdulPerson.do":
       return {
         DATA: [

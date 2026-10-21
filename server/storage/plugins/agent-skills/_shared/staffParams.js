@@ -29,6 +29,8 @@ const REQUIRED_STAFF_PARAMS = Object.freeze({
   "/SALDaylabMgr.do": ["cmmSearchStaffId"],
   "/CTIMcrtfIssuMgr.do": ["staffIdNm"],
   "/LONLoanReqstListMgr.do": ["cmmSearchStaffId"],
+  // 월 근무시간(5240 홈 "월별 근무현황", specs/019) — SQL은 요청한 값과 같은 직원을 고를 뿐 본인인지 확인하지 않는다(019 보안 리뷰 참고-1)
+  "/Home.do": ["cmmSearchStaffId"],
 });
 
 // 연말정산은 경로에 연도가 붙는다(/YTA{컨트롤러}{연도}.do) — InDctMgr만 searchStaffId

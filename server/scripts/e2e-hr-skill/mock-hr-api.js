@@ -250,6 +250,24 @@ function overtimeFixture(pathname, body) {
   return { status: 200, json: { DATA: rows } };
 }
 
+// 월 근무시간(5240 홈 "월별 근무현황", specs/019) — /Home.do는 이 cmd 하나만 응답한다(다른 cmd는 404).
+// 기준일(searchYmd) 월로 분기한다:
+//   9월 = 소정 초과(176/168/52) / 8월 = 본인 기록 없음(빈 Map) / 7월 = HTTP 500 / 그 밖 = 일반(82.5/171/53)
+// staffNo·staffNm은 내부값 비노출 검증용이다.
+const WORK_HOURS = {
+  normal: { workT: 82.5, basTime1: 171, basTime2: 53, basTime12: 128, remT: "88.5" },
+  "09": { workT: 176, basTime1: 168, basTime2: 52, basTime12: 160, remT: "-8" },
+};
+function workHoursFixture(pathname, body) {
+  if (pathname !== "/Home.do") return null;
+  if (body?.cmd !== "getHomeWorkStatusBarWidgetMap") return { status: 404, json: { message: "mock: unknown cmd" } };
+  const month = String(body?.searchYmd || "").replace(/\D/g, "").slice(4, 6);
+  if (month === "07") return { status: 500, json: { success: false, message: "mock failure" } };
+  if (month === "08") return { status: 200, json: { Map: {} } };
+  const values = WORK_HOURS[month] || WORK_HOURS.normal;
+  return { status: 200, json: { Map: { staffId: "S20260001", staffNo: "20260001", staffNm: "오사공", ...values } } };
+}
+
 const server = http.createServer((req, res) => {
   const parsed = url.parse(req.url, false);
   const baseEntry = {
@@ -262,7 +280,7 @@ const server = http.createServer((req, res) => {
   };
 
   function respond(parsedBody) {
-    const ot = overtimeFixture(parsed.pathname, parsedBody);
+    const ot = overtimeFixture(parsed.pathname, parsedBody) || workHoursFixture(parsed.pathname, parsedBody);
     if (parsed.pathname === "/health") {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ ok: true }));

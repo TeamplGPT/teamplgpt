@@ -63,6 +63,6 @@ specs/003 R1(클라이언트 실행 위임) 배포 가이드. kiwibox(5240 HR) �
 | "bridge: staffId not configured" | JSP staffId 미렌더, 또는 공백뿐(공백은 kiwibox SQL에서 빈 값 = 조회 권한 범위 전체라 거부, specs/017) |
 | "bridge: path not allowed" | 스킬이 쓰는 경로가 allowlist에 없음 (스킬-브리지 버전 불일치) |
 | "bridge: staff param required" | 사번 키가 꼭 있어야 하는 경로(`REQUIRED_STAFF_PARAMS` — 서버가 사번을 보내는 모든 경로. kiwibox SQL 다수가 대상이 비면 조회 권한 범위 전체를 돌려준다)에 키 없이 요청함. 스킬-브리지 버전 불일치면 양쪽 목록을 맞춘다 (specs/017) |
-| "bridge: param key not allowed" | 허용 키를 정한 경로(연장근무현황 두 경로)에 정해진 것 외의 키가 옴 (specs/017) |
+| "bridge: param key not allowed" | 허용 키를 정한 경로(연장근무현황 두 경로, 월 근무시간 `/Home.do`)에 정해진 것 외의 키가 옴 (specs/017·019) |
 | "bridge: cmd not allowed" | 경로의 `CMD_ALLOWLIST`에 없는 cmd(저장·삭제 등) 또는 cmd 분기 없는 경로에 cmd 전달 (스킬-브리지 버전 불일치 포함) |
 | "HR 세션이 만료되었거나..." | kiwibox 로그아웃 상태 — 재로그인 |

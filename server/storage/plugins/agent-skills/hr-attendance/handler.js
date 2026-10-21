@@ -19,6 +19,7 @@ const {
   appendBeforeAnswerGuide,
 } = require("../_shared/yearQuery");
 const { planOvertime, runOvertime } = require("../_shared/overtimeStatus");
+const { planWorkHours, runWorkHours, workHoursBlock, planYm } = require("../_shared/workHours");
 const {
   hrFetch,
   monthRange,
@@ -54,6 +55,8 @@ const ENDPOINT_MAP = {
   // 한도가 없고, 연장근무가 없는 달엔 성명·소속만 남아 "1건"으로 오답이 났다.
   overtime: { custom: "overtimeStatus" },
   overtime_limit: { custom: "overtimeStatus" },
+  // 월 근무시간 — 5240 홈 "월별 근무현황"과 같은 조회를 _shared/workHours가 조회·렌더한다(specs/019)
+  work_hours: { custom: "workHours" },
   leave_requests: {
     path: "/TAADclzVcatnList.do", cmd: "getTAADclzVcatnList2", // TAA-0490 정본(§3.2)
     period: "none", staffParam: ["staffId", "cmmSearchStaffId"], gate: false,
@@ -73,6 +76,7 @@ const QUERY_LABELS = {
   work_calendar: "월 근무캘린더",
   overtime: "연장근무 현황",
   overtime_limit: "연장근무 현황",
+  work_hours: "월 근무시간",
   leave_requests: "본인 휴가신청 상세",
   annual_leave_balance: "연차 발생/사용/잔여",
 };
@@ -179,6 +183,14 @@ module.exports.runtime = {
       const spec = ENDPOINT_MAP[query_type];
       const label = QUERY_LABELS[query_type];
 
+      // 월 근무시간 — 대상은 본인 마커 고정(모듈 내부), 값이 숫자로 읽히지 않으면 "—"(0으로 채우지 않음)
+      if (spec.custom === "workHours") {
+        this.introspect(`${label} 조회 중...`);
+        return await runWorkHours(planWorkHours(year_month), (req) =>
+          hrFetch(this, { ...req, gate: false })
+        );
+      }
+
       // 연장근무 — 대상은 본인 마커 고정(모듈 내부), 응답이 본인 1행이 아니면 결과를 쓰지 않는다
       if (spec.custom === "overtimeStatus") {
         this.introspect(`${label} 조회 중...`);
@@ -259,19 +271,7 @@ module.exports.runtime = {
         return await runYearQuery(this, { query_type, spec, label, form, yearPeriod });
       }
 
-      this.introspect(`${label} 조회 중...`);
-      const { errorMessage, records, isEmpty } = await hrFetch(this, {
-        path: spec.path,
-        form,
-        gate: spec.gate,
-      });
-      if (errorMessage) return errorMessage;
-      if (isEmpty) {
-        return `> ⚠️ **${label}** 조회 결과가 존재하지 않습니다.`;
-      }
-
-      this.introspect(`${label} 조회 완료.`);
-      return formatAttendance(untilToday(records, query_type), label, COLUMNS_BY_QT[query_type], query_type);
+      return await runMonthQuery(this, { query_type, spec, label, form, ym, year_month });
     } catch (e) {
       this.logger("Error in hr-attendance", e.message);
       return `> ⚠️ 근태 조회 중 오류가 발생했습니다: ${e.message}`;
@@ -321,6 +321,50 @@ function untilToday(records, query_type) {
     const ymd = String(field(r, "workYmd") ?? "").replace(/\D/g, "");
     return ymd.length !== 8 || ymd <= today;
   });
+}
+
+/**
+ * 월 단위 조회. 근무현황(work_status)은 그 달 근무시간(5240 홈 "월별 근무현황")을 동시에 조회해
+ * 제목 다음에 붙인다(specs/019 R7, 계약 §5). 근무시간 쪽은 계획 단계 예외까지 그 블록에서 끝난다 —
+ * 근무현황 응답을 막거나 늦추지 않는다(019 코드 리뷰 M-4).
+ */
+async function runMonthQuery(ctx, { query_type, spec, label, form, ym, year_month }) {
+  ctx.introspect(`${label} 조회 중...`);
+  const [main, hoursBlock] = await Promise.all([
+    hrFetch(ctx, { path: spec.path, form, gate: spec.gate }),
+    query_type === "work_status" ? monthHoursBlock(ctx, year_month, ym) : Promise.resolve(""),
+  ]);
+  const { errorMessage, records, isEmpty } = main;
+  if (errorMessage) return errorMessage;
+  if (isEmpty) {
+    const empty = `> ⚠️ **${label}** 조회 결과가 존재하지 않습니다.`;
+    // 근무현황이 0건이어도 받아 둔 근무시간은 버리지 않는다(019 코드 리뷰 M-7, 계약 §5)
+    return hoursBlock ? `## HR 근태 - ${label}\n\n${hoursBlock}\n\n${empty}` : empty;
+  }
+  ctx.introspect(`${label} 조회 완료.`);
+  const out = formatAttendance(untilToday(records, query_type), label, COLUMNS_BY_QT[query_type], query_type);
+  return hoursBlock ? withHoursBlock(out, hoursBlock) : out;
+}
+
+// 근무시간 블록 — 근무현황과 같은 달일 때만(시간대·해석 차이로 두 달이 섞이지 않게, 019 코드 리뷰 M-3)
+async function monthHoursBlock(ctx, year_month, ym) {
+  try {
+    const plan = planWorkHours(year_month);
+    if (planYm(plan) !== ym) return "";
+    return await workHoursBlock(plan, (req) => hrFetch(ctx, { ...req, gate: false }));
+  } catch (e) {
+    ctx.logger?.("hr-attendance work hours block skipped", e.message);
+    return "";
+  }
+}
+
+// 근무현황 출력의 "## " 제목 줄 바로 다음에 근무시간 블록을 넣는다(계약 §5 — 요약을 먼저, 날짜별 표를 나중에)
+function withHoursBlock(out, block) {
+  const lines = out.split("\n");
+  const at = lines.findIndex((l) => l.startsWith("## "));
+  if (at === -1) return `${block}\n\n${out}`;
+  const rest = lines.slice(at + 1).join("\n").replace(/^\n+/, "");
+  return [...lines.slice(0, at + 1), "", block, "", rest].join("\n");
 }
 
 // 연도 질의 결과 렌더 — 하루=1행 응답은 축약하고, 나머지는 기존 렌더러 그대로

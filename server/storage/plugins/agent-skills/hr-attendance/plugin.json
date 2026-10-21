@@ -5,17 +5,18 @@
   "version": "2.1.0",
   "hubId": "hr-attendance",
   "author": "teamplgpt",
-  "description": "본인의 근태 정보를 5240 HR 시스템에서 조회하는 skill입니다 — 연차·휴가(발생/사용/잔여 — '현황'을 물으면 사용내역까지 함께), 출퇴근 기록, 근무현황, 근무일정 캘린더, 휴가 사용내역, 연장근무(OT). '며칠 더 쉴 수 있지?', '어제 몇 시에 나갔더라?', '이번 달 늦은 적 있나?'처럼 근태 용어 없이 묻는 경우도 포함됩니다. 경계: 휴가 '신청서의 결재 진행 상태'는 hr-approval을, 급여·수당 금액은 hr-salary를 사용하세요. 팀·동료의 휴가자 현황 등 다른 직원의 근태는 제공하지 않습니다.",
+  "description": "본인의 근태 정보를 5240 HR 시스템에서 조회하는 skill입니다 — 연차·휴가(발생/사용/잔여 — '현황'을 물으면 사용내역까지 함께), 출퇴근 기록, 근무현황, 근무일정 캘린더, 휴가 사용내역, 연장근무(OT), 월 근무시간(누적 근로·소정근로). '며칠 더 쉴 수 있지?', '어제 몇 시에 나갔더라?', '이번 달 늦은 적 있나?'처럼 근태 용어 없이 묻는 경우도 포함됩니다. 경계: 휴가 '신청서의 결재 진행 상태'는 hr-approval을, 급여·수당 금액은 hr-salary를 사용하세요. 팀·동료의 휴가자 현황 등 다른 직원의 근태는 제공하지 않습니다.",
   "entrypoint": {
     "file": "handler.js",
     "params": {
       "query_type": {
-        "description": "조회 종류 (필수). 키워드가 아니라 사용자의 의도로 판단하세요: annual_leave_balance=휴가 종류별 발생/사용/잔여 — 며칠 남았는지·쉴 수 있는지가 관심사일 때(연차·보상휴가·포상휴가 포함), timesheet=출퇴근 기록 — 몇 시에 출근/퇴근했는지 시각과 기록이 관심사일 때(시업·종업 시각도 여기), work_status=근무현황 요약 — 지각/조퇴/결근/승인OT 발생 여부가 관심사일 때, work_calendar=월 근무일정 캘린더 — 앞으로의 근무유형/근무시간 계획이 관심사일 때, leave_requests=본인 휴가 사용내역·신청 상세 — 언제·왜 휴가를 썼는지 과거 사용 건이 관심사일 때, overtime=연장근무 현황(한도·사용·잔여 + 날짜별 연장근무 내역) — 야근/초과근무를 얼마나 했는지가 관심사일 때, overtime_limit=같은 연장근무 현황 — 야근을 더 할 수 있는지(남은 시간)가 관심사일 때. 둘 다 이번 주·이번 달(또는 지정한 달·연도) 한도·사용·잔여를 돌려줍니다. 연차·휴가의 '현황'을 물으면 annual_leave_balance와 leave_requests를 둘 다 호출하세요(5240 휴가현황 화면처럼 잔여와 사용내역을 함께 보여줌). 며칠·몇 개 남았는지를 물으면 annual_leave_balance 하나만, 사용·신청 내역을 물으면('전체 내역'처럼 범위를 넓혀도) leave_requests 하나만. 종류가 불분명하면 annual_leave_balance를 사용하세요.",
+        "description": "조회 종류 (필수). 키워드가 아니라 사용자의 의도로 판단하세요: annual_leave_balance=휴가 종류별 발생/사용/잔여 — 며칠 남았는지·쉴 수 있는지가 관심사일 때(연차·보상휴가·포상휴가 포함), timesheet=출퇴근 기록 — 몇 시에 출근/퇴근했는지 시각과 기록이 관심사일 때(시업·종업 시각도 여기), work_status=근무현황 요약 — 지각/조퇴/결근/승인OT 발생 여부가 관심사일 때(그 달 근무시간이 함께 나오므로 work_hours를 따로 부르지 마세요), work_hours=월 근무시간(누적 근로·월간 소정·최대 가능) — 한 달 동안 몇 시간 일했는지·소정근로를 얼마나 채웠는지가 관심사일 때(야근·연장근무 시간만 물으면 overtime), work_calendar=월 근무일정 캘린더 — 앞으로의 근무유형/근무시간 계획이 관심사일 때, leave_requests=본인 휴가 사용내역·신청 상세 — 언제·왜 휴가를 썼는지 과거 사용 건이 관심사일 때, overtime=연장근무 현황(한도·사용·잔여 + 날짜별 연장근무 내역) — 야근/초과근무를 얼마나 했는지가 관심사일 때(일한 시간 전체는 work_hours), overtime_limit=같은 연장근무 현황 — 야근을 더 할 수 있는지(남은 시간)가 관심사일 때. 둘 다 이번 주·이번 달(또는 지정한 달·연도) 한도·사용·잔여를 돌려줍니다. 연차·휴가의 '현황'을 물으면 annual_leave_balance와 leave_requests를 둘 다 호출하세요(5240 휴가현황 화면처럼 잔여와 사용내역을 함께 보여줌). 며칠·몇 개 남았는지를 물으면 annual_leave_balance 하나만, 사용·신청 내역을 물으면('전체 내역'처럼 범위를 넓혀도) leave_requests 하나만. 종류가 불분명하면 annual_leave_balance를 사용하세요.",
         "type": "string",
         "enum": [
           "annual_leave_balance",
           "timesheet",
           "work_status",
+          "work_hours",
           "work_calendar",
           "leave_requests",
           "overtime",
@@ -23,7 +24,7 @@
         ]
       },
       "year_month": {
-        "description": "조회 연월 (선택). 사용자가 기간을 언급한 경우에만 전달하고, 없으면 생략하세요(이번 달 자동 적용). 형식·되묻기 금지 규칙은 시스템 지시 [HR_SKILL_COMMON]을 따르세요. timesheet, work_status, work_calendar, overtime, overtime_limit에서 사용.",
+        "description": "조회 연월 (선택). 사용자가 기간을 언급한 경우에만 전달하고, 없으면 생략하세요(이번 달 자동 적용). 형식·되묻기 금지 규칙은 시스템 지시 [HR_SKILL_COMMON]을 따르세요. timesheet, work_status, work_hours, work_calendar, overtime, overtime_limit에서 사용. work_hours는 한 달 단위라 사용자가 연도와 달을 말하면 달을 빼지 말고 함께 전달하세요.",
         "type": "string"
       }
     },
@@ -111,6 +112,22 @@
     {
       "prompt": "이번 달 근무현황 요약해줘",
       "call": "{\"query_type\": \"work_status\"}"
+    },
+    {
+      "prompt": "이번 달 총 근무시간 보여줘",
+      "call": "{\"query_type\": \"work_hours\"}"
+    },
+    {
+      "prompt": "8월 근무시간",
+      "call": "{\"query_type\": \"work_hours\", \"year_month\": \"8\"}"
+    },
+    {
+      "prompt": "지난달 근무시간 얼마였어",
+      "call": "{\"query_type\": \"work_hours\", \"year_month\": \"지난달\"}"
+    },
+    {
+      "prompt": "2024년 3월 근무시간 알려줘",
+      "call": "{\"query_type\": \"work_hours\", \"year_month\": \"202403\"}"
     },
     {
       "prompt": "이번 달 근무캘린더 보여줘",

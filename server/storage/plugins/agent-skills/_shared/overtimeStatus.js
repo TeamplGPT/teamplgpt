@@ -20,12 +20,11 @@ const { SELF_STAFF_ID_MARKER } = require("./hrSession");
 const { toHHMM } = require("./attendanceDisplay");
 const { ANSWER_GUIDE, safeCell } = require("./formatTable");
 const { runMonthly, monthlyPeriod, withPeriodHeader } = require("./yearQuery");
+const { DASH, pad, field, toNumber, formatHours, seoulToday, lastDay, dashed, ymOf, mdTable } = require("./monthHours");
 
 const LIMIT_PATH = "/getMBLDclzWorkOtSchdul.do";
 const PERSON_PATH = "/getMBLDclzWorkOtSchdulPerson.do";
-const SEOUL_OFFSET_MS = 9 * 60 * 60 * 1000;
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
-const DASH = "—";
 
 const TITLE = "## HR 근태 - 연장근무 현황\n\n";
 const USED_NOTE = "> 사용 시간에는 결재 중인 신청 건이 포함됩니다.";
@@ -50,27 +49,7 @@ const LIMIT_FIELDS = {
 
 // ─── 값 도우미 ────────────────────────────────────────────────────────────────
 
-const pad = (n) => String(n).padStart(2, "0");
 const toRows = (records) => (Array.isArray(records) ? records : records ? [records] : []);
-
-// kiwibox jsonView는 camelCase. 대문자 원본(LMT_OT2 등)도 받는다.
-function field(row, camelKey) {
-  const snake = camelKey.replace(/([A-Z])/g, "_$1").replace(/(\d+)/g, "_$1").toUpperCase();
-  return row[camelKey] ?? row[snake] ?? row[snake.replace(/_(\d)/g, "$1")];
-}
-
-// 십진수만 숫자로 본다 — Number("0x10")=16, Number("1e2")=100 같은 해석을 막는다(코드 리뷰 L-3)
-const DECIMAL_RE = /^-?\d+(\.\d+)?$/;
-function toNumber(v) {
-  const s = v == null ? "" : String(v).replace(/,/g, "").trim();
-  return DECIMAL_RE.test(s) ? Number(s) : null;
-}
-
-/** 시간 숫자 → "12.0". 값이 없거나 숫자가 아니면 "—"(0으로 바꾸지 않는다, FR-014) */
-function formatHours(v) {
-  const n = toNumber(v);
-  return n === null ? DASH : n.toFixed(1);
-}
 
 /**
  * 사용 시간이 비어 있을 때의 해석(research R5). 그 기간 날짜별 내역이 0건으로 확인되면 0,
@@ -96,15 +75,6 @@ function toLimit(records, kind) {
 }
 
 // ─── 날짜 ────────────────────────────────────────────────────────────────────
-
-function seoulToday(now) {
-  const d = new Date(now.getTime() + SEOUL_OFFSET_MS);
-  return { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, d: d.getUTCDate() };
-}
-
-const lastDay = (y, m) => new Date(Date.UTC(y, m, 0)).getUTCDate();
-const dashed = (y, m, d) => `${y}-${pad(m)}-${pad(d)}`;
-const ymOf = (y, m) => `${y}${pad(m)}`;
 
 // "20261002" → "10/2(금)". 형식이 다르면 원본.
 function dayLabel(raw) {
@@ -152,11 +122,6 @@ const personForm = (y, m, endDay) => ({
 });
 
 // ─── 표 ──────────────────────────────────────────────────────────────────────
-
-function mdTable(headers, rows) {
-  const line = (cells) => `| ${cells.join(" | ")} |`;
-  return [line(headers), line(headers.map(() => "---")), ...rows.map(line)].join("\n");
-}
 
 const limitCells = (label, l) =>
   l.failed

@@ -24,7 +24,10 @@ const ROWS = [
 const respond = () => ({ DATA: ROWS });
 
 function parseTable(output) {
-  const lines = output.split("\n").filter((l) => l.startsWith("|"));
+  // 근무현황 앞에 근무시간 표가 붙는다(specs/019) — 날짜별 표("| 일자 |"로 시작)만 읽는다
+  const all = output.split("\n");
+  const start = all.findIndex((l) => l.startsWith("| 일자 |"));
+  const lines = all.slice(start).filter((l, i, arr) => l.startsWith("|") && arr.slice(0, i).every((x) => x.startsWith("|")));
   const cells = (l) => l.split("|").slice(1, -1).map((c) => c.trim());
   const header = cells(lines[0]);
   const rows = lines.slice(2).map(cells);

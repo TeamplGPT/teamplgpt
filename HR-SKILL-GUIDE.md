@@ -254,6 +254,7 @@ LLM 프롬프트(L1·가드)는 확률적으로 동작한다. 그래서 민감�
 | **매월 1일 아침 "이번 달"이 지난달로, 매일 아침 "오늘"이 어제로 조회됨** (서버가 UTC일 때) | `dateResolver`(sugar-date)·`hrSession.todayYmd` 등이 서버 로컬 시각을 썼다 — 도커 이미지에 시간대 설정이 없다 | `_shared/seoulClock.js` `seoulWallClock()`으로 서울 기준 계산(sugar-date `newDateInternal` 포함). 새 날짜 계산은 `new Date()` 로컬 getter 대신 이것을 쓴다. 테스트는 jest 안에서 `process.env.TZ`를 바꾸면 반영되지 않으니 TZ를 준 별도 프로세스로 확인(`seoul-clock.test.js`) |
 | **사번 칸을 빼고 보낸 HR 요청에 팀 전체가 돌아옴** (근무현황·연장근무 등, 보안 리뷰) | kiwibox SQL 다수가 대상 직원이 비면 조회 권한 범위 전체를 돌려준다. 브리지는 사번 칸이 "있을 때만" 본인인지 검사했다 | 서버 `hrFetch` 관문(`_shared/staffParams.js`) + 브리지 두 곳 `REQUIRED_STAFF_PARAMS` — 세 곳 목록을 같이 유지. 신규 경로·사번 키를 추가하면 세 곳 모두 갱신(specs/017) |
 | **모델이 HR 표를 목록으로 바꾸거나 빈 칸(—)을 옆 칸 값으로 채움, 날짜를 고쳐 씀** | 모델이 tool 결과 표를 받아 답변을 새로 쓴다 — `[응답 형식] 표 그대로` 지시로는 막지 못함(5회 중 4회 목록) | 위젯·채팅 경로(tool 루프)는 **시스템이 표를 그대로 붙인다**(specs/018, `utils/hrTableBlocks.js`). 마지막 조회 단계의 표만 붙고, 모델 문장은 다 받은 뒤 표·수치 목록을 걸러 함께 보낸다. **새 handler는 모델용 지시를 반드시 `> [`로 시작하는 줄이나 끝의 공통 응답 지침으로만 붙일 것** — 그 외 줄은 사용자에게 그대로 보인다. 파라미터 이름(`query_type` 등)이 든 줄도 자동으로 빠진다. @agent 경로는 아직 모델이 다시 씀(D9) |
+| **"이번 달 몇 시간 일했어?"에 답할 조회가 없음, 근무현황에 한 달 근무시간이 없음** | 근무현황은 날짜별 근무판정 표만 준다. 한 달 누적·소정 시간은 5240 홈 "월별 근무현황" 위젯에만 있다 | `query_type: work_hours` 신설 + 월 단위 `work_status`에 같은 표를 앞에 붙임(`_shared/workHours.js`, `/Home.do?cmd=getHomeWorkStatusBarWidgetMap`). 이번 달은 오늘, 지난 달은 말일 기준. 값이 숫자가 아니면 "—"(0으로 채우지 않음). `/Home.do`는 이 cmd 하나만 세 곳(서버·위젯·JSP 브리지)에서 허용 — 같은 경로에 팀 단위 홈 위젯 조회가 있다(specs/019) |
 
 ---
 

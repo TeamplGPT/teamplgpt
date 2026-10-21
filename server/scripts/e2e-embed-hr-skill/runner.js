@@ -147,7 +147,7 @@ function loadScenarios() {
     }
     // @agent 러너(e2e-hr-skill/helpers/expectations.js)에만 있는 판정 — 여기서는 조용히 무시되면
     // 실패해야 할 run이 PASS가 되므로 로드 단계에서 막는다(specs/016 코드 리뷰)
-    for (const key of ["mock_body_pattern_any", "mock_body_pattern_none", "min_hr_calls"]) {
+    for (const key of ["mock_body_pattern_none", "min_hr_calls"]) {
       if (s.expect[key] != null) {
         fatal(`Scenario ${s.id}: expect.${key} is not supported by the embed runner`);
       }
@@ -176,6 +176,23 @@ function loadScenarios() {
         fatal(`Scenario ${s.id}: expect.mock_body_pattern must be string[]`);
       }
       s._mockBodyRegexes = s.expect.mock_body_pattern.map((p) => {
+        try {
+          return new RegExp(p);
+        } catch (e) {
+          fatal(`Scenario ${s.id}: invalid body regex "${p}": ${e.message}`);
+        }
+      });
+    }
+    // 기록된 어떤 .do 요청 body와 맞으면 됨 — 한 질문에 HR 조회가 여러 번(동시)일 때 마지막 요청만
+    // 보면 순서에 따라 흔들린다(specs/019: 근무현황 + 근무시간 동시 조회). @agent 러너와 같은 의미.
+    if (s.expect.mock_body_pattern_any != null) {
+      if (
+        !Array.isArray(s.expect.mock_body_pattern_any) ||
+        s.expect.mock_body_pattern_any.some((p) => typeof p !== "string")
+      ) {
+        fatal(`Scenario ${s.id}: expect.mock_body_pattern_any must be string[]`);
+      }
+      s._mockBodyAnyRegexes = s.expect.mock_body_pattern_any.map((p) => {
         try {
           return new RegExp(p);
         } catch (e) {
@@ -591,6 +608,16 @@ async function runScenarioOnce(scenario, iteration, configMap, mockLogPath) {
         pass = false;
         reason = `[${scenario.axis}] mock body missing pattern(s): ${missed.join(" | ")}`;
       }
+    }
+  }
+  if (pass && scenario._mockBodyAnyRegexes) {
+    const bodies = relevantMock.map((m) => mockBodyToString(m.body));
+    const missed = scenario.expect.mock_body_pattern_any.filter(
+      (p, i) => !bodies.some((b) => scenario._mockBodyAnyRegexes[i].test(b))
+    );
+    if (missed.length > 0) {
+      pass = false;
+      reason = `[${scenario.axis}] no mock body (of ${bodies.length}) matched pattern(s): ${missed.join(" | ")}`;
     }
   }
   // 최종 답변·호출 건수 검증 — specs/012 contracts/e2e-assertion-schema.md 판정 4~7

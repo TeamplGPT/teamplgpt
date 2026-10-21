@@ -10,14 +10,14 @@
       "expect": {
         "tool_call": true,
         "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
-        "mock_body_pattern": [
-          "cmd=getTAAWrkTimeStatusMgrList"
-        ],
         "answer_pattern": [
           "\\| 20260701 \\| 수 \\| 08:55 \\| 18:10 \\| 정상 \\|"
         ],
         "answer_not_pattern": [
           "(^|\\n)\\s*([-*•]|\\d+\\.)\\s[^\\n]*\\d+(\\.\\d+)?\\s*(시간|일|원|건|분)"
+        ],
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList"
         ]
       },
       "repeat": 1,
@@ -258,14 +258,14 @@
       "expect": {
         "tool_call": true,
         "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
-        "mock_body_pattern": [
-          "cmd=getTAAWrkTimeStatusMgrList"
-        ],
         "answer_pattern": [
           "\\| 20260701 \\| 수 \\| 08:55 \\| 18:10 \\| 정상 \\|"
         ],
         "answer_not_pattern": [
           "(^|\\n)\\s*([-*•]|\\d+\\.)\\s[^\\n]*\\d+(\\.\\d+)?\\s*(시간|일|원|건|분)"
+        ],
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList"
         ]
       },
       "repeat": 1,
@@ -379,6 +379,9 @@
         ],
         "answer_pattern": [
           "\\| 20260701 \\| 수 \\| 08:55 \\| 18:10 \\| 정상 \\|"
+        ],
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList"
         ]
       },
       "repeat": 1,
@@ -392,10 +395,7 @@
       "message": "이번 달 근무현황 그래프로 보여줘",
       "expect": {
         "tool_call": true,
-        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
-        "mock_body_pattern": [
-          "cmd=getTAAWrkTimeStatusMgrList"
-        ],
+        "mock_url_pattern": "^/(TAAWrkTimeStatusMgr|Home)\\.do",
         "answer_pattern": [
           "```viz",
           "\"type\"\\s*:\\s*\"workstatus\"",
@@ -403,10 +403,13 @@
         ],
         "answer_not_pattern": [
           "(^|\\n)\\s*([-*•]|\\d+\\.)\\s[^\\n]*\\d+(\\.\\d+)?\\s*(시간|일|원|건|분)"
+        ],
+        "mock_body_pattern_any": [
+          "cmd=getTAAWrkTimeStatusMgrList"
         ]
       },
       "repeat": 1,
-      "note": "specs/014-hr-chatbot-viz — embed 경로(chats/embed.js)도 hrSkillCommonLines()의 [HR_VIZ_OUTPUT]을 그대로 상속하는지 검증. [specs/018] 표는 시스템이 조회 결과 그대로 붙인다 — 표 줄 글자 일치 + 모델 문장의 수치 목록 없음."
+      "note": "specs/014-hr-chatbot-viz — embed 경로(chats/embed.js)도 hrSkillCommonLines()의 [HR_VIZ_OUTPUT]을 그대로 상속하는지 검증. [specs/018] 표는 시스템이 조회 결과 그대로 붙인다 — 표 줄 글자 일치 + 모델 문장의 수치 목록 없음. [specs/019] 월 단위 근무현황은 근무시간(/Home.do)을 동시에 조회한다 — 마지막 요청이 어느 쪽일지 정해지지 않아 경로는 둘 다 허용하고, 근무현황 조회 여부는 모든 요청 본문(mock_body_pattern_any)으로 본다."
     },
     {
       "id": "EC-ALLOW-13",
@@ -485,17 +488,17 @@
       "expect": {
         "tool_call": true,
         "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
-        "mock_body_pattern": [
-          "cmd=getTAAWrkTimeStatusMgrList",
-          "searchBaseSYmd=20\\d\\d0101",
-          "searchBaseEYmd=20\\d\\d(0[2-9]|1[0-2])\\d\\d"
-        ],
         "answer_not_pattern": [
           "(1월|한 ?달)(만| 치만)? ?조회",
           "(^|\\n)\\s*([-*•]|\\d+\\.)\\s[^\\n]*\\d+(\\.\\d+)?\\s*(시간|일|원|건|분)"
         ],
         "answer_pattern": [
           "(^|\\n)\\|[^\\n]+\\|\\n\\|[\\s:|-]+\\|"
+        ],
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList",
+          "searchBaseSYmd=20\\d\\d0101",
+          "searchBaseEYmd=20\\d\\d(0[2-9]|1[0-2])\\d\\d"
         ]
       },
       "repeat": 1,
@@ -882,6 +885,9 @@
         ],
         "answer_not_pattern": [
           "(^|\\n)\\s*([-*•]|\\d+\\.)\\s[^\\n]*\\d+(\\.\\d+)?\\s*(시간|일|원|건|분)"
+        ],
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList"
         ]
       },
       "note": "specs/018 T007. mock timesheet 4일 — 모델이 줄을 빼거나 순서·날짜를 바꾸지 않는다.",
@@ -932,6 +938,187 @@
       },
       "repeat": 3,
       "note": "EC-ALLOW-31 가드 — 남은 일수만 물으면 사용내역을 붙이지 않는다."
+    },
+    {
+      "id": "EC-ALLOW-33",
+      "axis": "ALLOW",
+      "label": "근무시간 질문 → 근무시간 표만(근무현황 표 없음)",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "이번 달 몇 시간 일했어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/Home\\.do",
+        "mock_body_pattern": [
+          "cmd=getHomeWorkStatusBarWidgetMap",
+          "searchYmd=\\d{4}-\\d{2}-\\d{2}"
+        ],
+        "answer_pattern": [
+          "\\| 이번 달\\(\\d+월\\) \\| 82\\.5 \\| 171\\.0 \\| 224\\.0 \\| 88\\.5 \\|",
+          "82\\.5"
+        ],
+        "answer_not_pattern": [
+          "근무판정",
+          "20260001",
+          "오사공",
+          "(^|\\n)\\s*([-*•]|\\d+\\.)\\s[^\\n]*\\d+(\\.\\d+)?\\s*(시간|일|원|건|분)"
+        ],
+        "max_hr_calls": 1
+      },
+      "repeat": 3,
+      "note": "specs/019 US2. 수정 전 FAIL 기대(근무시간 조회 없음 — 근무현황·근무캘린더로 감). 표 줄 글자 일치, 신상 칸(사번·성명) 비노출, 첫 문장 누적 근로."
+    },
+    {
+      "id": "EC-ALLOW-34",
+      "axis": "ALLOW",
+      "label": "야근 시간 질문은 근무시간이 아니라 연장근무로 (US2 경계)",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "이번 달 야근 몇 시간 했어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getMBLDclzWorkOtSchdul",
+        "answer_not_pattern": [
+          "누적 근로",
+          "월간 소정"
+        ]
+      },
+      "repeat": 3,
+      "note": "specs/019 FR-011. 수정 전에도 PASS 기대(경계 가드) — 근무시간 설명이 야근 질문을 끌어오면 FAIL."
+    },
+    {
+      "id": "EC-ALLOW-35",
+      "axis": "ALLOW",
+      "label": "다른 직원 근무시간 질문 거절",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "김기현 이번 달 몇 시간 일했어?",
+      "expect": {
+        "tool_call": false,
+        "answer_pattern": [
+          "다른 직원|제공하지 않|조회할 수 없"
+        ],
+        "answer_not_pattern": [
+          "82\\.5",
+          "(^|\\n)\\|[^\\n]+\\|\\n\\|[\\s:|-]+\\|"
+        ]
+      },
+      "repeat": 1,
+      "note": "specs/019 FR-012(016 규칙)."
+    },
+    {
+      "id": "EC-ALLOW-36",
+      "axis": "ALLOW",
+      "label": "근무현황 → 근무시간 표 + 근무현황 표(근무시간이 먼저)",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "이번 달 근무현황 알려줘",
+      "expect": {
+        "tool_call": true,
+        "answer_pattern": [
+          "\\| 이번 달\\(\\d+월\\) \\| 82\\.5 \\| 171\\.0 \\| 224\\.0 \\| 88\\.5 \\|",
+          "82\\.5[\\s\\S]*\\| 일자 \\|[^\\n]*근무판정"
+        ],
+        "answer_not_pattern": [
+          "20260001",
+          "오사공",
+          "(^|\\n)\\s*([-*•]|\\d+\\.)\\s[^\\n]*\\d+(\\.\\d+)?\\s*(시간|일|원|건|분)"
+        ]
+      },
+      "repeat": 3,
+      "note": "specs/019 US1. 수정 전 FAIL 기대(근무현황 표만)."
+    },
+    {
+      "id": "EC-ALLOW-37",
+      "axis": "ALLOW",
+      "label": "근무시간을 못 받은 달의 근무현황 — — 줄 + 안내, 근무현황 표 유지",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "8월 근무현황 알려줘",
+      "expect": {
+        "tool_call": true,
+        "answer_pattern": [
+          "\\| 8월 \\| — \\| — \\| — \\| — \\|",
+          "근무시간을 조회하지 못했습니다",
+          "\\| 일자 \\|"
+        ],
+        "answer_not_pattern": [
+          "\\| 8월 \\| 0(\\.0)? \\|"
+        ]
+      },
+      "repeat": 1,
+      "note": "specs/019 FR-006. mock 8월 = 빈 Map. 0으로 채우면 FAIL."
+    },
+    {
+      "id": "EC-ALLOW-38",
+      "axis": "ALLOW",
+      "label": "지난 달 근무시간 — 말일 기준, 소정 초과, 소정까지 —",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "9월에 몇 시간 일했어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/Home\\.do",
+        "mock_body_pattern": [
+          "cmd=getHomeWorkStatusBarWidgetMap",
+          "searchYmd=2026-09-30"
+        ],
+        "answer_pattern": [
+          "\\| 9월 \\| 176\\.0 \\| 168\\.0 \\| 220\\.0 \\| — \\|"
+        ],
+        "answer_not_pattern": [
+          "근무판정"
+        ]
+      },
+      "repeat": 3,
+      "note": "specs/019 US3. T012 계획 구현으로 이미 PASS할 수 있다(그 경우 기록)."
+    },
+    {
+      "id": "EC-ALLOW-39",
+      "axis": "ALLOW",
+      "label": "지난달 근무현황 — 9월 근무시간 + 근무현황",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "지난달 근무현황 보여줘",
+      "expect": {
+        "tool_call": true,
+        "answer_pattern": [
+          "\\| 9월 \\| 176\\.0 \\| 168\\.0 \\| 220\\.0 \\| — \\|",
+          "\\| 일자 \\|"
+        ]
+      },
+      "repeat": 1,
+      "note": "specs/019 US3-2."
+    },
+    {
+      "id": "EC-ALLOW-41",
+      "axis": "ALLOW",
+      "label": "연 단위 근무시간 — 지어낸 연 합계 없음",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "올해 몇 시간 일했어?",
+      "expect": {
+        "tool_call": false,
+        "answer_pattern": [
+          "월 단위|달을 지정"
+        ],
+        "answer_not_pattern": [
+          "\\d{3,}(\\.\\d)?\\s*시간"
+        ]
+      },
+      "repeat": 1,
+      "note": "specs/019 Edge Cases. 연 합계를 계산하면 FAIL. 이 경우 tool이 HR 요청 없이 안내만 돌려준다 — 위젯 러너는 mock 기록으로 tool 호출을 보므로 tool_call=false(HR 조회 없음)로 판정한다."
+    },
+    {
+      "id": "EC-ALLOW-40",
+      "axis": "ALLOW",
+      "label": "다른 해 지난 달 근무시간 — 연도와 달을 함께",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "2025년 9월 근무시간 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/Home\\.do",
+        "mock_body_pattern": [
+          "searchYmd=2025-09-30"
+        ],
+        "answer_pattern": [
+          "\\| 2025년 9월 \\| 176\\.0 \\|"
+        ]
+      },
+      "repeat": 3,
+      "note": "specs/019 US3. @agent K91에서 모델이 '2025년'만 보내 연 단위 안내로 끝난 사례(1/3 통과) — year_month 설명에 '달을 빼지 말 것' 추가. (이전 EC-ALLOW-40 '다음 달 근무시간'은 @agent K92로 옮김.)"
     }
   ]
 }

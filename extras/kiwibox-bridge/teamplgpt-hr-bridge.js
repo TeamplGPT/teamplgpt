@@ -28,6 +28,7 @@
   // (카탈로그 §4.1~4.3, §4.5, §4.8~4.9)
   var DEFAULT_ALLOWED_PATHS = [
     "/LONLoanReqstListMgr.do",
+    "/Home.do", // 월 근무시간(5240 홈 "월별 근무현황") — cmd 하나만, specs/019
     "/PRCHrBassiemMgrTab220.do",
     "/CTIMcrtfReqstRefromMgr.do",
     "/CTIMcrtfIssuMgr.do", // 증명서 발급내역 목록 정본 (Refrom은 단건/초기조회용)
@@ -98,6 +99,7 @@
     "/SALDaylabMgr.do": ["cmmSearchStaffId"],
     "/CTIMcrtfIssuMgr.do": ["staffIdNm"],
     "/LONLoanReqstListMgr.do": ["cmmSearchStaffId"],
+    "/Home.do": ["cmmSearchStaffId"],
   };
 
   // 연말정산(YTA*)은 경로에 연도가 붙어 컨트롤러명으로 찾는다 — InDctMgr만 searchStaffId
@@ -118,6 +120,7 @@
   var ALLOWED_PARAM_KEYS = {
     "/getMBLDclzWorkOtSchdul.do": ["searchType", "searchBaseSYmd", "cmmSearchStaffId"],
     "/getMBLDclzWorkOtSchdulPerson.do": ["searchBaseSYmd", "searchBaseEYmd", "cmmSearchStaffId"],
+    "/Home.do": ["cmd", "searchYmd", "cmmSearchStaffId"],
   };
 
   function areParamKeysAllowed(path, formObj) {
@@ -180,6 +183,8 @@
     "/CTIMcrtfReqstRefromMgr.do": ["getCTIMcrtfReqstRefromMgrList"],
     "/CTIMcrtfIssuMgr.do": ["getCTIMcrtfIssuMgrList"],
     "/LONLoanReqstListMgr.do": ["getLONLoanReqstListMgrList1"],
+    // 홈 경로에는 팀·회사 단위 위젯 조회가 함께 있다 — 본인 월 근무시간 하나만(specs/019)
+    "/Home.do": ["getHomeWorkStatusBarWidgetMap"],
   };
 
   // YTA 경로는 연도를 뗀 컨트롤러명 기준 cmd allowlist

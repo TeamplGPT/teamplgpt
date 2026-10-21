@@ -45,6 +45,14 @@ describe("hrFetch 본인 사번 관문", () => {
     expect(calls).toHaveLength(0);
   });
 
+  it("월 근무시간(/Home.do)을 사번 키 없이 요청하면 보내지 않는다 (specs/019)", async () => {
+    const { ctx, calls } = ctxWithTransport();
+    const res = await hrFetch(ctx, { path: "/Home.do", form: { cmd: "getHomeWorkStatusBarWidgetMap", searchYmd: "2026-10-21" } });
+    expect(calls).toHaveLength(0);
+    expect(res.errorMessage).toMatch(/본인 정보를 확인할 수 없어/);
+    expect(requiredStaffKeys("/Home.do")).toEqual(["cmmSearchStaffId"]);
+  });
+
   it("본인 마커가 있으면 그대로 보낸다", async () => {
     const { ctx, calls } = ctxWithTransport();
     const res = await hrFetch(ctx, { path: "/TAAWrkTimeStatusMgr.do", form: { cmd: "getTAAWrkTimeStatusMgrList", cmmSearchStaffId: SELF } });
