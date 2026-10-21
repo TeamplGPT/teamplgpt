@@ -23,6 +23,7 @@ const {
   hrFetch,
   monthRange,
   todayDashed,
+  todayYmd,
   SELF_STAFF_ID_MARKER,
 } = require("../_shared/hrSession");
 
@@ -128,17 +129,15 @@ const COLUMNS_BY_QT = {
     endTime: "퇴근",
     baseStaTime: "기준출근",
     baseEndTime: "기준퇴근",
-    mark: "상태",
-    workComment: "특이사항",
-    lateYn: "지각",
-    earlyYn: "조퇴",
-    absentYn: "결근",
+    // 상태(mark)·지각·조퇴·결근 칸 대신 5240 화면의 "근무판정" 한 칸(verdictOf) — 사용자 결정 2026-10-21
+    verdict: "근무판정",
+    workComment: "근무특이사항",
   },
   work_status: {
     workYmd: "일자",
     week: "요일",
-    workComment: "근무내용",
-    mark: "상태",
+    verdict: "근무판정",
+    workComment: "근무특이사항",
     baseStaTime: "기준출근",
     baseEndTime: "기준퇴근",
     inTime: "출근",
@@ -272,7 +271,7 @@ module.exports.runtime = {
       }
 
       this.introspect(`${label} 조회 완료.`);
-      return formatAttendance(records, label, COLUMNS_BY_QT[query_type], query_type);
+      return formatAttendance(untilToday(records, query_type), label, COLUMNS_BY_QT[query_type], query_type);
     } catch (e) {
       this.logger("Error in hr-attendance", e.message);
       return `> ⚠️ 근태 조회 중 오류가 발생했습니다: ${e.message}`;
@@ -311,11 +310,24 @@ async function runYearQuery(ctx, { query_type, spec, label, form, yearPeriod }) 
   return withPeriodHeader(formatYearRecords(records, label, query_type), yearPeriod);
 }
 
+// 출퇴근 기록·근무현황은 오늘(서울)까지만 — 5240은 오지 않은 날에도 mark=NORMAL을 줘서 실서버에서
+// "10/22~10/31 정상"이 표에 나왔다(사용자 결정 2026-10-21: 안내 줄 없이 오늘까지만).
+// 날짜를 읽을 수 없는 행은 남긴다. 앞으로의 일정은 work_calendar가 맡는다.
+function untilToday(records, query_type) {
+  if (!DAY_ROW_QUERY_TYPES.has(query_type)) return records;
+  const rows = Array.isArray(records) ? records : records ? [records] : [];
+  const today = todayYmd();
+  return rows.filter((r) => {
+    const ymd = String(field(r, "workYmd") ?? "").replace(/\D/g, "");
+    return ymd.length !== 8 || ymd <= today;
+  });
+}
+
 // 연도 질의 결과 렌더 — 하루=1행 응답은 축약하고, 나머지는 기존 렌더러 그대로
 function formatYearRecords(records, label, query_type) {
   const columns = COLUMNS_BY_QT[query_type];
   if (DAY_ROW_QUERY_TYPES.has(query_type)) {
-    return formatNotableDays(records, label, columns, query_type);
+    return formatNotableDays(untilToday(records, query_type), label, columns, query_type);
   }
   if (query_type === "work_calendar") return formatCalendarExceptions(records, label, columns);
   return formatAttendance(records, label, columns, query_type);
@@ -429,7 +441,7 @@ function formatNotableDays(data, label, columns, query_type) {
 
   const { renderWhitelisted } = require("../_shared/formatTable");
   const { normalizeDisplayRows } = require("../_shared/renderNormalize");
-  const displayData = normalizeDisplayRows(notable, { weekKey: "week", markKey: "mark" });
+  const displayData = normalizeDisplayRows(withVerdict(notable), { weekKey: "week", markKey: "mark" });
   const shown = prepareAttendanceTable(displayData, columns);
   const table = renderWhitelisted(shown.rows, shown.columns);
   if (!table) return `${head}> 조회된 데이터가 없습니다.`;
@@ -467,12 +479,13 @@ function formatAttendance(data, label, columns, query_type) {
     // 표시용 사본만 정규화(week 영문 3자→한글, mark NORMAL/ABNORMAL→정상/비정상).
     // summarizeWorkStatus는 원본 mark 문자열("NORMAL")로 비교하므로 반드시 원본
     // data를 그대로 넘긴다 — 정규화된 사본을 넘기면 집계가 항상 0으로 깨진다.
-    const displayData = normalizeDisplayRows(data, {
+    // 출퇴근 기록·근무현황은 시각 HH:MM + 기준시간 분리(_shared/attendanceDisplay)
+    const isDayRows = DAY_ROW_QUERY_TYPES.has(query_type);
+    const sourceRows = Array.isArray(data) ? data : data ? [data] : [];
+    const displayData = normalizeDisplayRows(isDayRows ? withVerdict(sourceRows) : data, {
       weekKey: "week",
       markKey: "mark",
     });
-    // 출퇴근 기록·근무현황은 시각 HH:MM + 기준시간 분리(_shared/attendanceDisplay)
-    const isDayRows = DAY_ROW_QUERY_TYPES.has(query_type);
     const shown = isDayRows
       ? prepareAttendanceTable(displayData, columns)
       : { rows: displayData, columns, basisLine: "" };
@@ -525,13 +538,15 @@ function otHas(v) {
 const OT_FIELDS = ["otWorkOver", "otWorkNight", "otHoliWork", "otHoliOver", "otHoliNight"];
 
 // 하루 행의 근태 판정 — 집계(summarizeWorkStatus)와 연도 질의 특이사항 필터가 같은 규칙을 쓴다.
-function dayFlags(row) {
+function dayFlags(row, today = todayYmd()) {
   const otAmounts = OT_FIELDS.map((k) => field(row, k));
+  // 오늘은 아직 근무 중일 수 있다 — 출근만 있어도 출퇴근 누락으로 보지 않는다
+  const isToday = String(field(row, "workYmd") ?? "").replace(/\D/g, "") === today;
   return {
     isLate: has(field(row, "lateYn")),
     isEarly: has(field(row, "earlyYn")) || has(field(row, "earlyOtYn")),
     isAbsent: has(field(row, "absentYn")),
-    isMissing: has(field(row, "inTime")) !== has(field(row, "outTime")), // XOR
+    isMissing: !isToday && has(field(row, "inTime")) !== has(field(row, "outTime")), // XOR
     isLeave: has(field(row, "annualLeave")) || has(field(row, "etcLeave")),
     isBizTrip: has(field(row, "bizTrip")),
     isEducation: has(field(row, "education")),
@@ -539,6 +554,29 @@ function dayFlags(row) {
     isOt: otAmounts.some(otHas),
   };
 }
+
+// 근무판정 — 5240 출퇴근기록 화면(taaWrkTimeStatusMgr.jsp)의 분류 문구를 그대로 쓴다.
+// 판정할 것이 없고 출퇴근이 모두 찍힌 날만 "정상", 휴일·기록 없는 날은 빈 칸(MARK의 "정상"을 옮기지 않는다).
+function verdictOf(row) {
+  const f = dayFlags(row);
+  const tags = [
+    f.isLate && "지각",
+    f.isEarly && "조퇴",
+    f.isAbsent && "결근",
+    f.isMissing && "출퇴근 누락",
+    f.isLeave && "휴가",
+    f.isBizTrip && "출장",
+    f.isEducation && "교육",
+    otHas(field(row, "otWorkOver")) && "평일연장",
+    (otHas(field(row, "otWorkNight")) || otHas(field(row, "otHoliNight"))) && "야간근로",
+    otHas(field(row, "otHoliWork")) && "휴일근로",
+    otHas(field(row, "otHoliOver")) && "휴일연장",
+  ].filter(Boolean);
+  if (tags.length > 0) return tags.join(", ");
+  return has(field(row, "inTime")) && has(field(row, "outTime")) ? "정상" : "";
+}
+
+const withVerdict = (rows) => rows.map((r) => ({ ...r, verdict: verdictOf(r) }));
 
 // 특이사항 = 지각·조퇴·결근·출퇴근 누락·휴가·출장·교육·연장근무 중 하나 이상 (contracts §2)
 function isNotableDay(row) {

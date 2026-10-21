@@ -1059,14 +1059,13 @@
     },
     {
       "id": "K64",
-      "label": "근무현황 표의 요일·상태가 한글로 정규화되는지(실사용 피드백)",
+      "label": "근무현황 표의 요일·근무판정이 한글로 나오는지(실사용 피드백)",
       "message": "@agent 이번 달 근무현황 전체 표로 보여줘",
       "expect": {
         "tool_call": true,
         "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
         "answer_pattern": [
-          "정상",
-          "비정상",
+          "지각",
           "월|수|금|토"
         ],
         "answer_not_pattern": [
@@ -1076,13 +1075,14 @@
           "\\bSAT\\b",
           "\\bNORMAL\\b",
           "\\bABNORMAL\\b",
-          "\\[주말\\]"
+          "\\[주말\\]",
+          "비정상"
         ]
       },
       "repeat": 1,
       "pre_reset": true,
       "tier": "primary",
-      "note": "실사용 피드백 — kiwibox가 요일을 'MON'/'SAT [주말]' 영문으로, 상태를 'NORMAL'/'ABNORMAL' 영문으로 보내는데 hr-attendance가 그대로 렌더하고 있었다(work_status/timesheet 공용). handler.js에 있던 _shared/renderNormalize.js 미사용이 원인 — normalizeDisplayRows(weekKey/markKey)를 표시용 사본에만 적용해 수정(요약 집계용 원본 data는 그대로 유지, mark==='NORMAL' 문자열 비교가 깨지지 않도록). 확정적 검증은 node -e로 normalizeDisplayRows 순수 함수 직접 호출(WED→수, SAT [주말]→토, NORMAL→정상, ABNORMAL→비정상, 원본 불변 확인). 이 시나리오 자체는 LLM이 '전체 표로' 요청에도 요약/그래프로 답할 수 있어 다른 시나리오(K58 등)처럼 확률적으로 FAIL할 수 있음 — 그 경우 tool 결과 자체가 아니라 LLM 응답 형식 선택의 문제."
+      "note": "실사용 피드백 — kiwibox가 요일을 'MON'/'SAT [주말]' 영문으로, 상태를 'NORMAL'/'ABNORMAL' 영문으로 보내는데 hr-attendance가 그대로 렌더하고 있었다(work_status/timesheet 공용). handler.js에 있던 _shared/renderNormalize.js 미사용이 원인 — normalizeDisplayRows(weekKey/markKey)를 표시용 사본에만 적용해 수정(요약 집계용 원본 data는 그대로 유지, mark==='NORMAL' 문자열 비교가 깨지지 않도록). 확정적 검증은 node -e로 normalizeDisplayRows 순수 함수 직접 호출(WED→수, SAT [주말]→토, NORMAL→정상, ABNORMAL→비정상, 원본 불변 확인). 이 시나리오 자체는 LLM이 '전체 표로' 요청에도 요약/그래프로 답할 수 있어 다른 시나리오(K58 등)처럼 확률적으로 FAIL할 수 있음 — 그 경우 tool 결과 자체가 아니라 LLM 응답 형식 선택의 문제. [2026-10-21] 상태(정상/비정상) 칸을 5240 화면의 근무판정 한 칸으로 바꿈(사용자 결정) — 비정상은 더 나오지 않아야 한다."
     },
     {
       "id": "K65",
