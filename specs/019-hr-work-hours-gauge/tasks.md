@@ -125,7 +125,7 @@
 - [X] T031 전체 회귀: 단위(teamplgpt·okrservice) 기준선 외 새 실패 0, 라우팅 평가 2회 연속 기준선 대비 새 실패 0(Convention §7.3), 위젯·@agent E2E 전체 실행 — 실패는 기준선 실패(KB48, 급여명세서 2건 등)와 대조.
 - [X] T032 코드 리뷰(code-reviewer)·보안 리뷰(security-reviewer) — 브리지 3곳 규칙 일치, 신상 칸 비노출, 지어내기 없음. CRITICAL·HIGH 수정.
 - [X] T033 i18n 확인: 위젯 새 문자열은 기존 `LimitGauge`와 같이 한국어 고정(HR 데이터 표시 영역, `__()` 미사용) — 이 판단을 report에 기록. 번역 대상 UI(탭·버튼)는 변경 없음.
-- [ ] T034 실서버 대조(quickstart §4, 세션 ID는 사용자에게 받아 env로만) — 이번 달·지난 달 네 값, `remT` 형식, 0건 응답 모양, `basTime2` 값 → research R3·R5 갱신, SC-001 판정.
+- [X] T034 실서버 대조(quickstart §4, 세션 ID는 사용자에게 받아 env로만) — 이번 달·지난 달 네 값, `remT` 형식, 0건 응답 모양, `basTime2` 값 → research R3·R5 갱신, SC-001 판정.
 - [X] T035 report `docs/04-report/features/019-hr-work-hours-gauge.report.md` 작성(결과·남은 일·배포 순서: 브리지 먼저 또는 동시).
 
 ---

@@ -27,6 +27,9 @@ const HOME_CMD = "getHomeWorkStatusBarWidgetMap";
 const TITLE = "## HR 근태 - 근무시간\n\n";
 const HEADERS = ["구분", "누적 근로", "월간 소정", "최대 가능", "소정까지"];
 const UNIT_NOTE = "> 단위는 시간이며, 누적 근로에는 연장근무 시간이 포함됩니다.";
+// 최대 가능의 연장 몫(basTime2, 달력 일수×12÷7)은 연장근무 현황의 월 한도(회사 설정)와 다를 수 있다 —
+// 실서버 10월 53 vs 51(2026-10-21). 계획용 숫자로 오해하지 않게 밝힌다.
+const MAX_NOTE = "> 최대 가능은 5240 월별 근무현황 기준(주 12시간 환산)이며, 연장근무 신청 한도는 연장근무 현황을 따릅니다.";
 const FAIL_NOTE = "> 근무시간을 조회하지 못했습니다.";
 const ANSWER_LINE =
   "> [응답 형식] 근무시간을 물으면 누적 근로를 첫 문장에 쓰세요. 표의 값을 바꾸거나 더하고 빼지 마세요. 이 줄은 답변에 포함하지 마세요.";
@@ -131,7 +134,7 @@ function renderBlock(plan, wh) {
   const cells = wh.ok
     ? [plan.label, formatHours(wh.worked), formatHours(wh.normal), formatHours(wh.max), formatHours(wh.toNormal)]
     : [plan.label, DASH, DASH, DASH, DASH];
-  return `${mdTable(HEADERS, [cells])}\n\n${wh.ok ? UNIT_NOTE : FAIL_NOTE}`;
+  return `${mdTable(HEADERS, [cells])}\n\n${wh.ok ? `${UNIT_NOTE}\n${MAX_NOTE}` : FAIL_NOTE}`;
 }
 
 const OUT_OF_RANGE = {

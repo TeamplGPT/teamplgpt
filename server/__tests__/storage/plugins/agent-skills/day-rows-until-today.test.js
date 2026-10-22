@@ -61,3 +61,26 @@ describe("하루 단위 표는 오늘까지만", () => {
     expect(tableDates(output).join(" ")).toMatch(/10.?30/);
   });
 });
+
+// 실서버 형식(2026-10-21 ntest 확인): workYmd는 "10-22"(월-일, 연도 없음), 전체 날짜는 ymd("20261022")
+describe("실서버 날짜 형식 — ymd로 판정", () => {
+  beforeAll(() => freezeClock(NOW));
+  afterAll(() => jest.useRealTimers());
+
+  const real = (md, extra = {}) => ({ workYmd: md, ymd: `2026${md.replace("-", "")}`, week: "WED", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800", ...extra });
+  const respondReal = () => ({
+    DATA: [real("10-20", { workComment: "출근", inTime: "0855", outTime: "1805" }), real("10-21", { workComment: "출근", inTime: "0855" }), real("10-22", { workComment: "교육" }), real("10-31", { workComment: "휴일" })],
+  });
+
+  it.each(["timesheet", "work_status"])("%s: workYmd가 월-일이어도 오늘 이후는 뺀다", async (query_type) => {
+    const { output } = await runHandler("hr-attendance", { query_type }, respondReal);
+    expect(output).toMatch(/10-20/);
+    expect(output).toMatch(/10-21/);
+    expect(output).not.toMatch(/10-22|10-31/);
+  });
+
+  it("오늘(10-21)은 출근만 있어도 출퇴근 누락이 아니다", async () => {
+    const { output } = await runHandler("hr-attendance", { query_type: "timesheet" }, respondReal);
+    expect(output).not.toMatch(/출퇴근 누락/);
+  });
+});

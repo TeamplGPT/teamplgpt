@@ -72,7 +72,7 @@ describe("range 모드 — 1회 호출, 기간만 1년 (US1)", () => {
     const order = [
       "## HR 근태 - 근무현황 요약",
       HEADER_THIS_YEAR,
-      "> 집계(5일) · 정상 3일 · 지각 1회 · 휴가 1일 · 연장근로 1일(승인 3.0h)",
+      "> 집계(5일) · 출근 4일 · 휴가 1일 · 지각 1회 · 연장근로 1일(승인 3.0h)",
       "| 20260210 |",
       "> 그 외 2일은 특이사항 없음",
       "[응답 지침]",
@@ -87,7 +87,7 @@ describe("range 모드 — 1회 호출, 기간만 1년 (US1)", () => {
       { query_type: "work_status", year_month: "2026" },
       () => ({ DATA: [WORK_ROWS[0], WORK_ROWS[2]] })
     );
-    expect(output).toContain("> 집계(2일) · 정상 2일");
+    expect(output).toContain("> 집계(2일) · 출근 2일");
     expect(output).toContain("> 조회 기간 동안 특이사항이 있는 날이 없습니다.");
     expect(output).not.toContain("| 일자 |");
   });
