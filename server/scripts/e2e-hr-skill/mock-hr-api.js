@@ -253,6 +253,69 @@ function overtimeFixture(pathname, body) {
   return { status: 200, json: { DATA: rows } };
 }
 
+// 하루·주 조회(specs/020) — 근태(TAA-1410) 요청 범위가 7일 이하면 그 날짜 행을 실서버 형식으로 만든다
+// (workYmd "MM-DD" + ymd "YYYYMMDD", 2026-10-21 ntest 확인). 월 요청은 위 7월 고정 행 그대로(기존 시나리오 유지).
+// 날짜 규칙: 위 월 고정 행에 있는 날(2026-07-01·03·05·06)은 그 값 그대로(Q6 "7월 3일" = 09:10 지각)
+//            / 평일 출근 08:55~18:10 정상 / 매월 22일은 09:10 출근 지각 10분 / 토·일은 휴일(기록 없음)
+//            / 오늘(서울) 행은 퇴근 전이라 퇴근 칸이 비어 있다.
+// 근무캘린더(TAADclzWorkSearchCldr)는 한 달 이하 요청(searchSYmd~EYmd)이면 날마다 1행 — 평일 통상근무, 토·일 휴일.
+// 연 단위 요청은 전처럼 빈 응답(기존 시나리오 유지).
+const WEEK_EN = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+const DAY_MS = 24 * 60 * 60 * 1000;
+const digits8 = (v) => String(v || "").replace(/\D/g, "").slice(0, 8);
+const toUtc = (ymd) => new Date(Date.UTC(+ymd.slice(0, 4), +ymd.slice(4, 6) - 1, +ymd.slice(6, 8)));
+const ymdOf = (d) => d.toISOString().slice(0, 10).replace(/-/g, "");
+const seoulTodayYmd = () => ymdOf(new Date(Date.now() + 9 * 60 * 60 * 1000));
+
+function datesBetween(start, end) {
+  if (start.length !== 8 || end.length !== 8 || start > end) return [];
+  const out = [];
+  for (let d = toUtc(start); ymdOf(d) <= end; d = new Date(d.getTime() + DAY_MS)) out.push(d);
+  return out;
+}
+
+function timesheetRow(d, today) {
+  const ymd = ymdOf(d);
+  const fixed = FIXTURES_BY_CMD.getTAAWrkTimeStatusMgrList.result.find((r) => r.workYmd === ymd);
+  if (fixed) return { ...fixed, workYmd: `${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`, ymd };
+  const dow = d.getUTCDay();
+  const weekend = dow === 0 || dow === 6;
+  const base = {
+    workYmd: `${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`, ymd, week: weekend ? `${WEEK_EN[dow]} [주말]` : WEEK_EN[dow],
+    lateYn: "", earlyYn: "", absentYn: "", earlyTime: "0", goOutTime: "0", otTime: "0",
+  };
+  if (weekend) {
+    return { ...base, workComment: "휴일", mark: "NORMAL", baseStaTime: "", baseEndTime: "", staTime: "", endTime: "", inTime: "", outTime: "", lateTime: "0" };
+  }
+  const late = ymd.slice(6, 8) === "22";
+  const sta = late ? "0910" : "0855";
+  const end = ymd === today ? "" : "1810";
+  return {
+    ...base, workComment: "출근", mark: "NORMAL", baseStaTime: "0900", baseEndTime: "1800",
+    staTime: sta, endTime: end, inTime: sta, outTime: end, lateYn: late ? "지각" : "", lateTime: late ? "10" : "0",
+  };
+}
+
+// 하루·주 근태 요청이면 {status, json}, 아니면 null
+function dayRangeFixture(body) {
+  if (body?.cmd === "getTAAWrkTimeStatusMgrList") {
+    const days = datesBetween(digits8(body.searchBaseSYmd), digits8(body.searchBaseEYmd));
+    if (days.length === 0 || days.length > 7) return null;
+    const today = seoulTodayYmd();
+    return { status: 200, json: { result: days.map((d) => timesheetRow(d, today)) } };
+  }
+  if (body?.cmd === "getTAADclzWorkSearchCldr") {
+    const days = datesBetween(digits8(body.searchSYmd), digits8(body.searchEYmd));
+    if (days.length === 0 || days.length > 31) return null;
+    const rows = days.map((d) => {
+      const weekend = d.getUTCDay() === 0 || d.getUTCDay() === 6;
+      return { ymd: ymdOf(d), workTypeNm: weekend ? "휴일" : "통상근무", holidayNm: "", mark: "", kind: "1", wktypeCd: "10" };
+    });
+    return { status: 200, json: { result: rows } };
+  }
+  return null;
+}
+
 // 월 근무시간(5240 홈 "월별 근무현황", specs/019) — /Home.do는 이 cmd 하나만 응답한다(다른 cmd는 404).
 // 기준일(searchYmd) 월로 분기한다:
 //   9월 = 소정 초과(176/168/52) / 8월 = 본인 기록 없음(빈 Map) / 7월 = HTTP 500 / 그 밖 = 일반(82.5/171/53)
@@ -283,7 +346,10 @@ const server = http.createServer((req, res) => {
   };
 
   function respond(parsedBody) {
-    const ot = overtimeFixture(parsed.pathname, parsedBody) || workHoursFixture(parsed.pathname, parsedBody);
+    const ot =
+      overtimeFixture(parsed.pathname, parsedBody) ||
+      workHoursFixture(parsed.pathname, parsedBody) ||
+      dayRangeFixture(parsedBody);
     if (parsed.pathname === "/health") {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ ok: true }));

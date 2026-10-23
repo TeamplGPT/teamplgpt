@@ -21,6 +21,7 @@ const { toHHMM } = require("./attendanceDisplay");
 const { ANSWER_GUIDE, safeCell } = require("./formatTable");
 const { runMonthly, monthlyPeriod, withPeriodHeader } = require("./yearQuery");
 const { DASH, pad, field, toNumber, formatHours, seoulToday, lastDay, dashed, ymOf, mdTable } = require("./monthHours");
+const { inRange, topicParticle } = require("./dateRange");
 
 const LIMIT_PATH = "/getMBLDclzWorkOtSchdul.do";
 const PERSON_PATH = "/getMBLDclzWorkOtSchdulPerson.do";
@@ -177,41 +178,87 @@ function withUsed(limit, entries) {
   return { ...limit, used: resolveUsed(limit.used, entries === null ? null : entries.length) };
 }
 
-async function runCurrent(plan, fetch) {
+// ─── 하루·주 내역 (specs/020) ─────────────────────────────────────────────────
+// 한도 표는 월 계획 그대로 두고, 날짜별 내역만 date 범위로 바꾼다. 내역 SQL은 searchBaseSYmd가 속한
+// 달 1일부터 주므로(두 달에 걸친 주도 한 번에) 받은 뒤 workYmd로 범위만 남긴다.
+// 범위 내역 0건은 그 달 사용 0시간을 뜻하지 않으므로 R5(빈 사용 → 0)에는 쓰지 않는다.
+
+const ymdDashed = (ymd) => `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`;
+const todayOf = (plan) => `${ymOf(plan.today.y, plan.today.m)}${pad(plan.today.d)}`;
+
+function fetchEntries(plan, fetch, range) {
+  if (!range) return fetch({ path: PERSON_PATH, form: personForm(plan.y, plan.m, plan.day) });
+  const today = todayOf(plan);
+  if (range.start > today) return Promise.resolve({ future: true });
+  const shown = { start: range.start, end: range.end < today ? range.end : today };
+  const form = {
+    searchBaseSYmd: ymdDashed(shown.start),
+    searchBaseEYmd: ymdDashed(shown.end),
+    cmmSearchStaffId: SELF_STAFF_ID_MARKER,
+  };
+  return fetch({ path: PERSON_PATH, form }).then((res) =>
+    res.errorMessage ? res : { records: toRows(res.records).filter((e) => inRange(field(e, "workYmd"), shown)) }
+  );
+}
+
+// 내역 조각 — range가 있으면 그 범위 이름으로, 오늘 이후면 안내
+function entryPart(person, range, names) {
+  if (person.future) {
+    return { text: `> ⚠️ ${range.label}${topicParticle(range.label)} 아직 지나지 않은 날입니다.`, lines: [] };
+  }
+  const label = range ? range.label : null;
+  return entrySection(entriesOf(person), {
+    heading: label ?? names.heading,
+    noneText: label ?? names.noneText,
+  });
+}
+
+// 범위가 이번 주(오늘이 속한 월~일) 안인가 — 아니면 "이번 주" 한도 줄을 뺀다(D13, 사용자 결정 2026-10-23)
+function withinThisWeek(plan, range) {
+  const t = new Date(Date.UTC(plan.today.y, plan.today.m - 1, plan.today.d));
+  const mon = new Date(t.getTime() - ((t.getUTCDay() + 6) % 7) * 24 * 60 * 60 * 1000);
+  const sun = new Date(mon.getTime() + 6 * 24 * 60 * 60 * 1000);
+  const ymd = (d) => d.toISOString().slice(0, 10).replace(/-/g, "");
+  return range.start >= ymd(mon) && range.end <= ymd(sun);
+}
+
+// 표의 사용 값 — 범위 조회면 R5 예외 없이 응답 값 그대로
+const monthUsed = (limit, person, range) => (range ? limit : withUsed(limit, entriesOf(person)));
+
+async function runCurrent(plan, fetch, range) {
+  if (range && !withinThisWeek(plan, range)) return runMonth({ ...plan, monthLabel: `이번 달(${plan.m}월)` }, fetch, range);
   const ymd = dashed(plan.y, plan.m, plan.day);
   const [week, month, person] = await Promise.all([
     fetch({ path: LIMIT_PATH, form: limitForm("2", ymd) }),
     fetch({ path: LIMIT_PATH, form: limitForm("3", ymd) }),
-    fetch({ path: PERSON_PATH, form: personForm(plan.y, plan.m, plan.day) }),
+    fetchEntries(plan, fetch, range),
   ]);
   const problem = limitProblem([week, month]);
   if (problem) return problem;
 
-  const entries = entriesOf(person);
   const table = mdTable(["구분", "한도", "사용", "잔여"], [
     // 주간 줄은 R5 예외를 쓰지 않는다 — 주 범위가 지난달 말·오늘 이후를 포함할 수 있어
     // 이번 달 내역 0건이 그 주 0시간을 뜻하지 않는다(코드 리뷰 M-1)
     limitCells(`이번 주(${plan.m}/${plan.day} 기준)`, toLimit(week.records, "week")),
-    limitCells(`이번 달(${plan.m}월)`, withUsed(toLimit(month.records, "month"), entries)),
+    limitCells(`이번 달(${plan.m}월)`, monthUsed(toLimit(month.records, "month"), person, range)),
   ]);
-  const section = entrySection(entries, { heading: `${plan.m}월`, noneText: `이번 달(${plan.m}월)` });
+  const section = entryPart(person, range, { heading: `${plan.m}월`, noneText: `이번 달(${plan.m}월)` });
   return assemble([table, USED_NOTE, section.text], [limitTableLine(2), ...section.lines]);
 }
 
-async function runMonth(plan, fetch) {
+async function runMonth(plan, fetch, range) {
   const [month, person] = await Promise.all([
     fetch({ path: LIMIT_PATH, form: limitForm("3", dashed(plan.y, plan.m, plan.day)) }),
-    fetch({ path: PERSON_PATH, form: personForm(plan.y, plan.m, plan.day) }),
+    fetchEntries(plan, fetch, range),
   ]);
   const problem = limitProblem([month]);
   if (problem) return problem;
 
-  const name = monthName(plan);
-  const entries = entriesOf(person);
+  const name = plan.monthLabel ?? monthName(plan);
   const table = mdTable(["구분", "한도", "사용", "잔여"], [
-    limitCells(name, withUsed(toLimit(month.records, "month"), entries)),
+    limitCells(name, monthUsed(toLimit(month.records, "month"), person, range)),
   ]);
-  const section = entrySection(entries, { heading: name, noneText: name });
+  const section = entryPart(person, range, { heading: name, noneText: name });
   return assemble([table, USED_NOTE, section.text], [limitTableLine(1), ...section.lines]);
 }
 
@@ -286,13 +333,14 @@ async function runYear(plan, fetch) {
 /**
  * @param {ReturnType<typeof planOvertime>} plan
  * @param {(req: {path: string, form: object}) => Promise<{errorMessage?: string, records?: any, isEmpty?: boolean}>} fetch
+ * @param {{range?: {start: string, end: string, label: string}}} [options] - 하루·주(specs/020): 내역만 그 범위
  * @returns {Promise<string>} tool 결과 문자열
  */
-async function runOvertime(plan, fetch) {
+async function runOvertime(plan, fetch, { range } = {}) {
   if (plan.kind === "future") return `> ⚠️ ${plan.label}은 아직 연장근무 기록이 없습니다.`;
   if (plan.kind === "year") return runYear(plan, fetch);
-  if (plan.kind === "month") return runMonth(plan, fetch);
-  return runCurrent(plan, fetch);
+  if (plan.kind === "month") return runMonth(plan, fetch, range);
+  return runCurrent(plan, fetch, range);
 }
 
 module.exports = {

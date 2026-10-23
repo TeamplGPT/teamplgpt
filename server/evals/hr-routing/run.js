@@ -189,6 +189,7 @@ async function callLlm({ openai, model, systemPrompt, utterance, tools, toolChoi
  * 기대 호출: { skill, query_type?, params_regex? }
  *  - query_type 생략 시 skill만 일치하면 됨
  *  - params_regex: { paramName: regexString } — 실제 인자 값에 대해 부분 일치 검사
+ *  - params_absent: [paramName] — 그 인자가 없어야(빈 값 포함) 일치(specs/020 월·연 질문에 date 금지)
  * 빈 대안 []은 "tool 호출 없음"이 정답.
  */
 function matchesExpectedSet(actualCalls, expectedSet) {
@@ -211,6 +212,10 @@ function matchesExpectedCall(call, exp) {
       if (typeof value !== "string" || !new RegExp(pattern).test(value))
         return false;
     }
+  }
+  for (const key of exp.params_absent || []) {
+    const value = call.args?.[key];
+    if (value !== undefined && value !== null && String(value).trim() !== "") return false;
   }
   return true;
 }

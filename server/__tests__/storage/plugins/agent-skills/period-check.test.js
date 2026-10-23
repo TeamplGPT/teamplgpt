@@ -86,3 +86,15 @@ describe("handler — 해석 못 한 기간이면 HR 조회 없이 안내", () =
     expect(calls.length).toBeGreaterThan(0);
   });
 });
+
+describe("UNRESOLVED_DATE — date(하루·주) 해석 실패 안내 (specs/020 코드 리뷰 M5)", () => {
+  const { UNRESOLVED_DATE } = require(path.resolve(
+    __dirname,
+    "../../../../storage/plugins/agent-skills/_shared/periodCheck.js"
+  ));
+  it("하루·주 예시로 안내한다(달·연도 예시가 아니라)", () => {
+    expect(UNRESOLVED_DATE).toMatch(/날짜/);
+    expect(UNRESOLVED_DATE).toMatch(/오늘/);
+    expect(UNRESOLVED_DATE).toMatch(/이번 주/);
+  });
+});

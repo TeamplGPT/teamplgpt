@@ -13,6 +13,10 @@ const UNSPECIFIED_RE = /^(최근|요즘|전체|전부|모두|전체\s*기간)$/;
 const UNRESOLVED_PERIOD =
   '> ⚠️ 말씀하신 기간을 해석하지 못해 조회하지 않았습니다. "9월", "지난달", "2025년 3월"처럼 달이나 연도로 말씀해 주세요.';
 
+// date(하루·주) 해석 실패 안내(specs/020) — 달·연도 예시는 하루를 물은 사용자에게 엉뚱하다(코드 리뷰 M5)
+const UNRESOLVED_DATE =
+  '> ⚠️ 말씀하신 날짜를 해석하지 못해 조회하지 않았습니다. "오늘", "어제", "10월 15일", "이번 주"처럼 하루나 한 주로 말씀해 주세요.';
+
 const validMonth = (ym) => Number(ym.slice(4, 6)) >= 1 && Number(ym.slice(4, 6)) <= 12;
 
 /** 기간을 정하지 않는 말·빈 값은 undefined, 그 밖은 그대로 */
@@ -38,4 +42,4 @@ function periodProblem(value, format = "year_month") {
   return resolved ? null : UNRESOLVED_PERIOD;
 }
 
-module.exports = { UNRESOLVED_PERIOD, cleanPeriod, periodProblem };
+module.exports = { UNRESOLVED_PERIOD, UNRESOLVED_DATE, cleanPeriod, periodProblem };

@@ -11,7 +11,8 @@
 const { resolveDateParam } = require("../_shared/dateResolver");
 const { resolveYearPeriod } = require("../_shared/periodResolver");
 const { OTHER_EMPLOYEE_REFUSAL, isBlockedQueryType } = require("../_shared/otherEmployee");
-const { periodProblem } = require("../_shared/periodCheck");
+const { periodProblem, UNRESOLVED_DATE } = require("../_shared/periodCheck");
+const { resolveDateRange, inRange, monthsOf, topicParticle } = require("../_shared/dateRange");
 const { prepareAttendanceTable, DAY_TABLE_LINE, ISSUE_SUMMARY_LINE } = require("../_shared/attendanceDisplay");
 const {
   runMonthly,
@@ -103,6 +104,8 @@ const YEAR_MODE = {
 module.exports.YEAR_MODE = YEAR_MODE;
 // 하루=1행 응답이라 1년이면 수백 행 — 특이사항 있는 날만 표로 넘긴다(contracts §2)
 const DAY_ROW_QUERY_TYPES = new Set(["timesheet", "work_status"]);
+// date(하루·주)를 받는 조회(specs/020) — 그 밖의 query_type은 date를 보지 않는다
+const DATE_QUERY_TYPES = new Set(["timesheet", "work_status", "work_calendar", "overtime", "overtime_limit"]);
 
 // 게이트 스킵 파라미터 주입 금지 (§4.5 searchType=mobile 사례 방어)
 const FORBIDDEN_FIXED_VALUES = { searchType: ["mobile"] };
@@ -171,7 +174,7 @@ const COLUMNS_BY_QT = {
 module.exports.COLUMNS_BY_QT = COLUMNS_BY_QT;
 
 module.exports.runtime = {
-  handler: async function ({ query_type, year_month }) {
+  handler: async function ({ query_type, year_month, date }) {
     try {
       // 다른 직원 정보 조회는 HR 호출 없이 거절(specs/016) — 잘못된 값 안내보다 먼저
       if (isBlockedQueryType("hr-attendance", query_type)) return OTHER_EMPLOYEE_REFUSAL;
@@ -180,8 +183,12 @@ module.exports.runtime = {
         const types = Object.keys(ENDPOINT_MAP).join(", ");
         return `> ⚠️ query_type이 올바르지 않습니다. 가능한 값: ${types}`;
       }
+      // 하루·주(date)가 오면 year_month보다 우선한다(specs/020). 해석하지 못하면 다른 기간으로 바꾸지 않고 안내
+      const range = DATE_QUERY_TYPES.has(query_type) ? resolveDateRange(date) : undefined;
+      if (range === null) return UNRESOLVED_DATE;
+
       // 연차 잔여는 기간을 쓰지 않는다. 기간을 말했는데 해석하지 못하면 다른 기간으로 바꿔 조회하지 않고 안내(2026-10-21, _shared/periodCheck)
-      const periodMsg = query_type === "annual_leave_balance" ? null : periodProblem(year_month);
+      const periodMsg = query_type === "annual_leave_balance" || range ? null : periodProblem(year_month);
       if (periodMsg) return periodMsg;
 
       const spec = ENDPOINT_MAP[query_type];
@@ -198,9 +205,9 @@ module.exports.runtime = {
       // 연장근무 — 대상은 본인 마커 고정(모듈 내부), 응답이 본인 1행이 아니면 결과를 쓰지 않는다
       if (spec.custom === "overtimeStatus") {
         this.introspect(`${label} 조회 중...`);
-        return await runOvertime(planOvertime(year_month), (req) =>
-          hrFetch(this, { ...req, gate: false })
-        );
+        // 하루·주면 한도 표는 범위 끝(오늘 이후면 오늘)이 속한 달, 내역만 그 범위(specs/020)
+        const plan = planOvertime(range ? rangeBaseYmd(range).slice(0, 6) : year_month);
+        return await runOvertime(plan, (req) => hrFetch(this, { ...req, gate: false }), { range });
       }
 
       const form = {};
@@ -265,6 +272,11 @@ module.exports.runtime = {
         if ((FORBIDDEN_FIXED_VALUES[k] || []).includes(v)) continue;
         form[k] = v;
       }
+
+      if (range && query_type === "work_calendar") {
+        return await runCalendarRange(this, { spec, label, form, range });
+      }
+      if (range) return await runRangeQuery(this, { query_type, spec, label, form, range });
 
       // 연도 단위 질의(specs/015) — 연도 표현이 아니면 null이라 아래 기존 경로를 그대로 탄다.
       const yearMode = YEAR_MODE[query_type];
@@ -357,7 +369,87 @@ async function runMonthQuery(ctx, { query_type, spec, label, form, ym, year_mont
   }
   ctx.introspect(`${label} 조회 완료.`);
   const out = formatAttendance(untilToday(records, query_type), label, COLUMNS_BY_QT[query_type], query_type);
-  return hoursBlock ? withHoursBlock(out, hoursBlock) : out;
+  return hoursBlock ? afterTitle(out, hoursBlock) : out;
+}
+
+// ─── 하루·주 조회 (specs/020) ─────────────────────────────────────────────────
+
+const WEEK_KO = ["일", "월", "화", "수", "목", "금", "토"];
+
+/**
+ * 출퇴근 기록·근무현황을 date 범위로 조회한다. 끝은 오늘까지(기존 "오늘까지만"), 시작이 오늘 이후면
+ * 조회하지 않고 안내한다. 서버가 범위 밖 행을 줘도 표에는 범위 행만 둔다. 월 근무시간 블록은 붙이지 않는다(D5).
+ */
+async function runRangeQuery(ctx, { query_type, spec, label, form, range }) {
+  const today = todayYmd();
+  if (range.start > today) {
+    return `> ⚠️ ${range.label}${topicParticle(range.label)} 아직 지나지 않은 날이라 출퇴근 기록이 없습니다.`;
+  }
+  const shown = { start: range.start, end: range.end < today ? range.end : today };
+
+  ctx.introspect(`${label} ${range.label} 조회 중...`);
+  const { errorMessage, records } = await hrFetch(ctx, {
+    path: spec.path,
+    form: withYearRange(form, spec, shown),
+    gate: spec.gate,
+  });
+  if (errorMessage) return errorMessage;
+  const all = Array.isArray(records) ? records : records ? [records] : [];
+  const rows = all.filter((r) => inRange(rowYmd(r), shown));
+  if (rows.length === 0) return noRowsNotice(all, range, "출퇴근 기록");
+
+  ctx.introspect(`${label} 조회 완료.`);
+  const out = formatAttendance(rows, label, COLUMNS_BY_QT[query_type], query_type);
+  return afterTitle(out, rangeInfoLine(range));
+}
+
+// 범위 행이 0일 때 — 받은 행의 날짜를 하나도 읽지 못했으면 "없다"고 단정하지 않는다(실서버 형식이 바뀐 경우, 코드 리뷰 M3)
+function noRowsNotice(all, range, what) {
+  if (all.length > 0 && all.every((r) => rowYmd(r) === null)) {
+    return `> ⚠️ ${range.label} ${what}의 날짜를 확인하지 못해 표시하지 않았습니다.`;
+  }
+  return `> ⚠️ ${range.label} ${what}이 없습니다.`;
+}
+
+// 범위의 기준일 — 끝, 오늘 이후면 오늘
+function rangeBaseYmd(range) {
+  const today = todayYmd();
+  return range.end < today ? range.end : today;
+}
+
+/**
+ * 근무캘린더를 date 범위로 — 앞으로의 일정이라 오늘 이후도 보여준다. searchYm 한 달 단위 endpoint라
+ * 범위가 걸친 달(최대 2)을 조회한 뒤 그 범위 행만 남긴다.
+ */
+async function runCalendarRange(ctx, { spec, label, form, range }) {
+  ctx.introspect(`${label} ${range.label} 조회 중...`);
+  const results = await Promise.all(
+    monthsOf(range).map((ym) => hrFetch(ctx, { path: spec.path, form: withMonth(form, spec, ym), gate: spec.gate }))
+  );
+  const failed = results.find((r) => r.errorMessage);
+  if (failed) return failed.errorMessage;
+  const all = results.flatMap(({ records }) => (Array.isArray(records) ? records : records ? [records] : []));
+  const rows = all
+    .filter((r) => inRange(rowYmd(r), range));
+  if (rows.length === 0) return noRowsNotice(all, range, "근무일정");
+
+  ctx.introspect(`${label} 조회 완료.`);
+  const out = formatAttendance(rows, label, COLUMNS_BY_QT.work_calendar, "work_calendar");
+  return afterTitle(out, rangeInfoLine(range));
+}
+
+// 머리 정보 줄(contracts §4) — "> 조회 날짜: 10월 23일(금)" / "> 조회 기간: 10/19(월) ~ 10/25(일)"
+function rangeInfoLine(range) {
+  const dateOf = (ymd) => new Date(Date.UTC(+ymd.slice(0, 4), +ymd.slice(4, 6) - 1, +ymd.slice(6, 8)));
+  const dow = (ymd) => WEEK_KO[dateOf(ymd).getUTCDay()];
+  const [y, m, d] = [range.start.slice(0, 4), +range.start.slice(4, 6), +range.start.slice(6, 8)];
+  if (range.kind === "day") {
+    const md = `${m}월 ${d}일`;
+    const text = y === todayYmd().slice(0, 4) ? md : `${y}년 ${md}`;
+    return `> 조회 날짜: ${text}(${dow(range.start)})`;
+  }
+  const short = (ymd) => `${+ymd.slice(4, 6)}/${+ymd.slice(6, 8)}(${dow(ymd)})`;
+  return `> 조회 기간: ${short(range.start)} ~ ${short(range.end)}`;
 }
 
 // 근무시간 블록 — 근무현황과 같은 달일 때만(시간대·해석 차이로 두 달이 섞이지 않게, 019 코드 리뷰 M-3)
@@ -372,8 +464,9 @@ async function monthHoursBlock(ctx, year_month, ym) {
   }
 }
 
-// 근무현황 출력의 "## " 제목 줄 바로 다음에 근무시간 블록을 넣는다(계약 §5 — 요약을 먼저, 날짜별 표를 나중에)
-function withHoursBlock(out, block) {
+// 출력의 "## " 제목 줄 바로 다음에 블록을 넣는다 — 근무시간 블록(019 계약 §5 — 요약을 먼저, 날짜별 표를 나중에),
+// 하루·주 조회의 머리 정보 줄(020 계약 §4)
+function afterTitle(out, block) {
   const lines = out.split("\n");
   const at = lines.findIndex((l) => l.startsWith("## "));
   if (at === -1) return `${block}\n\n${out}`;

@@ -36,6 +36,7 @@ const {
   createEmbedConfig,
   cleanupEmbedConfigs,
 } = require("./helpers/embedconfig");
+const { fillDates } = require("../e2e-hr-skill/helpers/datePlaceholders");
 
 const SCRIPT_DIR = __dirname;
 
@@ -144,6 +145,12 @@ function loadScenarios() {
     }
     if (!s.expect || typeof s.expect.tool_call !== "boolean") {
       fatal(`Scenario ${s.id}: expect.tool_call (boolean) required`);
+    }
+    // 날짜 자리표시자({{TODAY_MD}} 등)를 실행일 날짜로(specs/020)
+    try {
+      s.expect = fillDates(s.expect);
+    } catch (e) {
+      fatal(`Scenario ${s.id}: ${e.message}`);
     }
     // @agent 러너(e2e-hr-skill/helpers/expectations.js)에만 있는 판정 — 여기서는 조용히 무시되면
     // 실패해야 할 run이 PASS가 되므로 로드 단계에서 막는다(specs/016 코드 리뷰)

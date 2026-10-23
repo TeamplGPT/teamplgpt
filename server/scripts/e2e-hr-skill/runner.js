@@ -23,6 +23,7 @@ const { spawn, execFileSync, spawnSync } = require("child_process");
 
 const { createDevApiKey, deleteDevApiKey } = require("./helpers/apikey");
 const { compileExpectations, judgeRun } = require("./helpers/expectations");
+const { fillDates } = require("./helpers/datePlaceholders");
 
 const SCRIPT_DIR = __dirname;
 
@@ -153,6 +154,8 @@ function loadScenarios() {
       fatal(`Scenario ${s.id}: expect.tool_call (boolean or null) required`);
     }
     try {
+      // 날짜 자리표시자({{TODAY}} 등)를 실행일 날짜로(specs/020)
+      s.expect = fillDates(s.expect);
       Object.assign(s, compileExpectations(s));
     } catch (e) {
       fatal(e.message);

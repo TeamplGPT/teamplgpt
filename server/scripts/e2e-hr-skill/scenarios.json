@@ -1715,6 +1715,85 @@
       "pre_reset": true,
       "tier": "primary",
       "note": "2026-10-21 사용자 확인: 5240 홈 '금월잔여연장 53.14'인데 챗봇은 '53시간 남았다'고 답함 — 표는 53.1(반올림), 문장은 모델이 53으로 다시 반올림. mock 4월 = 한도 53.14. 수정 전 FAIL 기대. @agent는 표 직접 출력·문장 수치 검사(L2)가 없는 경로라 L1(설명·결과 지시)로만 지킨다."
+    },
+    {
+      "id": "K95",
+      "label": "하루 조회 — 오늘 출근시각은 오늘만 조회 (@agent, specs/020 US1)",
+      "message": "@agent 오늘 출근시각 알려줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getTAAWrkTimeStatusMgrList",
+          "searchBaseSYmd={{TODAY}}",
+          "searchBaseEYmd={{TODAY}}"
+        ],
+        "answer_not_pattern": [
+          "0?7월\\s*1일|07-01|20260701",
+          "{{YESTERDAY_MD}}"
+        ]
+      },
+      "repeat": 3,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "2026-10-23 사용자 보고: '오늘 출근시각 알려줘'에 한 달 자료가 나옴. 수정 전 FAIL 기대(요청이 월 범위 — 시스템 지시 '일 정보는 무시', 예시 '2월 27일자 → year_month 2', 월 파라미터뿐). mock은 7일 이하 요청이면 그 날짜 행을 실서버 형식으로 준다(평일 08:55 출근, 오늘은 퇴근 칸 빈 값)."
+    },
+    {
+      "id": "K96",
+      "label": "하루 조회 — 내일 출근 기록은 조회하지 않고 안내 (@agent, specs/020 US1)",
+      "message": "@agent 내일 출근 기록 보여줘",
+      "expect": {
+        "tool_call": null,
+        "mock_body_pattern_none": [
+          "searchBaseSYmd={{TOMORROW}}",
+          "searchBaseSYmd=\\d{6}01&searchBaseEYmd"
+        ],
+        "answer_not_pattern": [
+          "{{TOMORROW_MD}}[^\\n]{0,40}\\d{1,2}:\\d{2}",
+          "08:55"
+        ]
+      },
+      "repeat": 3,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/020 contracts §4 — 지나지 않은 날은 출퇴근 조회 없이 안내. 근무캘린더(앞으로의 일정)로 가는 것도 맞는 경로라 tool 선택은 판정하지 않는다(null). 내일 출퇴근 시각을 지어내면 FAIL. 월 범위 조회(1일~)도 FAIL."
+    },
+    {
+      "id": "K97",
+      "label": "한 주 조회 — 지난주 출퇴근 (@agent, specs/020 US2)",
+      "message": "@agent 지난주 출퇴근 기록 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/TAAWrkTimeStatusMgr\\.do",
+        "mock_body_pattern": [
+          "searchBaseSYmd={{LAST_WEEK_MON}}",
+          "searchBaseEYmd={{LAST_WEEK_SUN}}"
+        ],
+        "answer_not_pattern": [
+          "0?7월\\s*1일|07-01|20260701"
+        ]
+      },
+      "repeat": 3,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/020 US2. 지난주 월~일만 조회."
+    },
+    {
+      "id": "K98",
+      "label": "하루 조회 — 오늘 회사 일정 (@agent, specs/020 US3)",
+      "message": "@agent 오늘 회사 일정 뭐 있어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/getHRDetailList\\.do|^/getScheduleDay\\.do",
+        "mock_body_pattern": [
+          "staYmd={{TODAY}}",
+          "endYmd={{TODAY}}"
+        ]
+      },
+      "repeat": 3,
+      "pre_reset": true,
+      "tier": "primary",
+      "note": "specs/020 US3. 인사 일정 조회 범위 = 오늘 하루."
     }
   ]
 }

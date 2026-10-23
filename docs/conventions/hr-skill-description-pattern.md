@@ -1,6 +1,6 @@
 # HR Skill `plugin.json` description 작성 표준
 
-**버전** v1.10 (2026-10-21) · **상태** 영구 convention (archive 대상 아님)
+**버전** v1.11 (2026-10-23) · **상태** 영구 convention (archive 대상 아님)
 
 > **v1.4 (2026-09-08): P0-2/P1-1 재설계 반영 — v1.3은 2026-08-10 시점 역추출로 현행과 불일치.**
 > 2026-09-03~04에 HR skill 7종의 description이 "키워드 매핑표 + `[CRITICAL]` 반복" 방식에서 "정체성 / 의도 서술 / 경계" 구조로 전면 재작성됐고, 모든 skill에 공통인 지시(본인 기준·즉시 호출·기간 되묻기 금지·year_month 형식·required 필수·코드성 인자 선행 조회)는 description 밖 시스템 프롬프트 가드 `hrSkillChatGuard()`로 이관됐다. v1.4는 그 결과물인 실물 `plugin.json` 7종, `server/utils/chats/index.js`의 가드, `server/evals/hr-routing/` 평가 하네스에서 다시 역추출한 것이다.
@@ -44,7 +44,7 @@ description 규율은 한 곳에 있지 않다. 바꿀 때는 아래를 함께 �
 | 블록 | 내용 |
 |---|---|
 | `[HR_DATE_CONTEXT]` | 오늘 날짜(Asia/Seoul) 주입. 상대 날짜 해석 기준 |
-| `[HR_SKILL_COMMON]` 1~6·10 | ① 본인 기준 조회, 사번·이름 되묻기 금지 ② skill·query_type을 정했으면 즉시 tool 호출, 결과 추측 금지 — 앞 HR 수치의 산정 근거·내역을 다시 물어도 같은 조회를 다시 호출(specs/016 R14) ③ 기간 파라미터(year_month/cal_yy) 없으면 생략하고 즉시 호출, 연도 추론 금지 ④ year_month 전달 형식(호출 여부를 정하는 규칙이 아님을 명시. 월 없이 연도만 말하면 그 표현을 그대로 — 생략·특정 월 변환 금지, 서버가 그해 기준 조회. 연도+월이면 `YYYYMM`/`YYYY-MM`/`YYYY년 M월`, 연도 미명시 시 월 표현 그대로, 일 정보 무시. 결과의 '조회 기간'보다 넓게 말하지 말 것) ⑤ required 파라미터는 enum이 하나여도 항상 채움 ⑥ 코드성 파라미터(pay_item/org_cd)는 선행 조회 결과의 코드값만 사용 ⑩ 다른 직원 정보 요청(이름·사번·호칭 지칭, 팀 휴가자·생일자·남이 올린 결재 문서)은 tool 없이 거절 — 조직도(조직 구조·팀원 이름·소속·직위·직책)만 예외, 결재 대기 건수는 todo_count 허용. [ORDER]에 예외 단서 |
+| `[HR_SKILL_COMMON]` 1~6·10 | ① 본인 기준 조회, 사번·이름 되묻기 금지 ② skill·query_type을 정했으면 즉시 tool 호출, 결과 추측 금지 — 앞 HR 수치의 산정 근거·내역을 다시 물어도 같은 조회를 다시 호출(specs/016 R14) ③ 기간 파라미터(year_month/cal_yy) 없으면 생략하고 즉시 호출, 연도 추론 금지 ④ year_month 전달 형식(호출 여부를 정하는 규칙이 아님을 명시. 월 없이 연도만 말하면 그 표현을 그대로 — 생략·특정 월 변환 금지, 서버가 그해 기준 조회. 연도+월이면 `YYYYMM`/`YYYY-MM`/`YYYY년 M월`, 연도 미명시 시 월 표현 그대로. 하루·주(오늘·어제·10월 15일·이번 주)는 그 표현을 `date`에 그대로, 이때 year_month 생략 — `date`가 없는 skill이면 월만(v1.11, specs/020). 결과의 '조회 기간'보다 넓게 말하지 말 것) ⑤ required 파라미터는 enum이 하나여도 항상 채움 ⑥ 코드성 파라미터(pay_item/org_cd)는 선행 조회 결과의 코드값만 사용 ⑩ 다른 직원 정보 요청(이름·사번·호칭 지칭, 팀 휴가자·생일자·남이 올린 결재 문서)은 tool 없이 거절 — 조직도(조직 구조·팀원 이름·소속·직위·직책)만 예외, 결재 대기 건수는 todo_count 허용. [ORDER]에 예외 단서 |
 | `[HR_TOOL_CALL_PRIORITY]` | workspace 프롬프트의 "모호성 검사 → 되묻기" 절차보다 HR 지시와 tool description이 우선 |
 | `[ORDER]` | HR 요청의 첫 액션은 tool_call |
 | `[HR_SALARY_TWO_STEP]` | hr-salary는 pay_item 미확보 시 무조건 `pay_periods` 선행 |
@@ -169,7 +169,7 @@ enum이 하나뿐인 skill(`hr-certificate`, `hr-welfare`).
 
 ### §5.2 주기 파라미터 description
 
-`year_month`는 5종(`hr-attendance`, `hr-personnel`, `hr-salary`, `hr-approval` + `cal_yy`를 쓰는 `hr-year-end-tax`)에 있다. 형식은 다섯 요소로 고정이다.
+`year_month`는 5종(`hr-attendance`, `hr-personnel`, `hr-salary`, `hr-approval` + `cal_yy`를 쓰는 `hr-year-end-tax`)에 있다. 하루·주 단위 `date`는 2종(`hr-attendance`, `hr-personnel`)에 있다(v1.11). 형식은 다섯 요소로 고정이다.
 
 ```
 {한글명} (선택). 사용자가 기간을 언급한 경우에만 전달하고, 없으면 생략하세요({서버 기본값} 자동 적용).
@@ -211,7 +211,8 @@ enum이 하나뿐인 skill(`hr-certificate`, `hr-welfare`).
 | 상대 표현 | `{"query_type": "timesheet", "year_month": "지난달"}` |
 | 연월 명시 | `{"query_type": "timesheet", "year_month": "202501"}` |
 
-- 일(day) 입도 함정을 한 건 못 박는다 — "2월 27일자 출퇴근 내역" → `year_month: "2"`.
+- 일(day) 입도는 `date`가 있는 skill이면 `date`로 보낸다 — "2월 27일자 출퇴근 내역" → `date: "2월 27일"`(v1.11, 이전에는 `year_month: "2"`로 못 박아 하루 질문에 한 달 표가 붙었다). `date`가 없는 skill은 월만 보낸다.
+- `date`가 있는 skill은 하루·주 예시를 query_type별로 1건씩 넣는다(`{"query_type": "timesheet", "date": "오늘"}`, `{"query_type": "work_status", "date": "이번 주"}`).
 - 코드성 파라미터가 있으면 선행 조회 결과를 받은 뒤의 후속 발화("그 건 공제내역")와 자리표시 코드(`"20260625NN"`, `"ORG123"`)로 2단계 흐름을 보여준다.
 - **eval 발화 복사 금지**는 examples에도 적용된다(§3 ②).
 
@@ -223,8 +224,8 @@ enum이 하나뿐인 skill(`hr-certificate`, `hr-welfare`).
 
 | skill | ver | query_type 수 | 주기 파라미터 | 코드성 파라미터 | required | examples | B 형태 | 폴백 값 | 경계 위임처 |
 |---|---|---|---|---|---|---|---|---|---|
-| `hr-attendance` | 2.1.0 | 8 | `year_month` | — | `query_type` | 16 | 다값형 | `annual_leave_balance` | hr-approval, hr-salary, (다른 직원 근태 미제공) |
-| `hr-personnel` | 2.2.0 | 8 | `year_month` | `org_cd` | `query_type` | 13 | 다값형 | `profile` | hr-year-end-tax, hr-approval, (다른 직원 개인 정보 미제공) |
+| `hr-attendance` | 2.1.0 | 8 | `year_month`, `date` | — | `query_type` | 21 | 다값형 | `annual_leave_balance` | hr-approval, hr-salary, (다른 직원 근태 미제공) |
+| `hr-personnel` | 2.2.0 | 8 | `year_month`, `date` | `org_cd` | `query_type` | 14 | 다값형 | `profile` | hr-year-end-tax, hr-approval, (다른 직원 개인 정보 미제공) |
 | `hr-salary` | 2.2.0 | 6 | `year_month` | `pay_item` | `query_type` | 8 | 선행 조회 의존형 | (2단계 규칙) | hr-year-end-tax |
 | `hr-year-end-tax` | 2.1.0 | 9 | `cal_yy` | — | `query_type` | 12 | 다값형 | `summary` | hr-salary |
 | `hr-approval` | 1.0.0 | 1 | `year_month` | — | `query_type` | 3 | 단일값형(`drafted`) | — | hr-personnel(todo_count), hr-attendance, (남이 올린 문서 미제공) |
@@ -309,6 +310,16 @@ v1.4 작성 시점에 확인된 코드-문서 불일치. 고칠 때 이 문서�
 ---
 
 ## 변경 이력
+
+### v1.10 → v1.11 (2026-10-23)
+
+| 항목 | v1.10 | v1.11 |
+|---|---|---|
+| 신규 주기 파라미터 | — | `date`(하루·주, 선택) — `hr-attendance`(timesheet·work_status·work_calendar·overtime·overtime_limit), `hr-personnel`(schedule_day·schedule_titles). §5.2 형식, 적용 범위 명시, required 아님. 둘 다 오면 `date` 우선(서버). "오늘 출근시각"에 한 달 표가 붙던 문제(specs/020) |
+| L2 `[HR_SKILL_COMMON]` 4항 | "일(day) 정보는 무시하고 월만 전달하세요" | "하루·주를 말하면 그 표현을 date에 그대로 전달하고 year_month는 생략하세요. date가 없는 skill이면 월만 전달하세요." — §7.2 "가드가 포괄 못 하면 가드를 고친다". 3항은 "year_month/cal_yy 등"이라 그대로 |
+| Location D | "2월 27일자 출퇴근 내역" → `year_month: "2"` | → `date: "2월 27일"`, 하루·주 예시 4건(근태)·1건(인사) 추가 |
+| `year_month` 조건 문구 | "사용자가 기간을 언급한 경우에만" | "사용자가 달·연도를 언급한 경우에만"(근태·인사) — 하루·주는 `date`로 |
+| 평가 하네스 | — | `params_absent`(그 인자가 없어야 일치) 추가 — 월·연 질문에 `date`가 붙지 않는지 `boundary`로 검증 |
 
 ### v1.9 → v1.10 (2026-10-21)
 

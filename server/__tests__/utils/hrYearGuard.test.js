@@ -13,6 +13,16 @@ const {
 const NOW = new Date("2026-10-19T10:00:00+09:00");
 const user = (text) => ({ role: "user", content: text });
 
+describe("allowedYears — 연초의 하루·주 상대 표현(specs/020 코드 리뷰 M1)", () => {
+  const JAN1 = new Date("2027-01-01T09:00:00+09:00");
+  it.each(["어제 출근시각 알려줘", "그저께 퇴근 몇 시였어", "지난주 근무현황"])("%p → 작년도 허용", (text) => {
+    expect(allowedYears([{ role: "user", content: text }], JAN1).has(2026)).toBe(true);
+  });
+  it("상대 표현이 없으면 작년은 허용하지 않는다", () => {
+    expect(allowedYears([{ role: "user", content: "출근시각 알려줘" }], JAN1).has(2026)).toBe(false);
+  });
+});
+
 describe("allowedYears — 사용자가 말한 연도 + 상대 표현 + 올해", () => {
   it.each([
     [["6월 급여 지급 건 목록 알려줘"], [2026]],
@@ -65,6 +75,22 @@ describe("correctToolArgs — 말하지 않은 연도는 떼고 조회", () => {
     const yta = (cal_yy) => ({ name: "hr-year-end-tax", call_id: "c", arguments: JSON.stringify({ query_type: "summary", cal_yy }) });
     expect(correctToolArgs(yta("2025"), ALLOWED).corrected).toBe(false);
     expect(JSON.parse(correctToolArgs(yta("2022"), ALLOWED).tc.arguments)).toEqual({ query_type: "summary" });
+  });
+
+  it.each([
+    [{ query_type: "timesheet", date: "2023-10-15" }, { query_type: "timesheet", date: "10월 15일" }],
+    [{ query_type: "timesheet", date: "20231015" }, { query_type: "timesheet", date: "10월 15일" }],
+    [{ query_type: "timesheet", date: "2023년 10월 15일" }, { query_type: "timesheet", date: "10월 15일" }],
+  ])("date도 말하지 않은 연도를 뗀다(specs/020) %p → %p", (args, expected) => {
+    const out = correctToolArgs(tc(args), ALLOWED);
+    expect(out.corrected).toBe(true);
+    expect(JSON.parse(out.tc.arguments)).toEqual(expected);
+  });
+
+  it("date의 허용 연도·상대 표현은 그대로", () => {
+    for (const date of ["2026-10-15", "오늘", "이번 주", "10월 15일"]) {
+      expect(correctToolArgs(tc({ query_type: "timesheet", date }), ALLOWED).corrected).toBe(false);
+    }
   });
 
   it("객체 인자도 처리하고 원본은 바꾸지 않는다", () => {

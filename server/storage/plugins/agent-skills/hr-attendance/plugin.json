@@ -24,7 +24,11 @@
         ]
       },
       "year_month": {
-        "description": "조회 연월 (선택). 사용자가 기간을 언급한 경우에만 전달하고, 없으면 생략하세요(이번 달 자동 적용). 형식·되묻기 금지 규칙은 시스템 지시 [HR_SKILL_COMMON]을 따르세요. timesheet, work_status, work_hours, work_calendar, overtime, overtime_limit에서 사용. work_hours는 한 달 단위라 사용자가 연도와 달을 말하면 달을 빼지 말고 함께 전달하세요.",
+        "description": "조회 연월 (선택). 사용자가 달·연도를 언급한 경우에만 전달하고, 없으면 생략하세요(이번 달 자동 적용). 형식·되묻기 금지 규칙은 시스템 지시 [HR_SKILL_COMMON]을 따르세요. timesheet, work_status, work_hours, work_calendar, overtime, overtime_limit에서 사용. work_hours는 한 달 단위라 사용자가 연도와 달을 말하면 달을 빼지 말고 함께 전달하세요.",
+        "type": "string"
+      },
+      "date": {
+        "description": "조회 날짜·주 (선택). 사용자가 하루(오늘·어제·10월 15일·이번 주 수요일 등)나 한 주(이번 주·지난주 등)를 말한 경우에만 그 표현을 그대로 전달하고, 이때 year_month는 생략하세요. 형식·되묻기 금지 규칙은 시스템 지시 [HR_SKILL_COMMON]을 따르세요. timesheet, work_status, work_calendar, overtime, overtime_limit에서 사용.",
         "type": "string"
       }
     },
@@ -151,7 +155,23 @@
     },
     {
       "prompt": "2월 27일자 출퇴근 내역 알려줘",
-      "call": "{\"query_type\": \"timesheet\", \"year_month\": \"2\"}"
+      "call": "{\"query_type\": \"timesheet\", \"date\": \"2월 27일\"}"
+    },
+    {
+      "prompt": "오늘 출근시각 알려줘",
+      "call": "{\"query_type\": \"timesheet\", \"date\": \"오늘\"}"
+    },
+    {
+      "prompt": "이번 주 근무현황",
+      "call": "{\"query_type\": \"work_status\", \"date\": \"이번 주\"}"
+    },
+    {
+      "prompt": "10월 15일 연장근무",
+      "call": "{\"query_type\": \"overtime\", \"date\": \"10월 15일\"}"
+    },
+    {
+      "prompt": "내일 근무 몇 시부터야",
+      "call": "{\"query_type\": \"work_calendar\", \"date\": \"내일\"}"
     },
     {
       "prompt": "지난달 출퇴근 기록",
