@@ -252,13 +252,33 @@ model embed_configs {
   allow_tool_calling         Boolean       @default(false)
   allowed_skill_hashes       String?
   client_tool_execution      Boolean       @default(false)
+  allow_company_documents    Boolean       @default(false)
   workspace_id               Int
   createdBy                  Int?
   usersId                    Int?
   createdAt                  DateTime      @default(now())
   workspace                  workspaces    @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
   embed_chats                embed_chats[]
+  company_documents          embed_company_documents[]
   users                      users?        @relation(fields: [usersId], references: [id])
+}
+
+model embed_company_documents {
+  id            Int           @id @default(autoincrement())
+  embed_id      Int
+  company_key   String
+  company_hash  String
+  filename      String
+  uploader_name String?
+  status        String        @default("processing")
+  error         String?
+  doc_id        String?       @unique
+  location      String?
+  createdAt     DateTime      @default(now())
+  lastUpdatedAt DateTime      @default(now())
+  embed_config  embed_configs @relation(fields: [embed_id], references: [id], onDelete: Cascade)
+
+  @@index([embed_id, company_hash])
 }
 
 model embed_chats {

@@ -25,6 +25,9 @@ const ACCEPTED_MIMES = {
   "application/pdf": [".pdf"],
   "application/mbox": [".mbox"],
 
+  "application/x-hwp": [".hwp"],
+  "application/hwp+zip": [".hwpx"],
+
   "audio/wav": [".wav"],
   "audio/mpeg": [".mp3"],
 
@@ -59,6 +62,9 @@ const SUPPORTED_FILETYPE_CONVERTERS = {
   ".odp": "./convert/asOfficeMime.js",
 
   ".xlsx": "./convert/asXlsx.js",
+
+  ".hwp": "./convert/asHwp.js",
+  ".hwpx": "./convert/asHwp.js",
 
   ".mbox": "./convert/asMbox.js",
 

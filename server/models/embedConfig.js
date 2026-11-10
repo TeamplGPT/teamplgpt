@@ -18,6 +18,7 @@ const EmbedConfig = {
     "allow_tool_calling",
     "allowed_skill_hashes",
     "client_tool_execution",
+    "allow_company_documents",
   ],
 
   new: async function (data, creatorId = null) {
@@ -54,6 +55,10 @@ const EmbedConfig = {
           message_limit: validatedCreationData(
             data?.message_limit,
             "message_limit"
+          ),
+          allow_company_documents: validatedCreationData(
+            data?.allow_company_documents,
+            "allow_company_documents"
           ),
           createdBy: Number(creatorId) ?? null,
           workspace: {
@@ -194,6 +199,7 @@ const BOOLEAN_KEYS = [
   "enabled",
   "allow_tool_calling",
   "client_tool_execution",
+  "allow_company_documents",
 ];
 
 const NUMBER_KEYS = [

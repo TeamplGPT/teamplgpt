@@ -31,7 +31,8 @@
     "normalize:translations": "cd frontend/src/locales && node normalizeEn.mjs && cd ../../.. && yarn lint && yarn verify:translations",
     "e2e:hr-skill": "node server/scripts/e2e-hr-skill/runner.js",
     "e2e:hr-skill:full": "node server/scripts/e2e-hr-skill/runner.js --tier=full",
-    "e2e:embed-hr-skill": "node server/scripts/e2e-embed-hr-skill/runner.js"
+    "e2e:embed-hr-skill": "node server/scripts/e2e-embed-hr-skill/runner.js",
+    "e2e:embed-company-docs": "node server/scripts/e2e-embed-company-docs/runner.js"
   },
   "private": false,
   "devDependencies": {

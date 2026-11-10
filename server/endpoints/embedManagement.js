@@ -76,7 +76,18 @@ function embedManagementEndpoints(app) {
     async (request, response) => {
       try {
         const { embedId } = request.params;
+        const {
+          removeCompanyDocsForEmbed,
+          dropNamespaceIfEmpty,
+        } = require("../utils/companyDocs/process");
+        const { enqueue } = require("../utils/companyDocs/queue");
+        const companyNamespaces = await removeCompanyDocsForEmbed(
+          await EmbedConfig.getWithWorkspace({ id: Number(embedId) })
+        );
         await EmbedConfig.delete({ id: Number(embedId) });
+        companyNamespaces.forEach((ns) =>
+          enqueue(() => dropNamespaceIfEmpty(ns))
+        );
         await EventLogs.logEvent(
           "embed_deleted",
           { embedId },

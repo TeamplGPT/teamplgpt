@@ -132,7 +132,9 @@ describe("performMergedSearch", () => {
       };
       const sharedResult = {
         contextTexts: ["shared text 1"],
-        sources: [{ title: "shared-doc", score: 0.7, chunkSource: "shared://1" }],
+        sources: [
+          { title: "shared-doc", score: 0.7, chunkSource: "shared://1" },
+        ],
         message: false,
       };
       mockPerformSimilaritySearch
@@ -233,8 +235,16 @@ describe("performMergedSearch", () => {
 
     it("공용 검색 설정은 공용 WS 자체 값을 사용한다", async () => {
       mockPerformSimilaritySearch
-        .mockResolvedValueOnce({ contextTexts: [], sources: [], message: false })
-        .mockResolvedValueOnce({ contextTexts: [], sources: [], message: false });
+        .mockResolvedValueOnce({
+          contextTexts: [],
+          sources: [],
+          message: false,
+        })
+        .mockResolvedValueOnce({
+          contextTexts: [],
+          sources: [],
+          message: false,
+        });
 
       await performMergedSearch(defaultParams);
 
@@ -419,6 +429,139 @@ describe("performMergedSearch", () => {
       const sharedCall = mockPerformSimilaritySearch.mock.calls[1][0];
       expect(localCall.input).toBe("원본 검색어");
       expect(sharedCall.input).toBe("원본 검색어");
+    });
+  });
+
+  // specs/021 — 위젯 회사 문서 검색
+  describe("companyNamespace", () => {
+    const local = {
+      contextTexts: ["공통 3일"],
+      sources: [{ title: "common.md", score: 0.7 }],
+      message: false,
+    };
+    const company = {
+      contextTexts: ["회사 5일"],
+      sources: [{ title: "rules.hwp", score: 0.6 }],
+      message: false,
+    };
+
+    beforeEach(() => {
+      mockGetShared.mockResolvedValue(null);
+    });
+
+    it("없으면 결과가 기존과 같다 (회사 필드 없음)", async () => {
+      mockPerformSimilaritySearch.mockResolvedValue(local);
+      const result = await performMergedSearch(defaultParams);
+      expect(result).toEqual(local);
+      expect(mockHasNamespace).not.toHaveBeenCalled();
+    });
+
+    it("있으면 회사 결과를 분리해서 돌려준다", async () => {
+      mockHasNamespace.mockResolvedValue(true);
+      mockPerformSimilaritySearch.mockImplementation(async ({ namespace }) =>
+        namespace === "test-workspace-co-abc" ? company : local
+      );
+
+      const result = await performMergedSearch({
+        ...defaultParams,
+        companyNamespace: "test-workspace-co-abc",
+      });
+
+      expect(result.contextTexts).toEqual(["공통 3일"]);
+      expect(result.sources).toEqual(local.sources);
+      expect(result.companyContextTexts).toEqual(["회사 5일"]);
+      expect(result.companySources).toEqual([
+        { title: "rules.hwp", score: 0.6, fromCompany: true },
+      ]);
+      const companyCall = mockPerformSimilaritySearch.mock.calls.find(
+        ([args]) => args.namespace === "test-workspace-co-abc"
+      )[0];
+      expect(companyCall).toMatchObject({
+        similarityThreshold: 0.25,
+        topN: 4,
+        filterIdentifiers: [],
+      });
+    });
+
+    it("공용 워크스페이스와 함께 있어도 회사 결과는 병합하지 않고 분리한다", async () => {
+      mockGetShared.mockResolvedValue({ id: 99, slug: "shared-ws" });
+      mockHasNamespace.mockResolvedValue(true);
+      mockPerformSimilaritySearch.mockImplementation(async ({ namespace }) => {
+        if (namespace === "test-workspace-co-abc") return company;
+        if (namespace === "shared-ws")
+          return {
+            contextTexts: ["공용"],
+            sources: [{ title: "s", score: 0.9 }],
+          };
+        return local;
+      });
+
+      const result = await performMergedSearch({
+        ...defaultParams,
+        companyNamespace: "test-workspace-co-abc",
+      });
+
+      expect(result.contextTexts).toEqual(["공용", "공통 3일"]);
+      expect(result.companyContextTexts).toEqual(["회사 5일"]);
+    });
+
+    it("워크스페이스 문서가 없고 회사 문서만 있으면 공통 검색 오류 없이 회사 결과만 돌려준다", async () => {
+      mockHasNamespace.mockImplementation(
+        async (ns) => ns === "test-workspace-co-abc"
+      );
+      mockPerformSimilaritySearch.mockImplementation(async ({ namespace }) =>
+        namespace === "test-workspace-co-abc"
+          ? company
+          : {
+              contextTexts: [],
+              sources: [],
+              message: "Invalid query - no documents found for workspace!",
+            }
+      );
+
+      const result = await performMergedSearch({
+        ...defaultParams,
+        companyNamespace: "test-workspace-co-abc",
+      });
+
+      expect(result.message).toBeFalsy();
+      expect(result.contextTexts).toEqual([]);
+      expect(result.companyContextTexts).toEqual(["회사 5일"]);
+    });
+
+    it("회사 namespace가 없으면 회사 검색을 호출하지 않는다", async () => {
+      mockHasNamespace.mockImplementation(
+        async (ns) => ns !== "test-workspace-co-abc"
+      );
+      mockPerformSimilaritySearch.mockResolvedValue(local);
+
+      const result = await performMergedSearch({
+        ...defaultParams,
+        companyNamespace: "test-workspace-co-abc",
+      });
+
+      expect(mockPerformSimilaritySearch).toHaveBeenCalledTimes(1);
+      expect(result.companyContextTexts).toEqual([]);
+      expect(result.companySources).toEqual([]);
+    });
+
+    it("회사 검색이 실패해도 공통 결과는 유지된다", async () => {
+      mockHasNamespace.mockResolvedValue(true);
+      jest.spyOn(console, "warn").mockImplementation(() => {});
+      mockPerformSimilaritySearch.mockImplementation(async ({ namespace }) => {
+        if (namespace === "test-workspace-co-abc")
+          throw new Error("lance down");
+        return local;
+      });
+
+      const result = await performMergedSearch({
+        ...defaultParams,
+        companyNamespace: "test-workspace-co-abc",
+      });
+
+      expect(result.contextTexts).toEqual(["공통 3일"]);
+      expect(result.companyContextTexts).toEqual([]);
+      console.warn.mockRestore();
     });
   });
 });

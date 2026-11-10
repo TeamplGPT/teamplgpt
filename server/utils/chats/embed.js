@@ -16,6 +16,11 @@ const {
   shouldUseRerank,
 } = require("../vectorSearch/searchModeHelpers");
 const { Workspace } = require("../../models/workspace");
+const { EmbedCompanyDocument } = require("../../models/embedCompanyDocument");
+const {
+  prefixCompanyContexts,
+  appendCompanyRules,
+} = require("./companyDocsPrompt");
 
 async function streamChatWithForEmbed(
   response,
@@ -31,6 +36,7 @@ async function streamChatWithForEmbed(
     temperatureOverride,
     username,
     toolRuntimeOverrides,
+    companyName,
   }
 ) {
   const chatMode = embed.chat_mode;
@@ -52,13 +58,18 @@ async function streamChatWithForEmbed(
   const messageLimit = embed.message_limit ?? 20;
   const hasVectorizedSpace = await VectorDb.hasNamespace(embed.workspace.slug);
   const embeddingsCount = await VectorDb.namespaceCount(embed.workspace.slug);
+  const companyNamespace = await resolveCompanyNamespace(
+    VectorDb,
+    embed,
+    companyName
+  );
 
   // User is trying to query-mode chat a workspace that has no data in it - so
   // we should exit early as no information can be found under these conditions.
   // Skip early exit if a shared workspace exists (merged search may still find results).
   const sharedWorkspace = await Workspace.getShared();
   const hasSharedFallback = sharedWorkspace && sharedWorkspace.id !== embed.workspace.id;
-  if ((!hasVectorizedSpace || embeddingsCount === 0) && chatMode === "query" && !hasSharedFallback) {
+  if ((!hasVectorizedSpace || embeddingsCount === 0) && chatMode === "query" && !hasSharedFallback && !companyNamespace) {
     writeResponseChunk(response, {
       id: uuid,
       type: "textResponse",
@@ -103,7 +114,7 @@ async function streamChatWithForEmbed(
     });
 
   const vectorSearchResults =
-    embeddingsCount !== 0
+    embeddingsCount !== 0 || companyNamespace
       ? await performMergedSearch({
           workspace: embed.workspace,
           input: message,
@@ -114,6 +125,7 @@ async function streamChatWithForEmbed(
           rerank: shouldUseRerank(embed.workspace),
           hybridSearch: shouldUseHybridSearch(embed.workspace),
           adjacentChunks: embed.workspace?.adjacentChunks ?? 0,
+          ...(companyNamespace ? { companyNamespace } : {}),
         })
       : {
           contextTexts: [],
@@ -149,7 +161,16 @@ async function streamChatWithForEmbed(
   // If a past citation was used to answer the question - that is visible in the history so it logically makes sense
   // and does not appear to the user that a new response used information that is otherwise irrelevant for a given prompt.
   // TLDR; reduces GitHub issues for "LLM citing document that has no answer in it" while keep answers highly accurate.
-  contextTexts = [...contextTexts, ...filledSources.contextTexts];
+  // 회사 근거는 표지를 붙여 맨 앞에 둔다(specs/021). sources에는 넣지 않는다 —
+  // 대화 기록 backfill로 삭제된 회사 문서 내용이 되살아나지 않게
+  const companyContextTexts = prefixCompanyContexts(
+    vectorSearchResults.companyContextTexts
+  );
+  contextTexts = [
+    ...companyContextTexts,
+    ...contextTexts,
+    ...filledSources.contextTexts,
+  ];
   sources = [...sources, ...vectorSearchResults.sources];
 
   // If in query mode and no sources are found in current search or backfilled from history, do not
@@ -194,9 +215,12 @@ async function streamChatWithForEmbed(
       : [];
   const messages = await LLMConnector.compressMessages(
     {
-      systemPrompt: buildEmbedSystemPrompt(
-        await chatPrompt(embed.workspace, username, allowedToolNames),
-        allowedToolNames
+      systemPrompt: appendCompanyRules(
+        buildEmbedSystemPrompt(
+          await chatPrompt(embed.workspace, username, allowedToolNames),
+          allowedToolNames
+        ),
+        companyContextTexts.length > 0
       ),
       userPrompt: message,
       contextTexts,
@@ -378,6 +402,20 @@ function extractToolName(tool, format) {
     default:
       return null;
   }
+}
+
+// 회사 문서 검색 대상 namespace. opt-in이 아니거나 회사 이름이 없거나
+// 아직 임베딩된 회사 문서가 없으면 null
+async function resolveCompanyNamespace(VectorDb, embed, companyName) {
+  if (embed.allow_company_documents !== true) return null;
+  const key = EmbedCompanyDocument.normalizeCompanyKey(companyName);
+  if (!key) return null;
+  const namespace = EmbedCompanyDocument.namespaceFor(
+    embed.workspace.slug,
+    embed.id,
+    EmbedCompanyDocument.companyHash(key)
+  );
+  return (await VectorDb.namespaceCount(namespace)) > 0 ? namespace : null;
 }
 
 async function recentEmbedChatHistory(sessionId, embed, messageLimit = 20) {

@@ -7,7 +7,7 @@
   "license": "MIT",
   "private": false,
   "engines": {
-    "node": ">=18.12.1"
+    "node": ">=20"
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon --ignore hotdir --ignore storage --trace-warnings index.js",
@@ -26,6 +26,7 @@
     "html-to-text": "^9.0.5",
     "ignore": "^5.3.0",
     "js-tiktoken": "^1.0.8",
+    "kordoc": "4.24.59",
     "langchain": "0.1.36",
     "mammoth": "^1.6.0",
     "mbox-parser": "^1.0.1",

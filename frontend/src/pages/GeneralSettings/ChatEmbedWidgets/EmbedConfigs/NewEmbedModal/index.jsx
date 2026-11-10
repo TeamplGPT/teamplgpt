@@ -24,6 +24,8 @@ export function enforceSubmissionSchema(form) {
   if (!data.hasOwnProperty("message_limit")) data.message_limit = 20;
   if (!data.hasOwnProperty("allow_tool_calling"))
     data.allow_tool_calling = false;
+  if (!data.hasOwnProperty("allow_company_documents"))
+    data.allow_company_documents = false;
   // allowed_skill_hashes is handled by submit handler (Option B) to preserve
   // DB value when toggle is OFF. See design doc §4.3-4.4.
   return data;
@@ -124,6 +126,11 @@ export default function NewEmbedModal({ closeModal }) {
                   <AllowedSkillsMultiSelect onChange={setSelectedHubIds} />
                 </>
               )}
+              <BooleanInput
+                name="allow_company_documents"
+                title="회사 문서 업로드 허용 (위젯 사규 RAG)"
+                hint="ON 시 위젯 사용자가 자기 회사의 취업규칙·사규 파일을 올리고, 같은 회사 직원의 답변에 그 문서가 우선 근거로 쓰입니다. 회사 구분은 위젯이 보내는 회사 이름(companyData.name)으로 하며, 같은 회사 직원은 누구나 문서를 올리고 지울 수 있습니다."
+              />
 
               {error && <p className="text-red-400 text-sm">Error: {error}</p>}
               <p className="text-white text-opacity-60 text-xs md:text-sm">

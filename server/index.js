@@ -12,6 +12,9 @@ const { systemEndpoints } = require("./endpoints/system");
 const { workspaceEndpoints } = require("./endpoints/workspaces");
 const { chatEndpoints } = require("./endpoints/chat");
 const { embeddedEndpoints } = require("./endpoints/embed");
+const {
+  embedCompanyDocumentsEndpoints,
+} = require("./endpoints/embedCompanyDocuments");
 const { embedManagementEndpoints } = require("./endpoints/embedManagement");
 const { getVectorDbClass } = require("./utils/helpers");
 const { adminEndpoints } = require("./endpoints/admin");
@@ -55,6 +58,8 @@ app.use(
   })
 );
 
+require("./utils/companyDocs/queue").recoverOnBoot();
+
 if (!!process.env.ENABLE_HTTPS) {
   bootSSL(app, process.env.SERVER_PORT || 3001);
 } else {
@@ -81,6 +86,8 @@ mcpServersEndpoints(apiRouter);
 mobileEndpoints(apiRouter);
 
 // Externally facing embedder endpoints
+// /embed/:embedId/:sessionId 보다 먼저 — 아니면 company-documents가 sessionId로 잡힘
+embedCompanyDocumentsEndpoints(apiRouter);
 embeddedEndpoints(apiRouter);
 
 // Externally facing browser extension endpoints

@@ -68,6 +68,7 @@ function embeddedEndpoints(app) {
           model = null,
           temperature = null,
           username = null,
+          companyName = null,
         } = reqBody(request);
 
         response.setHeader("Cache-Control", "no-cache");
@@ -84,6 +85,7 @@ function embeddedEndpoints(app) {
           temperatureOverride: temperature,
           username,
           toolRuntimeOverrides,
+          companyName,
         });
         await Telemetry.sendTelemetry("embed_sent_chat", {
           multiUserMode: multiUserMode(response),
