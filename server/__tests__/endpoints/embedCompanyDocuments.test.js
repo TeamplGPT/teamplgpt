@@ -54,6 +54,7 @@ jest.mock("../../utils/companyDocs/process", () => ({
   processCompanyDocument: jest.fn(),
   removeCompanyDocumentArtifacts: jest.fn(),
   dropNamespaceIfEmpty: jest.fn(),
+  readCompanyDocumentContent: jest.fn(),
 }));
 
 const { EmbedCompanyDocument } = require("../../models/embedCompanyDocument");
@@ -62,6 +63,7 @@ const {
   processCompanyDocument,
   removeCompanyDocumentArtifacts,
   dropNamespaceIfEmpty,
+  readCompanyDocumentContent,
 } = require("../../utils/companyDocs/process");
 const {
   embedCompanyDocumentsEndpoints,
@@ -378,5 +380,119 @@ describe("DELETE", () => {
     expect(res.status).toBe(404);
     expect(await res.json()).toEqual({ error: "NOT_FOUND" });
     expect(EmbedCompanyDocument.delete).not.toHaveBeenCalled();
+  });
+});
+
+// 위젯 본문 보기 (okrservice specs/005-company-doc-view)
+describe("GET content", () => {
+  const READY_ROW = {
+    id: 7,
+    embed_id: 1,
+    company_key: "오이사공",
+    company_hash: HASH,
+    filename: "2026 취업규칙.pdf",
+    uploader_name: "홍길동",
+    status: "ready",
+    error: null,
+    doc_id: "secret-doc",
+    location: `${HASH}/rules.json`,
+    createdAt: "2026-11-10T01:00:00.000Z",
+  };
+  const contentUrl = (id, name) => `${baseUrl}/${id}/content${q(name)}`;
+
+  beforeEach(() => {
+    jest.spyOn(console, "warn").mockImplementation(() => {});
+  });
+
+  it("returns the public document and the text the chatbot reads", async () => {
+    EmbedCompanyDocument.getOwned.mockResolvedValue(READY_ROW);
+    readCompanyDocumentContent.mockReturnValue("제16조(근로시간) 09:30");
+    const res = await fetch(contentUrl(7));
+    expect(res.status).toBe(200);
+    expect(EmbedCompanyDocument.getOwned).toHaveBeenCalledWith("7", 1, HASH);
+    expect(readCompanyDocumentContent).toHaveBeenCalledWith(READY_ROW);
+    const body = await res.json();
+    expect(body).toEqual({
+      document: {
+        id: 7,
+        filename: "2026 취업규칙.pdf",
+        uploaderName: "홍길동",
+        status: "ready",
+        error: null,
+        createdAt: "2026-11-10T01:00:00.000Z",
+      },
+      content: "제16조(근로시간) 09:30",
+    });
+    expect(JSON.stringify(body)).not.toMatch(/rules\.json|secret-doc|company/);
+    expect(res.headers.get("cache-control")).toBe("no-store");
+  });
+
+  it("401 when the origin is not in the allowlist", async () => {
+    mockEmbed = {
+      ...BASE_EMBED,
+      allowlist_domains: JSON.stringify(["https://allowed.example.com"]),
+    };
+    const res = await fetch(contentUrl(7), {
+      headers: { Origin: "https://evil.example.com" },
+    });
+    expect(res.status).toBe(401);
+    expect(EmbedCompanyDocument.getOwned).not.toHaveBeenCalled();
+  });
+
+  it("404 NOT_FOUND for another company's or embed's document, without reading it", async () => {
+    EmbedCompanyDocument.getOwned.mockResolvedValue(null);
+    const res = await fetch(contentUrl(7, "다른회사"));
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({ error: "NOT_FOUND" });
+    expect(EmbedCompanyDocument.getOwned).toHaveBeenCalledWith(
+      "7",
+      1,
+      EmbedCompanyDocument.companyHash("다른회사")
+    );
+    expect(readCompanyDocumentContent).not.toHaveBeenCalled();
+  });
+
+  it("answers a malformed id the same as a missing document", async () => {
+    EmbedCompanyDocument.getOwned.mockImplementation(
+      jest.requireActual("../../models/embedCompanyDocument").EmbedCompanyDocument
+        .getOwned
+    );
+    for (const id of ["abc", "-1", "0"]) {
+      const res = await fetch(contentUrl(id));
+      expect(res.status).toBe(404);
+      expect(await res.json()).toEqual({ error: "NOT_FOUND" });
+    }
+    expect(readCompanyDocumentContent).not.toHaveBeenCalled();
+  });
+
+  it("400 COMPANY_REQUIRED without a company", async () => {
+    const res = await fetch(`${baseUrl}/7/content${q("  ")}`);
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "COMPANY_REQUIRED" });
+  });
+
+  it("403 when the embed does not allow company documents", async () => {
+    mockEmbed = { ...BASE_EMBED, allow_company_documents: false };
+    const res = await fetch(contentUrl(7));
+    expect(res.status).toBe(403);
+    expect(EmbedCompanyDocument.getOwned).not.toHaveBeenCalled();
+  });
+
+  it("409 NOT_READY while processing or after a failure", async () => {
+    for (const status of ["processing", "failed"]) {
+      EmbedCompanyDocument.getOwned.mockResolvedValue({ ...READY_ROW, status });
+      const res = await fetch(contentUrl(7));
+      expect(res.status).toBe(409);
+      expect(await res.json()).toEqual({ error: "NOT_READY" });
+    }
+    expect(readCompanyDocumentContent).not.toHaveBeenCalled();
+  });
+
+  it("404 CONTENT_MISSING when a ready document has no readable text", async () => {
+    EmbedCompanyDocument.getOwned.mockResolvedValue(READY_ROW);
+    readCompanyDocumentContent.mockReturnValue(null);
+    const res = await fetch(contentUrl(7));
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({ error: "CONTENT_MISSING" });
   });
 });

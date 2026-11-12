@@ -478,9 +478,46 @@ describe("performMergedSearch", () => {
       )[0];
       expect(companyCall).toMatchObject({
         similarityThreshold: 0.25,
-        topN: 4,
+        topN: 16,
         filterIdentifiers: [],
       });
+    });
+
+    it("회사 검색 topN은 최소 16, 워크스페이스 topN이 더 크면 그 값을 쓴다", async () => {
+      mockHasNamespace.mockResolvedValue(true);
+      mockPerformSimilaritySearch.mockResolvedValue(company);
+      const companyTopN = () =>
+        mockPerformSimilaritySearch.mock.calls.find(
+          ([args]) => args.namespace === "test-workspace-co-abc"
+        )[0].topN;
+
+      await performMergedSearch({
+        ...defaultParams,
+        topN: undefined,
+        companyNamespace: "test-workspace-co-abc",
+      });
+      expect(companyTopN()).toBe(16);
+
+      mockPerformSimilaritySearch.mockClear();
+      await performMergedSearch({
+        ...defaultParams,
+        topN: 20,
+        companyNamespace: "test-workspace-co-abc",
+      });
+      expect(companyTopN()).toBe(20);
+    });
+
+    it("공통 검색 topN은 워크스페이스 값 그대로다", async () => {
+      mockHasNamespace.mockResolvedValue(true);
+      mockPerformSimilaritySearch.mockResolvedValue(local);
+      await performMergedSearch({
+        ...defaultParams,
+        companyNamespace: "test-workspace-co-abc",
+      });
+      const localCall = mockPerformSimilaritySearch.mock.calls.find(
+        ([args]) => args.namespace !== "test-workspace-co-abc"
+      )[0];
+      expect(localCall.topN).toBe(4);
     });
 
     it("공용 워크스페이스와 함께 있어도 회사 결과는 병합하지 않고 분리한다", async () => {

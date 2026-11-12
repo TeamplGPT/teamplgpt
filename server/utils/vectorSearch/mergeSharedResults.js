@@ -1,6 +1,10 @@
 const { Workspace } = require("../../models/workspace");
 const { rewriteQuery } = require("../queryRewriter");
 
+// 사규는 수십~수백 조항이라 워크스페이스 기본 4개로는 뒤쪽 조항을 놓친다.
+// 실측(specs/021): 48조 문서는 8개로 충분, 4개 문서 195조는 8개에서 누락·16개에서 전건 통과
+const COMPANY_DOC_MIN_TOP_N = 16;
+
 async function performMergedSearch({
   workspace,
   input,
@@ -31,7 +35,7 @@ async function performMergedSearch({
     input: searchInput,
     LLMConnector,
     similarityThreshold,
-    topN,
+    topN: Math.max(topN || 0, COMPANY_DOC_MIN_TOP_N),
     rerank,
     adjacentChunks,
     hybridSearch,

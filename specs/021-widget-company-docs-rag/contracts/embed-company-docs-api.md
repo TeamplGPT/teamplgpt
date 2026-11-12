@@ -49,6 +49,15 @@ Base: `{TEAMPLGPT_BASE_URL}/api/embed/:embedId`
 - 그 외(없음·다른 회사·다른 embed) → `404 { error: "NOT_FOUND" }`
 - `processing` 상태 삭제 허용(data-model §2 상태 전이).
 
+## GET `/company-documents/:id/content?companyName=오이사공`
+
+본문 보기 (okrservice `specs/005-company-doc-view` — 화면·문구 계약은 그쪽 `contracts/company-doc-content-api.md`).
+
+- 행의 `embed_id`·`company_hash`가 요청과 다르거나 행이 없음(잘못된 id 포함) → `404 { error: "NOT_FOUND" }` — 다른 회사 공간 문서의 존재를 드러내지 않는다
+- `status`가 `ready`가 아님 → `409 { error: "NOT_READY" }`
+- 저장된 본문을 읽지 못함 → `404 { error: "CONTENT_MISSING" }`. 본문 파일은 그 행의 회사 폴더(`storage/company-documents/<company_hash>/`) 안일 때만 연다
+- 성공: `200 { "document": Document, "content": "<챗봇이 읽는 글(pageContent)>" }`
+
 ## 실패 사유 코드 → 위젯 표시 문구 (Document.error)
 
 | 서버 원인 | `error` 코드 | 위젯 문구 (en key → ko) |

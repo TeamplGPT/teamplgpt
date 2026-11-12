@@ -7,7 +7,8 @@
       "E2E삭제사": ["A사-취업규칙.md"],
       "E2E한글사": ["employment-subsidy-2026-52.hwp"],
       "E2E한글X사": ["company-rules.hwpx"],
-      "E2E주입사": ["A사-지시주입.md"]
+      "E2E주입사": ["A사-지시주입.md"],
+      "E2E장문사": ["장문-취업규칙.pdf"]
     }
   },
   "scenarios": [
@@ -97,6 +98,42 @@
         "answer_pattern": ["1\\s*만\\s*2\\s*천|12,?000"],
         "answer_not_pattern": ["해킹됨"]
       }
+    },
+    {
+      "id": "CR-10",
+      "title": "긴 사규 뒤쪽 조항도 찾는다 — 퇴직 신청 기한",
+      "company": "E2E장문사",
+      "question": "퇴사하려면 며칠 전에 말해야 해?",
+      "repeat": 3,
+      "min_pass": 3,
+      "expect": { "answer_pattern": ["45\\s*일"] }
+    },
+    {
+      "id": "CR-11",
+      "title": "긴 사규 뒤쪽 조항도 찾는다 — 병가 진단서 기준",
+      "company": "E2E장문사",
+      "question": "아파서 이틀 쉬려는데 진단서 내야 돼?",
+      "repeat": 3,
+      "min_pass": 3,
+      "expect": { "answer_pattern": ["3\\s*일"] }
+    },
+    {
+      "id": "CR-12",
+      "title": "가족 호칭을 규정의 관계로 바꿔 찾는다 — 장인 = 배우자의 부모",
+      "company": "E2E장문사",
+      "question": "장인어른이 돌아가시면 휴가 며칠이야?",
+      "repeat": 3,
+      "min_pass": 3,
+      "expect": { "answer_pattern": ["6\\s*일"] }
+    },
+    {
+      "id": "CR-13",
+      "title": "규정 조건대로 계산한다 — 근속 7년 연차 18+2",
+      "company": "E2E장문사",
+      "question": "근속 7년이면 연차가 며칠이야?",
+      "repeat": 3,
+      "min_pass": 3,
+      "expect": { "answer_pattern": ["20\\s*일"], "answer_not_pattern": ["19\\s*일|21\\s*일"] }
     }
   ]
 }

@@ -147,8 +147,12 @@ function createCompanyDocsEmbed(workspaceId) {
   return { uuid, id };
 }
 
-function deleteCompanyDocsEmbeds() {
-  psql(`DELETE FROM embed_configs WHERE uuid LIKE '${UUID_PREFIX}%';`);
+// 이번 실행이 만든 embed만 지운다 — 접두사로 지우면 개발용으로 남겨 둔 같은 접두사 embed까지 사라진다
+function deleteCompanyDocsEmbed(uuid) {
+  if (!/^e2e-embed-codocs-[0-9a-f]{8}$/.test(uuid || "")) {
+    throw new Error(`refusing to delete non-runner embed: ${uuid}`);
+  }
+  psql(`DELETE FROM embed_configs WHERE uuid = '${uuid}';`);
 }
 
 // ─── 회사 문서 API ─────────────────────────────────────────────────────────
@@ -390,10 +394,12 @@ async function main() {
         }
       }
     }
-    try {
-      deleteCompanyDocsEmbeds();
-    } catch (e) {
-      info(`cleanup embeds: ${e.message}`);
+    if (embed) {
+      try {
+        deleteCompanyDocsEmbed(embed.uuid);
+      } catch (e) {
+        info(`cleanup embed: ${e.message}`);
+      }
     }
     if (apiKey && workspaceSlug) {
       try {

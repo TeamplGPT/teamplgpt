@@ -95,4 +95,46 @@ describe("searchModeHelpers", () => {
       expect(shouldUseRerank(undefined)).toBe(false);
     });
   });
+
+  // Prisma workspace 레코드에는 vectorDB 컬럼이 없다 — 서버 설정 VECTOR_DB로 판정해야 한다
+  describe("vectorDB가 없는 실제 workspace 레코드", () => {
+    const ORIGINAL = process.env.VECTOR_DB;
+    afterEach(() => {
+      if (ORIGINAL === undefined) delete process.env.VECTOR_DB;
+      else process.env.VECTOR_DB = ORIGINAL;
+    });
+
+    test("VECTOR_DB=lancedb + rerank 모드면 rerank한다", () => {
+      process.env.VECTOR_DB = "lancedb";
+      expect(shouldUseRerank({ vectorSearchMode: "rerank" })).toBe(true);
+      expect(shouldUseRerank({ vectorSearchMode: "default" })).toBe(false);
+    });
+
+    test("VECTOR_DB가 없으면 기본 lancedb로 본다", () => {
+      delete process.env.VECTOR_DB;
+      expect(shouldUseRerank({ vectorSearchMode: "rerank" })).toBe(true);
+      expect(shouldUseHybridSearch({ vectorSearchMode: "default" })).toBe(
+        false
+      );
+    });
+
+    test("VECTOR_DB=pgvector면 hybrid search를 쓰고 rerank는 안 한다", () => {
+      process.env.VECTOR_DB = "pgvector";
+      expect(shouldUseHybridSearch({ vectorSearchMode: "default" })).toBe(true);
+      expect(shouldUseRerank({ vectorSearchMode: "rerank" })).toBe(false);
+    });
+
+    test("workspace.vectorDB가 있으면 서버 설정보다 우선한다", () => {
+      process.env.VECTOR_DB = "pgvector";
+      expect(
+        shouldUseRerank({ vectorDB: "lancedb", vectorSearchMode: "rerank" })
+      ).toBe(true);
+    });
+
+    test("workspace가 없으면 서버 설정과 무관하게 false", () => {
+      process.env.VECTOR_DB = "pgvector";
+      expect(shouldUseHybridSearch(null)).toBe(false);
+      expect(shouldUseRerank(undefined)).toBe(false);
+    });
+  });
 });

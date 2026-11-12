@@ -11,6 +11,7 @@ const {
   processCompanyDocument,
   removeCompanyDocumentArtifacts,
   dropNamespaceIfEmpty,
+  readCompanyDocumentContent,
 } = require("../utils/companyDocs/process");
 
 /**
@@ -172,6 +173,50 @@ function embedCompanyDocumentsEndpoints(app) {
         });
       } catch (e) {
         console.error("[companyDocs] list failed:", e.message);
+        response.sendStatus(500);
+      }
+    }
+  );
+
+  // 본문 보기(okrservice specs/005): 다른 회사·embed 문서는 없는 문서와 같은 404
+  app.get(
+    "/embed/:embedId/company-documents/:id/content",
+    [validEmbedConfig, companyDocsAllowed],
+    async (request, response) => {
+      // 사규 전문 — 중간 캐시·브라우저 캐시에 남기지 않는다(삭제 후에도 보이는 일 방지)
+      response.setHeader("Cache-Control", "no-store");
+      try {
+        const company = resolveCompany(response, request.query.companyName);
+        if (!company) {
+          response.status(400).json({ error: "COMPANY_REQUIRED" });
+          return;
+        }
+        const embed = response.locals.embedConfig;
+        const row = await EmbedCompanyDocument.getOwned(
+          request.params.id,
+          embed.id,
+          company.hash
+        );
+        if (!row) {
+          response.status(404).json({ error: "NOT_FOUND" });
+          return;
+        }
+        if (row.status !== "ready") {
+          response.status(409).json({ error: "NOT_READY" });
+          return;
+        }
+        const content = await readCompanyDocumentContent(row);
+        if (content === null) {
+          console.warn(`[companyDocs] content missing for document ${row.id}`);
+          response.status(404).json({ error: "CONTENT_MISSING" });
+          return;
+        }
+        response.status(200).json({
+          document: EmbedCompanyDocument.toPublic(row),
+          content,
+        });
+      } catch (e) {
+        console.error("[companyDocs] content failed:", e.message);
         response.sendStatus(500);
       }
     }

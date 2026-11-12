@@ -72,6 +72,27 @@ function moveCollectorOutput(documents, hash, title) {
   return { location, data };
 }
 
+// 위젯 본문 보기(okrservice specs/005): 챗봇이 읽는 글 = 저장된 pageContent.
+// 그 행의 회사 폴더 안 파일만 연다 — DB 값이 잘못돼도 다른 회사 파일은 읽지 않는다
+// 큰 문서도 다른 요청을 막지 않게 비동기로 읽는다
+async function readCompanyDocumentContent(row) {
+  if (!row?.location || !row?.company_hash) return null;
+  try {
+    const companyRoot = path.resolve(companyDocsPath(), row.company_hash);
+    const target = path.resolve(
+      companyDocsPath(),
+      normalizePath(row.location)
+    );
+    if (!isWithin(companyRoot, target)) return null;
+    const { pageContent } = JSON.parse(
+      await fs.promises.readFile(target, "utf8")
+    );
+    return typeof pageContent === "string" ? pageContent : null;
+  } catch {
+    return null;
+  }
+}
+
 async function removeCompanyDocumentArtifacts(row, namespace) {
   if (row.doc_id) {
     try {
@@ -228,5 +249,6 @@ module.exports = {
   recoverInterruptedDocuments,
   failureCode,
   companyDocsPath,
+  readCompanyDocumentContent,
   COMPANY_DOC_ERRORS,
 };
