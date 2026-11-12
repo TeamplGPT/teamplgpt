@@ -130,6 +130,7 @@ export default function NewEmbedModal({ closeModal }) {
                 name="allow_company_documents"
                 title="회사 문서 업로드 허용 (위젯 사규 RAG)"
                 hint="ON 시 위젯 사용자가 자기 회사의 취업규칙·사규 파일을 올리고, 같은 회사 직원의 답변에 그 문서가 우선 근거로 쓰입니다. 회사 구분은 위젯이 보내는 회사 이름(companyData.name)으로 하며, 같은 회사 직원은 누구나 문서를 올리고 지울 수 있습니다."
+                defaultValue={true}
               />
 
               {error && <p className="text-red-400 text-sm">Error: {error}</p>}

@@ -252,7 +252,7 @@ model embed_configs {
   allow_tool_calling         Boolean       @default(false)
   allowed_skill_hashes       String?
   client_tool_execution      Boolean       @default(false)
-  allow_company_documents    Boolean       @default(false)
+  allow_company_documents    Boolean       @default(true)
   workspace_id               Int
   createdBy                  Int?
   usersId                    Int?
