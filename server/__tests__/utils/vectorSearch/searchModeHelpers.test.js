@@ -97,6 +97,9 @@ describe("searchModeHelpers", () => {
   });
 
   // Prisma workspace 레코드에는 vectorDB 컬럼이 없다 — 서버 설정 VECTOR_DB로 판정해야 한다
+  // Prisma workspace 레코드에는 vectorDB 컬럼이 없다. 서버 설정 VECTOR_DB만으로
+  // hybrid·rerank를 켜면 모든 채팅에 적용된다 — hybrid keyword 쿼리는 전체 스캔,
+  // rerank는 질문당 최대 50조각을 서버 프로세스에서 돌려 ~0.9GB를 쓴다(2026-11-13 demo 504)
   describe("vectorDB가 없는 실제 workspace 레코드", () => {
     const ORIGINAL = process.env.VECTOR_DB;
     afterEach(() => {
@@ -104,27 +107,27 @@ describe("searchModeHelpers", () => {
       else process.env.VECTOR_DB = ORIGINAL;
     });
 
-    test("VECTOR_DB=lancedb + rerank 모드면 rerank한다", () => {
+    test("VECTOR_DB=lancedb + rerank 모드여도 서버 설정만으로 rerank하지 않는다", () => {
       process.env.VECTOR_DB = "lancedb";
-      expect(shouldUseRerank({ vectorSearchMode: "rerank" })).toBe(true);
-      expect(shouldUseRerank({ vectorSearchMode: "default" })).toBe(false);
+      expect(shouldUseRerank({ vectorSearchMode: "rerank" })).toBe(false);
     });
 
-    test("VECTOR_DB가 없으면 기본 lancedb로 본다", () => {
+    test("VECTOR_DB가 없어도 rerank·hybrid를 켜지 않는다", () => {
       delete process.env.VECTOR_DB;
-      expect(shouldUseRerank({ vectorSearchMode: "rerank" })).toBe(true);
+      expect(shouldUseRerank({ vectorSearchMode: "rerank" })).toBe(false);
       expect(shouldUseHybridSearch({ vectorSearchMode: "default" })).toBe(
         false
       );
     });
 
-    test("VECTOR_DB=pgvector면 hybrid search를 쓰고 rerank는 안 한다", () => {
+    test("VECTOR_DB=pgvector여도 서버 설정만으로 hybrid search를 켜지 않는다", () => {
       process.env.VECTOR_DB = "pgvector";
-      expect(shouldUseHybridSearch({ vectorSearchMode: "default" })).toBe(true);
-      expect(shouldUseRerank({ vectorSearchMode: "rerank" })).toBe(false);
+      expect(shouldUseHybridSearch({ vectorSearchMode: "default" })).toBe(
+        false
+      );
     });
 
-    test("workspace.vectorDB가 있으면 서버 설정보다 우선한다", () => {
+    test("workspace.vectorDB를 명시하면 그 값으로 판정한다", () => {
       process.env.VECTOR_DB = "pgvector";
       expect(
         shouldUseRerank({ vectorDB: "lancedb", vectorSearchMode: "rerank" })
