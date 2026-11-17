@@ -5,6 +5,7 @@
  *   {{TODAY}} 20261023 / {{TODAY_MD}} 10-23 / {{YESTERDAY}}·{{YESTERDAY_MD}} / {{TOMORROW}}·{{TOMORROW_MD}}
  *   {{WEEK_MON}}·{{WEEK_SUN}} 이번 주 월·일요일(YYYYMMDD) / {{LAST_WEEK_MON}}·{{LAST_WEEK_SUN}}
  *   {{LAST_WEEK_WED}}·{{LAST_WEEK_WED_MD}} 지난주 수요일
+ *   {{LAST_MONTH_M}} 지난달 월(10, 1월이면 12)
  *
  * 두 러너(@agent·위젯)가 시나리오를 읽은 직후 expect에 적용한다.
  */
@@ -39,6 +40,8 @@ function placeholderValues(now = new Date()) {
     LAST_WEEK_SUN: ymdOf(weekDay(-1)),
     LAST_WEEK_WED: ymdOf(weekDay(-5)),
     LAST_WEEK_WED_MD: mdOf(weekDay(-5)),
+    // 지난달 월(앞 0 없음) — 1월이면 12
+    LAST_MONTH_M: String(((today.getUTCMonth() + 11) % 12) + 1),
   };
 }
 
