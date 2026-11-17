@@ -103,9 +103,30 @@ function isRepeatedValueLine(line) {
  */
 function sanitizeModelText(text) {
   if (typeof text !== "string") return "";
-  return tidyBlankLines(text.split("\n").filter((line) => !isRepeatedValueLine(line)))
+  return tidyBlankLines(dropBrokenLists(text.split("\n")).filter((line) => !isRepeatedValueLine(line)))
     .join("\n")
     .trim();
+}
+
+// 목록 한 덩어리(목록 줄 + 그 아래 들여쓴 줄, 빈 줄·다른 줄에서 끊김)에서 지울 줄이 하나라도 있으면
+// 덩어리째 지운다. 값이 든 항목만 지우면 남은 항목·하위 줄이 다른 뜻이 된다 — "결재 문서 목록"에서
+// 12/24·10/5가 든 두 문서 줄만 지워져 결재완료 1건이 "진행 중 문서"로 남은 사례(2026-11-18).
+function dropBrokenLists(lines) {
+  const out = [];
+  let i = 0;
+  while (i < lines.length) {
+    if (!LIST_MARKER_RE.test(lines[i])) {
+      out.push(lines[i]);
+      i += 1;
+      continue;
+    }
+    let end = i + 1;
+    while (end < lines.length && (LIST_MARKER_RE.test(lines[end]) || /^\s+\S/.test(lines[end]))) end += 1;
+    const block = lines.slice(i, end);
+    if (!block.some(isRepeatedValueLine)) out.push(...block);
+    i = end;
+  }
+  return out;
 }
 
 // 모델 문장의 "N시간"·"N일" — 날짜("10월 15일")는 수치로 보지 않는다
