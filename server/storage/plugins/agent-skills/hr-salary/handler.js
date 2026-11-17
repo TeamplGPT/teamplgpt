@@ -150,6 +150,18 @@ function payPeriodsForm(ym, applCd) {
 }
 
 // "YYYYMM" → 전월 "YYYYMM"
+const dashedYm = (ym) => `${ym.slice(0, 4)}-${ym.slice(4, 6)}`;
+
+// 이번 달 지급 건이 없어 이전 달 건을 보여줄 때 붙이는 안내(사용자에게도 보인다)
+function notYetPaidNote(requestedYm, shownYm) {
+  if (requestedYm === shownYm) return "";
+  const which = shownYm === prevYm(requestedYm) ? "지난달" : "가장 최근";
+  return (
+    `\n> 이번 달(${dashedYm(requestedYm)}) 급여는 아직 지급(마감) 전이라 ${which}(${dashedYm(shownYm)}) 지급 건을 보여드려요.` +
+    `\n> [답변 지침] 이 지급 건은 이번 달이 아니라 ${which}(${dashedYm(shownYm)}) 건입니다. 답변 첫 문장에 '이번 달 급여는 아직 지급 전이라 ${which}(${Number(shownYm.slice(4, 6))}월) 기준'이라고 밝히고, ${which} 금액을 '이번 달'이라고 부르지 마세요. 이 줄은 답변에 포함하지 마세요.`
+  );
+}
+
 function prevYm(ym) {
   const y = Number(ym.slice(0, 4));
   const m = Number(ym.slice(4, 6));
@@ -190,9 +202,13 @@ module.exports.runtime = {
         // 월 미지정 시 이번달이 마감 전이면 항상 빈 결과가 되므로 최대 2개월 소급 폴백.
         // 사용자가 월을 명시한 경우에는 그 달만 조회한다(의도 존중).
         const explicitYm = resolveDateParam(year_month, "year_month");
-        const tryYms = explicitYm
-          ? [explicitYm]
-          : [ym, prevYm(ym), prevYm(prevYm(ym))];
+        // 이번 달(또는 달 미지정)이면 아직 지급 전일 수 있어 지난달·지지난달까지 본다(사용자 결정 2026-11-18).
+        // 과거 달을 콕 집은 질문은 그 달만 — 다른 달로 바꿔 답하지 않는다.
+        const currentYm = resolveDateParam("이번달", "year_month");
+        const tryYms =
+          explicitYm && explicitYm !== currentYm
+            ? [explicitYm]
+            : [ym, prevYm(ym), prevYm(prevYm(ym))];
 
         this.introspect(`${label} 조회 중...`);
         for (const tryYm of tryYms) {
@@ -202,7 +218,7 @@ module.exports.runtime = {
             gate: PAY_PERIODS.gate,
           });
           if (errorMessage) return errorMessage;
-          if (!isEmpty) return formatPayPeriods(records, tryYm);
+          if (!isEmpty) return formatPayPeriods(records, tryYm) + notYetPaidNote(ym, tryYm);
         }
         return explicitYm
           ? `> ⚠️ **${label}**: 해당 월에 지급된(마감된) 급여 건이 없습니다.`

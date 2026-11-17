@@ -52,11 +52,12 @@ describe("range 모드 — 1회 호출, 기간만 1년 (US1)", () => {
       cmmSearchStaffId: SELF,
     });
     expect(output.startsWith(`## HR 근태 - 출퇴근 기록\n\n${HEADER_THIS_YEAR}\n\n`)).toBe(true);
-    expect(output).toContain("20260210");
-    expect(output).toContain("20260420");
-    expect(output).toContain("20260515");
-    expect(output).not.toContain("20260105");
-    expect(output).not.toContain("20260311");
+    // 표 날짜는 하이픈 형식(2026-11-18 사용자 결정, _shared/formatTable displayDate)
+    expect(output).toContain("2026-02-10");
+    expect(output).toContain("2026-04-20");
+    expect(output).toContain("2026-05-15");
+    expect(output).not.toContain("2026-01-05");
+    expect(output).not.toContain("2026-03-11");
     expect(output).toContain("> 그 외 2일은 특이사항 없음");
     expect(output).not.toContain("S0001");
   });
@@ -73,7 +74,7 @@ describe("range 모드 — 1회 호출, 기간만 1년 (US1)", () => {
       "## HR 근태 - 근무현황 요약",
       HEADER_THIS_YEAR,
       "> 요약: 정상 출퇴근 3일 · 출퇴근 특이사항(지각 1회) · 근무예외사항(휴가 1일) · 연장근로 1일(승인 3.0h)",
-      "| 20260210 |",
+      "| 2026-02-10 |",
       "> 그 외 2일은 특이사항 없음",
       "[응답 지침]",
     ].map((s) => output.indexOf(s));
@@ -273,8 +274,8 @@ describe("일정 조회 — 올해도 1/1~12/31 (US2)", () => {
         searchEYmd: "20260228",
       });
       expect(output).toContain(`2026-01 ~ 2026-12 (2026년 전체, 월 단위 조회)`);
-      expect(output).toContain("| 20261225 |");
-      expect(output).not.toContain("| 20260101 |");
+      expect(output).toContain("| 2026-12-25 |");
+      expect(output).not.toContain("| 2026-01-01 |");
       expect(output).toContain("> 그 외 12일은 평일 주간근무 / 주말 주간근무");
     } finally {
       YEAR_MODE.work_calendar = original;

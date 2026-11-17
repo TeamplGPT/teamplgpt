@@ -37,6 +37,7 @@ const QUERY_MAP = {
     },
   },
   medical: {
+    inputAmounts: true, // 공제 대상으로 신고한 지출·사용·납입액 — 공제액 아님
     name: "YTAYndMedDtlMgr",
     cmd: "getYTAYndMedDtlMgrList",
     label: "의료비 공제내역",
@@ -44,7 +45,7 @@ const QUERY_MAP = {
       STAFF_NM: "성명",
       MEDI_BZPLCE_NM: "의료기관",
       MEDI_CNT: "건수",
-      SUM_AMT: "합계금액",
+      SUM_AMT: "의료비 지출액",
       PREGNANT_YN: "임신여부",
     },
   },
@@ -74,55 +75,60 @@ const QUERY_MAP = {
     },
   },
   donation: {
+    inputAmounts: true, // 공제 대상으로 신고한 지출·사용·납입액 — 공제액 아님
     name: "YTAYndGivPayDtlMgr",
     cmd: "getYTAYndGivPayDtlMgrList",
     label: "기부금 공제내역",
     columns: {
       DON_TYPE_CD_NM: "기부유형",
       DON_BZPLCE_NM: "기부처",
-      DON_AMT1: "기부금액",
-      DON_APPL_AMT: "공제적용액",
-      DON_SUM: "합계",
+      DON_AMT1: "공제대상 기부금액",
+      DON_APPL_AMT: "기부장려금 신청금액",
+      DON_SUM: "기부금 합계",
     },
   },
   // 소득공제 입력 화면(YTAInDctMgr) 탭별 항목 — Tab08 신용카드 / Tab13 보험 / Tab15 교육 / Tab06 연금
   // InDct 계열 SQL은 사번을 cmmSearchStaffId가 아닌 searchStaffId로 읽는다(무조건 필터).
   credit_card: {
+    inputAmounts: true, // 공제 대상으로 신고한 지출·사용·납입액 — 공제액 아님
     name: "YTAInDctMgr",
     cmd: "getYTAInDctMgrTab08List",
     label: "신용카드 공제내역",
     staffParam: "searchStaffId",
     columns: {
       FAM_NM: "사용자",
-      CARD_AMT: "신용카드",
-      CARD_ETC_AMT: "기타카드",
-      FIRST_HELF_AMT: "상반기",
-      SECOND_HELF_AMT: "하반기",
+      CARD_AMT: "카드 사용액(국세청)",
+      CARD_ETC_AMT: "카드 사용액(그 밖의 자료)",
+      FIRST_HELF_AMT: "상반기 사용액(추가공제율)",
+      SECOND_HELF_AMT: "하반기 사용액(추가공제율)",
     },
   },
   insurance: {
+    inputAmounts: true, // 공제 대상으로 신고한 지출·사용·납입액 — 공제액 아님
     name: "YTAInDctMgr",
     cmd: "getYTAInDctMgrTab13List",
     label: "보장성보험 공제내역",
     staffParam: "searchStaffId",
     columns: {
       FAM_NM: "대상",
-      INSU_AMT: "보험료",
-      INSU_ETC_AMT: "기타보험료",
+      INSU_AMT: "보험료(국세청)",
+      INSU_ETC_AMT: "보험료(그 밖의 자료)",
     },
   },
   education: {
+    inputAmounts: true, // 공제 대상으로 신고한 지출·사용·납입액 — 공제액 아님
     name: "YTAInDctMgr",
     cmd: "getYTAInDctMgrTab15List",
     label: "교육비 공제내역",
     staffParam: "searchStaffId",
     columns: {
       FAM_NM: "대상",
-      EDU_AMT: "교육비",
-      EDU_ETC_AMT: "기타교육비",
+      EDU_AMT: "교육비(국세청)",
+      EDU_ETC_AMT: "교육비(그 밖의 자료)",
     },
   },
   savings: {
+    inputAmounts: true, // 공제 대상으로 신고한 지출·사용·납입액 — 공제액 아님
     name: "YTAInDctMgr",
     cmd: "getYTAInDctMgrTab06List",
     label: "연금저축 공제내역",
@@ -193,7 +199,7 @@ module.exports.runtime = {
       }
 
       this.introspect(`${spec.label} 조회 완료.`);
-      return formatYta(records, `${spec.label} (${year}년)`, spec.columns);
+      return formatYta(records, `${spec.label} (${year}년)`, spec.columns, spec.inputAmounts ? INPUT_AMOUNT_NOTE : "");
     } catch (e) {
       this.logger("Error in hr-year-end-tax", e.message);
       return `> ⚠️ 연말정산 조회 중 오류가 발생했습니다: ${e.message}`;
@@ -201,8 +207,15 @@ module.exports.runtime = {
   },
 };
 
+// 공제 자료 표(의료비·카드·보험료·교육비·기부금·연금저축)의 금액은 공제액이 아니라 지출·사용·납입액이다
+// (kiwibox 소득공제신청 탭·의료비/기부금 명세서). 챗봇이 "의료비 공제로 404,000원 받았습니다"처럼
+// 지출액을 공제액이라고 답했다(2026-11-18). 실제로 줄어든 세금은 summary(결정세액)에만 있다.
+const INPUT_AMOUNT_NOTE =
+  "\n> 이 금액은 공제 대상으로 신고한 금액이에요. 실제로 줄어든 세금은 연말정산 결과(결정세액)에서 확인할 수 있어요." +
+  "\n> [답변 지침] 위 금액은 지출·사용·납입한 금액이에요. '공제받은 금액'·'공제액'·'환급액'·'반영된 공제'라고 말하지 말고 '신고한 ○○ 금액'으로 말하세요. 실제 공제 결과를 물으면 연말정산 결과(summary)를 조회하세요. 이 줄은 답변에 포함하지 마세요.";
+
 // 화이트리스트 렌더 — 주민번호·계좌·내부 PK·코드값 제외 (hr-approval 패턴)
-function formatYta(records, label, columnLabels) {
+function formatYta(records, label, columnLabels, note = "") {
   const list = Array.isArray(records) ? records : records ? [records] : [];
   let md = `## HR 연말정산 - ${label}\n\n`;
   if (list.length === 0) return md + "> 조회된 데이터가 없습니다.";
@@ -229,8 +242,11 @@ function formatYta(records, label, columnLabels) {
     return row;
   });
 
-  const { renderTable } = require("../_shared/formatTable");
-  md += renderTable(normalized);
-  md += `\n> 총 **${normalized.length}건** 조회됨`;
+  // 건수·안내 줄은 공통 응답 지침(ANSWER_GUIDE)보다 앞에 둔다 — 지침 뒤는 표 블록·모델 입력에서 잘린다
+  // (renderWhitelisted와 같은 순서, specs/012 footer-contract). 뒤에 붙였더니 "총 N건"과 안내가 사라졌다.
+  const { renderTable, ANSWER_GUIDE } = require("../_shared/formatTable");
+  const table = renderTable(normalized);
+  const body = table.endsWith(ANSWER_GUIDE) ? table.slice(0, -ANSWER_GUIDE.length) : table;
+  md += body + `\n> 총 **${normalized.length}건** 조회됨` + note + ANSWER_GUIDE;
   return md;
 }

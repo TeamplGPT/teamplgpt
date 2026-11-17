@@ -130,6 +130,26 @@ const INTERNAL_KEYS = [
   "oid",
 ];
 
+// 표 날짜 표시 — 칸 이름이 날짜(…일·…일자)인 8자리 값은 YYYY-MM-DD, 칸 이름에 '연월'이 든 6자리 값은 YYYY-MM.
+// 급여 표와 같은 형식(사용자 결정 2026-11-18): 결재·증명서·교육·대출·휴가·연말정산 표에 20261116이 그대로 보였다.
+// 칸 이름으로만 판단해 발급번호 같은 숫자는 건드리지 않고, 달력에 없는 값(20261399)도 그대로 둔다. 원본은 바꾸지 않는다.
+const DATE_HEADER_RE = /(일|일자)$/;
+const MONTH_HEADER_RE = /연월/;
+
+function displayDate(header, value) {
+  if (typeof value !== "string" && typeof value !== "number") return value;
+  const v = String(value).trim();
+  if (DATE_HEADER_RE.test(header) && /^\d{8}$/.test(v)) {
+    const [y, m, d] = [v.slice(0, 4), Number(v.slice(4, 6)), Number(v.slice(6, 8))];
+    if (m >= 1 && m <= 12 && d >= 1 && d <= 31) return `${y}-${v.slice(4, 6)}-${v.slice(6, 8)}`;
+  }
+  if (MONTH_HEADER_RE.test(header) && /^\d{6}$/.test(v)) {
+    const m = Number(v.slice(4, 6));
+    if (m >= 1 && m <= 12) return `${v.slice(0, 4)}-${v.slice(4, 6)}`;
+  }
+  return value;
+}
+
 // footer 미부착 내부 렌더 — renderWhitelisted가 "총 N건" 줄 뒤에 footer를 한 번만
 // 붙일 수 있도록 분리 (specs/012-hr-answer-quality contracts/footer-contract.md).
 function renderTableRaw(rows, options = {}) {
@@ -145,7 +165,7 @@ function renderTableRaw(rows, options = {}) {
   md += `| ${keys.map(() => "------").join(" | ")} |\n`;
 
   for (const rec of rows) {
-    const row = keys.map((k) => formatCellValue(rec[k], boldNumbers));
+    const row = keys.map((k) => formatCellValue(displayDate(k, rec[k]), boldNumbers));
     md += `| ${row.join(" | ")} |\n`;
   }
 
