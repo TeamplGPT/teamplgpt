@@ -352,6 +352,29 @@ function payItemRefLine(refs) {
 
 
 
+// 표시용 날짜 형식 — 급여연월 202606 → 2026-06, 날짜 20260625 → 2026-06-25(2026-11-18 사용자 결정).
+// 숫자 모양 날짜를 위젯 표가 금액으로 보고 값 막대를 붙였고, 사람이 읽기에도 하이픈 형식이 낫다.
+// 날짜 모양(6·8자리 숫자)이 아니면 그대로 둔다. 원본은 바꾸지 않는다.
+const YM_KEYS = ["salYm"];
+const YMD_KEYS = ["salYmd", "empYmd", "workYmd"];
+
+function toDisplayDate(value, digits) {
+  const s = value == null ? "" : String(value).trim();
+  if (!new RegExp(`^\\d{${digits}}$`).test(s)) return value;
+  return digits === 6 ? `${s.slice(0, 4)}-${s.slice(4)}` : `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6)}`;
+}
+
+function withDisplayDates(row) {
+  if (!row || typeof row !== "object" || Array.isArray(row)) return row;
+  const dated = [...YM_KEYS.map((k) => [k, 6]), ...YMD_KEYS.map((k) => [k, 8])]
+    .filter(([k]) => k in row)
+    .map(([k, digits]) => [k, toDisplayDate(row[k], digits)]);
+  return dated.length > 0 ? { ...row, ...Object.fromEntries(dated) } : row;
+}
+
+const withDisplayDatesAll = (data) =>
+  Array.isArray(data) ? data.map(withDisplayDates) : withDisplayDates(data);
+
 function formatSalary(data, label, columns) {
   const {
     normalizeData,
@@ -364,7 +387,7 @@ function formatSalary(data, label, columns) {
 
   // 화이트리스트 정의가 있으면 선별 렌더 (detail HTML·내부 PK·코드 제외)
   if (columns) {
-    const table = renderWhitelisted(data, columns);
+    const table = renderWhitelisted(withDisplayDatesAll(data), columns);
     return table ? md + table : md + "> 조회된 데이터가 없습니다.";
   }
 
