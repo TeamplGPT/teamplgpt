@@ -586,7 +586,7 @@ function formatNotableDays(data, label, columns, query_type) {
 
   const { renderWhitelisted } = require("../_shared/formatTable");
   const { normalizeDisplayRows } = require("../_shared/renderNormalize");
-  const displayData = normalizeDisplayRows(withVerdict(notable), { weekKey: "week", markKey: "mark" });
+  const displayData = normalizeDisplayRows(withPunchPlaceholders(withVerdict(notable)), { weekKey: "week", markKey: "mark" });
   const shown = prepareAttendanceTable(displayData, columns);
   const table = renderWhitelisted(shown.rows, shown.columns);
   if (!table) return `${head}> 조회된 데이터가 없습니다.`;
@@ -636,7 +636,7 @@ function formatAttendance(data, label, columns, query_type) {
     // 출퇴근 기록·근무현황은 시각 HH:MM + 기준시간 분리(_shared/attendanceDisplay)
     const isDayRows = DAY_ROW_QUERY_TYPES.has(query_type);
     const sourceRows = Array.isArray(data) ? data : data ? [data] : [];
-    const displayData = normalizeDisplayRows(isDayRows ? withVerdict(sourceRows) : data, {
+    const displayData = normalizeDisplayRows(isDayRows ? withPunchPlaceholders(withVerdict(sourceRows)) : data, {
       weekKey: "week",
       markKey: "mark",
     });
@@ -733,6 +733,15 @@ function verdictOf(row) {
 
 const withVerdict = (rows) => rows.map((r) => ({ ...r, verdict: verdictOf(r) }));
 
+// 출퇴근 시각이 없는 칸은 "—" — 빈 칸만 있으면 표에서 칸이 통째로 빠져, AI가 "지각"만 보고
+// "출근 처리는 되었지만 지각"처럼 출근을 지어냈다(2026-11-18). 판정(verdict)은 원본으로 먼저 계산한다.
+const PUNCH_KEYS = ["inTime", "outTime", "staTime", "endTime"];
+const withPunchPlaceholders = (rows) =>
+  rows.map((r) => ({
+    ...r,
+    ...Object.fromEntries(PUNCH_KEYS.filter((k) => !has(field(r, k))).map((k) => [k, "—"])),
+  }));
+
 // 특이사항 = 지각·조퇴·결근·출퇴근 누락·휴가·출장·교육·연장근무 중 하나 이상 (contracts §2)
 function isNotableDay(row) {
   const f = dayFlags(row);
@@ -772,11 +781,16 @@ function isNormalDay(row, f) {
   );
 }
 
-/** 근무현황 표·요약에 넣는 날 — 출퇴근 기록이 있거나, 결근·휴가·출장·교육·연장근로가 있는 날 */
+/**
+ * 근무현황 표·요약에 넣는 날 — 출퇴근 기록이 있거나, 지각·조퇴·결근·휴가·출장·교육·연장근로가 있는 날.
+ * 지각·조퇴도 따로 본다: 5240은 기준 출근 시각이 지나도 출근 체크가 없으면 "지각"으로 표시해,
+ * 출퇴근 기록 없는 지각이 있다(2026-11-18 실데이터 — 빠뜨려 "지각 기록 없음"으로 답한 회귀).
+ */
 function isWorkStatusDay(row) {
   const f = dayFlags(row);
   return (
     has(field(row, "inTime")) || has(field(row, "outTime")) ||
+    f.isLate || f.isEarly ||
     f.isAbsent || f.isLeave || f.isBizTrip || f.isEducation || f.isOt
   );
 }

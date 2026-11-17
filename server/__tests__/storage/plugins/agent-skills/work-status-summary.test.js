@@ -181,3 +181,29 @@ describe("근무현황 — 분 단위 값은 AI만 읽는 줄로 (2026-11-17 사
   });
 });
 
+
+describe("출근 기록 없이 지각·조퇴만 찍힌 날 (2026-11-18 실데이터 회귀)", () => {
+  beforeAll(() => freezeClock(NOW));
+  afterAll(() => jest.useRealTimers());
+
+  // 5240은 기준 출근 시각이 지나도 출근 체크가 없으면 결근이 아니라 "지각"으로 표시한다
+  const noPunchLate = day("10-21", { mark: "ABNORMAL", lateYn: "지각", lateTime: "0", workComment: "지각", baseStaTime: "1600", baseEndTime: "0200" });
+
+  it("근무현황 표와 요약에 남는다", async () => {
+    const out = await outputOf([day("10-20", { absentYn: "결근", mark: "ABNORMAL", workComment: "결근" }), noPunchLate]);
+    expect(tableDates(out)).toEqual(["10-20", "10-21"]);
+    expect(out.split("\n").find((l) => l.startsWith("> 요약"))).toBe("> 요약: 출퇴근 특이사항(지각 1회, 결근 1일)");
+  });
+
+  it("출퇴근 기록이 없으면 출근·퇴근 칸에 —를 넣어 칸이 사라지지 않는다(AI가 출근을 지어내지 않게)", async () => {
+    const out = await outputOf([noPunchLate]);
+    expect(tableHeaderOf(out)).toBe("| 일자 | 요일 | 근무판정 | 근무특이사항 | 출근 | 퇴근 |");
+    expect(out).toMatch(/\| 10-21 \| [^|]+ \| 지각 \| 지각 \| — \| — \|/);
+  });
+
+  it("출퇴근 기록(timesheet) 오늘 조회도 출근·퇴근 칸이 —로 남는다", async () => {
+    const { output } = await runHandler("hr-attendance", { query_type: "timesheet", date: "오늘" }, () => ({ DATA: [noPunchLate] }));
+    expect(output.split("\n").find((l) => l.startsWith("| 일자"))).toMatch(/\| 출근 \| 퇴근 \|/);
+    expect(output).toMatch(/\| 10-21 \|[^\n]*\| — \| — \|/);
+  });
+});
