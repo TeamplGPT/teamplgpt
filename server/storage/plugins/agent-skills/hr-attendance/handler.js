@@ -142,6 +142,9 @@ const COLUMNS_BY_QT = {
     workComment: "근무특이사항",
   },
   work_status: {
+    // 표는 여섯 칸만 — 사용자 결정 2026-11-17 "일자 요일 근무판정 근무특이사항 출근 퇴근".
+    // 지각·조퇴·외출·연장(분)과 연차·기타휴가·출장·교육·휴직 칸은 근무판정 한 칸에 이미 담긴다.
+    // 기준출근·기준퇴근은 표 칸이 아니라 표 위 "기준 근무시간" 한 줄로 빠진다(attendanceDisplay).
     workYmd: "일자",
     week: "요일",
     verdict: "근무판정",
@@ -150,15 +153,6 @@ const COLUMNS_BY_QT = {
     baseEndTime: "기준퇴근",
     inTime: "출근",
     outTime: "퇴근",
-    lateTime: "지각(분)",
-    earlyTime: "조퇴(분)",
-    goOutTime: "외출(분)",
-    otTime: "연장(분)",
-    annualLeave: "연차",
-    etcLeave: "기타휴가",
-    bizTrip: "출장",
-    education: "교육",
-    leaveAbsence: "휴직",
   },
   // 이하 근거: docs/03-analysis/hr-column-whitelist-audit.analysis.md
   // (TAADclzWorkSearchCldr_SQL·TAADclzVcatnCldrMgr_SQL 대조)
@@ -597,7 +591,8 @@ function formatNotableDays(data, label, columns, query_type) {
   const table = renderWhitelisted(shown.rows, shown.columns);
   if (!table) return `${head}> 조회된 데이터가 없습니다.`;
   const rest = rows.length - notable.length;
-  const body = withIssueSummary(table, notable);
+  const withIssues = withIssueSummary(table, notable);
+  const body = query_type === "work_status" ? withMinuteDetail(withIssues, notable) : withIssues;
   return rest > 0
     ? head + shown.basisLine + appendBeforeAnswerGuide(body, `> 그 외 ${rest}일은 특이사항 없음`)
     : head + shown.basisLine + body;
@@ -625,6 +620,14 @@ function formatAttendance(data, label, columns, query_type) {
 
   let md = `## HR 근태 - ${label}\n\n`;
 
+  // 근무현황은 해당하는 날만 — 정상 출퇴근·출퇴근 특이사항·근무예외사항·연장근로(사용자 결정 2026-11-17).
+  // 휴일·기록 없는 날을 빼면 하나도 없을 때는 빈 표 대신 한 줄로 안내한다.
+  if (query_type === "work_status") {
+    const all = Array.isArray(data) ? data : data ? [data] : [];
+    data = all.filter(isWorkStatusDay);
+    if (data.length === 0) return md + WORK_STATUS_EMPTY_LINE;
+  }
+
   // 화이트리스트 정의가 있으면 선별 렌더(내부 PK·사번·코드 제외).
   if (columns) {
     // 표시용 사본만 정규화(week 영문 3자→한글, mark NORMAL/ABNORMAL→정상/비정상).
@@ -643,7 +646,8 @@ function formatAttendance(data, label, columns, query_type) {
     const rendered = renderWhitelisted(shown.rows, shown.columns);
     if (!rendered) return md + "> 조회된 데이터가 없습니다.";
     const rawRows = Array.isArray(data) ? data : data ? [data] : [];
-    const table = isDayRows ? withIssueSummary(rendered, rawRows) : rendered;
+    const withIssues = isDayRows ? withIssueSummary(rendered, rawRows) : rendered;
+    const table = query_type === "work_status" ? withMinuteDetail(withIssues, rawRows) : withIssues;
     // 근무현황 요약만 표 위에 집계 한 줄을 붙인다. 실패해도 표 렌더는 살려야 한다
     // (집계는 부가 정보, 표가 본체 — specs/014).
     const summaryLine =
@@ -751,68 +755,113 @@ function safeSummarizeWorkStatus(data) {
   }
 }
 
-// 하루 분류(2026-10-21 사용자 결정) — 출퇴근 기록이 있으면 출근(교육·반차·휴일근무도), 없으면
-// 휴가 > 출장 > 교육 > 결근 > 휴일 > 기록 없음. 휴일 = 회사 달력 근무여부 minusDd 0(TAAT_CLDR: 1 평일, 0 공휴일·토요일),
-// minusDd가 없는 데이터는 근무특이사항 "휴일".
-const DAY_KINDS = [
-  ["work", "출근"],
-  ["leave", "휴가"],
-  ["bizTrip", "출장"],
-  ["education", "교육"],
-  ["absent", "결근"],
-  ["holiday", "휴일"],
-  ["none", "기록 없음"],
+// 근무현황 분류 — 5240 근무현황 화면(taaWrkTimeStatusMgr.jsp)과 같은 묶음(사용자 결정 2026-11-17).
+// 정상 출퇴근(출근·퇴근 찍힘 + 지각·조퇴·결근·누락 없음) / 출퇴근 특이사항(지각·조퇴·결근·누락) /
+// 근무예외사항(휴가·출장·교육) / 연장근로(승인 OT). 5240 화면처럼 겹칠 수 있다(반차 출근 = 정상 + 휴가).
+// 휴일·기록 없는 날은 어느 분류에도 들지 않아 표·요약에서 빠진다 — 휴일 판정 기준(회사 달력 vs 근무유형)이
+// 5240 화면마다 달라 "휴일 N일"을 세면 화면과 숫자가 어긋났다(2026-11-17 4월 사례).
+const WORK_STATUS_EMPTY_LINE = "> 이 기간에는 출퇴근·특이사항·예외 기록이 없습니다.";
+
+// 정상 출퇴근 — 5240 판정(mark)이 정상이거나 연장근로가 있고, 지각·조퇴·결근·누락이 없는 근무일.
+// 출퇴근 기록이 없는 종일 출장일도 5240은 정상으로 센다(2026-11-17 4월 실데이터: 5240 근태현황(월) 정상 2건 =
+// 출장(국내) 1일 + 출근·외근 1일). 휴일은 isWorkStatusDay에서 먼저 빠진다.
+function isNormalDay(row, f) {
+  return (
+    (String(field(row, "mark") ?? "").trim() === "NORMAL" || f.isOt) &&
+    !f.isLate && !f.isEarly && !f.isAbsent && !f.isMissing
+  );
+}
+
+/** 근무현황 표·요약에 넣는 날 — 출퇴근 기록이 있거나, 결근·휴가·출장·교육·연장근로가 있는 날 */
+function isWorkStatusDay(row) {
+  const f = dayFlags(row);
+  return (
+    has(field(row, "inTime")) || has(field(row, "outTime")) ||
+    f.isAbsent || f.isLeave || f.isBizTrip || f.isEducation || f.isOt
+  );
+}
+
+// 분 단위 값(지각·조퇴·외출·연장) — 표 칸에서는 뺐지만(2026-11-17) "몇 분" 질문에 답할 수 있게
+// AI만 읽는 줄로 넘긴다. "> ["로 시작해 사용자 화면용 표 추출(hrTableBlocks)에서 빠진다. 0이 아닌 날만.
+const MINUTE_FIELDS = [
+  ["lateTime", "지각"],
+  ["earlyTime", "조퇴"],
+  ["goOutTime", "외출"],
+  ["otTime", "연장"],
 ];
 
-function isHolidayRow(row) {
-  const flag = field(row, "minusDd");
-  if (flag !== undefined && flag !== null && String(flag).trim() !== "") return Number(flag) === 0;
-  return String(field(row, "workComment") ?? "").trim() === "휴일";
+function minuteDetailLine(rows) {
+  const days = rows
+    .map((row) => {
+      const parts = MINUTE_FIELDS.map(([key, label]) => [label, parseFloat(String(field(row, key) ?? "").replace(/[^0-9.]/g, ""))])
+        .filter(([, n]) => Number.isFinite(n) && n > 0)
+        .map(([label, n]) => `${label} ${n}분`);
+      const ymd = rowYmd(row);
+      const date = ymd ? `${ymd.slice(4, 6)}-${ymd.slice(6, 8)}` : String(field(row, "workYmd") ?? "");
+      return parts.length > 0 ? `${date} ${parts.join(", ")}` : "";
+    })
+    .filter(Boolean);
+  return days.length > 0
+    ? `> [근무 상세(분)] ${days.join(" · ")} — 사용자가 몇 분인지 물을 때만 이 값을 쓰세요. 이 줄은 답변에 포함하지 마세요.`
+    : "";
 }
 
-function dayKind(row, f) {
-  if (has(field(row, "inTime")) || has(field(row, "outTime"))) return "work";
-  if (f.isLeave) return "leave";
-  if (f.isBizTrip) return "bizTrip";
-  if (f.isEducation) return "education";
-  if (f.isAbsent) return "absent";
-  return isHolidayRow(row) ? "holiday" : "none";
-}
+const withMinuteDetail = (table, rows) => {
+  const line = minuteDetailLine(rows);
+  return line ? appendBeforeAnswerGuide(table, line) : table;
+};
 
-/**
- * 근무현황 요약 줄 — 하루를 한 가지로만 세서 합이 집계 일수와 같다. 지각·조퇴·출퇴근 누락·연장근로는
- * 그날 생긴 일이라 따로 센다. (전에는 5240 화면처럼 "정상"을 겹쳐 세서 "정상 21일 · 교육 13일"처럼 합이 맞지 않았다.)
- */
+const joinCounts = (items) => items.filter(([, n]) => n > 0).map(([label, n, unit]) => `${label} ${n}${unit}`).join(", ");
+
+/** 근무현황 요약 줄 — 해당하는 분류만. 하나도 없으면 빈 문자열 */
 function summarizeWorkStatus(data) {
-  const rows = Array.isArray(data) ? data : data ? [data] : [];
+  // 해당하는 날만 센다 — 연도 질의는 전체 행을 넘기므로 여기서도 휴일·기록 없는 날을 뺀다
+  const rows = (Array.isArray(data) ? data : data ? [data] : []).filter(isWorkStatusDay);
   if (rows.length === 0) return "";
 
-  const kinds = Object.fromEntries(DAY_KINDS.map(([k]) => [k, 0]));
-  let late = 0, early = 0, missing = 0, otDays = 0, otHours = 0;
-  for (const row of rows) {
-    const f = dayFlags(row);
-    kinds[dayKind(row, f)]++;
-    if (f.isLate) late++;
-    if (f.isEarly) early++;
-    if (f.isMissing) missing++;
-    if (f.isOt) {
-      otDays++;
-      otHours += f.otAmounts
+  const counts = rows.reduce(
+    (acc, row) => {
+      const f = dayFlags(row);
+      const otHours = f.otAmounts
         .map((v) => parseFloat(String(v).replace(/[^0-9.-]/g, "")))
         .filter((n) => Number.isFinite(n) && n > 0)
         .reduce((a, b) => a + b, 0);
-    }
-  }
+      return {
+        normal: acc.normal + (isNormalDay(row, f) ? 1 : 0),
+        late: acc.late + (f.isLate ? 1 : 0),
+        early: acc.early + (f.isEarly ? 1 : 0),
+        absent: acc.absent + (f.isAbsent ? 1 : 0),
+        missing: acc.missing + (f.isMissing ? 1 : 0),
+        leave: acc.leave + (f.isLeave ? 1 : 0),
+        bizTrip: acc.bizTrip + (f.isBizTrip ? 1 : 0),
+        education: acc.education + (f.isEducation ? 1 : 0),
+        otDays: acc.otDays + (f.isOt ? 1 : 0),
+        otHours: acc.otHours + (f.isOt ? otHours : 0),
+      };
+    },
+    { normal: 0, late: 0, early: 0, absent: 0, missing: 0, leave: 0, bizTrip: 0, education: 0, otDays: 0, otHours: 0 }
+  );
 
-  // 출근은 0일이어도 쓴다(사용자가 가장 먼저 찾는 값), 나머지 분류는 있을 때만
-  const parts = [`집계(${rows.length}일)`, `출근 ${kinds.work}일`];
-  for (const [key, label] of DAY_KINDS.slice(1)) if (kinds[key]) parts.push(`${label} ${kinds[key]}일`);
-  if (late) parts.push(`지각 ${late}회`);
-  if (early) parts.push(`조퇴 ${early}회`);
-  if (missing) parts.push(`출퇴근 누락 ${missing}일`);
-  // OT 5종 합산은 TAAF_OT_TIME이 배수(1.5/0.5/2.0)로 계산한 값이라 단순 시간이 아니다
-  // — "총 연장시간"이라 단정하지 않고 "승인 N.Nh"로만 적는다. 종류별 상세는 표에 있다.
-  if (otDays) parts.push(`연장근로 ${otDays}일(승인 ${otHours.toFixed(1)}h)`);
+  const commute = joinCounts([
+    ["지각", counts.late, "회"],
+    ["조퇴", counts.early, "회"],
+    ["결근", counts.absent, "일"],
+    ["출퇴근 누락", counts.missing, "일"],
+  ]);
+  const exception = joinCounts([
+    ["휴가", counts.leave, "일"],
+    ["출장", counts.bizTrip, "일"],
+    ["교육", counts.education, "일"],
+  ]);
+  const parts = [
+    counts.normal > 0 && `정상 출퇴근 ${counts.normal}일`,
+    commute && `출퇴근 특이사항(${commute})`,
+    exception && `근무예외사항(${exception})`,
+    // OT 5종 합산은 TAAF_OT_TIME이 배수(1.5/0.5/2.0)로 계산한 값이라 단순 시간이 아니다
+    // — "총 연장시간"이라 단정하지 않고 "승인 N.Nh"로만 적는다. 종류별 상세는 표에 있다.
+    counts.otDays > 0 && `연장근로 ${counts.otDays}일(승인 ${counts.otHours.toFixed(1)}h)`,
+  ].filter(Boolean);
+  if (parts.length === 0) return "";
 
-  return `> ${parts.join(" · ")}\n\n`;
+  return `> 요약: ${parts.join(" · ")}\n\n`;
 }

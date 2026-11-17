@@ -36,7 +36,8 @@ describe("하루 단위 표는 오늘까지만", () => {
   it.each(["timesheet", "work_status"])("%s: 오늘 이후 날짜는 표에 없다", async (query_type) => {
     const { output } = await runHandler("hr-attendance", { query_type }, respond);
     const dates = tableDates(output);
-    expect(dates.length).toBe(3);
+    // 근무현황은 해당하는 날만(2026-11-17 사용자 결정) — 기록 없는 휴일 10-20은 빠진다
+    expect(dates.length).toBe(query_type === "work_status" ? 2 : 3);
     expect(dates.join(" ")).toMatch(/10.?19/);
     expect(dates.join(" ")).toMatch(/10.?21/);
     expect(dates.join(" ")).not.toMatch(/10.?(22|30|31)/);

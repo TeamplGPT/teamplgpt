@@ -60,7 +60,7 @@ describe("하루 조회 — 출퇴근 기록·근무현황 (US1)", () => {
     const { calls, output } = await runHandler("hr-attendance", { query_type: "work_status", date: "어제" }, respondRange);
     expect(calls.map((c) => c.path)).toEqual(["/TAAWrkTimeStatusMgr.do"]);
     expect(tableDates(output)).toEqual(["10-22"]);
-    expect(output).toMatch(/집계\(1일\) · 출근 1일/);
+    expect(output).toMatch(/> 요약: 정상 출퇴근 1일/);
     expect(output).not.toMatch(/월별 근무현황|최대 가능/);
   });
 
@@ -143,7 +143,7 @@ describe("한 주 조회 (US2)", () => {
     expect(rangeOf(calls[0].form)).toEqual(["20261019", "20261023", "20261019", "20261023"]);
     expect(tableDates(output)).toEqual(["10-19", "10-20", "10-21", "10-22", "10-23"]);
     expect(output).toContain("> 조회 기간: 10/19(월) ~ 10/25(일)");
-    expect(output).toMatch(/집계\(5일\)/);
+    expect(output).toMatch(/> 요약: 정상 출퇴근 \d일/);
   });
 
   it("지난주 → 그 주 월~일 전부", async () => {
