@@ -21,6 +21,13 @@ const {
   prefixCompanyContexts,
   appendCompanyRules,
 } = require("./companyDocsPrompt");
+const {
+  dropInternalDesignTexts,
+  dropInternalDesignSources,
+  isInternalDesignText,
+  isInternalDesignChat,
+  INTERNAL_INFO_RULES,
+} = require("./internalDocGuard");
 
 async function streamChatWithForEmbed(
   response,
@@ -100,7 +107,9 @@ async function streamChatWithForEmbed(
   })
     .pinnedDocs()
     .then((pinnedDocs) => {
+      // 고정 문서는 전체 본문으로 한 번 판정해 근거·출처에서 함께 뺀다(앞 1,000자만 보는 출처 판정과 어긋나지 않게)
       pinnedDocs.forEach((doc) => {
+        if (isInternalDesignText(doc.pageContent)) return;
         const { pageContent, ...metadata } = doc;
         pinnedDocIdentifiers.push(sourceIdentifier(doc));
         contextTexts.push(doc.pageContent);
@@ -163,15 +172,19 @@ async function streamChatWithForEmbed(
   // TLDR; reduces GitHub issues for "LLM citing document that has no answer in it" while keep answers highly accurate.
   // 회사 근거는 표지를 붙여 맨 앞에 둔다(specs/021). sources에는 넣지 않는다 —
   // 대화 기록 backfill로 삭제된 회사 문서 내용이 되살아나지 않게
+  // DB 설계 같은 내부 문서 조각은 LLM·출처 어디에도 넘기지 않는다(internalDocGuard.js)
   const companyContextTexts = prefixCompanyContexts(
-    vectorSearchResults.companyContextTexts
+    dropInternalDesignTexts(vectorSearchResults.companyContextTexts)
   );
-  contextTexts = [
+  contextTexts = dropInternalDesignTexts([
     ...companyContextTexts,
     ...contextTexts,
     ...filledSources.contextTexts,
-  ];
-  sources = [...sources, ...vectorSearchResults.sources];
+  ]);
+  sources = dropInternalDesignSources([
+    ...sources,
+    ...vectorSearchResults.sources,
+  ]);
 
   // If in query mode and no sources are found in current search or backfilled from history, do not
   // let the LLM try to hallucinate a response or use general knowledge
@@ -378,7 +391,9 @@ function buildEmbedSystemPrompt(basePrompt, allowedToolNames = []) {
 Tool usage policy for this embed:
 - No tools are available in this conversation.
 - Never output text that looks like a tool call, function name, or internal parameters (e.g. "tool: ...", "query_type: ...", a fenced code block naming a tool) — answer only in plain natural language.
-- If the request needs a tool you don't have, say so plainly instead of describing what you would call.`;
+- If the request needs a tool you don't have, say so plainly instead of describing what you would call.
+
+${INTERNAL_INFO_RULES}`;
   }
 
   const allowedList = allowedToolNames.join(", ");
@@ -388,7 +403,9 @@ Tool usage policy for this embed:
 - Only these tools are available: ${allowedList}
 - If the user's request does not match one of those tools, do not call a tool.
 - Do not force an unrelated available tool just because a request is about HR.
-- When the request is out of scope for the available tools, answer without tool calls using only normal chat/query behavior.`;
+- When the request is out of scope for the available tools, answer without tool calls using only normal chat/query behavior.
+
+${INTERNAL_INFO_RULES}`;
 }
 
 function extractToolName(tool, format) {
@@ -423,7 +440,10 @@ async function recentEmbedChatHistory(sessionId, embed, messageLimit = 20) {
     await EmbedChats.forEmbedByUser(embed.id, sessionId, messageLimit, {
       id: "desc",
     })
-  ).reverse();
+  )
+    .reverse()
+    // 수정 전에 새어 나간 답변이 같은 세션 기록으로 LLM에 되돌아가지 않게 뺀다
+    .filter((row) => !isInternalDesignChat(row));
   return { rawHistory, chatHistory: convertToPromptHistory(rawHistory) };
 }
 

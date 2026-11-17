@@ -3,6 +3,7 @@ const { reqBody, multiUserMode } = require("../../utils/http");
 const { Telemetry } = require("../../models/telemetry");
 const { streamChatWithForEmbed } = require("../../utils/chats/embed");
 const { EmbedChats } = require("../../models/embedChats");
+const { sanitizeEmbedChatRow } = require("../../utils/chats/internalDocGuard");
 const {
   validEmbedConfig,
   canRespond,
@@ -157,7 +158,10 @@ function embeddedEndpoints(app) {
           true
         );
 
-        response.status(200).json({ history: convertToChatHistory(history) });
+        // 수정 전에 새어 나간 내부 설계 답변·출처는 기록 화면에도 다시 내보내지 않는다
+        response.status(200).json({
+          history: convertToChatHistory(history.map(sanitizeEmbedChatRow)),
+        });
       } catch (e) {
         console.error(e.message, e);
         response.sendStatus(500).end();

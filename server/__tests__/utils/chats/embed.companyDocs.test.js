@@ -220,3 +220,86 @@ describe("문구 정본 (contracts/prompt-contract.md)", () => {
     );
   });
 });
+
+describe("내부 설계 문서 차단 (DB 테이블·컬럼 유출, 2026-11-18)", () => {
+  const DESIGN =
+    "CMMT_DBOBJ\nSERVAREA_ID VARCHAR2(20) N PK\nOWNER VARCHAR2(100) N PK\nOBJ_ID VARCHAR2(50) N PK";
+  const {
+    INTERNAL_INFO_RULES,
+  } = require("../../../utils/chats/internalDocGuard");
+
+  it("워크스페이스·회사 근거 중 DB 설계 조각은 LLM에 넘기지 않고 출처에도 남기지 않는다", async () => {
+    counts[COMPANY_NS] = 3;
+    performMergedSearch.mockImplementation(async () => ({
+      contextTexts: ["공통 3일", DESIGN],
+      sources: [
+        { text: "공통 3일", title: "common.md" },
+        { text: DESIGN, title: "db-design.xlsx" },
+      ],
+      message: false,
+      companyContextTexts: ["회사 5일", DESIGN],
+      companySources: [],
+    }));
+    const prompt = await run(makeEmbed(), "오이사공");
+    expect(prompt.contextTexts).toEqual([
+      `${COMPANY_DOC_MARKER}\n회사 5일`,
+      "공통 3일",
+    ]);
+    const saved = EmbedChats.new.mock.calls[0][0].response.sources;
+    expect(saved).toEqual([{ text: "공통 3일", title: "common.md" }]);
+  });
+
+  it("위젯 시스템 프롬프트에 내부 정보 비공개 규칙이 들어간다(도구 유무 모두)", () => {
+    expect(buildEmbedSystemPrompt("BASE", [])).toContain(INTERNAL_INFO_RULES);
+    expect(buildEmbedSystemPrompt("BASE", ["hr-attendance"])).toContain(
+      INTERNAL_INFO_RULES
+    );
+  });
+
+  it("근거가 전부 설계 조각이면 query 모드는 거절 문구로 끝난다", async () => {
+    performMergedSearch.mockImplementation(async () => ({
+      contextTexts: [DESIGN],
+      sources: [{ text: DESIGN }],
+      message: false,
+    }));
+    await run(makeEmbed({ chat_mode: "query" }), undefined);
+    expect(compressMessages).not.toHaveBeenCalled();
+    expect(writeResponseChunk).toHaveBeenCalled();
+  });
+});
+
+describe("리뷰 반영 — 고정 문서·대화 기록 (2026-11-18)", () => {
+  const { DocumentManager } = require("../../../utils/DocumentManager");
+  const { convertToPromptHistory } = require("../../../utils/helpers/chat/responses");
+  const LONG_DESIGN =
+    "가".repeat(1500) +
+    "\nSERVAREA_ID | VARCHAR2(20) | N\nOWNER | VARCHAR2(100) | N\nOBJ_ID | VARCHAR2(50) | N";
+
+  it("설계 신호가 1,000자 뒤에만 있는 고정 문서도 근거·출처 모두에서 뺀다", async () => {
+    DocumentManager.mockImplementationOnce(() => ({
+      pinnedDocs: async () => [{ pageContent: LONG_DESIGN, title: "db.md" }],
+    }));
+    const prompt = await run(makeEmbed(), undefined);
+    expect(prompt.contextTexts).toEqual(["공통 3일"]);
+    const saved = EmbedChats.new.mock.calls[0][0].response.sources;
+    expect(saved.map((s) => s.title)).toEqual(["common.md"]);
+  });
+
+  it("예전에 새어 나간 답변이 대화 기록에 있으면 LLM 기록에서 뺀다", async () => {
+    const leaked = {
+      prompt: "DB 테이블 알려줘",
+      response: JSON.stringify({
+        text: "| SERVAREA_ID | VARCHAR2(20) |\n| OBJ_ID | VARCHAR2(50) |\n| OBJ_NM2 | VARCHAR2(2000) |",
+        sources: [],
+      }),
+    };
+    const normal = {
+      prompt: "연차?",
+      response: JSON.stringify({ text: "13.6일", sources: [] }),
+    };
+    EmbedChats.forEmbedByUser.mockResolvedValueOnce([normal, leaked]);
+    await run(makeEmbed(), undefined);
+    const passed = convertToPromptHistory.mock.calls[0][0];
+    expect(passed).toEqual([normal]);
+  });
+});

@@ -188,6 +188,16 @@ describe("withHrRefusalTool (강제 호출 위젯의 거절 선택지, R14)", ()
     expect(withSelfDataNotice(UNSUPPORTED_TOOL_NAME, {}, UNSUPPORTED_NOTICE)).toBe(UNSUPPORTED_NOTICE);
     expect(UNSUPPORTED_NOTICE).toContain("다른 직원 정보라는 말은 하지 마세요");
   });
+
+  it("조회 없음 안내는 '문서로 답하라'보다 먼저 내부 구현 질문 거절을 지시한다(2026-11-18 DB 유출)", () => {
+    const refuseAt = UNSUPPORTED_NOTICE.indexOf("제공된 문서에 있더라도");
+    const docsAt = UNSUPPORTED_NOTICE.indexOf("제공된 문서에 근거가 있으면");
+    expect(refuseAt).toBeGreaterThan(-1);
+    expect(refuseAt).toBeLessThan(docsAt);
+    expect(UNSUPPORTED_NOTICE).toContain("'내부 구현 정보는 안내해 드릴 수 없습니다.'");
+    expect(UNSUPPORTED_NOTICE).toMatch(/테이블·컬럼 구조/);
+    expect(UNSUPPORTED_NOTICE).toMatch(/5240과의 연동 방식/);
+  });
 });
 
 describe("wrapHrRuntime (@agent)", () => {
