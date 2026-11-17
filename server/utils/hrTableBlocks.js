@@ -170,7 +170,21 @@ function dropUnsupportedNumbers(text, blocks, extra = []) {
  */
 function joinFinalAnswer(text, blocks) {
   const unique = blocks.filter((b, i) => blocks.findIndex((x) => x.trim() === b.trim()) === i);
-  return [text, ...unique].filter((part) => part && part.trim() !== "").join("\n\n");
+  return [dropEchoedHeadings(text, unique), ...unique].filter((part) => part && part.trim() !== "").join("\n\n");
+}
+
+// 영역 제목 줄 비교용 — 인용 표시·끝 콜론·공백 무시
+const headingKey = (line) => line.replace(/^\s*>\s*/, "").replace(/[:：]\s*$/, "").trim();
+const BLOCK_HEADING_RE = /^\s*>\s*\*\*[^*]+\*\*/;
+
+// 블록에 붙는 영역 제목(> **합계**, > **지급내역** 4건)을 모델이 빈 줄로 다시 쓴 줄을 뺀다(specs/024)
+function dropEchoedHeadings(text, blocks) {
+  if (typeof text !== "string" || !blocks || blocks.length === 0) return text;
+  const headings = new Set(
+    blocks.flatMap((b) => b.split("\n")).filter((l) => BLOCK_HEADING_RE.test(l)).map(headingKey)
+  );
+  if (headings.size === 0) return text;
+  return tidyBlankLines(text.split("\n").filter((l) => !headings.has(headingKey(l)))).join("\n").trim();
 }
 
 // 준비 단계 조회 — 다음 조회의 코드를 얻으려는 조회라 다른 표가 있으면 붙이지 않는다

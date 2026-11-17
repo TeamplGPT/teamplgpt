@@ -1440,6 +1440,78 @@
       },
       "repeat": 1,
       "note": "2026-11-18 운영 4차 테스트 H37 — '내가 결재할 문서 있어?'를 다른 직원 정보라며 거절. 있는지·몇 건인지는 todo_count로 답한다. 수정 전 FAIL 기대."
+    },
+    {
+      "id": "EC-ALLOW-54",
+      "axis": "ALLOW",
+      "label": "급여명세서 — 5240 화면 구성(합계·지급·공제·기재), 숨김 칸 없음",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "6월 급여명세서 보여줘",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/SALSalaryDtstmnMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getSALSalaryDtstmnMgrList3"
+        ],
+        "answer_pattern": [
+          "\\*\\*합계\\*\\*",
+          "\\*\\*지급내역\\*\\*",
+          "\\*\\*공제내역\\*\\*",
+          "\\*\\*기재사항\\*\\*",
+          "\\| 3,785,000 \\| 460,600 \\| 3,324,400 \\|",
+          "\\| 합계 \\| 460,600 \\|"
+        ],
+        "answer_not_pattern": [
+          "\\| 지급구분 \\|",
+          "\\| 급여연월 \\|"
+        ]
+      },
+      "repeat": 2,
+      "note": "specs/024 — 급여명세서를 5240 화면 구성(합계·지급내역·공제내역·기재사항)으로. 수정 전 FAIL 기대(지급 항목 표 하나, 지급구분·급여연월 칸 노출, List3 미호출)."
+    },
+    {
+      "id": "EC-ALLOW-55",
+      "axis": "ALLOW",
+      "label": "공제만 — 명세서 전체가 나오지 않음",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "6월에 얼마 떼갔어?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/SALSalaryDtstmnMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getSALSalaryDtstmnMgrList2"
+        ],
+        "answer_not_pattern": [
+          "\\*\\*지급내역\\*\\*",
+          "\\*\\*기재사항\\*\\*",
+          "\\| 지급항목 \\|"
+        ]
+      },
+      "repeat": 1,
+      "note": "specs/024 US2 — 공제만·실수령만 질문은 명세서 전체가 나오지 않는다(회귀 방지)."
+    },
+    {
+      "id": "EC-ALLOW-56",
+      "axis": "ALLOW",
+      "label": "실수령만 — 명세서 전체가 나오지 않음",
+      "embed_config": "e2e-embed-allow-all",
+      "message": "6월 실수령액 얼마야?",
+      "expect": {
+        "tool_call": true,
+        "mock_url_pattern": "^/SALSalaryDtstmnMgr\\.do",
+        "mock_body_pattern": [
+          "cmd=getSALSalaryDtstmnMgrMap"
+        ],
+        "answer_pattern": [
+          "3,324,400"
+        ],
+        "answer_not_pattern": [
+          "\\*\\*지급내역\\*\\*",
+          "\\| 지급항목 \\|"
+        ]
+      },
+      "repeat": 1,
+      "note": "specs/024 US2 — 공제만·실수령만 질문은 명세서 전체가 나오지 않는다(회귀 방지)."
     }
   ]
 }

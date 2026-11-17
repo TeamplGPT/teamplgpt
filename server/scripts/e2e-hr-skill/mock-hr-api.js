@@ -126,6 +126,39 @@ FIXTURES_BY_CMD.getSALSalaryBassMgrTab110List = {
   ],
 };
 
+// 급여명세서(SALSalaryDtstmnMgr) — specs/024: 5240 화면 구성(합계·지급·공제·기재) 검증용.
+// pay_periods fixture 코드 20260619P(6월)와 맞춘 값. 지급 합 3,785,000 · 공제 합 460,600 · 실지급 3,324,400.
+FIXTURES_BY_CMD.getSALSalaryDtstmnMgrList = {
+  Message: "",
+  DATA: [
+    { salItemNm: "기본급", salTypeNm: "지급", salYm: "202606", salAmt: 3200000, resalAmt: 0 },
+    { salItemNm: "직책수당", salTypeNm: "지급", salYm: "202606", salAmt: 200000, resalAmt: 0 },
+    { salItemNm: "연장근로수당", salTypeNm: "지급", salYm: "202606", salAmt: 185000, resalAmt: 0 },
+    { salItemNm: "식대", salTypeNm: "비과세", salYm: "202606", salAmt: 200000, resalAmt: 0 },
+  ],
+};
+FIXTURES_BY_CMD.getSALSalaryDtstmnMgrList2 = {
+  Message: "",
+  DATA: [
+    { salItemNm: "국민연금", salYm: "202606", salAmt: 153000 },
+    { salItemNm: "건강보험", salYm: "202606", salAmt: 120500 },
+    { salItemNm: "장기요양보험", salYm: "202606", salAmt: 15600 },
+    { salItemNm: "고용보험", salYm: "202606", salAmt: 30700 },
+    { salItemNm: "소득세", salYm: "202606", salAmt: 128000 },
+    { salItemNm: "지방소득세", salYm: "202606", salAmt: 12800 },
+  ],
+};
+FIXTURES_BY_CMD.getSALSalaryDtstmnMgrList3 = {
+  Message: "",
+  DATA: [
+    { salItemNm: "연장근로시간", salEntrCd: "T", salYm: "202606", salAmt: "10.00" },
+    { salItemNm: "통상시급", salEntrCd: "E", salYm: "202606", salAmt: "15,311" },
+  ],
+};
+FIXTURES_BY_CMD.getSALSalaryDtstmnMgrMap = {
+  Map: { staffNm: "오사공", orgNm: "개발팀", posNm: "책임", resNm: "-", empYmd: "20230301", salYmd: "20260619", jtotAmt: "3,785,000", gtotAmt: "460,600", ctotAmt: "3,324,400" },
+};
+
 // 교육이력(PRCHrBassiemMgrTab220) — K56: FIN_CD 수료여부 코드값 매핑 검증.
 // 1건은 수료(finCd=1), 1건은 미입력(finCd 없음) — 둘 다 화이트리스트 라벨로 렌더돼야 한다.
 FIXTURES_BY_CMD.getPRCHrBassiemMgrTab220List = {

@@ -170,6 +170,22 @@ describe("joinFinalAnswer", () => {
   it("블록이 없으면 문장만", () => {
     expect(joinFinalAnswer("요약", [])).toBe("요약");
   });
+
+  // specs/024 — 모델이 붙을 블록의 영역 제목(> **합계** 등)을 빈 줄로 다시 쓴 사례(2026-11-18)
+  it("블록의 영역 제목 줄을 문장에서 다시 쓰면 그 줄은 뺀다", () => {
+    const blocks = [
+      "> **합계**\n| 지급금액 |\n| --- |\n| 1 |\n\n> **지급내역** 4건\n| 지급항목 |\n| --- |\n| 기본급 |\n\n> **기재사항** 2건\n| 기재구분 |\n| --- |\n| 근태항목 |",
+    ];
+    const text = "실지급액은 3,063,790원입니다.\n\n**합계**\n\n**지급내역** 4건:\n\n> **기재사항** 2건";
+    expect(joinFinalAnswer(text, blocks)).toBe(`실지급액은 3,063,790원입니다.\n\n${blocks[0]}`);
+  });
+
+  it("제목 단어가 든 일반 문장은 남긴다", () => {
+    const blocks = ["> **합계**\n| a |\n| --- |\n| 1 |"];
+    expect(joinFinalAnswer("**합계** 기준으로 실지급액은 1원입니다.", blocks)).toBe(
+      `**합계** 기준으로 실지급액은 1원입니다.\n\n${blocks[0]}`
+    );
+  });
 });
 
 describe("sanitizeModelText — 코드 리뷰 M-2·M-3", () => {

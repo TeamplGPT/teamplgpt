@@ -10,7 +10,7 @@
     "file": "handler.js",
     "params": {
       "query_type": {
-        "description": "조회 종류 (필수). 키워드가 아니라 사용자의 의도로 판단하세요: pay_periods=해당 월의 지급 건 목록(급여일자+유형) — 명세서/공제/4대보험/실수령 등 특정 지급 건의 상세가 궁금한 모든 질문의 '첫 단계'입니다, payslip=지급 항목 상세(pay_item 있을 때만 선택 가능), deductions=공제 항목 상세: 4대보험·세금 등(pay_item 있을 때만 선택 가능), payslip_summary=총지급/총공제/실수령 요약(pay_item 있을 때만 선택 가능), salary_statement=월별 지급 이력 — 여러 달에 걸친 수령액 추이가 관심사일 때(pay_item 불요, year_month만), daylabor=일용직 급여(pay_item 불요). [CRITICAL] 대화에서 pay_item(pay_periods 결과의 CODE)을 아직 확보하지 못했다면 payslip/deductions/payslip_summary는 절대 선택하지 마세요 — 명세서·공제·4대보험·실수령액 어떤 질문이든 첫 호출은 예외 없이 pay_periods이며, 그 결과의 CODE로 상세를 재요청합니다. 의료비/보험료/기부금/카드/교육비/연금저축 \"공제 혜택\"과 연말정산 관련(공제신고/부양가족/종전근무지)은 이 skill이 아니라 hr-year-end-tax를 사용.",
+        "description": "조회 종류 (필수). 키워드가 아니라 사용자의 의도로 판단하세요: pay_periods=해당 월의 지급 건 목록(급여일자+유형) — 명세서/공제/4대보험/실수령 등 특정 지급 건의 상세가 궁금한 모든 질문의 '첫 단계'입니다, payslip=급여명세서 전체(합계·지급내역·공제내역·기재사항 — 5240 급여명세서 화면 구성) — 명세서·페이슬립을 보여 달라고 할 때(pay_item 있을 때만 선택 가능), deductions=공제 항목 상세: 4대보험·세금 등 — 얼마 떼갔는지·공제만 물을 때(pay_item 있을 때만 선택 가능), payslip_summary=총지급/총공제/실수령 요약 — 실수령액·총액만 물을 때(명세서를 보여 달라면 payslip, pay_item 있을 때만 선택 가능), salary_statement=월별 지급 이력 — 여러 달에 걸친 수령액 추이가 관심사일 때(pay_item 불요, year_month만), daylabor=일용직 급여(pay_item 불요). [CRITICAL] 대화에서 pay_item(pay_periods 결과의 CODE)을 아직 확보하지 못했다면 payslip/deductions/payslip_summary는 절대 선택하지 마세요 — 명세서·공제·4대보험·실수령액 어떤 질문이든 첫 호출은 예외 없이 pay_periods이며, 그 결과의 CODE로 상세를 재요청합니다. 의료비/보험료/기부금/카드/교육비/연금저축 \"공제 혜택\"과 연말정산 관련(공제신고/부양가족/종전근무지)은 이 skill이 아니라 hr-year-end-tax를 사용.",
         "type": "string",
         "enum": [
           "pay_periods",

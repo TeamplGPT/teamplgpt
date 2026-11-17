@@ -122,7 +122,7 @@ const ENDPOINT_MAP = {
 
 const QUERY_LABELS = {
   pay_periods: "급여 지급 건 목록",
-  payslip: "급여 지급항목 명세",
+  payslip: "급여명세서",
   deductions: "급여 공제내역",
   payslip_summary: "급여 요약(지급/공제/실수령 합계)",
   salary_statement: "월별 지급내역",
@@ -266,6 +266,12 @@ module.exports.runtime = {
         form[k] = v;
       }
 
+      // 급여명세서는 5240 화면처럼 합계·지급·공제·기재를 한 답으로(specs/024)
+      if (query_type === "payslip") {
+        this.introspect(`${label} 조회 중...`);
+        return withPeriod(await runPayslipStatement(this, form, label));
+      }
+
       this.introspect(`${label} 조회 중...`);
       const { errorMessage, records, isEmpty } = await hrFetch(this, {
         path: spec.path,
@@ -285,6 +291,138 @@ module.exports.runtime = {
     }
   },
 };
+
+// ─── 급여명세서 (specs/024 contracts/payslip-answer.md) ─────────────────────────
+// 5240 급여명세서 화면(SAL-0220·0230, kiwibox salSalaryDtstmnMgr)과 같은 구성:
+// 합계(Map) → 지급내역(List) → 공제내역(List2) → 기재사항(List3). 같은 지급 건·본인 사번 form에 cmd만 바꾼다.
+const PAYSLIP_SECTIONS = [
+  ["summary", "getSALSalaryDtstmnMgrMap"],
+  ["pay", "getSALSalaryDtstmnMgrList"],
+  ["deduction", "getSALSalaryDtstmnMgrList2"],
+  ["entry", "getSALSalaryDtstmnMgrList3"],
+];
+// 공통코드 SAL_ENTR_CD (kiwibox common-code-catalog)
+const ENTRY_KIND_NAMES = { E: "기준항목", T: "근태항목" };
+
+async function runPayslipStatement(ctx, form, label) {
+  const results = await Promise.all(
+    PAYSLIP_SECTIONS.map(([, cmd]) =>
+      hrFetch(ctx, { path: ENDPOINT_MAP.payslip.path, form: { ...form, cmd }, gate: ENDPOINT_MAP.payslip.gate })
+    )
+  );
+  const by = Object.fromEntries(PAYSLIP_SECTIONS.map(([key], i) => [key, results[i]]));
+  if (results.every((r) => r.errorMessage)) return results[0].errorMessage;
+  if (results.every((r) => !r.errorMessage && r.isEmpty)) {
+    return `> ⚠️ **${label}** 조회 결과가 존재하지 않습니다.`;
+  }
+  return formatPayslipStatement(by, label);
+}
+
+const fieldOf = (row, camelKey) => {
+  const snake = camelKey.replace(/([A-Z])/g, "_$1").toUpperCase();
+  return row?.[camelKey] ?? row?.[snake] ?? row?.[snake.toLowerCase()];
+};
+const amountOf = (v) => {
+  const n = Number(String(v ?? "").replace(/,/g, ""));
+  return Number.isFinite(n) ? n : 0;
+};
+// 항목 칸 — 5240이 준 값 그대로(숫자로 못 바꾸는 값을 0으로 바꿔 보이지 않게), 비었을 때만 0
+const cellAmount = (v) => {
+  const raw = String(v ?? "").trim();
+  if (raw === "") return 0;
+  const n = Number(raw.replace(/,/g, ""));
+  return Number.isFinite(n) ? n : raw;
+};
+const rowsOf = (res) => (Array.isArray(res.records) ? res.records : res.records ? [res.records] : []);
+
+function formatPayslipStatement(by, label) {
+  const { renderTable, ANSWER_GUIDE } = require("../_shared/formatTable");
+  // 표만 — 공통 응답 지침은 맨 끝에 한 번(지침 뒤 줄은 표 블록에서 잘린다, research R7)
+  const table = (rows) => {
+    const md = renderTable(rows);
+    return (md.endsWith(ANSWER_GUIDE) ? md.slice(0, -ANSWER_GUIDE.length) : md).trimEnd();
+  };
+  const failed = (name, particle) => `> **${name}**${particle} 조회하지 못했어요`;
+  const parts = [`## HR 급여 - ${label}`];
+
+  // 합계 — 5240 값 그대로. 실패하면 계산해 넣지 않는다(spec D7·FR-002)
+  const sum = by.summary;
+  if (sum.errorMessage) parts.push(failed("합계", "는"));
+  else if (sum.isEmpty) parts.push("> **합계** 조회된 값이 없어요");
+  else {
+    const m = rowsOf(sum)[0] || {};
+    parts.push(
+      "> **합계**\n\n" +
+        table([{ 지급금액: fieldOf(m, "jtotAmt") ?? "", 공제금액: fieldOf(m, "gtotAmt") ?? "", 실지급액: fieldOf(m, "ctotAmt") ?? "" }])
+    );
+  }
+
+  // 지급내역 — 지급구분·급여연월 숨김, 소급금액은 합이 0이 아닐 때만(5240 화면과 같음)
+  const pay = by.pay;
+  if (pay.errorMessage) parts.push(failed("지급내역", "은"));
+  else {
+    const rows = pay.isEmpty ? [] : rowsOf(pay);
+    const resalTotal = rows.reduce((a, r) => a + amountOf(fieldOf(r, "resalAmt")), 0);
+    const total = rows.reduce((a, r) => a + amountOf(fieldOf(r, "salAmt")), 0);
+    const line = (name, amt, resal) => ({ 지급항목: name, 지급금액: amt, ...(resalTotal !== 0 ? { 소급금액: resal } : {}) });
+    parts.push(
+      rows.length === 0
+        ? "> **지급내역** 0건"
+        : `> **지급내역** ${rows.length}건\n\n` +
+            table([
+              ...rows.map((r) => line(fieldOf(r, "salItemNm") ?? "", cellAmount(fieldOf(r, "salAmt")), cellAmount(fieldOf(r, "resalAmt")))),
+              line("합계", total, resalTotal),
+            ])
+    );
+  }
+
+  // 공제내역
+  const ded = by.deduction;
+  if (ded.errorMessage) parts.push(failed("공제내역", "은"));
+  else {
+    const rows = ded.isEmpty ? [] : rowsOf(ded);
+    const total = rows.reduce((a, r) => a + amountOf(fieldOf(r, "salAmt")), 0);
+    parts.push(
+      rows.length === 0
+        ? "> **공제내역** 0건"
+        : `> **공제내역** ${rows.length}건\n\n` +
+            table([
+              ...rows.map((r) => ({ 공제항목: fieldOf(r, "salItemNm") ?? "", 공제금액: cellAmount(fieldOf(r, "salAmt")) })),
+              { 공제항목: "합계", 공제금액: total },
+            ])
+    );
+  }
+
+  // 기재사항 — 행이 있을 때만. 금액/시간등은 5240이 포맷한 글자 그대로
+  const entry = by.entry;
+  if (entry.errorMessage) parts.push(failed("기재사항", "은"));
+  else if (!entry.isEmpty && rowsOf(entry).length > 0) {
+    const rows = rowsOf(entry);
+    parts.push(
+      `> **기재사항** ${rows.length}건\n\n` +
+        table(
+          rows.map((r) => {
+            const code = String(fieldOf(r, "salEntrCd") ?? "").trim();
+            return { 기재구분: ENTRY_KIND_NAMES[code] ?? code, 기재항목: fieldOf(r, "salItemNm") ?? "", "금액/시간등": String(fieldOf(r, "salAmt") ?? "") };
+          })
+        )
+    );
+  }
+
+  // 일부 영역만 실패하면 원인(세션 만료 등)을 한 번 알린다 — 전부 실패일 때만 보이던 문제(코드 리뷰)
+  const firstError = Object.values(by).find((r) => r.errorMessage)?.errorMessage;
+  if (firstError) parts.push(firstError);
+
+  // 시스템이 위 영역 제목·표를 답변 아래에 그대로 붙인다 — 모델이 제목을 또 쓰면 빈 제목 줄이 겹쳤다(2026-11-18)
+  // 표가 하나도 없으면 붙는 것이 없으므로 결과를 직접 알리게 한다(코드 리뷰)
+  const hasTable = parts.some((p) => /\n\|/.test(p));
+  parts.push(
+    hasTable
+      ? "> [답변 지침] 시스템이 위 영역(합계·지급내역·공제내역·기재사항)과 표를 답변 아래에 그대로 붙입니다. 영역 제목이나 표, 항목 목록을 다시 쓰지 마세요. 첫 문장에 어느 지급 건인지와 실지급액을 쓰고 1~2문장으로 끝내세요. 이 줄은 답변에 포함하지 마세요."
+      : "> [답변 지침] 표로 보여 드릴 내역이 없습니다. 위 영역별 결과(조회하지 못한 영역, 0건인 영역)를 그대로 짧게 알려 주세요. 금액을 계산하거나 지어내지 마세요. 이 줄은 답변에 포함하지 마세요."
+  );
+  return parts.join("\n\n") + "\n" + ANSWER_GUIDE;
+}
 
 // ─── 연도 단위 지급 건 목록 (specs/015 contracts/tool-output-year.md §3) ──────────
 

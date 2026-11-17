@@ -174,6 +174,7 @@
     "/SALSalaryDtstmnMgr.do": [
       "getSALSalaryDtstmnMgrList",
       "getSALSalaryDtstmnMgrList2",
+      "getSALSalaryDtstmnMgrList3", // 급여명세서 기재사항 (specs/024)
       "getSALSalaryDtstmnMgrMap",
     ],
     "/SALSalaryBassMgr.do": ["getSALSalaryBassMgrTab110List"],

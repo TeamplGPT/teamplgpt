@@ -36,11 +36,11 @@ describe("급여 표 날짜 형식", () => {
   beforeAll(() => freezeClock(new Date("2026-07-10T12:00:00+09:00")));
   afterAll(() => jest.useRealTimers());
 
-  it("명세·공제의 급여연월은 YYYY-MM (숫자로 와도)", async () => {
+  it("공제의 급여연월은 YYYY-MM (숫자로 와도), 명세서는 급여연월 칸이 없다(specs/024)", async () => {
+    // 급여명세서는 5240 화면처럼 지급구분·급여연월을 숨긴다(specs/024 D4)
     const payslip = await run({ query_type: "payslip", pay_item: "20260625P" });
-    expect(payslip).toMatch(/\| 기본급 \| 지급 \| 2026-06 \| 3,200,000 \|/);
-    expect(payslip).toMatch(/\| 식대 \| 비과세 \| 2026-06 \|/);
-    expect(payslip).not.toMatch(/\| 202606 \|/);
+    expect(payslip).toMatch(/\| 기본급 \| 3,200,000 \|/);
+    expect(payslip).not.toMatch(/\| 202606 \||\| 2026-06 \||급여연월/);
     const deductions = await run({ query_type: "deductions", pay_item: "20260625P" });
     expect(deductions).toMatch(/\| 국민연금 \| 2026-06 \| 153,000 \|/);
   });

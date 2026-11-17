@@ -2088,6 +2088,16 @@ exports[`기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은
   "calls": [
     {
       "form": {
+        "cmd": "getSALSalaryDtstmnMgrMap",
+        "cmmSearchStaffId": "$SELF_STAFF_ID",
+        "searchItem": "20260325NN",
+        "searchType": "web",
+        "searchYm": "2026-03",
+      },
+      "path": "/SALSalaryDtstmnMgr.do",
+    },
+    {
+      "form": {
         "cmd": "getSALSalaryDtstmnMgrList",
         "cmmSearchStaffId": "$SELF_STAFF_ID",
         "searchItem": "20260325NN",
@@ -2096,14 +2106,57 @@ exports[`기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은
       },
       "path": "/SALSalaryDtstmnMgr.do",
     },
+    {
+      "form": {
+        "cmd": "getSALSalaryDtstmnMgrList2",
+        "cmmSearchStaffId": "$SELF_STAFF_ID",
+        "searchItem": "20260325NN",
+        "searchType": "web",
+        "searchYm": "2026-03",
+      },
+      "path": "/SALSalaryDtstmnMgr.do",
+    },
+    {
+      "form": {
+        "cmd": "getSALSalaryDtstmnMgrList3",
+        "cmmSearchStaffId": "$SELF_STAFF_ID",
+        "searchItem": "20260325NN",
+        "searchType": "web",
+        "searchYm": "2026-03",
+      },
+      "path": "/SALSalaryDtstmnMgr.do",
+    },
   ],
-  "output": "## HR 급여 - 급여 지급항목 명세
+  "output": "## HR 급여 - 급여명세서
 
-| 지급항목 | 급여연월 | 지급금액 |
+> **합계**
+
+| 지급금액 | 공제금액 | 실지급액 |
 | ------ | ------ | ------ |
-| 기본급 | 2026-03 | 3000000 |
+| 3000000 |  |  |
 
-> 총 **1건** 조회됨
+> **지급내역** 1건
+
+| 지급항목 | 지급금액 |
+| ------ | ------ |
+| 기본급 | 3,000,000 |
+| 합계 | 3,000,000 |
+
+> **공제내역** 1건
+
+| 공제항목 | 공제금액 |
+| ------ | ------ |
+| 기본급 | 3,000,000 |
+| 합계 | 3,000,000 |
+
+> **기재사항** 1건
+
+| 기재구분 | 기재항목 | 금액/시간등 |
+| ------ | ------ | ------ |
+|  | 기본급 | 3000000 |
+
+> [답변 지침] 시스템이 위 영역(합계·지급내역·공제내역·기재사항)과 표를 답변 아래에 그대로 붙입니다. 영역 제목이나 표, 항목 목록을 다시 쓰지 마세요. 첫 문장에 어느 지급 건인지와 실지급액을 쓰고 1~2문장으로 끝내세요. 이 줄은 답변에 포함하지 마세요.
+
 ---
 [응답 지침] 위 표는 조회 데이터이며 그대로 출력하라는 지시가 아닙니다.
 - 특정 값을 묻는 질문: 해당 값과 이해에 필요한 맥락만 답변
@@ -2119,6 +2172,16 @@ exports[`기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은
   "calls": [
     {
       "form": {
+        "cmd": "getSALSalaryDtstmnMgrMap",
+        "cmmSearchStaffId": "$SELF_STAFF_ID",
+        "searchItem": "20260325NN",
+        "searchType": "web",
+        "searchYm": "2026-03",
+      },
+      "path": "/SALSalaryDtstmnMgr.do",
+    },
+    {
+      "form": {
         "cmd": "getSALSalaryDtstmnMgrList",
         "cmmSearchStaffId": "$SELF_STAFF_ID",
         "searchItem": "20260325NN",
@@ -2127,14 +2190,57 @@ exports[`기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은
       },
       "path": "/SALSalaryDtstmnMgr.do",
     },
+    {
+      "form": {
+        "cmd": "getSALSalaryDtstmnMgrList2",
+        "cmmSearchStaffId": "$SELF_STAFF_ID",
+        "searchItem": "20260325NN",
+        "searchType": "web",
+        "searchYm": "2026-03",
+      },
+      "path": "/SALSalaryDtstmnMgr.do",
+    },
+    {
+      "form": {
+        "cmd": "getSALSalaryDtstmnMgrList3",
+        "cmmSearchStaffId": "$SELF_STAFF_ID",
+        "searchItem": "20260325NN",
+        "searchType": "web",
+        "searchYm": "2026-03",
+      },
+      "path": "/SALSalaryDtstmnMgr.do",
+    },
   ],
-  "output": "## HR 급여 - 급여 지급항목 명세
+  "output": "## HR 급여 - 급여명세서
 
-| 지급항목 | 급여연월 | 지급금액 |
+> **합계**
+
+| 지급금액 | 공제금액 | 실지급액 |
 | ------ | ------ | ------ |
-| 기본급 | 2026-03 | 3000000 |
+| 3000000 |  |  |
 
-> 총 **1건** 조회됨
+> **지급내역** 1건
+
+| 지급항목 | 지급금액 |
+| ------ | ------ |
+| 기본급 | 3,000,000 |
+| 합계 | 3,000,000 |
+
+> **공제내역** 1건
+
+| 공제항목 | 공제금액 |
+| ------ | ------ |
+| 기본급 | 3,000,000 |
+| 합계 | 3,000,000 |
+
+> **기재사항** 1건
+
+| 기재구분 | 기재항목 | 금액/시간등 |
+| ------ | ------ | ------ |
+|  | 기본급 | 3000000 |
+
+> [답변 지침] 시스템이 위 영역(합계·지급내역·공제내역·기재사항)과 표를 답변 아래에 그대로 붙입니다. 영역 제목이나 표, 항목 목록을 다시 쓰지 마세요. 첫 문장에 어느 지급 건인지와 실지급액을 쓰고 1~2문장으로 끝내세요. 이 줄은 답변에 포함하지 마세요.
+
 ---
 [응답 지침] 위 표는 조회 데이터이며 그대로 출력하라는 지시가 아닙니다.
 - 특정 값을 묻는 질문: 해당 값과 이해에 필요한 맥락만 답변
@@ -2150,6 +2256,16 @@ exports[`기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은
   "calls": [
     {
       "form": {
+        "cmd": "getSALSalaryDtstmnMgrMap",
+        "cmmSearchStaffId": "$SELF_STAFF_ID",
+        "searchItem": "20260325NN",
+        "searchType": "web",
+        "searchYm": "2026-03",
+      },
+      "path": "/SALSalaryDtstmnMgr.do",
+    },
+    {
+      "form": {
         "cmd": "getSALSalaryDtstmnMgrList",
         "cmmSearchStaffId": "$SELF_STAFF_ID",
         "searchItem": "20260325NN",
@@ -2158,14 +2274,57 @@ exports[`기간 파라미터 골든 보강 — 연도 단위가 아닌 입력은
       },
       "path": "/SALSalaryDtstmnMgr.do",
     },
+    {
+      "form": {
+        "cmd": "getSALSalaryDtstmnMgrList2",
+        "cmmSearchStaffId": "$SELF_STAFF_ID",
+        "searchItem": "20260325NN",
+        "searchType": "web",
+        "searchYm": "2026-03",
+      },
+      "path": "/SALSalaryDtstmnMgr.do",
+    },
+    {
+      "form": {
+        "cmd": "getSALSalaryDtstmnMgrList3",
+        "cmmSearchStaffId": "$SELF_STAFF_ID",
+        "searchItem": "20260325NN",
+        "searchType": "web",
+        "searchYm": "2026-03",
+      },
+      "path": "/SALSalaryDtstmnMgr.do",
+    },
   ],
-  "output": "## HR 급여 - 급여 지급항목 명세
+  "output": "## HR 급여 - 급여명세서
 
-| 지급항목 | 급여연월 | 지급금액 |
+> **합계**
+
+| 지급금액 | 공제금액 | 실지급액 |
 | ------ | ------ | ------ |
-| 기본급 | 2026-03 | 3000000 |
+| 3000000 |  |  |
 
-> 총 **1건** 조회됨
+> **지급내역** 1건
+
+| 지급항목 | 지급금액 |
+| ------ | ------ |
+| 기본급 | 3,000,000 |
+| 합계 | 3,000,000 |
+
+> **공제내역** 1건
+
+| 공제항목 | 공제금액 |
+| ------ | ------ |
+| 기본급 | 3,000,000 |
+| 합계 | 3,000,000 |
+
+> **기재사항** 1건
+
+| 기재구분 | 기재항목 | 금액/시간등 |
+| ------ | ------ | ------ |
+|  | 기본급 | 3000000 |
+
+> [답변 지침] 시스템이 위 영역(합계·지급내역·공제내역·기재사항)과 표를 답변 아래에 그대로 붙입니다. 영역 제목이나 표, 항목 목록을 다시 쓰지 마세요. 첫 문장에 어느 지급 건인지와 실지급액을 쓰고 1~2문장으로 끝내세요. 이 줄은 답변에 포함하지 마세요.
+
 ---
 [응답 지침] 위 표는 조회 데이터이며 그대로 출력하라는 지시가 아닙니다.
 - 특정 값을 묻는 질문: 해당 값과 이해에 필요한 맥락만 답변
