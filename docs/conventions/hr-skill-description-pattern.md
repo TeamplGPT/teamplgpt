@@ -1,6 +1,6 @@
 # HR Skill `plugin.json` description 작성 표준
 
-**버전** v1.11 (2026-10-23) · **상태** 영구 convention (archive 대상 아님)
+**버전** v1.12 (2026-11-18) · **상태** 영구 convention (archive 대상 아님)
 
 > **v1.4 (2026-09-08): P0-2/P1-1 재설계 반영 — v1.3은 2026-08-10 시점 역추출로 현행과 불일치.**
 > 2026-09-03~04에 HR skill 7종의 description이 "키워드 매핑표 + `[CRITICAL]` 반복" 방식에서 "정체성 / 의도 서술 / 경계" 구조로 전면 재작성됐고, 모든 skill에 공통인 지시(본인 기준·즉시 호출·기간 되묻기 금지·year_month 형식·required 필수·코드성 인자 선행 조회)는 description 밖 시스템 프롬프트 가드 `hrSkillChatGuard()`로 이관됐다. v1.4는 그 결과물인 실물 `plugin.json` 7종, `server/utils/chats/index.js`의 가드, `server/evals/hr-routing/` 평가 하네스에서 다시 역추출한 것이다.
@@ -310,6 +310,15 @@ v1.4 작성 시점에 확인된 코드-문서 불일치. 고칠 때 이 문서�
 ---
 
 ## 변경 이력
+
+### v1.11 → v1.12 (2026-11-18)
+
+| 항목 | v1.11 | v1.12 |
+|---|---|---|
+| `hr-attendance` A·B | 근무현황 = 지각/조퇴/결근/승인OT | 근무예외사항(출장·외근·교육) 포함 명시, 결근과 출퇴근 누락이 다른 분류임을 work_status에, timesheet·leave_requests에 위임 괄호 추가 — 운영 위젯이 출장 질문을 "조회 불가"·휴가 사용내역으로, 누락 질문을 timesheet로 보내 결근을 누락이라 답함 |
+| `hr-approval` A 경계 | "내가 결재해야 할 문서"는 거절 | 남이 올린 문서의 목록·내용만 거절, 처리할 결재가 남았는지·몇 건인지는 `hr-personnel(todo_count)`로 위임 — "내가 결재할 문서 있어?"를 다른 직원 정보로 거절하던 문제 |
+| `hr-personnel` B todo_count | 몇 건인지 숫자 | + 처리할 게 남았는지(내가 결재할 차례인 문서가 있는지 포함) |
+| 평가 하네스 | tool 목록만 | 운영 tool 루프와 같게 `withHrRefusalTool`(다른 직원 거절·조회 없음 선택지)을 붙이고, 그 선택지 호출은 tool 미호출로 채점. `att-ts-date-02` params_regex를 서버 허용 형식(YYYYMM·월만)까지 확장(§7.4-3) |
 
 ### v1.10 → v1.11 (2026-10-23)
 

@@ -46,6 +46,14 @@ const { routeHrToolsForMessage } = require(path.join(
   SERVER_DIR,
   "utils/chats/toolCalling/hrRouting"
 ));
+// 운영 tool 루프(loop.js)와 같게 "다른 직원 거절"·"조회 없음" 선택지를 함께 준다(2026-11-18).
+// 없으면 운영에서 "출장 간 적 있어?"가 조회 없음으로 빠지는 실패를 하네스가 재현하지 못한다.
+const {
+  withHrRefusalTool,
+  REFUSAL_TOOL_NAME,
+  UNSUPPORTED_TOOL_NAME,
+} = require(path.join(SERVER_DIR, "utils/hrSelfDataNotice"));
+const PSEUDO_TOOL_NAMES = new Set([REFUSAL_TOOL_NAME, UNSUPPORTED_TOOL_NAME]);
 
 const PROVIDER_FORMAT = "openai-responses";
 
@@ -467,10 +475,14 @@ async function main() {
           model,
           systemPrompt,
           utterance: c.utterance,
-          tools: routedTools,
+          tools: withHrRefusalTool(routedTools, PROVIDER_FORMAT),
           toolChoice,
         });
-        const { pass, skillPass } = scoreCase(c, calls);
+        // 거절·조회 없음 선택지는 실제 조회가 아니다 — tool 미호출([])로 채점한다
+        const { pass, skillPass } = scoreCase(
+          c,
+          calls.filter((call) => !PSEUDO_TOOL_NAMES.has(call.skill))
+        );
         const r = {
           case: c,
           calls,

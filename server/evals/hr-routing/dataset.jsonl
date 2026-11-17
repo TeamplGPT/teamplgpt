@@ -12,7 +12,7 @@
 {"id":"att-ts-05","tags":["slang"],"utterance":"출퇴근기록좀","expect":[[{"skill":"hr-attendance","query_type":"timesheet"}]]}
 {"id":"att-ts-06","tags":["formal"],"utterance":"퇴근 시간 확인 부탁드립니다","expect":[[{"skill":"hr-attendance","query_type":"timesheet"}]]}
 {"id": "att-ts-date-01", "tags": ["boundary", "date", "normalized"], "utterance": "2025년 1월 출퇴근 기록 보여줘", "expect": [[{"skill": "hr-attendance", "query_type": "timesheet", "params_regex": {"year_month": "2025[-년]?\\s*0?1(월|$)"}, "params_absent": ["date"]}]]}
-{"id": "att-ts-date-02", "tags": ["boundary", "colloquial", "date"], "utterance": "지난달 출퇴근 기록 보여줘", "expect": [[{"skill": "hr-attendance", "query_type": "timesheet", "params_regex": {"year_month": "지난\\s*달|지난달"}, "params_absent": ["date"]}]]}
+{"id": "att-ts-date-02", "tags": ["boundary", "colloquial", "date"], "utterance": "지난달 출퇴근 기록 보여줘", "expect": [[{"skill": "hr-attendance", "query_type": "timesheet", "params_regex": {"year_month": "지난\\s*달|^\\d{4}-?\\d{2}$|^\\d{1,2}월?$"}, "params_absent": ["date"]}]]}
 {"id": "att-ws-01", "tags": ["boundary", "normalized"], "utterance": "이번 달 근무현황 요약해줘", "expect": [[{"skill": "hr-attendance", "query_type": "work_status", "params_absent": ["date"]}]]}
 {"id":"att-ws-02","tags":["colloquial"],"utterance":"나 이번 달에 지각한 적 있어?","expect":[[{"skill":"hr-attendance","query_type":"work_status"}]]}
 {"id":"att-ws-03","tags":["colloquial"],"utterance":"결근 처리된 날 있는지 봐줘","expect":[[{"skill":"hr-attendance","query_type":"work_status"}]]}
@@ -184,3 +184,9 @@
 {"id": "att-day-ot-01", "tags": ["date", "day"], "utterance": "어제 야근한 거 연장근무로 잡혀 있어?", "expect": [[{"skill": "hr-attendance", "query_type": "overtime", "params_regex": {"date": "어제|2026-?10-?22|10월\\s*22일|10/22"}}], [{"skill": "hr-attendance", "query_type": "overtime_limit", "params_regex": {"date": "어제|2026-?10-?22|10월\\s*22일|10/22"}}]]}
 {"id": "per-day-sch-01", "tags": ["date", "day"], "utterance": "오늘 회사에 잡힌 일정 있어?", "expect": [[{"skill": "hr-personnel", "query_type": "schedule_titles", "params_regex": {"date": "오늘|금일|2026-?10-?23|10월\\s*23일|10/23"}}], [{"skill": "hr-personnel", "query_type": "schedule_day", "params_regex": {"date": "오늘|금일|2026-?10-?23|10월\\s*23일|10/23"}}]]}
 {"id": "att-wday-01", "tags": ["date", "day"], "utterance": "지난주 금요일에 나 몇 시에 퇴근했지?", "expect": [[{"skill": "hr-attendance", "query_type": "timesheet", "params_regex": {"date": "지난\\s*(주\\s*)?금요일|저번\\s*주\\s*금요일|(2026-?)?10-?16|10월\\s*16일|10/16"}}], [{"skill": "hr-attendance", "query_type": "work_status", "params_regex": {"date": "지난\\s*(주\\s*)?금요일|저번\\s*주\\s*금요일|(2026-?)?10-?16|10월\\s*16일|10/16"}}]]}
+{"id":"prod-att-trip-01","tags":["production","colloquial","date"],"utterance":"5월에 출장 간 적 있어?","expect":[[{"skill":"hr-attendance","query_type":"work_status"}]]}
+{"id":"prod-att-trip-02","tags":["production","colloquial","date"],"utterance":"올해 출장 며칠 갔어?","expect":[[{"skill":"hr-attendance","query_type":"work_status"}]]}
+{"id":"att-ws-trip-03","tags":["indirect"],"utterance":"지난달에 외근 처리된 날 며칠이었지?","expect":[[{"skill":"hr-attendance","query_type":"work_status"}]]}
+{"id":"prod-att-miss-01","tags":["production","colloquial"],"utterance":"출퇴근 누락된 날 있어?","expect":[[{"skill":"hr-attendance","query_type":"work_status"}]]}
+{"id":"prod-apr-cnt-01","tags":["production","boundary","colloquial"],"utterance":"내가 결재할 문서 있어?","expect":[[{"skill":"hr-personnel","query_type":"todo_count"}]]}
+{"id":"apr-cnt-02","tags":["boundary","indirect"],"utterance":"승인해 줘야 할 게 남아 있나 확인해줘","expect":[[{"skill":"hr-personnel","query_type":"todo_count"}]]}
