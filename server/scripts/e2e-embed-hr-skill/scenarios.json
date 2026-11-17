@@ -1230,10 +1230,10 @@
         "tool_call": true,
         "mock_url_pattern": "^/TAADclzWorkSearchCldr\\.do",
         "answer_pattern": [
-          "\\| {{TOMORROW}} \\|"
+          "\\| {{TOMORROW_DASH}} \\|"
         ],
         "answer_not_pattern": [
-          "\\| {{TODAY}} \\|"
+          "\\| {{TODAY_DASH}} \\|"
         ]
       },
       "repeat": 3,

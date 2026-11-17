@@ -2,7 +2,7 @@
  * 시나리오 기대값의 날짜 자리표시자(specs/020) — "오늘 출근시각"처럼 실행하는 날에 따라 답이 바뀌는
  * 시나리오용. 실행 시점의 서울 날짜로 바꾼다. 자리표시자가 없는 문자열은 그대로.
  *
- *   {{TODAY}} 20261023 / {{TODAY_MD}} 10-23 / {{YESTERDAY}}·{{YESTERDAY_MD}} / {{TOMORROW}}·{{TOMORROW_MD}}
+ *   {{TODAY}} 20261023 / {{TODAY_MD}} 10-23 / {{TODAY_DASH}} 2026-10-23 / {{YESTERDAY}}·{{YESTERDAY_MD}}·{{YESTERDAY_DASH}} / {{TOMORROW}}·{{TOMORROW_MD}}·{{TOMORROW_DASH}}
  *   {{WEEK_MON}}·{{WEEK_SUN}} 이번 주 월·일요일(YYYYMMDD) / {{LAST_WEEK_MON}}·{{LAST_WEEK_SUN}}
  *   {{LAST_WEEK_WED}}·{{LAST_WEEK_WED_MD}} 지난주 수요일
  *   {{LAST_MONTH_M}} 지난달 월(10, 1월이면 12)
@@ -21,6 +21,7 @@ function seoulTodayUtc(now) {
 
 const ymdOf = (d) => d.toISOString().slice(0, 10).replace(/-/g, "");
 const mdOf = (d) => d.toISOString().slice(5, 10);
+const dashOf = (d) => d.toISOString().slice(0, 10);
 
 function placeholderValues(now = new Date()) {
   const today = seoulTodayUtc(now);
@@ -34,6 +35,10 @@ function placeholderValues(now = new Date()) {
     YESTERDAY_MD: mdOf(shift(-1)),
     TOMORROW: ymdOf(shift(1)),
     TOMORROW_MD: mdOf(shift(1)),
+    // 표 칸 날짜(YYYY-MM-DD, 2026-11-18부터 표 날짜를 하이픈 형식으로 보여준다)
+    TODAY_DASH: dashOf(today),
+    YESTERDAY_DASH: dashOf(shift(-1)),
+    TOMORROW_DASH: dashOf(shift(1)),
     WEEK_MON: ymdOf(weekDay(0)),
     WEEK_SUN: ymdOf(weekDay(6)),
     LAST_WEEK_MON: ymdOf(weekDay(-7)),

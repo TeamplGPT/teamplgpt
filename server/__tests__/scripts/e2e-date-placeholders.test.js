@@ -27,4 +27,12 @@ describe("E2E 날짜 자리표시자", () => {
     expect(values.TODAY).toBe("20261117");
     expect(values.YESTERDAY_MD).toBe("11-16");
   });
+
+  // 표 날짜가 하이픈 형식이 되면서(2026-11-18) 표 칸 기대값용 YYYY-MM-DD 자리표시자
+  it("{{TODAY_DASH}}·{{TOMORROW_DASH}}·{{YESTERDAY_DASH}}는 YYYY-MM-DD", () => {
+    const values = placeholderValues(seoulNoon("2026-11-18"));
+    expect(values.TODAY_DASH).toBe("2026-11-18");
+    expect(values.TOMORROW_DASH).toBe("2026-11-19");
+    expect(values.YESTERDAY_DASH).toBe("2026-11-17");
+  });
 });
