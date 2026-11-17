@@ -67,6 +67,14 @@ const EmbedCompanyDocument = {
     });
   },
 
+  // 고객 종료 파기(specs/022) — 같은 회사명 hash는 모든 embed에서 지운다
+  listByCompanyHash: async function (hash) {
+    return await prisma.embed_company_documents.findMany({
+      where: { company_hash: hash },
+      include: { embed_config: { include: { workspace: true } } },
+    });
+  },
+
   get: async function (id) {
     return await prisma.embed_company_documents.findFirst({
       where: { id: Number(id) },

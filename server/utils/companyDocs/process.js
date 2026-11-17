@@ -79,10 +79,7 @@ async function readCompanyDocumentContent(row) {
   if (!row?.location || !row?.company_hash) return null;
   try {
     const companyRoot = path.resolve(companyDocsPath(), row.company_hash);
-    const target = path.resolve(
-      companyDocsPath(),
-      normalizePath(row.location)
-    );
+    const target = path.resolve(companyDocsPath(), normalizePath(row.location));
     if (!isWithin(companyRoot, target)) return null;
     const { pageContent } = JSON.parse(
       await fs.promises.readFile(target, "utf8")
@@ -241,12 +238,55 @@ async function processCompanyDocument({ row, hotdirFilename, namespace }) {
   }
 }
 
+// 고객 종료(specs/022): 회사명으로 묶인 회사 문서·벡터·파일을 즉시 전부 삭제
+async function purgeCompanyDataByName(companyName) {
+  const key = EmbedCompanyDocument.normalizeCompanyKey(companyName);
+  if (!key) return null;
+
+  const hash = EmbedCompanyDocument.companyHash(key);
+  const rows = await EmbedCompanyDocument.listByCompanyHash(hash);
+  const namespaces = new Set();
+  let companyDocuments = 0;
+
+  for (const row of rows) {
+    const slug = row.embed_config?.workspace?.slug;
+    const namespace = slug
+      ? EmbedCompanyDocument.namespaceFor(slug, row.embed_id, row.company_hash)
+      : null;
+    if (namespace) {
+      namespaces.add(namespace);
+      await removeCompanyDocumentArtifacts(row, namespace);
+    } else if (row.location) {
+      removeWithin(companyDocsPath(), row.location);
+    }
+    const deleted = await EmbedCompanyDocument.delete(row.id);
+    if (deleted) companyDocuments += 1;
+  }
+
+  for (const namespace of namespaces) {
+    await dropNamespaceIfEmpty(namespace);
+  }
+
+  // 같은 hash 폴더에 남은 파일이 있으면 통째로 지운다 (고아 JSON 대비)
+  const companyDir = path.resolve(companyDocsPath(), hash);
+  if (fs.existsSync(companyDir) && isWithin(companyDocsPath(), companyDir)) {
+    fs.rmSync(companyDir, { recursive: true, force: true });
+  }
+
+  return {
+    companyName: key,
+    companyDocuments,
+    vectorNamespaces: namespaces.size,
+  };
+}
+
 module.exports = {
   processCompanyDocument,
   removeCompanyDocumentArtifacts,
   dropNamespaceIfEmpty,
   removeCompanyDocsForEmbed,
   recoverInterruptedDocuments,
+  purgeCompanyDataByName,
   failureCode,
   companyDocsPath,
   readCompanyDocumentContent,

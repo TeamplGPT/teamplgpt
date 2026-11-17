@@ -64,6 +64,8 @@ jest.mock("../../../models/embedCompanyDocument", () => {
       updateStatus: jest.fn(),
       listProcessing: jest.fn(),
       listByEmbed: jest.fn(),
+      listByCompanyHash: jest.fn(),
+      delete: jest.fn(),
     },
   };
 });
@@ -76,6 +78,7 @@ const {
   removeCompanyDocumentArtifacts,
   dropNamespaceIfEmpty,
   removeCompanyDocsForEmbed,
+  purgeCompanyDataByName,
   failureCode,
   companyDocsPath,
   COMPANY_DOC_ERRORS,
@@ -507,5 +510,67 @@ describe("queue", () => {
         doc_id: null,
         location: null,
       });
+  });
+});
+
+describe("purgeCompanyDataByName (specs/022)", () => {
+  it("회사명이 비면 null", async () => {
+    await expect(purgeCompanyDataByName("  ")).resolves.toBeNull();
+    expect(EmbedCompanyDocument.listByCompanyHash).not.toHaveBeenCalled();
+  });
+
+  it("문서가 없어도 멱등 성공 요약을 반환한다", async () => {
+    EmbedCompanyDocument.listByCompanyHash.mockResolvedValue([]);
+    await expect(purgeCompanyDataByName("오이사공")).resolves.toEqual({
+      companyName: "오이사공",
+      companyDocuments: 0,
+      vectorNamespaces: 0,
+    });
+  });
+
+  it("같은 회사 hash의 문서·벡터·폴더를 지운다", async () => {
+    const location = `${HASH}/doc.json`;
+    const companyDir = path.join(companyDocsPath(), HASH);
+    fs.mkdirSync(companyDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(companyDir, "doc.json"),
+      JSON.stringify({ pageContent: "x" })
+    );
+
+    EmbedCompanyDocument.listByCompanyHash.mockResolvedValue([
+      {
+        ...ROW,
+        id: 21,
+        doc_id: "d21",
+        location,
+        embed_config: { workspace: { slug: "ws" } },
+      },
+      {
+        ...ROW,
+        id: 22,
+        embed_id: 2,
+        doc_id: "d22",
+        location: null,
+        embed_config: { workspace: { slug: "ws" } },
+      },
+    ]);
+    EmbedCompanyDocument.delete.mockImplementation(async (id) => ({ id }));
+    mockHasNamespace.mockResolvedValue(true);
+    mockNamespaceCount.mockResolvedValue(0);
+
+    const result = await purgeCompanyDataByName(" 오이사공 ");
+    expect(result).toEqual({
+      companyName: "오이사공",
+      companyDocuments: 2,
+      vectorNamespaces: 2,
+    });
+    expect(mockDeleteDocumentFromNamespace).toHaveBeenCalledWith(
+      `ws-co-1-${HASH}`,
+      "d21"
+    );
+    expect(EmbedCompanyDocument.delete).toHaveBeenCalledWith(21);
+    expect(EmbedCompanyDocument.delete).toHaveBeenCalledWith(22);
+    expect(mockDeleteNamespace).toHaveBeenCalled();
+    expect(fs.existsSync(companyDir)).toBe(false);
   });
 });
