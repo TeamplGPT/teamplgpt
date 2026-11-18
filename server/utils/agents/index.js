@@ -546,10 +546,14 @@ class AgentHandler {
 
     this.aibitat.agent(USER_AGENT.name, userAgentDef);
     this.aibitat.agent(WORKSPACE_AGENT.name, workspaceAgentDef);
-    this.#funcsToLoad = [
-      ...(userAgentDef?.functions || []),
-      ...(workspaceAgentDef?.functions || []),
-    ];
+    const { filterToolsForChatHistoryOnly } = require("../chats/chatHistoryOnlyRequest");
+    this.#funcsToLoad = filterToolsForChatHistoryOnly(
+      [
+        ...(userAgentDef?.functions || []),
+        ...(workspaceAgentDef?.functions || []),
+      ],
+      this.invocation.prompt
+    );
   }
 
   async init() {

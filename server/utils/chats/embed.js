@@ -267,7 +267,8 @@ async function streamChatWithForEmbed(
   );
 
   let tools = null;
-  if (toolsEnabled) {
+  // 대화 회상만이면 허용 skill이어도 HR tool을 넘기지 않는다
+  if (toolsEnabled && !chatHistoryOnly) {
     tools = applyAllowedHashes(allTools, embed.allowed_skill_hashes, format);
   }
 

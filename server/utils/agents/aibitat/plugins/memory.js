@@ -87,7 +87,17 @@ const memory = {
           },
           search: async function (query = "") {
             try {
-              const workspace = this.super.handlerProps.invocation.workspace;
+              const invocation = this.super.handlerProps.invocation || {};
+              const {
+                isChatHistoryOnlyRequest,
+              } = require("../../../chats/chatHistoryOnlyRequest");
+              if (isChatHistoryOnlyRequest(invocation.prompt)) {
+                this.super.introspect(
+                  `${this.caller}: Skipping document search — user asked for chat history only.`
+                );
+                return "Document search skipped. Answer using chat history only; do not invent content from workplace documents.";
+              }
+              const workspace = invocation.workspace;
               const LLMConnector = getLLMProvider({
                 provider: workspace?.chatProvider,
                 model: workspace?.chatModel,

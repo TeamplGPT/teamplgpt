@@ -387,17 +387,21 @@ async function streamChatWithWorkspace(
     typeof LLMConnector.toolCallingFormat === "function"
       ? LLMConnector.toolCallingFormat()
       : null;
+  // 대화 회상만이면 HR·문서 tool을 아예 안 넘긴다(RAG 스킵만으로는 신규 조회가 섞일 수 있음)
   const rawTools =
+    !chatHistoryOnly &&
     typeof LLMConnector.supportsToolCalling === "function" &&
     LLMConnector.supportsToolCalling()
       ? ChatToolsManager.getToolDefinitions(providerFormat)
       : null;
   const { routeHrToolsForMessage } = require("./toolCalling/hrRouting");
-  const { tools, toolChoice } = routeHrToolsForMessage({
-    tools: rawTools,
-    providerFormat,
-    message: updatedMessage,
-  });
+  const { tools, toolChoice } = chatHistoryOnly
+    ? { tools: null, toolChoice: undefined }
+    : routeHrToolsForMessage({
+        tools: rawTools,
+        providerFormat,
+        message: updatedMessage,
+      });
 
   const {
     completeText: finalText,

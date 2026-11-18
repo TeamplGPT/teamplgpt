@@ -10,6 +10,10 @@ const {
   shouldUseRerank,
 } = require("../vectorSearch/searchModeHelpers");
 const { Workspace } = require("../../models/workspace");
+const {
+  isChatHistoryOnlyRequest,
+  withChatHistoryOnlyGuide,
+} = require("./chatHistoryOnlyRequest");
 
 const { PassThrough } = require("stream");
 
@@ -23,6 +27,7 @@ async function chatSync({
 }) {
   const uuid = uuidv4();
   const chatMode = workspace?.chatMode ?? "chat";
+  const chatHistoryOnly = isChatHistoryOnlyRequest(prompt);
   const LLMConnector = getLLMProvider({
     provider: workspace?.chatProvider,
     model: workspace?.chatModel,
@@ -34,9 +39,15 @@ async function chatSync({
   // User is trying to query-mode chat a workspace that has no data in it - so
   // we should exit early as no information can be found under these conditions.
   // Skip early exit if a shared workspace exists (merged search may still find results).
+  // 대화 회상만이면 문서가 없어도 히스토리로 답한다.
   const sharedWorkspace = await Workspace.getShared();
   const hasSharedFallback = sharedWorkspace && sharedWorkspace.id !== workspace.id;
-  if ((!hasVectorizedSpace || embeddingsCount === 0) && chatMode === "query" && !hasSharedFallback) {
+  if (
+    !chatHistoryOnly &&
+    (!hasVectorizedSpace || embeddingsCount === 0) &&
+    chatMode === "query" &&
+    !hasSharedFallback
+  ) {
     const textResponse =
       workspace?.queryRefusalResponse ??
       "There is no relevant information in this workspace to answer your query.";
@@ -72,27 +83,30 @@ async function chatSync({
   let contextTexts = [];
   let sources = [];
   let pinnedDocIdentifiers = [];
-  await new DocumentManager({
-    workspace,
-    maxTokens: LLMConnector.promptWindowLimit(),
-  })
-    .pinnedDocs()
-    .then((pinnedDocs) => {
-      pinnedDocs.forEach((doc) => {
-        const { pageContent, ...metadata } = doc;
-        pinnedDocIdentifiers.push(sourceIdentifier(doc));
-        contextTexts.push(doc.pageContent);
-        sources.push({
-          text:
-            pageContent.slice(0, 1_000) +
-            "...continued on in source document...",
-          ...metadata,
+  if (!chatHistoryOnly) {
+    await new DocumentManager({
+      workspace,
+      maxTokens: LLMConnector.promptWindowLimit(),
+    })
+      .pinnedDocs()
+      .then((pinnedDocs) => {
+        pinnedDocs.forEach((doc) => {
+          const { pageContent, ...metadata } = doc;
+          pinnedDocIdentifiers.push(sourceIdentifier(doc));
+          contextTexts.push(doc.pageContent);
+          sources.push({
+            text:
+              pageContent.slice(0, 1_000) +
+              "...continued on in source document...",
+            ...metadata,
+          });
         });
       });
-    });
+  }
 
-  const vectorSearchResults =
-    embeddingsCount !== 0
+  const vectorSearchResults = chatHistoryOnly
+    ? { contextTexts: [], sources: [], message: null }
+    : embeddingsCount !== 0
       ? await performMergedSearch({
           workspace,
           input: String(prompt),
@@ -131,7 +145,7 @@ async function chatSync({
 
   // If in query mode and no context chunks are found from search, backfill, or pins -  do not
   // let the LLM try to hallucinate a response or use general knowledge and exit early
-  if (chatMode === "query" && contextTexts.length === 0) {
+  if (chatMode === "query" && contextTexts.length === 0 && !chatHistoryOnly) {
     const textResponse =
       workspace?.queryRefusalResponse ??
       "There is no relevant information in this workspace to answer your query.";
@@ -164,7 +178,10 @@ async function chatSync({
   // Compress & Assemble message to ensure prompt passes token limit with room for response
   // and build system messages based on inputs and history.
   const messages = await LLMConnector.compressMessages({
-    systemPrompt: systemPrompt ?? (await chatPrompt(workspace)),
+    systemPrompt: withChatHistoryOnlyGuide(
+      systemPrompt ?? (await chatPrompt(workspace)),
+      chatHistoryOnly
+    ),
     userPrompt: String(prompt),
     contextTexts,
     chatHistory: history,
@@ -231,6 +248,7 @@ async function streamChat({
 }) {
   const uuid = uuidv4();
   const chatMode = workspace?.chatMode ?? "chat";
+  const chatHistoryOnly = isChatHistoryOnlyRequest(prompt);
   const LLMConnector = getLLMProvider({
     provider: workspace?.chatProvider,
     model: workspace?.chatModel,
@@ -263,7 +281,12 @@ async function streamChat({
   // Skip early exit if a shared workspace exists (merged search may still find results).
   const sharedWs = await Workspace.getShared();
   const hasSharedFallback2 = sharedWs && sharedWs.id !== workspace.id;
-  if ((!hasVectorizedSpace || embeddingsCount === 0) && chatMode === "query" && !hasSharedFallback2) {
+  if (
+    !chatHistoryOnly &&
+    (!hasVectorizedSpace || embeddingsCount === 0) &&
+    chatMode === "query" &&
+    !hasSharedFallback2
+  ) {
     const textResponse =
       workspace?.queryRefusalResponse ??
       "There is no relevant information in this workspace to answer your query.";
@@ -303,27 +326,30 @@ async function streamChat({
   let contextTexts = [];
   let sources = [];
   let pinnedDocIdentifiers = [];
-  await new DocumentManager({
-    workspace,
-    maxTokens: LLMConnector.promptWindowLimit(),
-  })
-    .pinnedDocs()
-    .then((pinnedDocs) => {
-      pinnedDocs.forEach((doc) => {
-        const { pageContent, ...metadata } = doc;
-        pinnedDocIdentifiers.push(sourceIdentifier(doc));
-        contextTexts.push(doc.pageContent);
-        sources.push({
-          text:
-            pageContent.slice(0, 1_000) +
-            "...continued on in source document...",
-          ...metadata,
+  if (!chatHistoryOnly) {
+    await new DocumentManager({
+      workspace,
+      maxTokens: LLMConnector.promptWindowLimit(),
+    })
+      .pinnedDocs()
+      .then((pinnedDocs) => {
+        pinnedDocs.forEach((doc) => {
+          const { pageContent, ...metadata } = doc;
+          pinnedDocIdentifiers.push(sourceIdentifier(doc));
+          contextTexts.push(doc.pageContent);
+          sources.push({
+            text:
+              pageContent.slice(0, 1_000) +
+              "...continued on in source document...",
+            ...metadata,
+          });
         });
       });
-    });
+  }
 
-  const vectorSearchResults =
-    embeddingsCount !== 0
+  const vectorSearchResults = chatHistoryOnly
+    ? { contextTexts: [], sources: [], message: null }
+    : embeddingsCount !== 0
       ? await performMergedSearch({
           workspace,
           input: String(prompt),
@@ -366,7 +392,7 @@ async function streamChat({
 
   // If in query mode and no context chunks are found from search, backfill, or pins -  do not
   // let the LLM try to hallucinate a response or use general knowledge and exit early
-  if (chatMode === "query" && contextTexts.length === 0) {
+  if (chatMode === "query" && contextTexts.length === 0 && !chatHistoryOnly) {
     const textResponse =
       workspace?.queryRefusalResponse ??
       "There is no relevant information in this workspace to answer your query.";
@@ -403,7 +429,10 @@ async function streamChat({
   // Compress & Assemble message to ensure prompt passes token limit with room for response
   // and build system messages based on inputs and history.
   const messages = await LLMConnector.compressMessages({
-    systemPrompt: systemPrompt ?? (await chatPrompt(workspace)),
+    systemPrompt: withChatHistoryOnlyGuide(
+      systemPrompt ?? (await chatPrompt(workspace)),
+      chatHistoryOnly
+    ),
     userPrompt: String(prompt),
     contextTexts,
     chatHistory: history,

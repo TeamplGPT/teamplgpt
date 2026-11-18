@@ -963,15 +963,18 @@ async function streamChat({
         ? LLMConnector.toolCallingFormat()
         : null;
     const rawTools =
+      !chatHistoryOnly &&
       typeof LLMConnector.supportsToolCalling === "function" &&
       LLMConnector.supportsToolCalling()
         ? ChatToolsManager.getToolDefinitions(providerFormat)
         : null;
-    const { tools, toolChoice } = routeHrToolsForMessage({
-      tools: rawTools,
-      providerFormat,
-      message,
-    });
+    const { tools, toolChoice } = chatHistoryOnly
+      ? { tools: null, toolChoice: undefined }
+      : routeHrToolsForMessage({
+          tools: rawTools,
+          providerFormat,
+          message,
+        });
     const {
       completeText: finalText,
       metrics: finalMetrics,

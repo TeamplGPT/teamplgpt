@@ -354,12 +354,16 @@ class EphemeralAgentHandler extends AgentHandler {
       )
     );
 
-    this.#funcsToLoad = [
-      ...(await agentSkillsFromSystemSettings()),
-      ...ImportedPlugin.activeImportedPlugins(),
-      ...AgentFlows.activeFlowPlugins(),
-      ...(await new MCPCompatibilityLayer().activeMCPServers()),
-    ];
+    const { filterToolsForChatHistoryOnly } = require("../chats/chatHistoryOnlyRequest");
+    this.#funcsToLoad = filterToolsForChatHistoryOnly(
+      [
+        ...(await agentSkillsFromSystemSettings()),
+        ...ImportedPlugin.activeImportedPlugins(),
+        ...AgentFlows.activeFlowPlugins(),
+        ...(await new MCPCompatibilityLayer().activeMCPServers()),
+      ],
+      this.#prompt
+    );
   }
 
   async init() {
@@ -380,6 +384,7 @@ class EphemeralAgentHandler extends AgentHandler {
         invocation: {
           workspace: this.#workspace,
           workspace_id: this.#workspace.id,
+          prompt: this.#prompt,
         },
         log: this.log,
       },

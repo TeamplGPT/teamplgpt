@@ -136,7 +136,7 @@ const ENDPOINT_MAP = {
     columns: {
       MD: "날짜(월일)",
       HOLIDAY_YN: "공휴일여부",
-      RESULT: "건수",
+      RESULT: "일정·생일·공휴일 건수",
     },
   },
   // birthday(생일자 명단) — 성명·소속·직위·생일이 다른 직원 정보라 제공 중단(specs/016)
@@ -193,7 +193,7 @@ const QUERY_LABELS = {
   profile_detail: "인사카드 상세",
   org_tree: "조직도",
   org_members: "조직원 목록",
-  todo_count: "할일/미결 건수",
+  todo_count: "할일·쪽지·미결 건수",
   todo_task_count: "미확인 할일 건수",
   todo_note_count: "미확인 쪽지 건수",
   pending_approval_count: "미결 결재 건수",

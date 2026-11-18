@@ -189,27 +189,30 @@ async function streamReactChat(
   let finalAnswer = null;
 
   try {
-    await new DocumentManager({
-      workspace,
-      maxTokens:
-        typeof LLMConnector.promptWindowLimit === "function"
-          ? LLMConnector.promptWindowLimit()
-          : null,
-    })
-      .pinnedDocs()
-      .then((docs) => {
-        docs.forEach((doc) => {
-          const { pageContent, ...metadata } = doc;
-          pinnedDocIdentifiers.push(sourceIdentifier(doc));
-          pinnedContextTexts.push(pageContent);
-          pinnedSources.push({
-            text:
-              pageContent.slice(0, 1_000) +
-              "...continued on in source document...",
-            ...metadata,
+    // 대화 회상만이면 pinned 문서도 넣지 않는다(stream/embed와 동일)
+    if (!chatHistoryOnly) {
+      await new DocumentManager({
+        workspace,
+        maxTokens:
+          typeof LLMConnector.promptWindowLimit === "function"
+            ? LLMConnector.promptWindowLimit()
+            : null,
+      })
+        .pinnedDocs()
+        .then((docs) => {
+          docs.forEach((doc) => {
+            const { pageContent, ...metadata } = doc;
+            pinnedDocIdentifiers.push(sourceIdentifier(doc));
+            pinnedContextTexts.push(pageContent);
+            pinnedSources.push({
+              text:
+                pageContent.slice(0, 1_000) +
+                "...continued on in source document...",
+              ...metadata,
+            });
           });
         });
-      });
+    }
 
     // Keep pinned docs in final citations even if a search returns 0.
     allSources = [...pinnedSources];
