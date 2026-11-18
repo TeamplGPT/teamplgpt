@@ -28,6 +28,10 @@ const {
   isInternalDesignChat,
   INTERNAL_INFO_RULES,
 } = require("./internalDocGuard");
+const {
+  isChatHistoryOnlyRequest,
+  withChatHistoryOnlyGuide,
+} = require("./chatHistoryOnlyRequest");
 
 async function streamChatWithForEmbed(
   response,
@@ -70,13 +74,21 @@ async function streamChatWithForEmbed(
     embed,
     companyName
   );
+  const chatHistoryOnly = isChatHistoryOnlyRequest(message);
 
   // User is trying to query-mode chat a workspace that has no data in it - so
   // we should exit early as no information can be found under these conditions.
   // Skip early exit if a shared workspace exists (merged search may still find results).
+  // 이전 대화만 요약 요청은 문서 없이도 히스토리로 답한다.
   const sharedWorkspace = await Workspace.getShared();
   const hasSharedFallback = sharedWorkspace && sharedWorkspace.id !== embed.workspace.id;
-  if ((!hasVectorizedSpace || embeddingsCount === 0) && chatMode === "query" && !hasSharedFallback && !companyNamespace) {
+  if (
+    !chatHistoryOnly &&
+    (!hasVectorizedSpace || embeddingsCount === 0) &&
+    chatMode === "query" &&
+    !hasSharedFallback &&
+    !companyNamespace
+  ) {
     writeResponseChunk(response, {
       id: uuid,
       type: "textResponse",
@@ -101,29 +113,38 @@ async function streamChatWithForEmbed(
   );
 
   // See stream.js comment for more information on this implementation.
-  await new DocumentManager({
-    workspace: embed.workspace,
-    maxTokens: LLMConnector.promptWindowLimit(),
-  })
-    .pinnedDocs()
-    .then((pinnedDocs) => {
-      // 고정 문서는 전체 본문으로 한 번 판정해 근거·출처에서 함께 뺀다(앞 1,000자만 보는 출처 판정과 어긋나지 않게)
-      pinnedDocs.forEach((doc) => {
-        if (isInternalDesignText(doc.pageContent)) return;
-        const { pageContent, ...metadata } = doc;
-        pinnedDocIdentifiers.push(sourceIdentifier(doc));
-        contextTexts.push(doc.pageContent);
-        sources.push({
-          text:
-            pageContent.slice(0, 1_000) +
-            "...continued on in source document...",
-          ...metadata,
+  // 이전 대화만 요약이면 고정 문서·RAG를 넣지 않는다(취업규칙 등이 대화처럼 요약되던 문제).
+  if (!chatHistoryOnly) {
+    await new DocumentManager({
+      workspace: embed.workspace,
+      maxTokens: LLMConnector.promptWindowLimit(),
+    })
+      .pinnedDocs()
+      .then((pinnedDocs) => {
+        // 고정 문서는 전체 본문으로 한 번 판정해 근거·출처에서 함께 뺀다(앞 1,000자만 보는 출처 판정과 어긋나지 않게)
+        pinnedDocs.forEach((doc) => {
+          if (isInternalDesignText(doc.pageContent)) return;
+          const { pageContent, ...metadata } = doc;
+          pinnedDocIdentifiers.push(sourceIdentifier(doc));
+          contextTexts.push(doc.pageContent);
+          sources.push({
+            text:
+              pageContent.slice(0, 1_000) +
+              "...continued on in source document...",
+            ...metadata,
+          });
         });
       });
-    });
+  }
 
-  const vectorSearchResults =
-    embeddingsCount !== 0 || companyNamespace
+  const vectorSearchResults = chatHistoryOnly
+    ? {
+        contextTexts: [],
+        sources: [],
+        message: null,
+        companyContextTexts: [],
+      }
+    : embeddingsCount !== 0 || companyNamespace
       ? await performMergedSearch({
           workspace: embed.workspace,
           input: message,
@@ -188,7 +209,7 @@ async function streamChatWithForEmbed(
 
   // If in query mode and no sources are found in current search or backfilled from history, do not
   // let the LLM try to hallucinate a response or use general knowledge
-  if (chatMode === "query" && contextTexts.length === 0) {
+  if (chatMode === "query" && contextTexts.length === 0 && !chatHistoryOnly) {
     writeResponseChunk(response, {
       id: uuid,
       type: "textResponse",
@@ -228,12 +249,15 @@ async function streamChatWithForEmbed(
       : [];
   const messages = await LLMConnector.compressMessages(
     {
-      systemPrompt: appendCompanyRules(
-        buildEmbedSystemPrompt(
-          await chatPrompt(embed.workspace, username, allowedToolNames),
-          allowedToolNames
+      systemPrompt: withChatHistoryOnlyGuide(
+        appendCompanyRules(
+          buildEmbedSystemPrompt(
+            await chatPrompt(embed.workspace, username, allowedToolNames),
+            allowedToolNames
+          ),
+          companyContextTexts.length > 0
         ),
-        companyContextTexts.length > 0
+        chatHistoryOnly
       ),
       userPrompt: message,
       contextTexts,

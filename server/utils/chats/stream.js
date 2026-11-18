@@ -21,6 +21,10 @@ const {
 const { ChatTraceLogger } = require("./traceLogger");
 const { ChatToolsManager } = require("./toolCalling/manager");
 const { toolCallingLoop } = require("./toolCalling/loop");
+const {
+  isChatHistoryOnlyRequest,
+  withChatHistoryOnlyGuide,
+} = require("./chatHistoryOnlyRequest");
 
 const VALID_CHAT_MODE = ["chat", "query", "react"];
 
@@ -84,13 +88,20 @@ async function streamChatWithWorkspace(
   const messageLimit = workspace?.openAiHistory || 20;
   const hasVectorizedSpace = await VectorDb.hasNamespace(workspace.slug);
   const embeddingsCount = await VectorDb.namespaceCount(workspace.slug);
+  const chatHistoryOnly = isChatHistoryOnlyRequest(updatedMessage);
 
   // User is trying to query-mode chat a workspace that has no data in it - so
   // we should exit early as no information can be found under these conditions.
   // Skip early exit if a shared workspace exists (merged search may still find results).
+  // 이전 대화만 요약 요청은 문서 없이도 히스토리로 답한다.
   const sharedWorkspace = await Workspace.getShared();
   const hasSharedFallback = sharedWorkspace && sharedWorkspace.id !== workspace.id;
-  if ((!hasVectorizedSpace || embeddingsCount === 0) && chatMode === "query" && !hasSharedFallback) {
+  if (
+    !chatHistoryOnly &&
+    (!hasVectorizedSpace || embeddingsCount === 0) &&
+    chatMode === "query" &&
+    !hasSharedFallback
+  ) {
     logger.traceStart({ query: updatedMessage, workspace, chatHistoryCount: 0, pinnedDocsCount: 0, parsedFilesCount: 0 });
     logger.searchSkipped("no embeddings");
     logger.traceEnd({ reason: "query_no_embeddings" });
@@ -144,40 +155,43 @@ async function streamChatWithWorkspace(
   // it will undergo prompt compression anyway to make it work. If there is so much pinned that the context here is bigger than
   // what the model can support - it would get compressed anyway and that really is not the point of pinning. It is really best
   // suited for high-context models.
-  await new DocumentManager({
-    workspace,
-    maxTokens: LLMConnector.promptWindowLimit(),
-  })
-    .pinnedDocs()
-    .then((pinnedDocs) => {
-      pinnedDocs.forEach((doc) => {
-        const { pageContent, ...metadata } = doc;
-        pinnedDocIdentifiers.push(sourceIdentifier(doc));
-        contextTexts.push(doc.pageContent);
-        sources.push({
-          text:
-            pageContent.slice(0, 1_000) +
-            "...continued on in source document...",
-          ...metadata,
+  let parsedFiles = [];
+  if (!chatHistoryOnly) {
+    await new DocumentManager({
+      workspace,
+      maxTokens: LLMConnector.promptWindowLimit(),
+    })
+      .pinnedDocs()
+      .then((pinnedDocs) => {
+        pinnedDocs.forEach((doc) => {
+          const { pageContent, ...metadata } = doc;
+          pinnedDocIdentifiers.push(sourceIdentifier(doc));
+          contextTexts.push(doc.pageContent);
+          sources.push({
+            text:
+              pageContent.slice(0, 1_000) +
+              "...continued on in source document...",
+            ...metadata,
+          });
         });
       });
-    });
 
-  // Inject any parsed files for this workspace/thread/user
-  const parsedFiles = await WorkspaceParsedFiles.getContextFiles(
-    workspace,
-    thread || null,
-    user || null
-  );
-  parsedFiles.forEach((doc) => {
-    const { pageContent, ...metadata } = doc;
-    contextTexts.push(doc.pageContent);
-    sources.push({
-      text:
-        pageContent.slice(0, 1_000) + "...continued on in source document...",
-      ...metadata,
+    // Inject any parsed files for this workspace/thread/user
+    parsedFiles = await WorkspaceParsedFiles.getContextFiles(
+      workspace,
+      thread || null,
+      user || null
+    );
+    parsedFiles.forEach((doc) => {
+      const { pageContent, ...metadata } = doc;
+      contextTexts.push(doc.pageContent);
+      sources.push({
+        text:
+          pageContent.slice(0, 1_000) + "...continued on in source document...",
+        ...metadata,
+      });
     });
-  });
+  }
 
   logger.traceStart({
     query: updatedMessage,
@@ -188,8 +202,13 @@ async function streamChatWithWorkspace(
   });
 
   const searchStartMs = Date.now();
-  const vectorSearchResults =
-    embeddingsCount !== 0
+  const vectorSearchResults = chatHistoryOnly
+    ? {
+        contextTexts: [],
+        sources: [],
+        message: null,
+      }
+    : embeddingsCount !== 0
       ? await performMergedSearch({
           workspace,
           input: updatedMessage,
@@ -207,6 +226,9 @@ async function streamChatWithWorkspace(
           sources: [],
           message: null,
         };
+  if (chatHistoryOnly) {
+    logger.searchSkipped("chat_history_only");
+  }
   const searchDurationMs = Date.now() - searchStartMs;
 
   // Failed similarity search if it was run at all and failed.
@@ -271,7 +293,7 @@ async function streamChatWithWorkspace(
 
   // If in query mode and no context chunks are found from search, backfill, or pins -  do not
   // let the LLM try to hallucinate a response or use general knowledge and exit early
-  if (chatMode === "query" && contextTexts.length === 0) {
+  if (chatMode === "query" && contextTexts.length === 0 && !chatHistoryOnly) {
     logger.traceEnd({ reason: "query_no_context" });
     logger.traceSummary();
     const textResponse =
@@ -312,7 +334,10 @@ async function streamChatWithWorkspace(
     );
   }
 
-  const systemPrompt = await chatPrompt(workspace, user);
+  const systemPrompt = withChatHistoryOnlyGuide(
+    await chatPrompt(workspace, user),
+    chatHistoryOnly
+  );
   const messages = await LLMConnector.compressMessages(
     {
       systemPrompt,

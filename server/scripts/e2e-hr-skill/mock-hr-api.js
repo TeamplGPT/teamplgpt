@@ -234,6 +234,11 @@ const FIXTURES_BY_PATH = {
       { title: "전사 워크숍" },
     ],
   },
+  // 할일·쪽지·미결 건수(getTodoIconCnt) — K71: 결재 대기 질문은 미결 결재만 표에 나와야 함
+  // (pending_approval_count). 할일·쪽지 열이 답에 나오면 FAIL.
+  "/getTodoIconCnt.do": {
+    todoCnt: [{ cnt1: 2, cnt2: 1, cnt3: 3 }],
+  },
 };
 
 // 연장근무현황(모바일, specs/017) — 한도·사용·잔여(searchType 2=주간, 3=월간)와 날짜별 내역.

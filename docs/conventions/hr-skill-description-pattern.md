@@ -225,10 +225,10 @@ enum이 하나뿐인 skill(`hr-certificate`, `hr-welfare`).
 | skill | ver | query_type 수 | 주기 파라미터 | 코드성 파라미터 | required | examples | B 형태 | 폴백 값 | 경계 위임처 |
 |---|---|---|---|---|---|---|---|---|---|
 | `hr-attendance` | 2.1.0 | 8 | `year_month`, `date` | — | `query_type` | 21 | 다값형 | `annual_leave_balance` | hr-approval, hr-salary, (다른 직원 근태 미제공) |
-| `hr-personnel` | 2.2.0 | 8 | `year_month`, `date` | `org_cd` | `query_type` | 14 | 다값형 | `profile` | hr-year-end-tax, hr-approval, (다른 직원 개인 정보 미제공) |
+| `hr-personnel` | 2.4.0 | 11 | `year_month`, `date` | `org_cd` | `query_type` | 17 | 다값형 | `profile` | hr-year-end-tax, hr-approval, (다른 직원 개인 정보 미제공) |
 | `hr-salary` | 2.2.0 | 6 | `year_month` | `pay_item` | `query_type` | 8 | 선행 조회 의존형 | (2단계 규칙) | hr-year-end-tax |
 | `hr-year-end-tax` | 2.1.0 | 9 | `cal_yy` | — | `query_type` | 12 | 다값형 | `summary` | hr-salary |
-| `hr-approval` | 1.0.0 | 1 | `year_month` | — | `query_type` | 3 | 단일값형(`drafted`) | — | hr-personnel(todo_count), hr-attendance, (남이 올린 문서 미제공) |
+| `hr-approval` | 1.0.0 | 1 | `year_month` | — | `query_type` | 3 | 단일값형(`drafted`) | — | hr-personnel(pending_approval_count), hr-attendance, (남이 올린 문서 미제공) |
 | `hr-certificate` | 1.0.0 | 1 | — | — | `query_type` | 4 | 단일값형 | — | (발급 신청 불가 명시) |
 | `hr-welfare` | 1.0.0 | 1 | — | — | `query_type` | 4 | 단일값형 | — | hr-year-end-tax, 미지원 항목 안내 |
 

@@ -350,6 +350,7 @@ class Provider {
     provider = null,
     workspace = null,
     user = null,
+    userPrompt = null,
   }) {
     const base = !workspace?.openAiPrompt
       ? Provider.defaultSystemPromptForProvider(provider)
@@ -359,7 +360,20 @@ class Provider {
           workspace.id
         );
     const hrGuard = Provider.hrSkillPeriodGuard();
-    return hrGuard ? `${base}\n\n${hrGuard}` : base;
+    let prompt = hrGuard ? `${base}\n\n${hrGuard}` : base;
+    try {
+      const {
+        isChatHistoryOnlyRequest,
+        withChatHistoryOnlyGuide,
+      } = require("../../../chats/chatHistoryOnlyRequest");
+      prompt = withChatHistoryOnlyGuide(
+        prompt,
+        isChatHistoryOnlyRequest(userPrompt)
+      );
+    } catch (_) {
+      /* optional guide */
+    }
+    return prompt;
   }
 
   /**

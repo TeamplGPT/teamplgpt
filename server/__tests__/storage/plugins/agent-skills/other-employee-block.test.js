@@ -31,6 +31,9 @@ describe("otherEmployee 모듈 — 제공 중단 조회 판정", () => {
     ["hr-personnel", "org_members"],
     ["hr-personnel", "org_tree"],
     ["hr-personnel", "todo_count"],
+    ["hr-personnel", "todo_task_count"],
+    ["hr-personnel", "todo_note_count"],
+    ["hr-personnel", "pending_approval_count"],
     ["hr-personnel", "schedule_day"],
     ["hr-personnel", "schedule_titles"],
     ["hr-approval", "drafted"],
@@ -118,7 +121,19 @@ describe("제공 중단 조회는 HR 호출 없이 거절한다 (US2)", () => {
   });
 
   it("미결 건수(todo_count)는 그대로 조회한다", async () => {
-    const { calls } = await runHandler("hr-personnel", { query_type: "todo_count" }, () => ({ DATA: [{ CNT1: "1", CNT2: "0", CNT3: "2" }] }));
+    const { calls } = await runHandler("hr-personnel", { query_type: "todo_count" }, () => ({
+      DATA: [{ CNT1: "1", CNT2: "0", CNT3: "2" }],
+    }));
+    expect(calls).toHaveLength(1);
+    expect(calls[0].path).toBe("/getTodoIconCnt.do");
+  });
+
+  it("결재 대기 건수(pending_approval_count)는 그대로 조회한다", async () => {
+    const { calls } = await runHandler(
+      "hr-personnel",
+      { query_type: "pending_approval_count" },
+      () => ({ todoCnt: [{ cnt1: 1, cnt2: 0, cnt3: 2 }] }),
+    );
     expect(calls).toHaveLength(1);
     expect(calls[0].path).toBe("/getTodoIconCnt.do");
   });

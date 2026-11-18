@@ -13,6 +13,10 @@ const {
 } = require("../../vectorSearch/searchModeHelpers");
 const { Workspace } = require("../../../models/workspace");
 const { ChatTraceLogger } = require("../traceLogger");
+const {
+  isChatHistoryOnlyRequest,
+  withChatHistoryOnlyGuide,
+} = require("../chatHistoryOnlyRequest");
 
 // Maximum characters per search observation to prevent LLM context window overflow.
 // Tune based on model context limits.
@@ -150,11 +154,15 @@ async function streamReactChat(
     messageLimit,
   });
 
+  const chatHistoryOnly = isChatHistoryOnlyRequest(message);
   const basePrompt = await chatPrompt(workspace, user);
   const hasAttachments = attachments.length > 0;
-  const systemPrompt = buildReactSystemPrompt(basePrompt, {
-    hasImages: hasAttachments,
-  });
+  const systemPrompt = withChatHistoryOnlyGuide(
+    buildReactSystemPrompt(basePrompt, {
+      hasImages: hasAttachments,
+    }),
+    chatHistoryOnly
+  );
 
   // Build initial messages array with system prompt, chat history, and user message.
   // Strip attachments from chat history — only the current user message includes images.
@@ -299,6 +307,12 @@ async function streamReactChat(
         let observation = "";
         let currentSearchSourceCount = 0;
         const searchStartMs = Date.now();
+        // 이전 대화만 회상/요약 요청이면 문서 검색 결과를 넣지 않는다
+        if (chatHistoryOnly) {
+          observation =
+            "Document search skipped. Answer using chat history only; do not invent content from workplace documents.";
+          logger.searchSkipped("chat_history_only");
+        } else {
         // Skip local-only fallback if shared workspace exists (merged search may find results)
         const sharedWorkspace = await Workspace.getShared();
         const hasSharedFallback = sharedWorkspace && sharedWorkspace.id !== workspace.id;
@@ -395,6 +409,7 @@ async function streamReactChat(
               .join("\n\n");
           }
         }
+        } // end !chatHistoryOnly
 
         // Truncate observation to prevent context overflow
         const wasTruncated = observation.length > OBSERVATION_MAX_CHARS;

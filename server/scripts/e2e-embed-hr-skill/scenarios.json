@@ -708,11 +708,13 @@
         "tool_call": true,
         "mock_url_pattern": "^/getTodoIconCnt\\.do",
         "answer_not_pattern": [
-          "다른 직원"
+          "다른 직원",
+          "미확인 할일",
+          "미확인 쪽지"
         ]
       },
       "repeat": 1,
-      "note": "specs/016 후속 코드 리뷰. 거절 선택지 설명에 건수 예외가 없을 때 '다른 직원의 정보는 조회할 수 없습니다'로 거절한 사례가 있었다(3회 중 1회). 건수는 todo_count로 답해야 한다."
+      "note": "specs/016 후속 코드 리뷰. 거절 선택지 설명에 건수 예외가 없을 때 '다른 직원의 정보는 조회할 수 없습니다'로 거절한 사례가 있었다(3회 중 1회). 건수는 pending_approval_count로 답해야 한다."
     },
     {
       "id": "EC-ALLOW-25",
@@ -1428,18 +1430,20 @@
     {
       "id": "EC-ALLOW-53",
       "axis": "ALLOW",
-      "label": "결재 대기 여부 — 거절하지 않고 할일 건수로 답함",
+      "label": "결재 대기 여부 — 거절하지 않고 미결 결재 건수로 답함",
       "embed_config": "e2e-embed-allow-all",
       "message": "내가 결재할 문서 있어?",
       "expect": {
         "tool_call": true,
         "mock_url_pattern": "^/getTodoIconCnt\\.do",
         "answer_not_pattern": [
-          "다른 직원"
+          "다른 직원",
+          "미확인 할일",
+          "미확인 쪽지"
         ]
       },
       "repeat": 1,
-      "note": "2026-11-18 운영 4차 테스트 H37 — '내가 결재할 문서 있어?'를 다른 직원 정보라며 거절. 있는지·몇 건인지는 todo_count로 답한다. 수정 전 FAIL 기대."
+      "note": "2026-11-18 운영 4차 테스트 H37 — '내가 결재할 문서 있어?'를 다른 직원 정보라며 거절. 있는지·몇 건인지는 pending_approval_count(미결 결재만)로 답한다."
     },
     {
       "id": "EC-ALLOW-54",

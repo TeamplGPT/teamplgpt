@@ -78,7 +78,7 @@ node evals/hr-routing/run.js --verbose        # PASS 케이스도 출력
 | 휴가 | 팀·조직의 휴가자 | hr-attendance.vacation_calendar |
 | 휴가 | 신청서의 결재 진행 상태 | hr-approval.drafted |
 | 결재·미결 | 문서 목록·내용 | hr-approval.* |
-| 결재·미결 | 건수만("몇 건") | hr-personnel.todo_count |
+| 결재·미결 | 건수만("몇 건") | hr-personnel.pending_approval_count |
 | 교육 | 수강 이력·이수 시간 | hr-personnel.education |
 | 교육 | 교육비 공제 | hr-year-end-tax.education |
 | 가족 | 부양가족 공제·등록 현황 | hr-year-end-tax.family |

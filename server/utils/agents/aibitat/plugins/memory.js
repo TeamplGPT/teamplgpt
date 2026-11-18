@@ -16,7 +16,7 @@ const memory = {
           tracker: new Deduplicator(),
           name: this.name,
           description:
-            "Search against local documents for context that is relevant to the query or store a snippet of text into memory for retrieval later. Storing information should only be done when the user specifically requests for information to be remembered or saved to long-term memory. You should use this tool before search the internet for information. Do not use this tool unless you are explicitly told to 'remember' or 'store' information.",
+            "Search against local documents for context that is relevant to the query or store a snippet of text into memory for retrieval later. Storing information should only be done when the user specifically requests for information to be remembered or saved to long-term memory. You should use this tool before search the internet for information. Do not use this tool unless you are explicitly told to 'remember' or 'store' information. Do NOT use this tool when the user asks to summarize, recall, or review the current chat/conversation history only — answer from the chat messages without searching documents.",
           examples: [
             {
               prompt: "What is AnythingLLM?",

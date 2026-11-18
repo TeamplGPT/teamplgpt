@@ -107,6 +107,27 @@ const ENDPOINT_MAP = {
       CNT3: "미결 결재",
     },
   },
+  // 할일만 — 같은 API, CNT1만
+  todo_task_count: {
+    path: "/getTodoIconCnt.do", staffParam: null, gate: false,
+    columns: {
+      CNT1: "미확인 할일",
+    },
+  },
+  // 쪽지만 — 같은 API, CNT2만
+  todo_note_count: {
+    path: "/getTodoIconCnt.do", staffParam: null, gate: false,
+    columns: {
+      CNT2: "미확인 쪽지",
+    },
+  },
+  // 결재 대기·미결 건수만 — 같은 API지만 할일·쪽지 열을 빼 결재 질문에 노이즈가 안 나가게 한다
+  pending_approval_count: {
+    path: "/getTodoIconCnt.do", staffParam: null, gate: false,
+    columns: {
+      CNT3: "미결 결재",
+    },
+  },
   // getScheduleDay는 일자별 "건수"만 준다(집계 쿼리) — 무엇인지는 안 담겨 있다.
   // "생일자 몇 명" 같은 건수 질문에만 쓴다. "누구 생일인지"는 다른 직원 정보라 제공하지 않는다(specs/016).
   schedule_day: {
@@ -173,6 +194,9 @@ const QUERY_LABELS = {
   org_tree: "조직도",
   org_members: "조직원 목록",
   todo_count: "할일/미결 건수",
+  todo_task_count: "미확인 할일 건수",
+  todo_note_count: "미확인 쪽지 건수",
+  pending_approval_count: "미결 결재 건수",
   schedule_day: "일정/생일/공휴일 건수",
   schedule_titles: "일정/공휴일 제목",
   education: "교육이력",
